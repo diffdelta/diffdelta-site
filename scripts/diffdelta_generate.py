@@ -402,8 +402,13 @@ def compute_buckets(prev_state: Dict[str, Any], posts: List[Dict[str, Any]]) -> 
 
 
 def set_known_issues(issues: List[Dict[str, Any]]) -> None:
-    # Keep known_issues about DIFFDELTA health, not upstream drama.
-    write_json_atomic(KNOWN_ISSUES_PATH, {"issues": issues, "updated_at": now_iso()})
+    # Must match known_issues.schema.json: schema_version, generated_at, issues
+    payload = {
+        "schema_version": SCHEMA_VERSION,
+        "generated_at": now_iso(),
+        "issues": issues,
+    }
+    write_json_atomic(KNOWN_ISSUES_PATH, payload)
 
 
 def main() -> None:
