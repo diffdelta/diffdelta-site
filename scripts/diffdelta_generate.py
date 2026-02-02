@@ -238,15 +238,11 @@ def build_delta_item(
     content, did_redact = redact_suspect_secrets(content)
     redacted = redacted or did_redact
 
-    # summary: title + small preview, but never huge
-    preview = content.strip().replace("\n", " ")
-    preview = preview[:280] + ("…" if len(preview) > 280 else "")
-    summary_bits = []
+    # summary: keep stable to avoid churn (title-only)
     if isinstance(title, str) and title.strip():
-        summary_bits.append(title.strip())
-    if preview:
-        summary_bits.append(preview)
-    summary = clamp_summary(" — ".join(summary_bits) if summary_bits else "Update detected.")
+        summary = clamp_summary(title.strip())
+    else:
+        summary = "Update detected."
 
     # action_items: conservative suggestions only
     action_items = []
