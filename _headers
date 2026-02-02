@@ -1,14 +1,24 @@
+# Diff feeds (polled often): cache briefly but always revalidate
 /diff/*
-  Cache-Control: public, max-age=60
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=60, s-maxage=60, must-revalidate
 
+# Known issues: changes occasionally, but you still want fast propagation
 /known_issues.json
-  Cache-Control: public, max-age=60
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=60, s-maxage=60, must-revalidate
 
+# Discovery manifest: cache a bit longer, but still revalidate
 /.well-known/*
-  Cache-Control: public, max-age=300
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=300, s-maxage=300, must-revalidate
 
+# Schemas are versioned (v1/...), so they can be cached hard
 /schema/*
-  Cache-Control: public, max-age=86400
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=31536000, immutable
 
+# Health endpoint: never cache
 /healthz.json
+  Content-Type: application/json; charset=utf-8
   Cache-Control: no-store
