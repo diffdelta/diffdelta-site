@@ -4,14 +4,45 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>DiffDelta</title>
+    <meta name="description" content="A secure changefeed protocol for AI agents. Poll normalized, risk-vetted JSON diffs instead of re-scraping the web." />
   </head>
-  <body style="font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 40px; max-width: 900px;">
-    <h1>DiffDelta</h1>
-    <p>DiffDelta is a bot-first changefeed. Start here:</p>
-    <ul>
-      <li><a href="/.well-known/diffdelta.json">/.well-known/diffdelta.json</a></li>
-      <li><a href="/diff/latest.json">/diff/latest.json</a></li>
-      <li><a href="/known_issues.json">/known_issues.json</a></li>
+  <body style="font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif; margin: 40px; max-width: 920px; line-height: 1.45;">
+    <h1 style="margin: 0 0 10px 0;">DiffDelta</h1>
+
+    <p style="margin: 0 0 18px 0;">
+      DiffDelta is a secure changefeed protocol for AI agents. Instead of re-scraping pages, bots poll a normalized,
+      risk-vetted JSON diff stream and act only on changes.
+    </p>
+
+    <h2 style="font-size: 16px; margin: 22px 0 8px 0;">Canonical entry point</h2>
+    <ul style="margin-top: 0;">
+      <li><a href="/.well-known/diffdelta.json">/.well-known/diffdelta.json</a> <span style="color:#666;">(discovery manifest)</span></li>
     </ul>
+
+    <h2 style="font-size: 16px; margin: 22px 0 8px 0;">Feeds</h2>
+    <ul style="margin-top: 0;">
+      <li><a href="/diff/latest.json">/diff/latest.json</a> <span style="color:#666;">(global aggregated feed)</span></li>
+      <li><a href="/diff/source/moltbook/latest.json">/diff/source/{source}/latest.json</a> <span style="color:#666;">(per-source feed)</span></li>
+      <li><a href="/known_issues.json">/known_issues.json</a> <span style="color:#666;">(operational memory)</span></li>
+    </ul>
+
+    <h2 style="font-size: 16px; margin: 22px 0 8px 0;">Schemas</h2>
+    <ul style="margin-top: 0;">
+      <li><a href="/schema/v1/wellknown.schema.json">/schema/v1/wellknown.schema.json</a></li>
+      <li><a href="/schema/v1/diff.schema.json">/schema/v1/diff.schema.json</a></li>
+      <li><a href="/schema/v1/known_issues.schema.json">/schema/v1/known_issues.schema.json</a></li>
+    </ul>
+
+    <h2 style="font-size: 16px; margin: 22px 0 8px 0;">Golden path (bot loop)</h2>
+    <ol style="margin-top: 0;">
+      <li>Fetch the manifest (<a href="/.well-known/diffdelta.json">/.well-known/diffdelta.json</a>) to discover endpoints.</li>
+      <li>Poll <a href="/diff/latest.json">/diff/latest.json</a> using <code>If-None-Match</code> (ETag) when available.</li>
+      <li>If you receive <code>304 Not Modified</code> or <code>"changed": false</code>, stop.</li>
+      <li>Process <code>new</code>, <code>updated</code>, and <code>resolved</code>. Treat <code>flagged</code> as quarantine.</li>
+    </ol>
+
+    <p style="margin: 22px 0 0 0; color:#666; font-size: 14px;">
+      Status: Alpha. Schemas are stable and changes are additive.
+    </p>
   </body>
 </html>
