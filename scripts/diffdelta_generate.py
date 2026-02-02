@@ -283,11 +283,6 @@ def build_delta_item(
         if isinstance((p.get("submolt") or p.get("community")), dict)
         else (p.get("submolt") or p.get("community"))
     ),
-    "submolt_display_name": (
-        (p.get("submolt") or p.get("community") or {}).get("display_name")
-        if isinstance((p.get("submolt") or p.get("community")), dict)
-        else None
-    ),
 
     "score": p.get("score") or p.get("upvotes"),
     "comment_count": p.get("comment_count") or p.get("comments"),
