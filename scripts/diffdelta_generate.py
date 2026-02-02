@@ -269,13 +269,29 @@ def build_delta_item(
         "summary": summary,
         "risk": {"score": float(max(0.0, min(1.0, risk_score))), "reasons": risk_reasons[:10]},
         "provenance": {"fetched_at": fetched_at, "evidence_urls": [url]},
-        "source_payload": {
-            # Keep it small-ish; don't dump entire post bodies if huge
-            "author": (p.get("author") or {}).get("name") if isinstance(p.get("author"), dict) else p.get("author"),
-            "submolt": p.get("submolt") or p.get("community"),
-            "score": p.get("score") or p.get("upvotes"),
-            "comment_count": p.get("comment_count") or p.get("comments"),
-            "redacted": redacted,
+     "source_payload": {
+    "author": (p.get("author") or {}).get("name") if isinstance(p.get("author"), dict) else p.get("author"),
+
+    # submolt/community can be dict-like; flatten to stable scalars to reduce churn
+    "submolt_id": (
+        (p.get("submolt") or p.get("community") or {}).get("id")
+        if isinstance((p.get("submolt") or p.get("community")), dict)
+        else None
+    ),
+    "submolt_name": (
+        (p.get("submolt") or p.get("community") or {}).get("name")
+        if isinstance((p.get("submolt") or p.get("community")), dict)
+        else (p.get("submolt") or p.get("community"))
+    ),
+    "submolt_display_name": (
+        (p.get("submolt") or p.get("community") or {}).get("display_name")
+        if isinstance((p.get("submolt") or p.get("community")), dict)
+        else None
+    ),
+
+    "score": p.get("score") or p.get("upvotes"),
+    "comment_count": p.get("comment_count") or p.get("comments"),
+    "redacted": redacted,
         },
     }
 
