@@ -57,7 +57,7 @@ def main():
 
     # 1b) telemetry exists (not yet required in discovery)
     if not os.path.exists(TELEMETRY_LATEST):
-    raise RuntimeError(f"Telemetry missing on disk: {TELEMETRY_LATEST}")
+        raise RuntimeError(f"Telemetry missing on disk: {TELEMETRY_LATEST}")
 
     # 2) validate payloads if schemas exist under your naming
     diff_schema = os.path.join(SCHEMA_DIR, "diff.schema.json")
