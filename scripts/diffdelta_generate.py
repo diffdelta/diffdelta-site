@@ -146,9 +146,10 @@ def content_fingerprint(p: Dict[str, Any]) -> str:
 
 # Very rough token-ish patterns (keep conservative to avoid over-flagging)
 TOKEN_PATTERNS = [
-    re.compile(r"\bsk-[A-Za-z0-9]{20,}\b"),             # looks like an API key format
-    re.compile(r"\b[A-Za-z0-9_\-]{32,}\b"),             # long token-ish strings
-    re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),  # private key block
+    re.compile(r"\bsk-[A-Za-z0-9]{20,}\b"),
+    re.compile(r"\beyJ[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}\b"),
+    re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
+    re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
 ]
 
 KEYWORDS = {
