@@ -45,6 +45,13 @@ def parse_iso(ts: str) -> Optional[datetime]:
     except Exception:
         return None
 
+
+# --- cursor helpers (Fix B) ---
+
+def make_cursor(updated_at: str, stable_id: str) -> str:
+    return f"{updated_at}|{stable_id}"
+
+
 def parse_cursor(cursor: str) -> Tuple[datetime, str]:
     """
     Cursor format: "{iso_ts}|{stable_id}"
@@ -69,7 +76,6 @@ def is_after_cursor(updated_at: str, pid: str, boundary_cursor: str) -> bool:
         return True
     if udt < bdt:
         return False
-    # same second
     return str(pid) > str(bid)
 
 
@@ -93,6 +99,19 @@ def write_json_atomic(path: str, obj: Any) -> None:
 
 def sha256(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
+
+
+def load_prev_published_cursor() -> str:
+    """
+    Fix B: the emit boundary comes from the *previous published feed*,
+    not from private state.
+    """
+    prev_feed = read_json(MOLT_LATEST_PATH, default={})
+    if isinstance(prev_feed, dict):
+        c = prev_feed.get("cursor")
+        if isinstance(c, str) and c:
+            return c
+    return "init|0"
 
 
 # --- moltbook fetch ---
@@ -181,7 +200,7 @@ def best_effort_times(p: Dict[str, Any]) -> Tuple[str, str]:
 
 def content_fingerprint(p: Dict[str, Any]) -> str:
     """
-    Used to detect content changes. Keep it stable and cheap.
+    Used to detect content changes (optional). Keep it stable and cheap.
     """
     title = p.get("title") or ""
     content = p.get("content") or ""
@@ -192,7 +211,6 @@ def content_fingerprint(p: Dict[str, Any]) -> str:
 
 # --- risk / flags (defensive; no exploit content) ---
 
-# Conservative token-ish patterns (high-confidence formats)
 TOKEN_PATTERNS = [
     re.compile(r"\bsk-[A-Za-z0-9]{20,}\b"),
     re.compile(r"\beyJ[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}\b"),  # JWT
@@ -202,7 +220,6 @@ TOKEN_PATTERNS = [
 ]
 
 KEYWORDS = {
-    # secret-ish / credential-ish
     "api_key": "possible_secret",
     "private_key": "possible_secret",
     "api key": "possible_secret",
@@ -216,7 +233,6 @@ KEYWORDS = {
     "authorization": "possible_secret",
     "jwt": "possible_secret",
 
-    # incident-ish
     "supabase": "security_incident_terms",
     "data leak": "security_incident_terms",
     "db leak": "security_incident_terms",
@@ -227,7 +243,6 @@ KEYWORDS = {
     "database dump": "security_incident_terms",
     "credential dump": "security_incident_terms",
 
-    # prompt injection-ish
     "prompt injection": "prompt_injection_language",
     "ignore previous": "prompt_injection_language",
     "system prompt": "prompt_injection_language",
@@ -278,10 +293,6 @@ def clamp_summary(s: str) -> str:
     return s if s else "Update detected."
 
 
-def make_cursor(updated_at: str, stable_id: str) -> str:
-    return f"{updated_at}|{stable_id}"
-
-
 def build_delta_item(
     p: Dict[str, Any],
     fetched_at: str,
@@ -299,13 +310,12 @@ def build_delta_item(
     content, did_redact = redact_suspect_secrets(content)
     redacted = redacted or did_redact
 
-    # summary: keep stable to avoid churn (title-only)
+    # summary: keep stable (title-only) to avoid churn
     if isinstance(title, str) and title.strip():
         summary = clamp_summary(title.strip())
     else:
         summary = "Update detected."
 
-    # action_items: conservative suggestions only
     action_items: List[Dict[str, Any]] = []
     if risk_score >= 0.7:
         action_items.append({
@@ -322,7 +332,6 @@ def build_delta_item(
             "text": "Monitor for follow-up confirmations or retractions."
         })
 
-    # Flatten submolt/community to stable scalars to reduce diff churn
     community = p.get("submolt") or p.get("community")
     submolt_id = None
     submolt_name = None
@@ -361,11 +370,9 @@ def build_delta_item(
         },
     }
 
-    # drop Nones that aren't required
     if item.get("title") is None:
         item.pop("title", None)
 
-    # drop None values inside source_payload (optional, keeps JSON smaller)
     sp = item.get("source_payload", {})
     if isinstance(sp, dict):
         item["source_payload"] = {k: v for k, v in sp.items() if v is not None}
@@ -374,11 +381,14 @@ def build_delta_item(
 
 
 def compute_buckets(prev_state: Dict[str, Any], posts: List[Dict[str, Any]]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """
+    Fix B: emit boundary is prev_cursor (from published feed).
+    _state.json remains optional for content fingerprint tracking.
+    """
     fetched_at = now_iso()
 
     prev_cursor = prev_state.get("cursor") or "init|0"
     prev_hash_by_id: Dict[str, str] = prev_state.get("hash_by_id") or {}
-    
 
     normalized: List[Dict[str, Any]] = []
     for p in posts:
@@ -393,68 +403,65 @@ def compute_buckets(prev_state: Dict[str, Any], posts: List[Dict[str, Any]]) -> 
             "fp": fp,
         })
 
+    # Sort newest -> oldest
     normalized.sort(
         key=lambda x: (parse_iso(x["updated_at"]) or datetime.min.replace(tzinfo=timezone.utc), x["id"]),
         reverse=True
     )
     normalized = normalized[:MAX_ITEMS]
 
+    # Frontier cursor represents newest observed item (even if we emit nothing)
     if normalized:
-        cursor = make_cursor(normalized[0]["updated_at"], normalized[0]["id"])
+        frontier_cursor = make_cursor(normalized[0]["updated_at"], normalized[0]["id"])
     else:
-        cursor = prev_cursor
+        frontier_cursor = prev_cursor
 
     bucket_new: List[Dict[str, Any]] = []
     bucket_updated: List[Dict[str, Any]] = []
     bucket_resolved: List[Dict[str, Any]] = []
     bucket_flagged: List[Dict[str, Any]] = []
 
-    next_seen_ids: List[str] = []
     next_hash_by_id: Dict[str, str] = dict(prev_hash_by_id)
+    next_seen_ids: List[str] = []  # retained only for future use / debugging
 
     changed = False
 
     for row in normalized:
-        p = row["_raw"]
         pid = row["id"]
-        fp = row["fp"]
 
-        # Boundary rule: only emit items newer than prev_cursor
+        # Boundary: only emit items strictly newer than prev_cursor
         if not is_after_cursor(row["updated_at"], pid, prev_cursor):
-        # Since normalized is sorted newest->oldest, once we hit the boundary we're done.
             break
+
+        p = row["_raw"]
+        fp = row["fp"]
 
         title = p.get("title") if isinstance(p.get("title"), str) else ""
         content = p.get("content") if isinstance(p.get("content"), str) else ""
         risk_score, risk_reasons = risk_assess(f"{title}\n{content}")
 
-        is_new = pid not in prev_seen
-        is_updated = (not is_new) and (prev_hash_by_id.get(pid) != fp)
+        # Fix B: everything beyond boundary is a "new_item"
+        item = build_delta_item(p, fetched_at, "new_item", risk_score, risk_reasons, redacted=False)
+        bucket_new.append(item)
+        changed = True
 
-        item: Optional[Dict[str, Any]] = None
-
-        if is_new:
-            item = build_delta_item(p, fetched_at, "new_item", risk_score, risk_reasons, redacted=False)
-            bucket_new.append(item)
-            changed = True
-        elif is_updated:
-            item = build_delta_item(p, fetched_at, "content_changed", risk_score, risk_reasons, redacted=False)
-            bucket_updated.append(item)
-            changed = True
-
+        # flagged overlay bucket
         if risk_score >= 0.7:
-            if item is None:
-                item = build_delta_item(p, fetched_at, "risk_detected", risk_score, risk_reasons, redacted=False)
             bucket_flagged.append(item)
-            changed = True
 
         next_seen_ids.append(pid)
         next_hash_by_id[pid] = fp
 
-    next_cursor = cursor if changed else prev_cursor
+    # Cursor invariant: if changed=false, cursor must equal prev_cursor
+    next_cursor = frontier_cursor if changed else prev_cursor
 
-    next_seen_ids = list(dict.fromkeys(next_seen_ids + list(prev_seen)))[:500]
-    next_hash_by_id = {k: v for k, v in next_hash_by_id.items() if k in set(next_seen_ids)}
+    # Keep hash map bounded / relevant
+    next_seen_ids = list(dict.fromkeys(next_seen_ids))[:500]
+    if next_seen_ids:
+        next_hash_by_id = {k: v for k, v in next_hash_by_id.items() if k in set(next_seen_ids)}
+    else:
+        # If we emitted nothing, keep prior hashes as-is (optional)
+        next_hash_by_id = prev_hash_by_id
 
     feed = {
         "schema_version": SCHEMA_VERSION,
@@ -485,12 +492,21 @@ def compute_buckets(prev_state: Dict[str, Any], posts: List[Dict[str, Any]]) -> 
 
 
 def set_known_issues(issues: List[Dict[str, Any]]) -> None:
-    payload = {
+    """
+    Avoid churn: don't rewrite known_issues.json if issues array is unchanged.
+    """
+    new_payload = {
         "schema_version": SCHEMA_VERSION,
         "generated_at": now_iso(),
         "issues": issues,
     }
-    write_json_atomic(KNOWN_ISSUES_PATH, payload)
+
+    existing = read_json(KNOWN_ISSUES_PATH, default=None)
+    if isinstance(existing, dict):
+        if existing.get("schema_version") == new_payload["schema_version"] and existing.get("issues") == issues:
+            return
+
+    write_json_atomic(KNOWN_ISSUES_PATH, new_payload)
 
 
 def write_telemetry(
@@ -528,10 +544,12 @@ def write_telemetry(
 
 
 def main() -> None:
+    # Load private state (optional) but cursor boundary comes from published feed
     prev_state = read_json(
         STATE_PATH,
         default={"cursor": "init|0", "seen_ids": [], "hash_by_id": {}, "last_run_at": ""}
     )
+    prev_state["cursor"] = load_prev_published_cursor()
 
     fetch_ok = False
     status_code = 0
@@ -547,29 +565,26 @@ def main() -> None:
 
         feed, next_state = compute_buckets(prev_state, posts)
 
-        # Write per-source
-        write_json_atomic(MOLT_LATEST_PATH, feed)
+        # Only write feeds when changed=true to avoid churn commits
+        if feed.get("changed"):
+            write_json_atomic(MOLT_LATEST_PATH, feed)
+            write_json_atomic(TOP_LATEST_PATH, feed)
 
-        # For now, top-level mirrors moltbook (until you add other sources)
-        write_json_atomic(TOP_LATEST_PATH, feed)
-
-        # Telemetry (written on success)
+        # Always write telemetry
         write_telemetry(fetch_ok, status_code, fetch_duration_ms, items_fetched, feed)
 
-        # Clear diffdelta known issues on success
+        # Clear known issues on success, but no-op if already empty
         set_known_issues([])
 
-        # Persist state last
+        # Persist state last (even if unchanged; not staged by commit step)
         write_json_atomic(STATE_PATH, next_state)
 
         print(
             f"OK: changed={feed['changed']} new={len(feed['new'])} updated={len(feed['updated'])} "
-            f"flagged={len(feed['flagged'])} cursor={feed['cursor']}"
+            f"flagged={len(feed['flagged'])} cursor={feed['cursor']} prev_cursor={feed['prev_cursor']}"
         )
 
     except Exception as e:
-        # Keep known_issues.json schema-valid on error (optional improvement).
-        # If you don't want error runs to write known issues, you can remove this block.
         first_seen = now_iso()
         issue = {
             "issue_key": "moltbook_fetch_failed",
@@ -591,7 +606,6 @@ def main() -> None:
         try:
             set_known_issues([issue])
         except Exception:
-            # Never mask the original error if known_issues writing fails
             pass
 
         print(f"ERROR: {type(e).__name__}: {e}", file=sys.stderr)
@@ -600,4 +614,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
