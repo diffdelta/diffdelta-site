@@ -19,6 +19,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Debug state tracking
+        run: |
+          echo "=== Does state file exist in checkout? ==="
+          ls -la diff/source/moltbook/_state.json || true
+
+          echo "=== Is state file tracked? ==="
+          git ls-files diff/source/moltbook/_state.json || true
+
+          echo "=== Is state file ignored? ==="
+          git check-ignore -v diff/source/moltbook/_state.json && echo "IGNORED" || echo "NOT IGNORED"
+
+          echo "=== First 5 lines of working-tree state ==="
+          sed -n '1,5p' diff/source/moltbook/_state.json || true
+
+          echo "=== First 5 lines of committed (HEAD) state ==="
+          git show HEAD:diff/source/moltbook/_state.json 2>/dev/null | sed -n '1,5p' || echo "NOT IN HEAD"
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
