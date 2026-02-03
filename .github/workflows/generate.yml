@@ -45,14 +45,18 @@ jobs:
           git config user.name "diffdelta-bot"
           git config user.email "diffdelta-bot@users.noreply.github.com"
 
-          # Stage ONLY the public artifacts you want to publish
-          git add diff known_issues.json || true
+          # 1. ONLY stage files that bots actually consume
+          # We explicitly AVOID staging _state.json
+          git add diff/latest.json \
+                  diff/source/moltbook/latest.json \
+                  known_issues.json \
+                  telemetry/latest.json || true
 
+          # 2. Check if anything meaningful changed
           if git diff --cached --quiet; then
-            echo "No publishable changes."
+            echo "No public-facing changes detected. Skipping commit."
             exit 0
           fi
 
           git commit -m "chore: update diff feeds"
           git push
-
