@@ -72,9 +72,9 @@ def main():
 
     telemetry_schema = os.path.join(SCHEMA_DIR, "telemetry.schema.json")
     if os.path.exists(telemetry_schema):
-    validate(telemetry_schema, TELEMETRY_LATEST)
+        validate(telemetry_schema, TELEMETRY_LATEST)
 
-    print("OK: validation passed")
+        print("OK: validation passed")
 
 
 if __name__ == "__main__":
