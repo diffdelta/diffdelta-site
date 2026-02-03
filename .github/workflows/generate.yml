@@ -56,21 +56,23 @@ jobs:
         run: |
           python scripts/diffdelta_validate.py
 
-      - name: Commit if changed
-        run: |
-          set -e
+    - name: Commit if changed
+  run: |
+    set -e
 
-          git config user.name "diffdelta-bot"
-          git config user.email "diffdelta-bot@users.noreply.github.com"
+    git config user.name "diffdelta-bot"
+    git config user.email "diffdelta-bot@users.noreply.github.com"
 
-          # Stage ONLY the files this pipeline owns
-          git add diff known_issues.json telemetry/latest.json diff/source/moltbook/_state.json || true
+    # Stage ONLY the public artifacts that should trigger a commit
+    # (telemetry and _state are operational and will churn every run)
+    git add diff known_issues.json || true
 
-          # If nothing staged, exit clean
-          if git diff --cached --quiet; then
-            echo "No changes."
-            exit 0
-          fi
+    # If nothing staged, exit clean
+    if git diff --cached --quiet; then
+      echo "No publishable changes."
+      exit 0
+    fi
 
-          git commit -m "chore: update diff feeds"
-          git push
+    git commit -m "chore: update diff feeds"
+    git push
+
