@@ -9,6 +9,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 WELL_KNOWN = os.path.join(ROOT, ".well-known", "diffdelta.json")
 SCHEMA_DIR = os.path.join(ROOT, "schema", "v1")
+TELEMETRY_LATEST = os.path.join(ROOT, "telemetry", "latest.json")
 
 
 def load(path):
@@ -54,6 +55,10 @@ def main():
         if not os.path.exists(path):
             raise RuntimeError(f"Discovery endpoint missing on disk: {ep} -> {path}")
 
+    # 1b) telemetry exists (not yet required in discovery)
+    if not os.path.exists(TELEMETRY_LATEST):
+    raise RuntimeError(f"Telemetry missing on disk: {TELEMETRY_LATEST}")
+
     # 2) validate payloads if schemas exist under your naming
     diff_schema = os.path.join(SCHEMA_DIR, "diff.schema.json")
     known_schema = os.path.join(SCHEMA_DIR, "known_issues.schema.json")
@@ -64,6 +69,10 @@ def main():
 
     if os.path.exists(known_schema):
         validate(known_schema, os.path.join(ROOT, "known_issues.json"))
+
+    telemetry_schema = os.path.join(SCHEMA_DIR, "telemetry.schema.json")
+    if os.path.exists(telemetry_schema):
+    validate(telemetry_schema, TELEMETRY_LATEST)
 
     print("OK: validation passed")
 
