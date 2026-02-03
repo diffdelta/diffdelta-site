@@ -42,12 +42,18 @@ jobs:
       - name: Commit if changed
         run: |
           set -e
-          if git diff --quiet; then
+
+          git config user.name "diffdelta-bot"
+          git config user.email "diffdelta-bot@users.noreply.github.com"
+
+          # Stage ONLY the files this pipeline owns
+          git add diff known_issues.json telemetry/latest.json diff/source/moltbook/_state.json || true
+
+          # If nothing staged, exit clean
+          if git diff --cached --quiet; then
             echo "No changes."
             exit 0
           fi
-          git config user.name "diffdelta-bot"
-          git config user.email "diffdelta-bot@users.noreply.github.com"
-          git add diff known_issues.json
+
           git commit -m "chore: update diff feeds"
           git push
