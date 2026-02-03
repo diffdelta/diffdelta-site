@@ -428,27 +428,33 @@ def compute_buckets(prev_state: Dict[str, Any], posts: List[Dict[str, Any]]) -> 
 
     for row in normalized:
         pid = row["id"]
-
-        # Boundary: only emit items strictly newer than prev_cursor
-        if not is_after_cursor(row["updated_at"], pid, prev_cursor):
-            break
-
         p = row["_raw"]
         fp = row["fp"]
-
+        
+        # Risk assessment for both New and Updated items
         title = p.get("title") if isinstance(p.get("title"), str) else ""
         content = p.get("content") if isinstance(p.get("content"), str) else ""
         risk_score, risk_reasons = risk_assess(f"{title}\n{content}")
 
-        # Fix B: everything beyond boundary is a "new_item"
-        item = build_delta_item(p, fetched_at, "new_item", risk_score, risk_reasons, redacted=False)
-        bucket_new.append(item)
-        changed = True
+        # LOGIC A: Is it strictly NEW? (Beyond the cursor)
+        if is_after_cursor(row["updated_at"], pid, prev_cursor):
+            item = build_delta_item(p, fetched_at, "new_item", risk_score, risk_reasons, redacted=False)
+            bucket_new.append(item)
+            changed = True
+            if risk_score >= 0.7:
+                bucket_flagged.append(item)
+        
+        # LOGIC B: Is it an UPDATE? (Behind cursor but fingerprint changed)
+        else:
+            old_hash = prev_hash_by_id.get(pid)
+            if old_hash and fp != old_hash:
+                item = build_delta_item(p, fetched_at, "content_edit", risk_score, risk_reasons, redacted=False)
+                bucket_updated.append(item)
+                changed = True
+                if risk_score >= 0.7:
+                    bucket_flagged.append(item)
 
-        # flagged overlay bucket
-        if risk_score >= 0.7:
-            bucket_flagged.append(item)
-
+        # Always track seen IDs and hashes for the next state
         next_seen_ids.append(pid)
         next_hash_by_id[pid] = fp
 
