@@ -98,13 +98,31 @@ def fetch_moltbook_posts() -> Tuple[List[Dict[str, Any]], int]:
 # --- normalization + diff logic aligned to your schema ---
 
 def best_effort_post_id(p: Dict[str, Any]) -> str:
-    pid = p.get("id") or p.get("post_id")
-    if pid:
-        return str(pid)
+    """
+    Moltbook payloads can vary. Prefer canonical post UUIDs, even if nested.
+    Fall back to a stable hash ONLY if we truly can't find an id.
+    """
+    # Common direct keys
+    for k in ("id", "post_id", "postId"):
+        v = p.get(k)
+        if v:
+            return str(v)
+
+    # Common nested containers
+    for container_key in ("post", "data", "item"):
+        c = p.get(container_key)
+        if isinstance(c, dict):
+            for k in ("id", "post_id", "postId"):
+                v = c.get(k)
+                if v:
+                    return str(v)
+
+    # Fall back to stable-ish hash
     url = p.get("url") or ""
     created = p.get("created_at") or p.get("createdAt") or ""
     title = p.get("title") or ""
-    return sha256(f"{url}\n{created}\n{title}")[:32]
+    content = p.get("content") or ""
+    return sha256(f"{url}\n{created}\n{title}\n{content}")[:32]
 
 
 def best_effort_url(p: Dict[str, Any], pid: str) -> str:
@@ -373,6 +391,10 @@ def compute_buckets(prev_state: Dict[str, Any], posts: List[Dict[str, Any]]) -> 
         p = row["_raw"]
         pid = row["id"]
         fp = row["fp"]
+
+        if pid in prev_seen:
+            print(f"INFO: hit prev_seen id={pid}; stopping early.")
+            break
 
         title = p.get("title") if isinstance(p.get("title"), str) else ""
         content = p.get("content") if isinstance(p.get("content"), str) else ""
