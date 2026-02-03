@@ -45,6 +45,33 @@ def parse_iso(ts: str) -> Optional[datetime]:
     except Exception:
         return None
 
+def parse_cursor(cursor: str) -> Tuple[datetime, str]:
+    """
+    Cursor format: "{iso_ts}|{stable_id}"
+    Returns (ts_dt_utc, id_str). Falls back to epoch on bad input.
+    """
+    if not cursor or not isinstance(cursor, str) or "|" not in cursor:
+        return datetime(1970, 1, 1, tzinfo=timezone.utc), ""
+    ts, sid = cursor.split("|", 1)
+    dt = parse_iso(ts) or datetime(1970, 1, 1, tzinfo=timezone.utc)
+    return dt, (sid or "")
+
+
+def is_after_cursor(updated_at: str, pid: str, boundary_cursor: str) -> bool:
+    """
+    True if (updated_at, pid) is strictly newer than boundary_cursor.
+    Tie-break: updated_at equal -> pid lexicographically greater.
+    """
+    bdt, bid = parse_cursor(boundary_cursor)
+    udt = parse_iso(updated_at) or datetime(1970, 1, 1, tzinfo=timezone.utc)
+
+    if udt > bdt:
+        return True
+    if udt < bdt:
+        return False
+    # same second
+    return str(pid) > str(bid)
+
 
 # --- json io ---
 
@@ -350,7 +377,6 @@ def compute_buckets(prev_state: Dict[str, Any], posts: List[Dict[str, Any]]) -> 
     fetched_at = now_iso()
 
     prev_cursor = prev_state.get("cursor") or "init|0"
-    prev_seen = set(prev_state.get("seen_ids") or [])
     prev_hash_by_id: Dict[str, str] = prev_state.get("hash_by_id") or {}
     
 
@@ -393,8 +419,9 @@ def compute_buckets(prev_state: Dict[str, Any], posts: List[Dict[str, Any]]) -> 
         pid = row["id"]
         fp = row["fp"]
 
-        if pid in prev_seen:
-            print(f"INFO: hit prev_seen id={pid}; stopping early.")
+        # Boundary rule: only emit items newer than prev_cursor
+        if not is_after_cursor(row["updated_at"], pid, prev_cursor):
+        # Since normalized is sorted newest->oldest, once we hit the boundary we're done.
             break
 
         title = p.get("title") if isinstance(p.get("title"), str) else ""
