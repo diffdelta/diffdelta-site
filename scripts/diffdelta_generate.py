@@ -352,11 +352,7 @@ def compute_buckets(prev_state: Dict[str, Any], posts: List[Dict[str, Any]]) -> 
     prev_cursor = prev_state.get("cursor") or "init|0"
     prev_seen = set(prev_state.get("seen_ids") or [])
     prev_hash_by_id: Dict[str, str] = prev_state.get("hash_by_id") or {}
-        print(
-        f"DEBUG: loaded_state cursor={prev_state.get('cursor')} "
-        f"seen_ids={len(prev_state.get('seen_ids') or [])} "
-        f"hashes={len((prev_state.get('hash_by_id') or {}))}"
-        )
+    
 
     normalized: List[Dict[str, Any]] = []
     for p in posts:
@@ -541,7 +537,7 @@ def main() -> None:
 
         print(
             f"OK: changed={feed['changed']} new={len(feed['new'])} updated={len(feed['updated'])} "
-            f"flagged={len(feed['flagged'])} cursor={feed['cursor']} fetch_ms={fetch_duration_ms}"
+            f"flagged={len(feed['flagged'])} cursor={feed['cursor']}"
         )
 
     except Exception as e:
