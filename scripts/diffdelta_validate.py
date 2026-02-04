@@ -44,8 +44,10 @@ def check_logic_invariants(feed_path):
         raise ValueError(f"CRITICAL: Cursor instability in {feed_path}. changed=false but cursor moved.")
 
     # Invariant: Bucket Presence
-    for bucket in ["new", "updated", "resolved", "flagged"]:
-        if bucket not in feed or not isinstance(feed[bucket], list):
+    # Check if buckets are nested (Phase 1 schema) or top-level (legacy)
+    buckets_obj = feed.get("buckets", feed)
+    for bucket in ["new", "updated", "removed", "flagged"]:
+        if bucket not in buckets_obj or not isinstance(buckets_obj[bucket], list):
             raise ValueError(f"CRITICAL: Missing or invalid bucket '{bucket}' in {feed_path}")
 
 def main():

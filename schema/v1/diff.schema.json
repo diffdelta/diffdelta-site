@@ -1,10 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://diffdelta.io/schema/v1/diff.schema.json",
-  "title": "DiffDelta Diff Feed (v1)",
+  "title": "DiffDelta Diff Feed (v1) - Phase 1: Substrate Lockdown",
   "type": "object",
   "additionalProperties": false,
   "required": [
+    "batch_narrative",
     "schema_version",
     "generated_at",
     "cursor",
@@ -12,19 +13,35 @@
     "changed",
     "ttl_sec",
     "sources_included",
-    "new",
-    "updated",
-    "resolved",
-    "flagged",
-    "meta"
+    "sources",
+    "buckets"
   ],
   "properties": {
+    "batch_narrative": { 
+      "type": "string", 
+      "minLength": 1,
+      "maxLength": 500,
+      "description": "Human-readable summary of batch changes (max 30 words per SPEC.md)"
+    },
     "schema_version": { "type": "string", "pattern": "^1\\.[0-9]+\\.[0-9]+$" },
     "generated_at": { "type": "string", "format": "date-time" },
 
-    "cursor": { "type": "string", "minLength": 1, "maxLength": 200 },
-    "prev_cursor": { "type": "string", "minLength": 1, "maxLength": 200 },
-    "changed": { "type": "boolean" },
+    "cursor": { 
+      "type": "string", 
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Hash-based deterministic cursor (format: sha256:<64-char-hex>)"
+    },
+    "prev_cursor": { 
+      "type": "string", 
+      "minLength": 1,
+      "maxLength": 200,
+      "description": "Previous hash-based cursor (format: sha256:<64-char-hex>)"
+    },
+    "changed": { 
+      "type": "boolean",
+      "description": "True if any source changed. If false, cursor MUST equal prev_cursor."
+    },
     "ttl_sec": { "type": "integer", "minimum": 15, "maximum": 3600 },
 
     "sources_included": {
@@ -34,34 +51,49 @@
       "items": { "type": "string", "pattern": "^[a-z0-9_\\-]{2,32}$" }
     },
 
-    "batch_narrative": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 500,
-      "description": "Anti-Firehose: 1-sentence summary synthesizing all changes in this batch"
+    "sources": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/sourceStatus" }
     },
 
-    "new": { "type": "array", "items": { "$ref": "#/$defs/deltaItem" } },
-    "updated": { "type": "array", "items": { "$ref": "#/$defs/deltaItem" } },
-    "resolved": { "type": "array", "items": { "$ref": "#/$defs/deltaItem" } },
-    "flagged": { "type": "array", "items": { "$ref": "#/$defs/deltaItem" } },
-
-    "meta": {
+    "buckets": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["target_max_payload_kb", "generator_version"],
+      "required": ["new", "updated", "removed", "flagged"],
       "properties": {
-        "target_max_payload_kb": { "type": "integer", "minimum": 10, "maximum": 2000 },
-        "generator_version": { "type": "string", "minLength": 1, "maxLength": 64 }
+        "new": { "type": "array", "items": { "$ref": "#/$defs/deltaItem" } },
+        "updated": { "type": "array", "items": { "$ref": "#/$defs/deltaItem" } },
+        "removed": { "type": "array", "items": { "$ref": "#/$defs/deltaItem" } },
+        "flagged": { "type": "array", "items": { "$ref": "#/$defs/deltaItem" } }
       }
     }
   },
 
   "$defs": {
+    "sourceStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changed", "cursor", "prev_cursor", "ttl_sec", "status"],
+      "properties": {
+        "changed": { "type": "boolean" },
+        "cursor": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "prev_cursor": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "ttl_sec": { "type": "integer", "minimum": 15, "maximum": 3600 },
+        "status": {
+          "type": "string",
+          "enum": ["ok", "error", "disabled"]
+        },
+        "error": {
+          "type": "string",
+          "description": "Error message if status is 'error'"
+        }
+      }
+    },
+
     "deltaItem": {
       "type": "object",
       "additionalProperties": true,
-      "required": ["source", "id", "url", "published_at", "updated_at", "change_reason", "summary", "risk", "provenance"],
+      "required": ["source", "id", "url", "published_at", "updated_at", "summary", "risk", "provenance"],
       "properties": {
         "source": { "type": "string", "pattern": "^[a-z0-9_\\-]{2,32}$" },
         "id": { "type": "string", "minLength": 1, "maxLength": 200 },
@@ -70,11 +102,6 @@
         "title": { "type": "string", "maxLength": 200 },
         "published_at": { "type": "string", "format": "date-time" },
         "updated_at": { "type": "string", "format": "date-time" },
-
-        "change_reason": {
-          "type": "string",
-          "enum": ["new_item", "content_changed", "status_changed", "risk_detected", "manual_override", "backfill"]
-        },
 
         "signals": {
           "type": "array",
@@ -93,8 +120,12 @@
 
         "risk": { "$ref": "#/$defs/risk" },
         "provenance": { "$ref": "#/$defs/provenance" },
-
-        "source_payload": { "type": "object" }
+        
+        "source_payload": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Opaque raw upstream data from the source, preserved for debugging and traceability"
+        }
       }
     },
 
@@ -129,7 +160,7 @@
     "provenance": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fetched_at", "evidence_urls"],
+      "required": ["fetched_at", "evidence_urls", "content_hash"],
       "properties": {
         "fetched_at": { "type": "string", "format": "date-time" },
         "evidence_urls": {
@@ -137,6 +168,11 @@
           "minItems": 1,
           "maxItems": 20,
           "items": { "type": "string", "format": "uri" }
+        },
+        "content_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA256 hash of canonical content for integrity verification"
         }
       }
     }

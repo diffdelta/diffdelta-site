@@ -101,6 +101,26 @@ def sha256(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
 
+def sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def canonical_json(obj: Any) -> bytes:
+    """Generate canonical JSON bytes for deterministic hashing."""
+    return json.dumps(obj, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode('utf-8')
+
+
+def compute_content_hash(item: Dict[str, Any]) -> str:
+    """Compute deterministic hash of item's canonical content."""
+    # Build canonical representation (exclude timestamps, IDs, etc.)
+    canonical = {
+        "title": (item.get("title") or "").strip(),
+        "content": (item.get("content") or "").strip(),
+        "url": (item.get("url") or "").strip(),
+    }
+    return sha256_bytes(canonical_json(canonical))
+
+
 def load_prev_published_cursor() -> str:
     """
     Fix B: the emit boundary comes from the *previous published feed*,
@@ -341,6 +361,14 @@ def build_delta_item(
     else:
         submolt_name = community
 
+    # Build item dict for content hash computation (before adding provenance)
+    item_for_hash = {
+        "title": (title or "").strip() if isinstance(title, str) else "",
+        "content": content.strip() if isinstance(content, str) else "",
+        "url": url.strip() if isinstance(url, str) else "",
+    }
+    content_hash = compute_content_hash(item_for_hash)
+
     item: Dict[str, Any] = {
         "source": SOURCE_NAME,
         "id": pid,
@@ -358,7 +386,8 @@ def build_delta_item(
         },
         "provenance": {
             "fetched_at": fetched_at,
-            "evidence_urls": [url]
+            "evidence_urls": [url],
+            "content_hash": content_hash
         },
         "source_payload": {
             "author": (p.get("author") or {}).get("name") if isinstance(p.get("author"), dict) else p.get("author"),
@@ -418,7 +447,7 @@ def compute_buckets(prev_state: Dict[str, Any], posts: List[Dict[str, Any]]) -> 
 
     bucket_new: List[Dict[str, Any]] = []
     bucket_updated: List[Dict[str, Any]] = []
-    bucket_resolved: List[Dict[str, Any]] = []
+    bucket_removed: List[Dict[str, Any]] = []
     bucket_flagged: List[Dict[str, Any]] = []
 
     next_hash_by_id: Dict[str, str] = dict(prev_hash_by_id)
@@ -439,20 +468,24 @@ def compute_buckets(prev_state: Dict[str, Any], posts: List[Dict[str, Any]]) -> 
         # LOGIC A: Is it strictly NEW? (Beyond the cursor)
         if is_after_cursor(row["updated_at"], pid, prev_cursor):
             item = build_delta_item(p, fetched_at, "new_item", risk_score, risk_reasons, redacted=False)
-            bucket_new.append(item)
             changed = True
+            # Quarantine: flagged items go ONLY to flagged bucket, not to new/updated
             if risk_score >= 0.7:
                 bucket_flagged.append(item)
+            else:
+                bucket_new.append(item)
         
         # LOGIC B: Is it an UPDATE? (Behind cursor but fingerprint changed)
         else:
             old_hash = prev_hash_by_id.get(pid)
             if old_hash and fp != old_hash:
                 item = build_delta_item(p, fetched_at, "content_edit", risk_score, risk_reasons, redacted=False)
-                bucket_updated.append(item)
                 changed = True
+                # Quarantine: flagged items go ONLY to flagged bucket, not to new/updated
                 if risk_score >= 0.7:
                     bucket_flagged.append(item)
+                else:
+                    bucket_updated.append(item)
 
         # Always track seen IDs and hashes for the next state
         next_seen_ids.append(pid)
@@ -469,6 +502,34 @@ def compute_buckets(prev_state: Dict[str, Any], posts: List[Dict[str, Any]]) -> 
         # If we emitted nothing, keep prior hashes as-is (optional)
         next_hash_by_id = prev_hash_by_id
 
+    # Generate batch_narrative (required per SPEC.md)
+    total_changes = len(bucket_new) + len(bucket_updated)
+    if total_changes == 0:
+        batch_narrative = f"{SOURCE_NAME}: No changes detected."
+    elif total_changes == 1:
+        item = (bucket_new + bucket_updated)[0]
+        title = item.get("title") or item.get("summary", "item")
+        change_type = "new" if item in bucket_new else "updated"
+        batch_narrative = f"{SOURCE_NAME}: {change_type} '{title[:40]}'."
+    else:
+        new_count = len(bucket_new)
+        updated_count = len(bucket_updated)
+        flagged_count = len(bucket_flagged)
+        parts = [f"{SOURCE_NAME}: {total_changes} changes"]
+        if new_count > 0 and updated_count > 0:
+            parts.append(f"({new_count} new, {updated_count} updated)")
+        elif new_count > 0:
+            parts.append(f"({new_count} new)")
+        elif updated_count > 0:
+            parts.append(f"({updated_count} updated)")
+        if flagged_count > 0:
+            parts.append(f"{flagged_count} flagged")
+        batch_narrative = " ".join(parts) + "."
+        # Enforce max 30 words per SPEC.md
+        words = batch_narrative.split()
+        if len(words) > 30:
+            batch_narrative = " ".join(words[:30]) + "..."
+    
     feed = {
         "schema_version": SCHEMA_VERSION,
         "generated_at": fetched_at,
@@ -477,9 +538,10 @@ def compute_buckets(prev_state: Dict[str, Any], posts: List[Dict[str, Any]]) -> 
         "changed": bool(changed),
         "ttl_sec": TTL_SEC,
         "sources_included": [SOURCE_NAME],
+        "batch_narrative": batch_narrative,
         "new": bucket_new,
         "updated": bucket_updated,
-        "resolved": bucket_resolved,
+        "removed": bucket_removed,
         "flagged": bucket_flagged,
         "meta": {
             "target_max_payload_kb": TARGET_MAX_PAYLOAD_KB,
@@ -538,8 +600,8 @@ def write_telemetry(
             "changed": bool(feed.get("changed")),
             "new": len(feed.get("new", [])),
             "updated": len(feed.get("updated", [])),
+            "removed": len(feed.get("removed", [])),
             "flagged": len(feed.get("flagged", [])),
-            "resolved": len(feed.get("resolved", [])),
         },
         "state": {
             "cursor": feed.get("cursor", ""),
