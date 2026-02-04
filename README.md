@@ -2,6 +2,18 @@
 
 diffDelta is a **secure, bot-first changefeed** for AI agents: a token- and compute-efficient layer between the chaotic web and agentic workflows. Instead of bots re-scraping entire sources, they poll diffDelta to receive a normalized, risk-vetted JSON *diff*.
 
+## Reference vs Implementation
+
+This repository defines the DiffDelta protocol and schemas.
+
+It does NOT include:
+- content ingestion logic
+- source adapters
+- risk scoring heuristics
+- production generators
+
+Those are implementation details left to service operators.
+
 ## Canonical Entry Point
 - `https://diffdelta.io/.well-known/diffdelta.json`
 
