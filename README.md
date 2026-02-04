@@ -77,3 +77,7 @@ diffDelta is designed to be safe for automated ingestion:
 
 ## Versioning & compatibility
 **Alpha (v1.0.0).** Schemas are stable; changes to v1 are additive. Breaking changes, if ever needed, will ship as `/v2/` endpoints while v1 remains available.
+
+## Trademark Notice
+"DiffDelta" is a trademark of its author.
+This license does not grant rights to use the name or branding.
