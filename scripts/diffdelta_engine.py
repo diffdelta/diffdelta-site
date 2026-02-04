@@ -863,7 +863,7 @@ def main() -> None:
                 "prev_cursor": (result.get("prev_cursor") or "").strip() or ("sha256:" + "0" * 64),
                 "ttl_sec": result.get("ttl_sec", 60),
                 "status": result.get("status", "unknown"),
-                "error": result.get("error"),
+                **({"error": result.get("error")} if result.get("error") else {}),
             }
             for source_name, result in source_results.items()
         },
@@ -903,7 +903,6 @@ def main() -> None:
                         "prev_cursor": source_result.get("prev_cursor", "sha256:" + "0" * 64),
                         "ttl_sec": source_result.get("ttl_sec", source_config.get("config", {}).get("ttl_sec", 3600)),
                         "status": "disabled",
-                        "error": None,
                     }
                 },
                 "buckets": {
@@ -931,7 +930,7 @@ def main() -> None:
                         "prev_cursor": source_result.get("prev_cursor", "sha256:" + "0" * 64),
                         "ttl_sec": source_result.get("ttl_sec", source_config.get("config", {}).get("ttl_sec", 3600)),
                         "status": "error",
-                        "error": source_result.get("error"),
+                        "error": source_result.get("error") or "Unknown error",
                     }
                 },
                 "buckets": {
@@ -1008,7 +1007,7 @@ def main() -> None:
                         "prev_cursor": source_result.get("prev_cursor", "sha256:" + "0" * 64),
                         "ttl_sec": source_result.get("ttl_sec", source_config.get("config", {}).get("ttl_sec", 3600)),
                         "status": source_result.get("status", "ok"),
-                        "error": source_result.get("error"),
+                        **({"error": source_result.get("error")} if source_result.get("error") else {}),
                     }
                 },
                 "buckets": source_buckets,
