@@ -176,12 +176,14 @@ class BaseAdapter:
         return sha256(f"{url}\n{title}")[:32]
     
     def best_effort_url(self, item: Dict[str, Any], item_id: str) -> str:
-        """Extract or construct URL."""
+        """Extract or construct URL. Returns empty string if no valid URL found."""
         # Try common URL fields (GitHub uses html_url, RSS uses link, etc.)
         url = item.get("url") or item.get("html_url") or item.get("link")
         if isinstance(url, str) and url.startswith("http"):
             return url
-        return url or f"https://unknown/{item_id}"
+        # Return empty string if no valid URL - adapters should override this method
+        # to provide source-specific URL construction logic
+        return ""
     
     def best_effort_times(self, item: Dict[str, Any]) -> Tuple[str, str]:
         """Extract published_at and updated_at."""
@@ -453,6 +455,14 @@ class HTMLAdapter(BaseAdapter):
 class MoltbookAdapter(JSONAdapter):
     """Adapter for Moltbook source (special case of JSON API)."""
     
+    def best_effort_url(self, item: Dict[str, Any], item_id: str) -> str:
+        """Override to use Moltbook-specific URL pattern."""
+        url = item.get("url")
+        if isinstance(url, str) and url.startswith("http"):
+            return url
+        # Moltbook fallback: use canonical post URL
+        return f"https://www.moltbook.com/post/{item_id}"
+    
     def fetch(self) -> Tuple[List[Dict[str, Any]], int, Optional[str]]:
         """Override to handle Moltbook's {posts:[...]} format."""
         api_url = self.config.get("api_url", "")
@@ -632,7 +642,17 @@ def process_source(
         
         # Build items with risk v0 and provenance
         processed_items = []
+        invalid_url_count = 0
         for item in normalized_items:
+            # Validate URL: must be a real HTTP(S) URL, not https://unknown/...
+            item_url = item.get("url", "")
+            if not item_url or not isinstance(item_url, str) or not item_url.startswith("http"):
+                invalid_url_count += 1
+                continue  # Skip items with invalid URLs
+            if item_url.startswith("https://unknown/"):
+                invalid_url_count += 1
+                continue  # Skip items with placeholder URLs
+            
             risk_score, risk_reasons = calculate_risk_v0(item, fetch_failed=False, http_status=http_status)
             content_hash = compute_content_hash(item)
             
@@ -684,6 +704,25 @@ def process_source(
                 buckets["new"].append(processed_item)
             
             processed_items.append(processed_item)
+        
+        # If all items have invalid URLs, mark source as error
+        if invalid_url_count > 0 and len(processed_items) == 0 and len(normalized_items) > 0:
+            prev_state = fleet_state.get(source_name, {})
+            last_cursor = prev_state.get("last_cursor", "")
+            if not last_cursor:
+                last_cursor = "sha256:" + "0" * 64
+            
+            return {
+                "status": "error",
+                "changed": False,
+                "cursor": last_cursor,
+                "prev_cursor": last_cursor,
+                "ttl_sec": config.get("ttl_sec", 60),
+                "error": f"All {len(normalized_items)} items have invalid URLs (cannot form canonical URLs)",
+            }, {
+                "last_error_at": now_iso(),
+                "last_error": f"All items have invalid URLs",
+            }
         
         # Build canonical feed payload (exclude generated_at, timings)
         canonical_payload = {
@@ -870,9 +909,8 @@ def main() -> None:
         "buckets": all_buckets,
     }
     
-    # Write feed if changed
-    if global_changed:
-        write_json_atomic(TOP_LATEST_PATH, feed)
+    # Always write feed (even if unchanged) to ensure cursors are always valid
+    write_json_atomic(TOP_LATEST_PATH, feed)
     
     # Write per-source feeds for ALL sources (enabled and disabled)
     for source_name, source_config in sources.items():
