@@ -874,6 +874,150 @@ def main() -> None:
     if global_changed:
         write_json_atomic(TOP_LATEST_PATH, feed)
     
+    # Write per-source feeds for ALL sources (enabled and disabled)
+    for source_name, source_config in sources.items():
+        source_paths = source_config.get("paths", {})
+        source_latest_path = source_paths.get("latest")
+        if not source_latest_path:
+            continue
+        
+        source_result = source_results.get(source_name, {})
+        source_status = source_result.get("status", "unknown")
+        
+        # Build per-source feed
+        if source_status == "disabled":
+            # Disabled source: minimal valid feed
+            source_feed = {
+                "schema_version": SCHEMA_VERSION,
+                "generated_at": generated_at,
+                "cursor": source_result.get("cursor", "sha256:" + "0" * 64),
+                "prev_cursor": source_result.get("prev_cursor", "sha256:" + "0" * 64),
+                "changed": False,
+                "ttl_sec": source_result.get("ttl_sec", source_config.get("config", {}).get("ttl_sec", 3600)),
+                "sources_included": [source_name],
+                "batch_narrative": f"{source_name}: Source disabled.",
+                "sources": {
+                    source_name: {
+                        "changed": False,
+                        "cursor": source_result.get("cursor", "sha256:" + "0" * 64),
+                        "prev_cursor": source_result.get("prev_cursor", "sha256:" + "0" * 64),
+                        "ttl_sec": source_result.get("ttl_sec", source_config.get("config", {}).get("ttl_sec", 3600)),
+                        "status": "disabled",
+                        "error": None,
+                    }
+                },
+                "buckets": {
+                    "new": [],
+                    "updated": [],
+                    "removed": [],
+                    "flagged": [],
+                },
+            }
+        elif source_status == "error":
+            # Error source: minimal valid feed with error status
+            source_feed = {
+                "schema_version": SCHEMA_VERSION,
+                "generated_at": generated_at,
+                "cursor": source_result.get("cursor", "sha256:" + "0" * 64),
+                "prev_cursor": source_result.get("prev_cursor", "sha256:" + "0" * 64),
+                "changed": False,
+                "ttl_sec": source_result.get("ttl_sec", source_config.get("config", {}).get("ttl_sec", 3600)),
+                "sources_included": [source_name],
+                "batch_narrative": f"{source_name}: Error - {source_result.get('error', 'Unknown error')}.",
+                "sources": {
+                    source_name: {
+                        "changed": False,
+                        "cursor": source_result.get("cursor", "sha256:" + "0" * 64),
+                        "prev_cursor": source_result.get("prev_cursor", "sha256:" + "0" * 64),
+                        "ttl_sec": source_result.get("ttl_sec", source_config.get("config", {}).get("ttl_sec", 3600)),
+                        "status": "error",
+                        "error": source_result.get("error"),
+                    }
+                },
+                "buckets": {
+                    "new": [],
+                    "updated": [],
+                    "removed": [],
+                    "flagged": [],
+                },
+            }
+        else:
+            # Enabled source: full feed with actual buckets
+            source_buckets = source_result.get("buckets", {
+                "new": [],
+                "updated": [],
+                "removed": [],
+                "flagged": [],
+            })
+            
+            # Generate per-source batch_narrative
+            source_total = len(source_buckets.get("new", [])) + len(source_buckets.get("updated", [])) + len(source_buckets.get("removed", []))
+            source_flagged = len(source_buckets.get("flagged", []))
+            
+            if not source_result.get("changed", False):
+                source_narrative = f"{source_name}: No changes detected."
+            elif source_total == 0 and source_flagged > 0:
+                source_narrative = f"{source_name}: {source_flagged} flagged item(s) detected."
+            elif source_total == 0:
+                source_narrative = f"{source_name}: No changes detected."
+            elif source_total == 1:
+                item = (source_buckets.get("new", []) + source_buckets.get("updated", []) + source_buckets.get("removed", []))[0]
+                title = item.get("title") or item.get("summary", "item")
+                change_type = "new" if item in source_buckets.get("new", []) else ("updated" if item in source_buckets.get("updated", []) else "removed")
+                source_narrative = f"{source_name}: {change_type} '{title[:40]}'."
+            else:
+                new_count = len(source_buckets.get("new", []))
+                updated_count = len(source_buckets.get("updated", []))
+                removed_count = len(source_buckets.get("removed", []))
+                parts = [f"{source_name}: {source_total} changes"]
+                if new_count > 0 and (updated_count > 0 or removed_count > 0):
+                    subparts = []
+                    if new_count > 0:
+                        subparts.append(f"{new_count} new")
+                    if updated_count > 0:
+                        subparts.append(f"{updated_count} updated")
+                    if removed_count > 0:
+                        subparts.append(f"{removed_count} removed")
+                    parts.append(f"({', '.join(subparts)})")
+                elif new_count > 0:
+                    parts.append(f"({new_count} new)")
+                elif updated_count > 0:
+                    parts.append(f"({updated_count} updated)")
+                elif removed_count > 0:
+                    parts.append(f"({removed_count} removed)")
+                if source_flagged > 0:
+                    parts.append(f"{source_flagged} flagged")
+                source_narrative = " ".join(parts) + "."
+                words = source_narrative.split()
+                if len(words) > 30:
+                    source_narrative = " ".join(words[:30]) + "..."
+            
+            source_feed = {
+                "schema_version": SCHEMA_VERSION,
+                "generated_at": generated_at,
+                "cursor": source_result.get("cursor", "sha256:" + "0" * 64),
+                "prev_cursor": source_result.get("prev_cursor", "sha256:" + "0" * 64),
+                "changed": source_result.get("changed", False),
+                "ttl_sec": source_result.get("ttl_sec", source_config.get("config", {}).get("ttl_sec", 3600)),
+                "sources_included": [source_name],
+                "batch_narrative": source_narrative,
+                "sources": {
+                    source_name: {
+                        "changed": source_result.get("changed", False),
+                        "cursor": source_result.get("cursor", "sha256:" + "0" * 64),
+                        "prev_cursor": source_result.get("prev_cursor", "sha256:" + "0" * 64),
+                        "ttl_sec": source_result.get("ttl_sec", source_config.get("config", {}).get("ttl_sec", 3600)),
+                        "status": source_result.get("status", "ok"),
+                        "error": source_result.get("error"),
+                    }
+                },
+                "buckets": source_buckets,
+            }
+        
+        # Write per-source feed (always write, even if unchanged)
+        source_latest_full_path = os.path.join(ROOT, source_latest_path)
+        write_json_atomic(source_latest_full_path, source_feed)
+    
     # Update fleet state
     for source_name, state_update in updated_fleet_state.items():
         if source_name not in fleet_state:

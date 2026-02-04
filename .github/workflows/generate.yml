@@ -27,17 +27,18 @@ jobs:
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          pip install requests jsonschema
+          pip install -r requirements.txt
 
       - name: Generate feeds
         env:
           MOLTBOOK_API_KEY: ${{ secrets.MOLTBOOK_API_KEY }} # optional
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # optional
         run: |
-          python scripts/diffdelta_generate.py
+          python scripts/diffdelta_engine.py
 
       - name: Validate schemas + endpoints
         run: |
-          python scripts/diffdelta_validate.py
+          python scripts/diffdelta_validate.py diff/latest.json
 
       - name: Commit if changed
         run: |
@@ -47,8 +48,9 @@ jobs:
 
           # 1. ONLY stage files that bots actually consume
           # We explicitly AVOID staging _state.json
+          # Stage all per-source feeds dynamically
           git add diff/latest.json \
-                  diff/source/moltbook/latest.json \
+                  diff/source/*/latest.json \
                   known_issues.json \
                   telemetry/latest.json || true
 
