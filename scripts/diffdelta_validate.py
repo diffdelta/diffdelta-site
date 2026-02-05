@@ -52,6 +52,16 @@ def check_logic_invariants(feed_path):
 
 def main():
     print("--- Starting DiffDelta Validation ---")
+    
+    # Parse command-line arguments
+    feed_path = None
+    if len(sys.argv) > 1:
+        feed_path = sys.argv[1]
+        # Resolve relative paths relative to ROOT
+        if not os.path.isabs(feed_path):
+            feed_path = os.path.join(ROOT, feed_path)
+        feed_path = os.path.normpath(feed_path)
+    
     wk = load(WELL_KNOWN)
 
     # 1) Check Well-Known Endpoints
@@ -69,17 +79,38 @@ def main():
     known_schema = os.path.join(SCHEMA_DIR, "known_issues.schema.json")
     telemetry_schema = os.path.join(SCHEMA_DIR, "telemetry.schema.json")
 
-    # Feeds to validate
-    feeds = [
-        os.path.join(ROOT, "diff", "latest.json"),
-        os.path.join(ROOT, "diff", "source", "moltbook", "latest.json")
-    ]
+    # If a specific feed path was provided, validate only that file
+    if feed_path:
+        if not os.path.exists(feed_path):
+            raise FileNotFoundError(f"Feed file not found: {feed_path}")
+        print(f"Validating {feed_path}...")
+        validate_json(diff_schema, feed_path)
+        check_logic_invariants(feed_path)
+    else:
+        # Default: validate all known feeds dynamically
+        feeds = [os.path.join(ROOT, "diff", "latest.json")]  # Always validate global feed
+        
+        # Dynamically discover per-source feeds from .well-known/diffdelta.json
+        sources_supported = wk.get("sources_supported", [])
+        if sources_supported:
+            for source_id in sources_supported:
+                source_feed_path = os.path.join(ROOT, "diff", "source", source_id, "latest.json")
+                if os.path.exists(source_feed_path):
+                    feeds.append(source_feed_path)
+        else:
+            # Fallback: discover all feeds in diff/source/*/latest.json
+            source_dir = os.path.join(ROOT, "diff", "source")
+            if os.path.exists(source_dir):
+                for item in os.listdir(source_dir):
+                    source_feed_path = os.path.join(source_dir, item, "latest.json")
+                    if os.path.exists(source_feed_path):
+                        feeds.append(source_feed_path)
 
-    for f in feeds:
-        if os.path.exists(f):
-            print(f"Validating {f}...")
-            validate_json(diff_schema, f)
-            check_logic_invariants(f)
+        for f in feeds:
+            if os.path.exists(f):
+                print(f"Validating {f}...")
+                validate_json(diff_schema, f)
+                check_logic_invariants(f)
 
     # 3) Known Issues & Telemetry
     if os.path.exists(known_schema):
