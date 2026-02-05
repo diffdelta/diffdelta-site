@@ -33,29 +33,33 @@
           "type": "string", 
           "minLength": 1,
           "maxLength": 200,
-          "description": "Hash-based deterministic cursor (format: sha256:<64-char-hex>)"
+          "description": "Hash-based deterministic cursor (format: sha256:<64-char-hex>). Hash of canonical batch payload excluding volatile fields. See cursor_basis for canonicalization rules."
         },
         "prev_cursor": { 
           "type": "string", 
           "minLength": 1,
           "maxLength": 200,
-          "description": "Previous hash-based cursor (format: sha256:<64-char-hex>)"
+          "description": "Previous hash-based cursor (format: sha256:<64-char-hex>). See cursor_basis for canonicalization rules."
+        },
+        "cursor_basis": {
+          "type": "string",
+          "description": "Specifies the canonicalization method for cursor computation. Format: 'canonical_v1' indicates cursor is hash of canonical batch payload EXCLUDING volatile fields (generated_at, etc.). Rule: cursor MUST NOT include generated_at or other timestamps - rerunning engine without changes MUST produce identical cursor. hash field represents the file as stored (including generated_at). See schema docs for exact canonicalization rules."
         },
         "hash": {
           "type": "string",
           "minLength": 1,
           "maxLength": 200,
-          "description": "SHA-256 hash of items/content only (deterministic sorting before hashing). Format: sha256:<64-char-hex>"
+          "description": "SHA-256 hash of the file as stored (including generated_at and other volatile fields). Format: sha256:<64-char-hex>. Differs from cursor which uses canonicalized payload."
         },
         "prev_hash": {
           "type": "string",
           "minLength": 1,
           "maxLength": 200,
-          "description": "Previous hash value from previous latest.json. Format: sha256:<64-char-hex>"
+          "description": "Previous hash value from previous latest.json (file as stored). Format: sha256:<64-char-hex>"
         },
         "changed": { 
           "type": "boolean",
-          "description": "True if any source changed. If false, cursor MUST equal prev_cursor."
+          "description": "True if any source changed (i.e., counts.new > 0 or counts.updated > 0 or counts.removed > 0). Contract: when true, top-level cursor MUST differ from prev_cursor. When false, cursor MUST equal prev_cursor."
         },
         "ttl_sec": { "type": "integer", "minimum": 15, "maximum": 3600 },
         "integrity_reset": {
@@ -68,23 +72,36 @@
           "maximum": 1,
           "description": "Risk score (0.0-1.0) indicating integrity concerns. 0.2 if integrity_reset is true, 0.0 otherwise"
         },
+        "impact": {
+          "type": "string",
+          "enum": ["low", "high"],
+          "description": "Overall impact level of batch changes (Phase B, optional). 'low' for boilerplate/timestamp-only changes, 'high' for substantive content changes. Allows bots to subscribe to high-impact only."
+        },
+        "impact_reason": {
+          "type": "string",
+          "enum": ["boilerplate_only", "title_only", "minor_edit", "timestamp_only", "metadata_only", "substantive"],
+          "description": "Reason for batch impact classification (optional). Helps bots understand why byte-level changes occurred."
+        },
 
         "sources_included": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": { "type": "string", "pattern": "^[a-z0-9_\\-]{2,32}$" }
+          "items": { "type": "string", "pattern": "^[a-z0-9_\\-]{2,32}$" },
+          "description": "List of source IDs included in this batch. MUST be sorted alphabetically for deterministic cursor computation."
         },
 
         "sources": {
           "type": "object",
-          "additionalProperties": { "$ref": "#/$defs/sourceStatus" }
+          "additionalProperties": { "$ref": "#/$defs/sourceStatus" },
+          "description": "Per-source status object. When serialized for cursor computation, MUST use canonical JSON ordering (keys sorted alphabetically) to ensure deterministic hashing."
         },
 
         "buckets": {
           "type": "object",
-          "additionalProperties": false,
+          "additionalProperties": true,
           "required": ["new", "updated", "removed", "flagged"],
+          "description": "Item buckets. Arrays MUST be sorted deterministically (e.g., by published_at, then source, then id) for stable cursor computation. Same semantic content MUST produce identical cursor. Extensibility: clients MUST treat missing bucket arrays as empty arrays. Clients MAY ignore unknown bucket types for forward compatibility.",
           "properties": {
             "new": { "type": "array", "items": { "$ref": "#/$defs/deltaItem" } },
             "updated": { "type": "array", "items": { "$ref": "#/$defs/deltaItem" } },
@@ -126,29 +143,33 @@
           "type": "string", 
           "minLength": 1,
           "maxLength": 200,
-          "description": "Hash-based deterministic cursor (format: sha256:<64-char-hex>)"
+          "description": "Hash-based deterministic cursor (format: sha256:<64-char-hex>). Hash of canonical batch payload excluding volatile fields. See cursor_basis for canonicalization rules."
         },
         "prev_cursor": { 
           "type": "string", 
           "minLength": 1,
           "maxLength": 200,
-          "description": "Previous hash-based cursor (format: sha256:<64-char-hex>)"
+          "description": "Previous hash-based cursor (format: sha256:<64-char-hex>). See cursor_basis for canonicalization rules."
+        },
+        "cursor_basis": {
+          "type": "string",
+          "description": "Specifies the canonicalization method for cursor computation. Format: 'canonical_v1' indicates cursor is hash of canonical batch payload EXCLUDING volatile fields (generated_at, etc.). Rule: cursor MUST NOT include generated_at or other timestamps - rerunning engine without changes MUST produce identical cursor. hash field represents the file as stored (including generated_at). See schema docs for exact canonicalization rules."
         },
         "hash": {
           "type": "string",
           "minLength": 1,
           "maxLength": 200,
-          "description": "SHA-256 hash of items/content only (deterministic sorting before hashing). Format: sha256:<64-char-hex>"
+          "description": "SHA-256 hash of the file as stored (including generated_at and other volatile fields). Format: sha256:<64-char-hex>. Differs from cursor which uses canonicalized payload."
         },
         "prev_hash": {
           "type": "string",
           "minLength": 1,
           "maxLength": 200,
-          "description": "Previous hash value from previous latest.json. Format: sha256:<64-char-hex>"
+          "description": "Previous hash value from previous latest.json (file as stored). Format: sha256:<64-char-hex>"
         },
         "changed": { 
           "type": "boolean",
-          "description": "True if any source changed. If false, cursor MUST equal prev_cursor."
+          "description": "True if any source changed (i.e., counts.new > 0 or counts.updated > 0 or counts.removed > 0). Contract: when true, top-level cursor MUST differ from prev_cursor. When false, cursor MUST equal prev_cursor."
         },
         "ttl_sec": { "type": "integer", "minimum": 15, "maximum": 3600 },
         "integrity_reset": {
@@ -161,23 +182,36 @@
           "maximum": 1,
           "description": "Risk score (0.0-1.0) indicating integrity concerns. 0.2 if integrity_reset is true, 0.0 otherwise"
         },
+        "impact": {
+          "type": "string",
+          "enum": ["low", "high"],
+          "description": "Overall impact level of batch changes (Phase B, optional). 'low' for boilerplate/timestamp-only changes, 'high' for substantive content changes. Allows bots to subscribe to high-impact only."
+        },
+        "impact_reason": {
+          "type": "string",
+          "enum": ["boilerplate_only", "title_only", "minor_edit", "timestamp_only", "metadata_only", "substantive"],
+          "description": "Reason for batch impact classification (optional). Helps bots understand why byte-level changes occurred."
+        },
 
         "sources_included": {
           "type": "array",
           "minItems": 1,
           "uniqueItems": true,
-          "items": { "type": "string", "pattern": "^[a-z0-9_\\-]{2,32}$" }
+          "items": { "type": "string", "pattern": "^[a-z0-9_\\-]{2,32}$" },
+          "description": "List of source IDs included in this batch. MUST be sorted alphabetically for deterministic cursor computation."
         },
 
         "sources": {
           "type": "object",
-          "additionalProperties": { "$ref": "#/$defs/sourceStatus" }
+          "additionalProperties": { "$ref": "#/$defs/sourceStatus" },
+          "description": "Per-source status object. When serialized for cursor computation, MUST use canonical JSON ordering (keys sorted alphabetically) to ensure deterministic hashing."
         },
 
         "buckets": {
           "type": "object",
-          "additionalProperties": false,
+          "additionalProperties": true,
           "required": ["new", "updated", "removed", "flagged"],
+          "description": "Item buckets. Arrays MUST be sorted deterministically (e.g., by published_at, then source, then id) for stable cursor computation. Same semantic content MUST produce identical cursor. Extensibility: clients MUST treat missing bucket arrays as empty arrays. Clients MAY ignore unknown bucket types for forward compatibility.",
           "properties": {
             "new": { "type": "array", "items": { "$ref": "#/$defs/deltaItem" } },
             "updated": { "type": "array", "items": { "$ref": "#/$defs/deltaItem" } },
@@ -207,17 +241,91 @@
       "additionalProperties": false,
       "required": ["changed", "cursor", "prev_cursor", "ttl_sec", "status"],
       "properties": {
-        "changed": { "type": "boolean" },
-        "cursor": { "type": "string", "minLength": 1, "maxLength": 200 },
-        "prev_cursor": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "changed": { 
+          "type": "boolean",
+          "description": "True if source content changed at byte level since last cursor (hash-based detection). Contract: when true, MUST have either (1) items in buckets with matching source ID, OR (2) delta_counts provided. If changed:true but all delta_counts are zero, MUST provide impact_reason."
+        },
+        "cursor": { 
+          "type": "string", 
+          "minLength": 1, 
+          "maxLength": 200,
+          "description": "Hash-based cursor. For error/disabled sources, MUST be the last-known-good cursor (not zero cursor) to preserve continuity."
+        },
+        "prev_cursor": { 
+          "type": "string", 
+          "minLength": 1, 
+          "maxLength": 200,
+          "description": "Previous cursor. For error/disabled sources, MUST be the last-known-good cursor (not zero cursor) to preserve continuity."
+        },
         "ttl_sec": { "type": "integer", "minimum": 15, "maximum": 3600 },
         "status": {
           "type": "string",
           "enum": ["ok", "error", "disabled"]
         },
-        "error": {
+        "stale": {
+          "type": "boolean",
+          "description": "True if source is disabled or in error state. Indicates data may be outdated."
+        },
+        "stale_age_sec": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of seconds since last successful fetch (last_ok_at). Present when stale is true. Helps bots decide: ignore, alert, or fallback to alternate mirrors."
+        },
+        "last_ok_at": {
           "type": "string",
-          "description": "Error message if status is 'error'"
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of last successful fetch. Present when stale is true."
+        },
+        "delta_counts": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Count of items changed per source. Present when changed is true to help bots decide which sources to fetch deeper details for.",
+          "required": ["new", "updated", "removed"],
+          "properties": {
+            "new": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of new items from this source"
+            },
+            "updated": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of updated items from this source"
+            },
+            "removed": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of removed items from this source"
+            }
+          }
+        },
+        "impact": {
+          "type": "string",
+          "enum": ["low", "high"],
+          "description": "Impact level of changes (Phase B). 'low' for boilerplate/timestamp-only changes, 'high' for substantive content changes. Allows bots to subscribe to high-impact only without ignoring byte-level changes."
+        },
+        "impact_reason": {
+          "type": "string",
+          "enum": ["boilerplate_only", "title_only", "minor_edit", "timestamp_only", "metadata_only", "substantive"],
+          "description": "Reason for impact classification. Required when changed:true but all delta_counts are zero. Helps bots understand why byte-level changes occurred without item-level deltas."
+        },
+        "error": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Error details if status is 'error'",
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "Error code (e.g., 'HTTP_403', 'HTTP_500', 'TIMEOUT', 'NETWORK_ERROR')"
+            },
+            "http_status": {
+              "type": "integer",
+              "minimum": 100,
+              "maximum": 599,
+              "description": "HTTP status code if error was from HTTP request"
+            }
+          },
+          "required": ["code"]
         }
       }
     },
@@ -274,14 +382,19 @@
             },
             "lang": {
               "type": "string",
-              "pattern": "^[a-z]{2}$",
-              "description": "ISO 639-1 language code (e.g., 'en', 'es')"
+              "pattern": "^[a-z]{2,3}$",
+              "description": "Language code: ISO 639-1 (2-letter, e.g., 'en', 'es') or 'und' (undetermined) when language cannot be confidently detected. Never use a confident label if uncertain; 'und' is safer than incorrect detection."
             }
           }
         },
 
         "risk": { "$ref": "#/$defs/risk" },
         "provenance": { "$ref": "#/$defs/provenance" },
+        "item_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "Deterministic hash for item deduplication: sha256(source_id + '|' + id + '|' + content_hash). Optional but recommended. Bots can use this as primary key for deduplication across sources."
+        },
         
         "source_payload": {
           "type": "object",
@@ -308,7 +421,7 @@
     "risk": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["score", "reasons"],
+      "required": ["score"],
       "properties": {
         "score": { "type": "number", "minimum": 0, "maximum": 1 },
         "reasons": {

@@ -5,8 +5,14 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>DiffDelta</title>
     <meta name="description" content="A secure changefeed protocol for AI agents. Poll normalized, risk-vetted JSON diffs instead of re-scraping the web." />
+    <link rel="alternate" type="application/json" href="/diff/head.json" title="DiffDelta Global Feed" />
+    <link rel="alternate" type="application/json" href="/diff/sources.json" title="DiffDelta Sources Index" />
   </head>
   <body style="font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif; margin: 40px; max-width: 920px; line-height: 1.45;">
+    <div style="background: #f0f9ff; border-left: 4px solid #0284c7; padding: 12px 16px; margin-bottom: 24px; border-radius: 4px;">
+      <strong style="color: #0284c7;">For bots:</strong> Use <a href="/diff/head.json" style="color: #0284c7; text-decoration: underline;">/diff/head.json</a> or <a href="/diff/sources.json" style="color: #0284c7; text-decoration: underline;">/diff/sources.json</a> for efficient polling. See <a href="/.well-known/diffdelta.json" style="color: #0284c7; text-decoration: underline;">discovery manifest</a>.
+    </div>
+    
     <h1 style="margin: 0 0 10px 0;">DiffDelta</h1>
 
     <p style="margin: 0 0 18px 0;">
@@ -21,8 +27,12 @@
 
     <h2 style="font-size: 16px; margin: 22px 0 8px 0;">Feeds</h2>
     <ul style="margin-top: 0;">
+      <li><a href="/diff/head.json">/diff/head.json</a> <span style="color:#666;">(global head pointer - recommended for bots)</span></li>
+      <li><a href="/diff/sources.json">/diff/sources.json</a> <span style="color:#666;">(sources index)</span></li>
       <li><a href="/diff/latest.json">/diff/latest.json</a> <span style="color:#666;">(global aggregated feed)</span></li>
-      <li><a href="/diff/source/moltbook/latest.json">/diff/source/{source}/latest.json</a> <span style="color:#666;">(per-source feed)</span></li>
+      <li><a href="/diff/ping.json">/diff/ping.json</a> <span style="color:#666;">(canary endpoint for discovery tracking)</span></li>
+      <li><a href="/diff/{source}/head.json">/diff/{source}/head.json</a> <span style="color:#666;">(per-source head pointer)</span></li>
+      <li><a href="/diff/{source}/latest.json">/diff/{source}/latest.json</a> <span style="color:#666;">(per-source feed)</span></li>
       <li><a href="/known_issues.json">/known_issues.json</a> <span style="color:#666;">(operational memory)</span></li>
     </ul>
 
@@ -36,9 +46,10 @@
     <h2 style="font-size: 16px; margin: 22px 0 8px 0;">Golden path (bot loop)</h2>
     <ol style="margin-top: 0;">
       <li>Fetch the manifest (<a href="/.well-known/diffdelta.json">/.well-known/diffdelta.json</a>) to discover endpoints.</li>
-      <li>Poll <a href="/diff/latest.json">/diff/latest.json</a> using <code>If-None-Match</code> (ETag) when available.</li>
-      <li>If you receive <code>304 Not Modified</code> or <code>"changed": false</code>, stop.</li>
-      <li>Process <code>new</code>, <code>updated</code>, and <code>resolved</code>. Treat <code>flagged</code> as quarantine.</li>
+      <li>Poll <a href="/diff/head.json">/diff/head.json</a> to check if cursor changed (most efficient).</li>
+      <li>If cursor unchanged → stop (no need to fetch full feed).</li>
+      <li>If cursor changed → fetch <a href="/diff/latest.json">/diff/latest.json</a> or per-source feed.</li>
+      <li>Process <code>new</code>, <code>updated</code>, and <code>removed</code>. Treat <code>flagged</code> as quarantine.</li>
     </ol>
 
     <p style="margin: 22px 0 0 0; color:#666; font-size: 14px;">
