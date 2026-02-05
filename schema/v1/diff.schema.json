@@ -225,7 +225,7 @@
     "deltaItem": {
       "type": "object",
       "additionalProperties": true,
-      "required": ["source", "id", "url", "published_at", "updated_at", "summary", "risk", "provenance"],
+      "required": ["source", "id", "url", "published_at", "updated_at", "headline", "content", "risk", "provenance"],
       "properties": {
         "source": { "type": "string", "pattern": "^[a-z0-9_\\-]{2,32}$" },
         "id": { "type": "string", "minLength": 1, "maxLength": 200 },
@@ -248,7 +248,37 @@
           "items": { "$ref": "#/$defs/actionItem" }
         },
 
-        "summary": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "headline": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "description": "Deterministic title-like field derived from source (RSS title, etc.). Not an LLM summary."
+        },
+        
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "description": "Optional LLM-generated summary (pre-chewed content). Can be absent or 'pending' if not yet generated."
+        },
+        
+        "content": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["lang"],
+          "properties": {
+            "excerpt_text": {
+              "type": "string",
+              "maxLength": 500,
+              "description": "Plain text excerpt extracted from HTML for agents/diffing"
+            },
+            "lang": {
+              "type": "string",
+              "pattern": "^[a-z]{2}$",
+              "description": "ISO 639-1 language code (e.g., 'en', 'es')"
+            }
+          }
+        },
 
         "risk": { "$ref": "#/$defs/risk" },
         "provenance": { "$ref": "#/$defs/provenance" },
@@ -256,7 +286,7 @@
         "source_payload": {
           "type": "object",
           "additionalProperties": true,
-          "description": "Opaque raw upstream data from the source, preserved for debugging and traceability"
+          "description": "Opaque raw upstream data from the source, preserved for debugging and traceability. HTML content is consolidated into 'html' field (removes duplicate description/summary)."
         }
       }
     },
