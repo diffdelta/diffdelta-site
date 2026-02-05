@@ -169,27 +169,58 @@ This preserves cursor continuity — a recovering source resumes from where it l
 
 The server MUST set `ETag` on `head.json` and `latest.json` responses.
 
-```
-ETag: "sha256:ab12cd34…"
-```
+When serving feeds from a static host behind a CDN (e.g., Cloudflare Pages),
+the CDN typically generates its own ETag (often an MD5 of the file content).
+This is acceptable — the 304 mechanism works correctly regardless of whether
+the ETag equals the cursor.
 
-The ETag value MUST equal the `cursor` value from the response body, enclosed in double quotes.
+**Normative:**
+
+- If the server controls ETag generation, ETag SHOULD equal the quoted cursor:
+  `ETag: "sha256:ab12cd34…"`
+- If a CDN proxy generates its own ETag, clients MUST still use it for
+  `If-None-Match` and MUST NOT assume ETag == cursor.
+- The **cursor** field in the JSON body remains the authoritative stop condition.
+  Clients compare `cursor` against their stored cursor to detect changes,
+  and use `ETag` / `If-None-Match` purely for HTTP-level bandwidth savings.
 
 ### 6.2 If-None-Match (304 handling)
 
-When a client sends `If-None-Match` with a cursor that matches the current cursor,
-the server MUST return `304 Not Modified` with an empty body.
+When a client sends `If-None-Match` with the ETag from a prior response,
+the server (or CDN) MUST return `304 Not Modified` with an empty body
+if the underlying file has not changed.
 
-### 6.3 Cache-Control directives
+### 6.3 CDN Edge Caching
 
-| Resource | Cache-Control |
-|---|---|
-| `head.json` | `public, max-age=min(ttl_sec, 300), must-revalidate` |
-| `latest.json` | `public, max-age=min(ttl_sec, 300), must-revalidate` |
-| `archive/*.json` | `public, max-age=31536000, immutable` |
-| `schema/*.json` | `public, max-age=31536000, immutable` |
+To enable edge caching (serving repeated requests from CDN PoPs without
+hitting origin), servers SHOULD set `CDN-Cache-Control` alongside
+`Cache-Control`:
 
-### 6.4 Content-Type
+```
+Cache-Control: public, max-age=60, must-revalidate
+CDN-Cache-Control: public, max-age=60, must-revalidate
+```
+
+This ensures the CDN caches at the edge (not just passes through),
+so multiple bots polling from the same region share the cached response.
+
+For archive snapshots, the CDN MUST cache immutably:
+
+```
+Cache-Control: public, max-age=31536000, immutable
+CDN-Cache-Control: public, max-age=31536000, immutable
+```
+
+### 6.4 Cache-Control directives
+
+| Resource | Cache-Control | CDN-Cache-Control |
+|---|---|---|
+| `head.json` | `public, max-age=60, must-revalidate` | same |
+| `latest.json` | `public, max-age=60, must-revalidate` | same |
+| `archive/*.json` | `public, max-age=31536000, immutable` | same |
+| `schema/*.json` | `public, max-age=31536000, immutable` | same |
+
+### 6.5 Content-Type
 
 All feed responses MUST use `Content-Type: application/json; charset=utf-8`.
 

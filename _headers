@@ -7,25 +7,35 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), microphone=(), camera=()
 
-# Diff feeds (polled often): cache briefly but always revalidate
+# Diff feeds (polled often): edge-cache briefly, revalidate on expiry
 /diff/*
   Content-Type: application/json; charset=utf-8
-  Cache-Control: public, max-age=60, s-maxage=60, must-revalidate
+  Cache-Control: public, max-age=60, must-revalidate
+  CDN-Cache-Control: public, max-age=60, must-revalidate
+
+# Archive snapshots: immutable, cache forever (content never changes)
+/archive/*
+  Content-Type: application/json; charset=utf-8
+  Cache-Control: public, max-age=31536000, immutable
+  CDN-Cache-Control: public, max-age=31536000, immutable
 
 # Known issues: changes occasionally, but you still want fast propagation
 /known_issues.json
   Content-Type: application/json; charset=utf-8
-  Cache-Control: public, max-age=60, s-maxage=60, must-revalidate
+  Cache-Control: public, max-age=60, must-revalidate
+  CDN-Cache-Control: public, max-age=60, must-revalidate
 
 # Discovery manifest: cache a bit longer, but still revalidate
 /.well-known/*
   Content-Type: application/json; charset=utf-8
-  Cache-Control: public, max-age=300, s-maxage=300, must-revalidate
+  Cache-Control: public, max-age=300, must-revalidate
+  CDN-Cache-Control: public, max-age=300, must-revalidate
 
 # Schemas are versioned (v1/...), so they can be cached hard
 /schema/*
   Content-Type: application/json; charset=utf-8
   Cache-Control: public, max-age=31536000, immutable
+  CDN-Cache-Control: public, max-age=31536000, immutable
 
 # Health endpoint: never cache
 /healthz.json

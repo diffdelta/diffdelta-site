@@ -157,6 +157,23 @@ for source_id, status in feed["sources"].items():
 
 ---
 
+## Archive History (Walk-Back)
+
+Every time a source has new content, the server writes an immutable archive snapshot.
+These are cached forever by the CDN (`Cache-Control: immutable`).
+
+```python
+# Walk back through history
+history = client.walk_back("aws_whats_new", limit=5)
+for snap in history:
+    print(f"  {snap['generated_at']}: {snap['cursor'][:24]}…")
+```
+
+Archive URLs follow the pattern:
+```
+/archive/{source_id}/{YYYY}/{MM}/{DD}/{YYYYMMDDTHHMMSSZ}_{cursor_hex}.json
+```
+
 ## Reference
 
 - [DiffDelta Feed Spec](./diffdelta-feed-spec.md) — full protocol specification
