@@ -1,12 +1,22 @@
 {
+  "version": "1",
   "service": "diffDelta",
-  "schema_version": "1.0.0",
-  "generated_at": "2026-02-02T00:00:00Z",
+  "schema_version": "1.2.0",
+  "generated_at": "2026-02-05T00:00:00Z",
+  "feeds": {
+    "global_head": "/diff/head.json",
+    "sources_index": "/diff/sources.json",
+    "pattern": "/diff/{source_id}/head.json"
+  },
   "endpoints": {
     "diff_latest": "https://diffdelta.io/diff/latest.json",
+    "diff_head": "https://diffdelta.io/diff/head.json",
+    "diff_sources": "https://diffdelta.io/diff/sources.json",
+    "diff_ping": "https://diffdelta.io/diff/ping.json",
     "known_issues": "https://diffdelta.io/known_issues.json",
     "healthz": "https://diffdelta.io/healthz.json",
     "diff_by_source_template": "https://diffdelta.io/diff/source/{source}/latest.json",
+    "diff_head_by_source_template": "https://diffdelta.io/diff/source/{source}/head.json",
     "schemas": {
       "diff": "https://diffdelta.io/schema/v1/diff.schema.json",
       "known_issues": "https://diffdelta.io/schema/v1/known_issues.schema.json",
@@ -19,9 +29,25 @@
     "cursor_supported": true,
     "known_issues_supported": true,
     "per_source_endpoints": true,
+    "head_pointers_supported": true,
     "webhooks_supported": false,
     "telemetry_opt_in": false
   },
-  "sources_supported": ["aws_whats_new", "google_search_docs", "pydantic_github", "apple_developer_releases", "nvidia_press_releases"],
+  "sources_supported": [
+    "apple_developer_releases",
+    "aws_whats_new",
+    "celery_releases",
+    "cloudflare_global",
+    "fastapi_releases",
+    "google_search_docs",
+    "kubernetes_cve",
+    "kubernetes_releases",
+    "langchain_releases",
+    "nvidia_press_releases",
+    "openai_api_changelog",
+    "postgresql_releases",
+    "pydantic_github",
+    "redis_releases"
+  ],
   "limits": { "max_items_per_bucket": 10, "max_summary_chars": 600, "target_max_payload_kb": 200 }
 }
