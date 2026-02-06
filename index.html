@@ -10,7 +10,7 @@
   </head>
   <body style="font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif; margin: 40px; max-width: 920px; line-height: 1.45;">
     <div style="background: #f0f9ff; border-left: 4px solid #0284c7; padding: 12px 16px; margin-bottom: 24px; border-radius: 4px;">
-      <strong style="color: #0284c7;">For bots:</strong> Use <a href="/diff/head.json" style="color: #0284c7; text-decoration: underline;">/diff/head.json</a> or <a href="/diff/sources.json" style="color: #0284c7; text-decoration: underline;">/diff/sources.json</a> for efficient polling. See <a href="/.well-known/diffdelta.json" style="color: #0284c7; text-decoration: underline;">discovery manifest</a>.
+      <strong style="color: #0284c7;">For bots:</strong> Start with <a href="/diff/sources.json" style="color: #0284c7; text-decoration: underline;">/diff/sources.json</a> to see what's available, then poll <a href="/diff/head.json" style="color: #0284c7; text-decoration: underline;">/diff/head.json</a> for changes. <a href="/docs/spec/client-quickstart" style="color: #0284c7; text-decoration: underline; font-weight: 600;">→ 5-minute quickstart</a>
     </div>
     
     <h1 style="margin: 0 0 10px 0;">DiffDelta</h1>
@@ -43,14 +43,16 @@
       <li><a href="/schema/v1/known_issues.schema.json">/schema/v1/known_issues.schema.json</a></li>
     </ul>
 
-    <h2 style="font-size: 16px; margin: 22px 0 8px 0;">Golden path (bot loop)</h2>
+    <h2 style="font-size: 16px; margin: 22px 0 8px 0;">How bots use DiffDelta</h2>
     <ol style="margin-top: 0;">
-      <li>Fetch the manifest (<a href="/.well-known/diffdelta.json">/.well-known/diffdelta.json</a>) to discover endpoints.</li>
-      <li>Poll <a href="/diff/head.json">/diff/head.json</a> to check if cursor changed (most efficient).</li>
-      <li>If cursor unchanged → stop (no need to fetch full feed).</li>
-      <li>If cursor changed → fetch <a href="/diff/latest.json">/diff/latest.json</a> or per-source feed.</li>
-      <li>Process <code>new</code>, <code>updated</code>, and <code>removed</code>. Treat <code>flagged</code> as quarantine.</li>
+      <li><strong>First visit:</strong> <code>GET <a href="/diff/latest.json">/diff/latest.json</a></code> — get all recent changes. Save the <code>cursor</code> value.</li>
+      <li><strong>Every visit after:</strong> <code>GET <a href="/diff/head.json">/diff/head.json</a></code> (~400 bytes) — compare cursor to your stored cursor.</li>
+      <li>Same cursor → nothing new, stop. Different cursor → fetch <code>latest.json</code>, process items, update cursor.</li>
+      <li>Process <code>new</code>, <code>updated</code>, <code>removed</code> buckets. Treat <code>flagged</code> as quarantine.</li>
     </ol>
+    <p style="margin-top: 4px; font-size: 14px; color: #666;">
+      Full walkthrough: <a href="/docs/spec/client-quickstart">/docs/spec/client-quickstart</a>
+    </p>
 
     <p style="margin: 22px 0 0 0; color:#666; font-size: 14px;">
       Status: Alpha. Schemas are stable and changes are additive.
