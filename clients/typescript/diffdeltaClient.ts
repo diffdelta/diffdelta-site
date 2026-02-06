@@ -405,5 +405,10 @@ async function main(): Promise<void> {
   console.log("\nDone.");
 }
 
-// Run if executed directly (Node / tsx / ts-node)
-main().catch(console.error);
+// Run if executed directly (Node / tsx / ts-node), not when imported as a library
+const _isDirectRun =
+  process.argv[1]?.endsWith("diffdeltaClient.ts") ||
+  process.argv[1]?.endsWith("diffdeltaClient.js");
+if (_isDirectRun) {
+  main().catch(console.error);
+}
