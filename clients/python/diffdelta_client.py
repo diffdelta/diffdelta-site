@@ -3,17 +3,23 @@
 DiffDelta Reference Client — Python
 
 Zero external dependencies. Uses only the Python standard library.
-Implements the DiffDelta Feed Spec v1 polling protocol with ETag/304 support
-and local cursor caching.
+Implements the DiffDelta Feed Spec v1.1 polling protocol.
+
+**Key behavior:** Every call to ``poll()`` or ``fetch_latest()`` goes
+through head.json first, sends ``If-None-Match`` with the cached ETag,
+and only fetches the full payload when content has actually changed.
+This is not optional — it's how the protocol scales.  At 100,000 bots,
+skipping head.json turns a 200-byte 304 into a 50 KB full fetch.
 
 Usage:
     from diffdelta_client import DiffDeltaClient
 
     client = DiffDeltaClient("https://diffdelta.io")
-    changed, head = client.fetch_head("aws_whats_new")
-    if changed:
-        feed = client.fetch_latest(head["latest_url"])
-        for item in feed["buckets"]["new"]:
+
+    # Recommended: use poll() — it does head-first automatically
+    result = client.poll("aws_whats_new")
+    if result is not None:
+        for item in result["buckets"]["new"]:
             print(item["headline"])
 """
 
@@ -26,7 +32,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 # ---------------------------------------------------------------------------
 # Cache
@@ -36,7 +42,7 @@ _DEFAULT_CACHE_DIR = Path.home() / ".cache" / "diffdelta"
 
 
 class CursorCache:
-    """Persists per-source ETags/cursors to a local JSON file."""
+    """Persists per-source ETags and cursors to a local JSON file."""
 
     def __init__(self, cache_dir: Optional[Path] = None) -> None:
         self._dir = cache_dir or _DEFAULT_CACHE_DIR
@@ -64,8 +70,8 @@ class CursorCache:
     def get(self, key: str) -> Optional[str]:
         return self._data.get(key)
 
-    def set(self, key: str, cursor: str) -> None:
-        self._data[key] = cursor
+    def set(self, key: str, value: str) -> None:
+        self._data[key] = value
         self._save()
 
 
@@ -79,12 +85,22 @@ _USER_AGENT = f"diffdelta-python-client/{__version__}"
 class DiffDeltaClient:
     """Minimal DiffDelta polling client with ETag/304 support.
 
+    The client enforces the two-step polling pattern by default:
+
+    1. Fetch ``head.json`` with ``If-None-Match``.
+    2. If 304 → done.  If ``changed: false`` → done.
+    3. Only then fetch ``latest.json``.
+
+    This behavior is built into ``poll()`` and ``fetch_latest()``.
+    Bot operators don't need to think about it.
+
     Parameters
     ----------
     base_url : str
         Origin of the DiffDelta server (e.g. ``https://diffdelta.io``).
     cache_dir : Path | None
-        Directory for persisting cursors.  Defaults to ``~/.cache/diffdelta``.
+        Directory for persisting cursors/ETags.  Defaults to
+        ``~/.cache/diffdelta``.
     timeout : int
         HTTP timeout in seconds.
     """
@@ -111,7 +127,10 @@ class DiffDeltaClient:
         if not url.startswith("http"):
             url = self.base_url + ("" if url.startswith("/") else "/") + url
 
-        headers = {"User-Agent": _USER_AGENT, "Accept": "application/json"}
+        headers: Dict[str, str] = {
+            "User-Agent": _USER_AGENT,
+            "Accept": "application/json",
+        }
         if etag:
             headers["If-None-Match"] = f'"{etag}"'
 
@@ -134,93 +153,131 @@ class DiffDeltaClient:
     ) -> Tuple[bool, Optional[Dict[str, Any]]]:
         """Poll the head pointer for *source_id*.
 
-        Uses a locally cached cursor to send ``If-None-Match``.
+        Uses a locally cached ETag to send ``If-None-Match``.
         Returns ``(changed, head_json_or_None)``.
 
-        * ``changed=False`` + ``head=None`` → 304, nothing new.
-        * ``changed=True``  + ``head={…}``  → new data available.
-        * ``changed=False`` + ``head={…}``  → server says ``changed: false``
-          (content fetched but no semantic change).
+        * ``changed=False, head=None`` → 304, nothing new.
+        * ``changed=True,  head={…}``  → new data available.
+        * ``changed=False, head={…}``  → fetched but no semantic change.
         """
-        cache_key = f"head:{source_id}"
-        stored_cursor = self._cache.get(cache_key)
+        cache_key = f"etag:{source_id}"
+        stored_etag = self._cache.get(cache_key)
 
-        url = f"/diff/source/{source_id}/head.json"
-        status, body, resp_etag = self._get(url, etag=stored_cursor)
+        url = f"/diff/{source_id}/head.json"
+        status, body, resp_etag = self._get(url, etag=stored_etag)
 
         if status == 304:
             return False, None
 
-        # Update cached cursor
-        cursor = (body or {}).get("cursor", resp_etag)
-        if cursor:
-            self._cache.set(cache_key, cursor)
+        # Persist ETag for next poll
+        if resp_etag:
+            self._cache.set(cache_key, resp_etag)
 
         changed = (body or {}).get("changed", True)
         return changed, body
 
-    def fetch_latest(
-        self, url_or_source_id: str
-    ) -> Dict[str, Any]:
-        """Fetch the full latest feed.
+    def poll(
+        self, source_id: str
+    ) -> Optional[Dict[str, Any]]:
+        """Head-first poll for a source.  Returns the feed or None.
 
-        *url_or_source_id* can be a relative URL (``/diff/…/latest.json``)
-        or a bare source ID (``aws_whats_new``).
+        This is the recommended entry point.  It:
+        1. Checks head.json (with If-None-Match).
+        2. Returns ``None`` immediately on 304 or ``changed: false``.
+        3. Fetches latest.json only when content has actually changed.
+
+        Returns the full feed dict, or ``None`` if nothing changed.
         """
-        if "/" not in url_or_source_id:
-            url = f"/diff/source/{url_or_source_id}/latest.json"
-        else:
-            url = url_or_source_id
+        changed, head = self.fetch_head(source_id)
+        if not changed or head is None:
+            return None
+        if not head.get("changed", True):
+            return None
 
-        _status, body, _etag = self._get(url)
-        if body is None:
-            raise RuntimeError(f"Empty response from {url}")
-        return body
+        latest_url = head.get("latest_url", f"/diff/{source_id}/latest.json")
+        return self._fetch_json(latest_url)
 
-    def fetch_global(self) -> Dict[str, Any]:
-        """Fetch the global aggregated feed."""
-        _status, body, _etag = self._get("/diff/latest.json")
-        if body is None:
-            raise RuntimeError("Empty response from /diff/latest.json")
-        return body
+    def poll_global(self) -> Optional[Dict[str, Any]]:
+        """Head-first poll for the global aggregated feed.
+
+        Returns the full feed dict, or ``None`` if nothing changed.
+        """
+        cache_key = "etag:_global"
+        stored_etag = self._cache.get(cache_key)
+
+        status, body, resp_etag = self._get("/diff/head.json", etag=stored_etag)
+
+        if status == 304:
+            return None
+
+        if resp_etag:
+            self._cache.set(cache_key, resp_etag)
+
+        changed = (body or {}).get("changed", True)
+        if not changed:
+            return None
+
+        return self._fetch_json("/diff/latest.json")
+
+    def fetch_latest(self, source_id: str) -> Optional[Dict[str, Any]]:
+        """Fetch latest feed for *source_id*, head-first.
+
+        Equivalent to ``poll(source_id)`` — exists for backward compat.
+        """
+        return self.poll(source_id)
+
+    def fetch_latest_direct(self, url: str) -> Dict[str, Any]:
+        """Fetch a feed URL directly (no head check).
+
+        Use this ONLY when you already know the content has changed
+        (e.g. after walking the archive).
+        """
+        return self._fetch_json(url)
+
+    def fetch_global(self) -> Optional[Dict[str, Any]]:
+        """Fetch the global aggregated feed, head-first."""
+        return self.poll_global()
 
     def walk_back(
         self,
         source_id: str,
         limit: int = 10,
     ) -> List[Dict[str, Any]]:
-        """Walk the prev_cursor chain via archive snapshots.
+        """Walk the archive chain for historical snapshots.
 
-        Starts from the current ``latest.json`` and follows ``prev_cursor``
-        links up to *limit* steps.  Returns a list of feed snapshots
-        (newest first).
-
-        Note: requires the server to expose ``/archive/`` endpoints.
+        Fetches ``/archive/{source_id}/index.json`` and retrieves up to
+        *limit* snapshots (newest first).  This is for onboarding / catchup,
+        not for steady-state polling.
         """
         snapshots: List[Dict[str, Any]] = []
-        feed = self.fetch_latest(source_id)
-        snapshots.append(feed)
 
-        zero = "sha256:" + "0" * 64
-        prev = feed.get("prev_cursor", zero)
+        try:
+            index = self._fetch_json(f"/archive/{source_id}/index.json")
+        except Exception:
+            return snapshots
 
-        for _ in range(limit - 1):
-            if not prev or prev == zero:
-                break
-            # Derive archive URL from prev_cursor
-            # Convention: /archive/{source_id}/prev_{hash}.json
-            cursor_hex = prev.replace("sha256:", "")[:12]
-            archive_url = f"/archive/{source_id}/prev_{cursor_hex}.json"
+        entries = index.get("snapshots", [])
+        # Newest first
+        for entry in entries[-limit:][::-1]:
+            url = entry.get("url")
+            if not url:
+                continue
             try:
-                _status, body, _etag = self._get(archive_url)
-                if body is None:
-                    break
-                snapshots.append(body)
-                prev = body.get("prev_cursor", zero)
-            except HTTPError:
-                break  # Archive not available
+                snap = self._fetch_json(url)
+                snapshots.append(snap)
+            except Exception:
+                break
 
         return snapshots
+
+    # -- internal -----------------------------------------------------------
+
+    def _fetch_json(self, url: str) -> Dict[str, Any]:
+        """Fetch a JSON URL directly (no ETag logic)."""
+        status, body, _ = self._get(url)
+        if body is None:
+            raise RuntimeError(f"Empty response from {url}")
+        return body
 
 
 # ---------------------------------------------------------------------------
@@ -228,32 +285,27 @@ class DiffDeltaClient:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
-    """Demonstrate the polling loop."""
+    """Demonstrate the head-first polling loop."""
     base = os.environ.get("DIFFDELTA_BASE_URL", "https://diffdelta.io")
     source = sys.argv[1] if len(sys.argv) > 1 else "aws_whats_new"
 
     client = DiffDeltaClient(base)
 
     print(f"Polling {base} for source '{source}' …")
-    changed, head = client.fetch_head(source)
+    feed = client.poll(source)
 
-    if not changed:
-        print("304 — nothing new. Stopping.")
+    if feed is None:
+        print("Nothing new (304 or changed:false). Done.")
         return
 
-    if head and head.get("changed") is False:
-        print("Server says changed:false — no semantic change.")
-        return
-
-    print(f"Changed! Cursor: {head['cursor'][:24]}…")
-    feed = client.fetch_latest(head.get("latest_url", source))
+    print(f"Changed! Cursor: {(feed.get('cursor') or 'null')[:24]}…")
 
     for bucket in ("new", "updated", "removed", "flagged"):
         items = feed.get("buckets", {}).get(bucket, [])
         if items:
             print(f"\n  [{bucket}] {len(items)} item(s):")
             for item in items[:5]:
-                risk = item.get("risk", {}).get("score", 0)
+                risk = (item.get("risk") or {}).get("score", 0)
                 flag = " ⚠" if risk >= 0.4 else ""
                 print(f"    • {item.get('headline', '(no headline)')}{flag}")
             if len(items) > 5:

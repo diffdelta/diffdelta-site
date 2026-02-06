@@ -2,14 +2,20 @@
  * DiffDelta Reference Client — TypeScript
  *
  * Zero external dependencies.  Uses the standard `fetch` API (Node 18+ / browsers).
- * Implements the DiffDelta Feed Spec v1 polling protocol with ETag / 304 support.
+ * Implements the DiffDelta Feed Spec v1.1 polling protocol.
+ *
+ * **Key behavior:** Every call to `poll()` or `fetchLatest()` goes through
+ * head.json first, sends `If-None-Match` with the cached ETag, and only
+ * fetches the full payload when content has actually changed.
+ * This is not optional — it's how the protocol scales.
  *
  * @example
  * ```ts
  * const client = new DiffDeltaClient("https://diffdelta.io");
- * const { changed, head } = await client.fetchHead("aws_whats_new");
- * if (changed && head) {
- *   const feed = await client.fetchLatest(head.latest_url);
+ *
+ * // Recommended: use poll() — head-first by default
+ * const feed = await client.poll("aws_whats_new");
+ * if (feed) {
  *   for (const item of feed.buckets.new) console.log(item.headline);
  * }
  * ```
@@ -20,8 +26,8 @@
 // ---------------------------------------------------------------------------
 
 export interface HeadPointer {
-  cursor: string;
-  prev_cursor: string;
+  cursor: string | null;
+  prev_cursor: string | null;
   changed: boolean;
   generated_at: string;
   ttl_sec: number;
@@ -29,16 +35,21 @@ export interface HeadPointer {
 }
 
 export interface SourceStatus {
+  name?: string;
   changed: boolean;
-  cursor: string;
-  prev_cursor: string;
+  cursor: string | null;
+  prev_cursor: string | null;
   ttl_sec: number;
-  status: "ok" | "error" | "disabled";
+  status: "ok" | "error" | "disabled" | "unknown";
+  delta_counts?: { new: number; updated: number; removed: number };
   stale?: boolean;
+  stale_since?: string;
   stale_age_sec?: number;
   last_ok_at?: string;
-  delta_counts?: { new: number; updated: number; removed: number };
   error?: { code: string; http_status?: number };
+  disabled_reason?: string;
+  latest_url?: string;
+  head_url?: string;
 }
 
 export interface DeltaItem {
@@ -48,7 +59,8 @@ export interface DeltaItem {
   headline: string;
   published_at: string;
   updated_at: string;
-  risk: { score: number; reasons?: string[] };
+  /** Optional — omitted when score==0 and no reasons.  Treat missing as {score:0}. */
+  risk?: { score: number; reasons?: string[] };
   provenance: {
     fetched_at: string;
     evidence_urls: string[];
@@ -62,8 +74,8 @@ export interface DeltaItem {
 export interface Feed {
   schema_version: string;
   generated_at: string;
-  cursor: string;
-  prev_cursor: string;
+  cursor: string | null;
+  prev_cursor: string | null;
   changed: boolean;
   ttl_sec: number;
   sources_included: string[];
@@ -77,6 +89,7 @@ export interface Feed {
   };
   batch_narrative: string;
   cursor_basis?: string;
+  _discovery?: Record<string, string>;
   [key: string]: unknown;
 }
 
@@ -88,7 +101,7 @@ export interface FetchHeadResult {
 }
 
 // ---------------------------------------------------------------------------
-// In-memory cursor cache (with optional file stub)
+// In-memory cursor / ETag cache
 // ---------------------------------------------------------------------------
 
 class CursorCache {
@@ -98,25 +111,8 @@ class CursorCache {
     return this.data.get(key);
   }
 
-  set(key: string, cursor: string): void {
-    this.data.set(key, cursor);
-  }
-
-  /**
-   * Stub for file-based persistence.
-   * In Node, implement with fs.readFileSync / fs.writeFileSync
-   * targeting ~/.cache/diffdelta/cursor_cache.json.
-   */
-  async loadFromDisk(_path?: string): Promise<void> {
-    // Implement for persistent caching:
-    // const data = JSON.parse(await fs.promises.readFile(path, "utf-8"));
-    // for (const [k, v] of Object.entries(data)) this.data.set(k, v as string);
-  }
-
-  async saveToDisk(_path?: string): Promise<void> {
-    // Implement for persistent caching:
-    // const obj = Object.fromEntries(this.data);
-    // await fs.promises.writeFile(path, JSON.stringify(obj, null, 2), "utf-8");
+  set(key: string, value: string): void {
+    this.data.set(key, value);
   }
 }
 
@@ -124,7 +120,7 @@ class CursorCache {
 // Client
 // ---------------------------------------------------------------------------
 
-const USER_AGENT = "diffdelta-ts-client/0.1.0";
+const USER_AGENT = "diffdelta-ts-client/0.2.0";
 
 export class DiffDeltaClient {
   private baseUrl: string;
@@ -143,7 +139,7 @@ export class DiffDeltaClient {
 
   // -- HTTP helpers --------------------------------------------------------
 
-  private async get<T>(
+  private async httpGet<T>(
     url: string,
     etag?: string
   ): Promise<{ status: number; body: T | null; etag: string | null }> {
@@ -168,8 +164,9 @@ export class DiffDeltaClient {
         signal: controller.signal,
       });
 
+      const respEtag = (resp.headers.get("etag") ?? "").replace(/"/g, "");
+
       if (resp.status === 304) {
-        const respEtag = (resp.headers.get("etag") ?? "").replace(/"/g, "");
         return { status: 304, body: null, etag: respEtag };
       }
 
@@ -178,7 +175,6 @@ export class DiffDeltaClient {
       }
 
       const body = (await resp.json()) as T;
-      const respEtag = (resp.headers.get("etag") ?? "").replace(/"/g, "");
       return { status: resp.status, body, etag: respEtag };
     } finally {
       clearTimeout(timer);
@@ -190,27 +186,25 @@ export class DiffDeltaClient {
   /**
    * Poll the head pointer for a source.
    *
-   * Sends `If-None-Match` with the locally cached cursor.
-   * Returns `{ changed: false, head: null }` on 304 (nothing new).
+   * Sends `If-None-Match` with the locally cached ETag.
+   * Returns `{ changed: false, head: null }` on 304.
    */
   async fetchHead(sourceId: string): Promise<FetchHeadResult> {
-    const cacheKey = `head:${sourceId}`;
-    const storedCursor = this.cache.get(cacheKey);
+    const cacheKey = `etag:${sourceId}`;
+    const storedEtag = this.cache.get(cacheKey);
 
-    const url = `/diff/source/${sourceId}/head.json`;
-    const { status, body, etag } = await this.get<HeadPointer>(
+    const url = `/diff/${sourceId}/head.json`;
+    const { status, body, etag } = await this.httpGet<HeadPointer>(
       url,
-      storedCursor
+      storedEtag
     );
 
     if (status === 304) {
       return { changed: false, head: null };
     }
 
-    // Update cached cursor
-    const cursor = body?.cursor ?? etag;
-    if (cursor) {
-      this.cache.set(cacheKey, cursor);
+    if (etag) {
+      this.cache.set(cacheKey, etag);
     }
 
     const changed = body?.changed ?? true;
@@ -218,53 +212,98 @@ export class DiffDeltaClient {
   }
 
   /**
-   * Fetch the full latest feed.
+   * Head-first poll for a source.  Returns the feed or null.
    *
-   * @param urlOrSourceId  Relative URL or bare source ID.
+   * **This is the recommended entry point.**  It:
+   * 1. Checks head.json (with If-None-Match).
+   * 2. Returns `null` immediately on 304 or `changed: false`.
+   * 3. Fetches latest.json only when content has actually changed.
    */
-  async fetchLatest(urlOrSourceId: string): Promise<Feed> {
-    const url = urlOrSourceId.includes("/")
-      ? urlOrSourceId
-      : `/diff/source/${urlOrSourceId}/latest.json`;
+  async poll(sourceId: string): Promise<Feed | null> {
+    const { changed, head } = await this.fetchHead(sourceId);
+    if (!changed || !head) return null;
+    if (!head.changed) return null;
 
-    const { body } = await this.get<Feed>(url);
+    const latestUrl = head.latest_url ?? `/diff/${sourceId}/latest.json`;
+    return this.fetchDirect<Feed>(latestUrl);
+  }
+
+  /**
+   * Head-first poll for the global aggregated feed.
+   * Returns the full feed, or null if nothing changed.
+   */
+  async pollGlobal(): Promise<Feed | null> {
+    const cacheKey = "etag:_global";
+    const storedEtag = this.cache.get(cacheKey);
+
+    const { status, body, etag } = await this.httpGet<HeadPointer>(
+      "/diff/head.json",
+      storedEtag
+    );
+
+    if (status === 304) return null;
+
+    if (etag) {
+      this.cache.set(cacheKey, etag);
+    }
+
+    if (!(body?.changed ?? true)) return null;
+
+    return this.fetchDirect<Feed>("/diff/latest.json");
+  }
+
+  /**
+   * Fetch latest feed for a source, head-first.
+   *
+   * Equivalent to `poll()` — exists for backward compatibility.
+   */
+  async fetchLatest(sourceId: string): Promise<Feed | null> {
+    return this.poll(sourceId);
+  }
+
+  /** Fetch the global aggregated feed, head-first. */
+  async fetchGlobal(): Promise<Feed | null> {
+    return this.pollGlobal();
+  }
+
+  /**
+   * Fetch a URL directly (no head check).
+   *
+   * Use ONLY when you already know content has changed
+   * (e.g. after walking the archive).
+   */
+  async fetchDirect<T>(url: string): Promise<T> {
+    const { body } = await this.httpGet<T>(url);
     if (!body) throw new Error(`Empty response from ${url}`);
     return body;
   }
 
-  /** Fetch the global aggregated feed. */
-  async fetchGlobal(): Promise<Feed> {
-    const { body } = await this.get<Feed>("/diff/latest.json");
-    if (!body) throw new Error("Empty response from /diff/latest.json");
-    return body;
-  }
-
   /**
-   * Walk the prev_cursor chain via archive snapshots.
+   * Walk the archive chain for historical snapshots.
    *
-   * Returns an array of feed snapshots (newest first), up to `limit`.
+   * Fetches `/archive/{sourceId}/index.json` and retrieves up to
+   * `limit` snapshots (newest first).  For onboarding / catchup only.
    */
   async walkBack(sourceId: string, limit = 10): Promise<Feed[]> {
     const snapshots: Feed[] = [];
-    const feed = await this.fetchLatest(sourceId);
-    snapshots.push(feed);
 
-    const zero = "sha256:" + "0".repeat(64);
-    let prev = feed.prev_cursor ?? zero;
+    let index: { snapshots?: Array<{ url?: string }> };
+    try {
+      index = await this.fetchDirect(`/archive/${sourceId}/index.json`);
+    } catch {
+      return snapshots;
+    }
 
-    for (let i = 1; i < limit; i++) {
-      if (!prev || prev === zero) break;
+    const entries = index.snapshots ?? [];
+    const recent = entries.slice(-limit).reverse();
 
-      const cursorHex = prev.replace("sha256:", "").slice(0, 12);
-      const archiveUrl = `/archive/${sourceId}/prev_${cursorHex}.json`;
-
+    for (const entry of recent) {
+      if (!entry.url) continue;
       try {
-        const { body } = await this.get<Feed>(archiveUrl);
-        if (!body) break;
-        snapshots.push(body);
-        prev = body.prev_cursor ?? zero;
+        const snap = await this.fetchDirect<Feed>(entry.url);
+        snapshots.push(snap);
       } catch {
-        break; // Archive not available
+        break;
       }
     }
 
@@ -283,20 +322,14 @@ async function main(): Promise<void> {
   const client = new DiffDeltaClient(baseUrl);
 
   console.log(`Polling ${baseUrl} for source '${sourceId}' …`);
-  const { changed, head } = await client.fetchHead(sourceId);
+  const feed = await client.poll(sourceId);
 
-  if (!changed || !head) {
-    console.log("304 — nothing new. Stopping.");
+  if (!feed) {
+    console.log("Nothing new (304 or changed:false). Done.");
     return;
   }
 
-  if (!head.changed) {
-    console.log("Server says changed:false — no semantic change.");
-    return;
-  }
-
-  console.log(`Changed! Cursor: ${head.cursor.slice(0, 24)}…`);
-  const feed = await client.fetchLatest(head.latest_url ?? sourceId);
+  console.log(`Changed! Cursor: ${(feed.cursor ?? "null").slice(0, 24)}…`);
 
   for (const bucket of ["new", "updated", "removed", "flagged"] as const) {
     const items = feed.buckets[bucket] ?? [];

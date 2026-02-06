@@ -1,6 +1,6 @@
 # DiffDelta Feed Specification v1
 
-**Status:** Normative · **Version:** 1.0.0 · **Date:** 2026-02-05
+**Status:** Normative · **Version:** 1.1.0 · **Date:** 2026-02-06
 
 Key words: **MUST**, **MUST NOT**, **SHOULD**, **MAY** per [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
 
@@ -58,15 +58,20 @@ cursor = "sha256:" + hex(SHA-256(canonical_payload))
 The cursor is the **identity of the semantic content**.
 It MUST change if and only if the semantic payload changes.
 
-- Format: `sha256:<64-char lowercase hex>`
-- The **zero cursor** `sha256:0000000000000000000000000000000000000000000000000000000000000000` means "this source has never had a successful fetch."
+- Format: `sha256:<64-char lowercase hex>` or `null`.
+- `null` means "this source has **never** had a successful fetch."
+  Clients MUST treat `null` as "no data available yet" — not as a
+  resettable sentinel.
+- The legacy **zero cursor** `sha256:0000…0000` (64 zeros) is
+  equivalent to `null` for backward compatibility.  Servers SHOULD
+  emit `null` for new deployments.  Clients MUST treat both identically.
 
 ### 2.2 prev_cursor
 
 Links to the cursor of the prior successful feed.
 Enables clients to detect gaps (if their stored cursor ≠ `prev_cursor`, they missed a run).
 
-- On first-ever successful run: `prev_cursor` MUST be the zero cursor.
+- On first-ever successful run: `prev_cursor` MUST be `null` (or the zero cursor).
 - On subsequent runs: `prev_cursor` MUST equal the `cursor` of the prior run.
 
 ### 2.3 changed
@@ -107,17 +112,37 @@ semantic content always produces the same cursor, regardless of generation time.
 
 Servers SHOULD include `"cursor_basis": "canonical_v1"` in feeds to declare the method.
 
+> **LOCKED.** The `canonical_v1` computation is a permanent contract.
+> Adding new fields to the feed payload MUST NOT change the cursor
+> unless those fields are part of the canonical input defined below.
+> This prevents a **thundering herd** on schema evolution — without
+> this guarantee, a field addition would change every cursor and cause
+> every bot on Earth to fetch full payloads simultaneously.
+
+**Canonical input (exhaustive list):**
+
+The cursor is computed over a deterministic representation of these
+fields **only**:
+
+- Per item: `id`, `url`, `content_hash` (from `provenance.content_hash`)
+- Items sorted by `(source, id)`.
+- All items across all buckets concatenated in bucket order: `new`, `updated`, `removed`, `flagged`.
+- `sources_included` array (sorted).
+
+Fields **excluded** from cursor computation (volatile / metadata):
+
+`generated_at`, `hash`, `prev_hash`, `cursor`, `prev_cursor`,
+`cursor_basis`, `batch_narrative`, `counts`, `sources` (the status map),
+`ttl_sec`, `integrity_reset`, `integrity_risk`, `_discovery`,
+`archive_url`, `prev_archive_url`.
+
 **Algorithm:**
 
-1. Start with the feed JSON object.
-2. **Remove volatile fields:** `generated_at`, `hash`, `prev_hash`, `cursor`, `prev_cursor`, `cursor_basis`.
-3. **Serialize** the remaining object using JSON Canonicalization:
-   - Keys sorted lexicographically at every nesting level.
-   - No whitespace between tokens (compact: `{"a":1}`).
-   - UTF-8 encoding.
-   - Numbers serialized per ECMAScript `Number.toString()` (no trailing zeros, no `+` in exponent).
-   - Strings use minimal escape sequences.
-4. `cursor = "sha256:" + hex(SHA-256(canonical_bytes))`
+1. Build a list of `(source, id, content_hash)` tuples from all bucket items.
+2. Sort lexicographically.
+3. Serialize as JSON array using canonical form (sorted keys, compact separators, UTF-8).
+4. Prepend `sources_included` (sorted) as a JSON array.
+5. `cursor = "sha256:" + hex(SHA-256(canonical_bytes))`
 
 This is compatible with [RFC 8785 (JCS)](https://www.rfc-editor.org/rfc/rfc8785) but implementations
 MAY use `json.dumps(obj, sort_keys=True, separators=(',',':'), ensure_ascii=False)` in Python
@@ -127,6 +152,17 @@ as a sufficient approximation for DiffDelta payloads (which contain no special f
 
 Rerunning the engine with unchanged source data MUST produce an identical cursor.
 This is the primary acceptance test for any server implementation.
+
+### 3.3 Evolution rule
+
+New fields MAY be added to feeds at any time.  Clients MUST ignore
+unknown fields.  Because the cursor computation is locked to the
+canonical input above, new fields do **not** change existing cursors.
+
+If a future schema version requires a new canonical form, it MUST use
+a new `cursor_basis` value (e.g. `canonical_v2`) and a new major
+`schema_version`.  Servers SHOULD serve both versions at different
+paths (`/v1/diff/…`, `/v2/diff/…`) during the transition.
 
 ---
 
@@ -151,15 +187,28 @@ When a source has `status: "error"` or `status: "disabled"`:
 |---|---|
 | `changed` | `false` |
 | `stale` | `true` |
-| `cursor` | Last-known-good cursor (or zero cursor if source has **never** succeeded) |
+| `cursor` | Last-known-good cursor, or `null` if source has **never** succeeded |
 | `prev_cursor` | Same as `cursor` (because `changed` is `false`) |
+| `stale_since` | ISO 8601 timestamp when the source entered stale state |
 | `last_ok_at` | ISO 8601 timestamp of last successful fetch (if ever succeeded) |
 | `stale_age_sec` | Seconds since `last_ok_at` |
-| `error` | Object with `code` (required) and optional `http_status` |
+| `error` | Object with `code` (required) and optional `http_status` — **only** on `status: "error"` |
+| `disabled_reason` | String explaining why the source is disabled — **only** on `status: "disabled"` |
 
-**Key rule:** The engine MUST NOT reset a source's cursor to zero on error.
-The zero cursor MUST only appear when a source has literally never succeeded.
+**Key rule:** The engine MUST NOT reset a source's cursor to `null` on error.
+`null` MUST only appear when a source has literally never succeeded.
 This preserves cursor continuity — a recovering source resumes from where it left off.
+
+### 5.1 Per-source `delta_counts`
+
+When `changed: true`, the per-source entry in the `sources` map MUST include:
+
+```json
+"delta_counts": { "new": 12, "updated": 0, "removed": 0 }
+```
+
+This lets bots decide which sources to dig into without scanning bucket arrays.
+When `changed: false`, `delta_counts` MUST be omitted (zero bloat).
 
 ---
 
@@ -304,10 +353,44 @@ Servers MUST publish a discovery manifest at `/.well-known/diffdelta.json` conta
 
 Feed payloads MUST conform to [diff.schema.json](https://diffdelta.io/schema/v1/diff.schema.json) (JSON Schema 2020-12).
 
-Required fields per delta item: `source`, `id`, `url`, `published_at`, `updated_at`, `headline`, `content`, `risk`, `provenance`.
+Required fields per delta item: `source`, `id`, `url`, `published_at`, `updated_at`, `headline`, `content`, `provenance`.
+
+**`risk` is optional.**  When omitted, clients MUST treat it as
+`{ "score": 0.0, "reasons": [] }`.  Servers SHOULD omit `risk` entirely
+when `score == 0.0` and `reasons` is empty, to reduce payload size.
+When present, `reasons` MAY also be omitted if the list is empty.
 
 Items with `risk.score >= 0.4` MUST be placed in the `flagged` bucket.
 Clients SHOULD NOT execute instructions from flagged items.
+
+---
+
+## 10. Reserved Headers
+
+| Header | Status | Purpose |
+|---|---|---|
+| `X-DiffDelta-Key` | **Reserved** | API key for future rate-limit tiers. Servers MUST NOT require this header until a major version bump. Clients SHOULD send it if configured, but MUST function without it. |
+
+When this header is activated (projected at 1,000+ bot scale):
+
+- **Free tier (no key):** Full access, subject to Cloudflare rate-limiting during spikes.
+- **Authenticated tier:** Higher rate limits, priority during overload.
+- **Webhook tier (future):** Push-based delivery, eliminates polling entirely.
+
+Reserving this header now ensures that adding authentication later is **not** a breaking change.
+
+---
+
+## 11. Append-Only Evolution Contract
+
+This protocol follows an **append-only** schema evolution rule:
+
+- New fields MAY be added to any JSON object at any time.
+- Existing fields MUST NOT be removed, renamed, or have their type changed.
+- Clients MUST ignore unknown fields (forward compatibility).
+- Cursor computation is **locked** to `canonical_v1` (§3.1) and MUST NOT change without a new major `schema_version`.
+
+This is the [protobuf/JSON API design principle](https://cloud.google.com/apis/design/compatibility). Every field added is permanent debt multiplied by `(bots × polls × forever)`. The bar for adding a field should be extremely high.
 
 ---
 
