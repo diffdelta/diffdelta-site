@@ -52,6 +52,33 @@ export interface SourceStatus {
   head_url?: string;
 }
 
+export interface SourceEntry {
+  source_id: string;
+  name: string;
+  tags: string[];
+  description: string;
+  homepage: string;
+  upstream_url?: string;
+  enabled: boolean;
+  status: string;
+  cursor: string | null;
+  ttl_sec: number;
+  head_url: string;
+  latest_url: string;
+  stale?: boolean;
+  last_ok_at?: string;
+  error?: string;
+}
+
+export interface SourcesCatalog {
+  schema_version: string;
+  generated_at: string;
+  total: number;
+  enabled_count: number;
+  tags_available: string[];
+  sources: SourceEntry[];
+}
+
 export interface DeltaItem {
   source: string;
   id: string;
@@ -276,6 +303,36 @@ export class DiffDeltaClient {
     const { body } = await this.httpGet<T>(url);
     if (!body) throw new Error(`Empty response from ${url}`);
     return body;
+  }
+
+  /**
+   * Fetch the source catalog and optionally filter by tags.
+   *
+   * Returns source entries from `/diff/sources.json`.
+   * If `tags` is provided, only sources matching **any** of the
+   * given tags are returned (OR logic).
+   *
+   * This is a setup-time call, not a polling call.  Cache the result
+   * and use the returned `source_id` values with `poll()`.
+   *
+   * @example
+   * ```ts
+   * const security = await client.fetchSources(["security"]);
+   * for (const src of security) {
+   *   const feed = await client.poll(src.source_id);
+   * }
+   * ```
+   */
+  async fetchSources(tags?: string[]): Promise<SourceEntry[]> {
+    const catalog = await this.fetchDirect<SourcesCatalog>("/diff/sources.json");
+    let sources = catalog.sources ?? [];
+    if (tags && tags.length > 0) {
+      const tagSet = new Set(tags);
+      sources = sources.filter((s) =>
+        (s.tags ?? []).some((t) => tagSet.has(t))
+      );
+    }
+    return sources;
   }
 
   /**

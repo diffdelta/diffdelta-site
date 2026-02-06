@@ -238,6 +238,35 @@ class DiffDeltaClient:
         """Fetch the global aggregated feed, head-first."""
         return self.poll_global()
 
+    def fetch_sources(
+        self, tags: Optional[List[str]] = None
+    ) -> List[Dict[str, Any]]:
+        """Fetch the source catalog and optionally filter by tags.
+
+        Returns a list of source entries from ``/diff/sources.json``.
+        If *tags* is provided, only sources matching **any** of the
+        given tags are returned (OR logic).
+
+        This is a setup-time call, not a polling call.  Cache the result
+        and use the returned ``source_id`` values with ``poll()``.
+
+        Example::
+
+            # Get only security sources
+            security = client.fetch_sources(tags=["security"])
+            for src in security:
+                feed = client.poll(src["source_id"])
+        """
+        data = self._fetch_json("/diff/sources.json")
+        sources = data.get("sources", [])
+        if tags:
+            tag_set = set(tags)
+            sources = [
+                s for s in sources
+                if tag_set.intersection(s.get("tags", []))
+            ]
+        return sources
+
     def walk_back(
         self,
         source_id: str,

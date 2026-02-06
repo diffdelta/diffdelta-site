@@ -102,6 +102,14 @@
     .source-links{display:flex;gap:10px}
     .source-links a{font-size:.8rem;color:var(--text3);transition:color .15s;font-family:var(--mono)}
     .source-links a:hover{color:var(--accent)}
+    .tag-pill{display:inline-block;font-size:.7rem;padding:2px 8px;border-radius:99px;margin:1px 3px 1px 0;
+      font-weight:600;letter-spacing:.3px;white-space:nowrap}
+    .tag-security{background:#dc354520;color:#dc3545}
+    .tag-cloud-status{background:#fd7e1420;color:#fd7e14}
+    .tag-releases{background:#0d6efd20;color:#0d6efd}
+    .tag-ai{background:#6f42c120;color:#6f42c1}
+    .tag-news{background:#6c757d20;color:#6c757d}
+    .tag-cloud{background:#0dcaf020;color:#0aa2c0}
 
     /* ── Code block + tabs ── */
     .code-block{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
@@ -242,12 +250,13 @@
         <thead>
           <tr>
             <th>Source</th>
+            <th>Tags</th>
             <th>Status</th>
             <th>Endpoints</th>
           </tr>
         </thead>
         <tbody id="sources-body">
-          <tr><td colspan="3" style="color:var(--text3);padding:24px;text-align:center">Loading sources…</td></tr>
+          <tr><td colspan="4" style="color:var(--text3);padding:24px;text-align:center">Loading sources…</td></tr>
         </tbody>
       </table>
     </div>
@@ -306,7 +315,11 @@ curl -s https://diffdelta.io/diff/source/cisa_kev/latest.json \
   | jq <span class="s">'.buckets.new[].headline'</span>
 
 <span class="cm"># List all available sources</span>
-curl -s https://diffdelta.io/diff/sources.json | jq <span class="s">'.sources[].source_id'</span></pre>
+curl -s https://diffdelta.io/diff/sources.json | jq <span class="s">'.sources[].source_id'</span>
+
+<span class="cm"># Filter by tag — only security sources</span>
+curl -s https://diffdelta.io/diff/sources.json \
+  | jq <span class="s">'[.sources[] | select(.tags | contains(["security"]))]'</span></pre>
       </div>
     </div>
   </section>
@@ -414,9 +427,13 @@ curl -s https://diffdelta.io/diff/sources.json | jq <span class="s">'.sources[].
             : s.status === 'degraded' ? 'status-degraded'
             : s.status === 'error' ? 'status-error'
             : 'status-disabled';
+          var tags = (s.tags || []).map(function(t) {
+            return '<span class="tag-pill tag-' + esc(t) + '">' + esc(t) + '</span>';
+          }).join('');
           var tr = document.createElement('tr');
           tr.innerHTML =
             '<td><div class="source-name-cell"><span class="status-dot ' + cls + '"></span>' + esc(s.name) + '</div></td>' +
+            '<td>' + tags + '</td>' +
             '<td style="color:var(--text3)">' + esc(s.status) + '</td>' +
             '<td><div class="source-links">' +
               '<a href="' + esc(s.head_url) + '">head</a>' +
@@ -426,7 +443,7 @@ curl -s https://diffdelta.io/diff/sources.json | jq <span class="s">'.sources[].
         }
       } catch (e) {
         var fallback = document.getElementById('sources-body');
-        if (fallback) fallback.innerHTML = '<tr><td colspan="3" style="color:var(--text3);padding:24px">Could not load sources. <a href="/diff/sources.json">View raw JSON →</a></td></tr>';
+        if (fallback) fallback.innerHTML = '<tr><td colspan="4" style="color:var(--text3);padding:24px">Could not load sources. <a href="/diff/sources.json">View raw JSON →</a></td></tr>';
       }
     })();
 

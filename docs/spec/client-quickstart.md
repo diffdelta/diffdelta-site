@@ -1,6 +1,6 @@
 # DiffDelta — Your First 5 Minutes
 
-DiffDelta monitors 14+ tech sources (AWS, Kubernetes, OpenAI, Redis, etc.) and publishes a single JSON feed of what changed. Instead of scraping 14 websites, your bot polls one URL.
+DiffDelta monitors 35+ tech sources (AWS, Kubernetes, OpenAI, Redis, etc.) and publishes a single JSON feed of what changed. Instead of scraping dozens of websites, your bot polls one URL.
 
 ---
 
@@ -10,26 +10,38 @@ DiffDelta monitors 14+ tech sources (AWS, Kubernetes, OpenAI, Redis, etc.) and p
 GET https://diffdelta.io/diff/sources.json
 ```
 
-This returns a catalog of every source DiffDelta tracks:
+This returns a catalog of every source DiffDelta tracks, including **tags** for filtering:
 
 ```json
 {
+  "tags_available": ["ai", "cloud", "cloud-status", "news", "releases", "security"],
   "sources": [
+    {
+      "source_id": "cisa_kev",
+      "name": "CISA Known Exploited Vulnerabilities",
+      "tags": ["security"],
+      "description": "CISA catalog of known exploited vulnerabilities.",
+      "enabled": true,
+      "status": "ok",
+      "head_url": "/diff/source/cisa_kev/head.json",
+      "latest_url": "/diff/source/cisa_kev/latest.json"
+    },
     {
       "source_id": "aws_whats_new",
       "name": "AWS What's New",
+      "tags": ["news", "cloud"],
       "description": "New AWS service launches, features, and region expansions.",
       "enabled": true,
       "status": "ok",
-      "latest_url": "/diff/source/aws_whats_new/latest.json",
-      "head_url": "/diff/source/aws_whats_new/head.json"
+      "head_url": "/diff/source/aws_whats_new/head.json",
+      "latest_url": "/diff/source/aws_whats_new/latest.json"
     },
     ...
   ]
 }
 ```
 
-You now know what sources exist and where their feeds live.
+You now know what sources exist, what category they belong to, and where their feeds live.
 
 ---
 
@@ -185,14 +197,31 @@ Run this on a schedule (every 60 seconds, or whatever `ttl_sec` says). Most runs
 
 ## Per-source feeds
 
-Don't need all 14 sources? Poll just the ones you care about:
+Don't need all 35 sources? Filter by **tag** and poll only what matters to you:
+
+```python
+# Only poll security sources
+from diffdelta_client import DiffDeltaClient
+
+client = DiffDeltaClient("https://diffdelta.io")
+security = client.fetch_sources(tags=["security"])  # 8 sources
+
+for src in security:
+    feed = client.poll(src["source_id"])
+    if feed:
+        for item in feed["buckets"]["new"]:
+            print(f"🚨 [{src['name']}] {item['headline']}")
+```
+
+Or poll individual sources directly:
 
 ```
-GET https://diffdelta.io/diff/source/aws_whats_new/head.json
+GET https://diffdelta.io/diff/source/cisa_kev/head.json
 GET https://diffdelta.io/diff/source/kubernetes_cve/head.json
 ```
 
-Same cursor logic — just scoped to one source. The `sources.json` catalog tells you what's available.
+Available tags: `security`, `releases`, `cloud-status`, `ai`, `news`, `cloud`.
+Same cursor logic — just scoped to the sources you care about. The `sources.json` catalog has the full list.
 
 ---
 
