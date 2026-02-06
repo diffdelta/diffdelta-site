@@ -147,20 +147,34 @@ class CursorCache {
 // Client
 // ---------------------------------------------------------------------------
 
-const USER_AGENT = "diffdelta-ts-client/0.2.0";
+const USER_AGENT = "diffdelta-ts-client/0.3.0";
+
+export interface DiffDeltaClientOptions {
+  /** Optional Pro/Enterprise API key for higher rate limits. */
+  apiKey?: string;
+  /** HTTP timeout in milliseconds (default 15 000). */
+  timeout?: number;
+}
 
 export class DiffDeltaClient {
   private baseUrl: string;
   private timeout: number;
+  private apiKey?: string;
   private cache: CursorCache;
 
   /**
    * @param baseUrl  Origin of the DiffDelta server.
-   * @param timeout  HTTP timeout in milliseconds (default 15 000).
+   * @param options  Optional config: apiKey for Pro tier, timeout.
    */
-  constructor(baseUrl = "https://diffdelta.io", timeout = 15_000) {
+  constructor(baseUrl = "https://diffdelta.io", options?: DiffDeltaClientOptions | number) {
     this.baseUrl = baseUrl.replace(/\/+$/, "");
-    this.timeout = timeout;
+    // Backward compat: accept raw timeout number as second arg
+    if (typeof options === "number") {
+      this.timeout = options;
+    } else {
+      this.timeout = options?.timeout ?? 15_000;
+      this.apiKey = options?.apiKey;
+    }
     this.cache = new CursorCache();
   }
 
@@ -178,6 +192,9 @@ export class DiffDeltaClient {
       "User-Agent": USER_AGENT,
       Accept: "application/json",
     };
+    if (this.apiKey) {
+      headers["X-DiffDelta-Key"] = this.apiKey;
+    }
     if (etag) {
       headers["If-None-Match"] = `"${etag}"`;
     }

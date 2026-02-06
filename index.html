@@ -134,10 +134,28 @@
     .saving-label{font-size:.85rem;color:var(--text2);margin-top:4px}
     .saving-sub{font-size:.75rem;color:var(--text3)}
 
-    /* ── CTA ── */
+    /* ── CTA / Pricing ── */
     .cta{text-align:center;padding:56px var(--px) 72px}
     .cta p{color:var(--text2);margin-bottom:24px}
     .cta .hi{color:var(--green);font-weight:600}
+
+    /* ── Pricing cards ── */
+    .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:36px;text-align:left}
+    .pricing-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:32px 28px;
+      display:flex;flex-direction:column;position:relative}
+    .pricing-card.featured{border-color:var(--accent);box-shadow:0 0 40px var(--accent-glow)}
+    .pricing-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--accent);
+      color:#fff;font-size:.7rem;font-weight:700;padding:4px 14px;border-radius:20px;text-transform:uppercase;
+      letter-spacing:.5px;white-space:nowrap}
+    .pricing-tier{font-size:.85rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+    .pricing-price{font-size:2.5rem;font-weight:800;letter-spacing:-1.5px;margin-bottom:4px}
+    .pricing-price span{font-size:1rem;font-weight:400;color:var(--text3)}
+    .pricing-sub{font-size:.8rem;color:var(--text3);margin-bottom:20px}
+    .pricing-features{list-style:none;padding:0;margin:0 0 28px;flex:1}
+    .pricing-features li{font-size:.9rem;color:var(--text2);padding:7px 0;position:relative;padding-left:24px}
+    .pricing-features li::before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:700}
+    .pricing-card .btn{width:100%;justify-content:center;text-align:center}
+    @media(max-width:768px){.pricing-grid{grid-template-columns:1fr}}
 
     /* ── Footer ── */
     .footer{max-width:var(--max-w);margin:0 auto;padding:24px var(--px);
@@ -179,6 +197,7 @@
     <div class="nav-links">
       <a href="/docs/spec/client-quickstart">Docs</a>
       <a href="#sources">Sources</a>
+      <a href="#pricing">Pricing</a>
       <a href="/docs/spec/diffdelta-feed-spec">Spec</a>
       <a href="https://github.com/diffdelta">GitHub</a>
     </div>
@@ -362,16 +381,69 @@ curl -s https://diffdelta.io/diff/sources.json \
     </div>
   </section>
 
-  <!-- CTA -->
-  <section class="cta">
+  <!-- Pricing -->
+  <section class="cta" id="pricing">
     <div class="section-label">Pricing</div>
-    <h2 class="section-title">Free forever for basic polling</h2>
-    <p><span class="hi">Free tier</span> — All sources, unlimited polling, full feed access, no API key required.<br>
-      Pro &amp; Enterprise tiers coming soon for webhooks, premium sources, and SLA guarantees.</p>
-    <div class="hero-actions" style="margin-top:24px">
-      <a href="/docs/spec/diffdelta-feed-spec" class="btn btn-primary">Read the Spec →</a>
-      <a href="/docs/spec/client-quickstart" class="btn btn-ghost">Client Quickstart →</a>
+    <h2 class="section-title">Simple, transparent pricing</h2>
+    <p>Start free. Upgrade when your bots need more speed.</p>
+
+    <div class="pricing-grid">
+
+      <!-- Free -->
+      <div class="pricing-card">
+        <div class="pricing-tier">Free</div>
+        <div class="pricing-price">$0<span>/mo</span></div>
+        <div class="pricing-sub">No credit card required</div>
+        <ul class="pricing-features">
+          <li>All 35+ sources</li>
+          <li>Full feed &amp; archive access</li>
+          <li>60 requests/min</li>
+          <li>Tag-based filtering</li>
+          <li>Client libraries (Python, TS)</li>
+          <li>Community support</li>
+        </ul>
+        <a href="#quickstart" class="btn btn-ghost">Get Started</a>
+      </div>
+
+      <!-- Pro -->
+      <div class="pricing-card featured">
+        <div class="pricing-badge">Most Popular</div>
+        <div class="pricing-tier">Pro</div>
+        <div class="pricing-price">$29<span>/mo</span></div>
+        <div class="pricing-sub">For production bots &amp; teams</div>
+        <ul class="pricing-features">
+          <li>Everything in Free</li>
+          <li>1,000 requests/min</li>
+          <li>Webhook push (real-time)</li>
+          <li>Usage analytics</li>
+          <li>API key &amp; key rotation</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="/api/v1/checkout" class="btn btn-primary">Upgrade to Pro →</a>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="pricing-card">
+        <div class="pricing-tier">Enterprise</div>
+        <div class="pricing-price">Custom</div>
+        <div class="pricing-sub">For platform teams at scale</div>
+        <ul class="pricing-features">
+          <li>Everything in Pro</li>
+          <li>5,000+ requests/min</li>
+          <li>Custom source onboarding</li>
+          <li>SLA with financial backing</li>
+          <li>SSO &amp; team key management</li>
+          <li>Dedicated support channel</li>
+        </ul>
+        <a href="mailto:enterprise@diffdelta.io" class="btn btn-ghost">Contact Sales →</a>
+      </div>
+
     </div>
+
+    <p style="margin-top:28px;font-size:.85rem;color:var(--text3)">
+      All tiers include the same sources and data. Pro adds speed, real-time push, and key management.<br>
+      <a href="/terms">Terms of Service</a> · <a href="/docs/spec/diffdelta-feed-spec">Feed Spec</a>
+    </p>
   </section>
 
   <!-- Footer -->

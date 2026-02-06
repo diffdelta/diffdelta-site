@@ -32,7 +32,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 # ---------------------------------------------------------------------------
 # Cache
@@ -98,6 +98,10 @@ class DiffDeltaClient:
     ----------
     base_url : str
         Origin of the DiffDelta server (e.g. ``https://diffdelta.io``).
+    api_key : str | None
+        Optional Pro/Enterprise API key.  When provided, it is sent as
+        the ``X-DiffDelta-Key`` header on every request, unlocking higher
+        rate limits (1,000 req/min Pro vs 60 req/min Free).
     cache_dir : Path | None
         Directory for persisting cursors/ETags.  Defaults to
         ``~/.cache/diffdelta``.
@@ -108,11 +112,13 @@ class DiffDeltaClient:
     def __init__(
         self,
         base_url: str = "https://diffdelta.io",
+        api_key: Optional[str] = None,
         cache_dir: Optional[Path] = None,
         timeout: int = 15,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
+        self._api_key = api_key
         self._cache = CursorCache(cache_dir)
 
     # -- HTTP helpers -------------------------------------------------------
@@ -131,6 +137,8 @@ class DiffDeltaClient:
             "User-Agent": _USER_AGENT,
             "Accept": "application/json",
         }
+        if self._api_key:
+            headers["X-DiffDelta-Key"] = self._api_key
         if etag:
             headers["If-None-Match"] = f'"{etag}"'
 

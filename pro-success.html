@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Welcome to Pro — DiffDelta</title>
+  <meta name="robots" content="noindex">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#09090b;--surface:#18181b;--surface2:#27272a;--border:#27272a;
+      --text:#fafafa;--text2:#a1a1aa;--text3:#71717a;
+      --accent:#3b82f6;--accent-h:#2563eb;
+      --green:#22c55e;--green-bg:rgba(34,197,94,.12);
+      --yellow:#eab308;--red:#ef4444;
+      --font:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+      --mono:ui-monospace,'SF Mono','Cascadia Code',monospace;
+      --max-w:640px;--px:24px
+    }
+    html{font-size:16px}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.7;
+      min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    code{font-family:var(--mono);font-size:.875em;background:var(--surface2);padding:2px 6px;border-radius:4px}
+    pre{font-family:var(--mono);font-size:.85rem;background:var(--surface);border:1px solid var(--border);
+      border-radius:8px;padding:16px 20px;overflow-x:auto;margin:12px 0;line-height:1.5}
+
+    .card{max-width:var(--max-w);width:100%;background:var(--surface);border:1px solid var(--border);
+      border-radius:16px;padding:40px var(--px);text-align:center}
+    .card h1{font-size:1.8rem;font-weight:800;letter-spacing:-1px;margin-bottom:8px}
+    .card p{color:var(--text2);margin-bottom:16px}
+    .card .sub{font-size:.9rem;color:var(--text3)}
+
+    .spinner{width:40px;height:40px;border:3px solid var(--surface2);border-top-color:var(--accent);
+      border-radius:50%;animation:spin 1s linear infinite;margin:20px auto}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .key-box{background:var(--bg);border:2px solid var(--green);border-radius:10px;padding:20px;
+      margin:24px 0;text-align:left}
+    .key-box label{font-size:.75rem;font-weight:600;color:var(--green);text-transform:uppercase;
+      letter-spacing:1px;display:block;margin-bottom:8px}
+    .key-display{display:flex;align-items:center;gap:12px}
+    .key-display code{font-size:1rem;flex:1;word-break:break-all;background:transparent;padding:0}
+    .key-display button{background:var(--accent);color:#fff;border:none;padding:8px 16px;
+      border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600;white-space:nowrap}
+    .key-display button:hover{background:var(--accent-h)}
+    .key-display button.copied{background:var(--green)}
+
+    .warning{background:rgba(234,179,8,.1);border:1px solid rgba(234,179,8,.3);border-radius:8px;
+      padding:12px 16px;font-size:.85rem;color:var(--yellow);margin:16px 0;text-align:left}
+
+    .next-steps{text-align:left;margin-top:32px}
+    .next-steps h2{font-size:1.1rem;font-weight:700;margin-bottom:16px}
+    .next-steps ol{padding-left:20px;color:var(--text2)}
+    .next-steps li{margin-bottom:16px}
+    .next-steps li strong{color:var(--text)}
+
+    .back-link{margin-top:24px;display:inline-block;font-size:.9rem}
+
+    .badge{display:inline-flex;align-items:center;gap:6px;background:var(--green-bg);color:var(--green);
+      padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:600;margin-bottom:16px}
+    .badge::before{content:"✓";font-weight:700}
+
+    .error-msg{color:var(--red);font-size:.9rem;margin-top:12px}
+
+    .hidden{display:none}
+  </style>
+</head>
+<body>
+
+  <!-- Loading state -->
+  <div class="card" id="state-loading">
+    <div class="spinner"></div>
+    <h1>Setting up your Pro account...</h1>
+    <p>This usually takes a few seconds. Don't close this page.</p>
+    <p class="sub" id="retry-msg"></p>
+  </div>
+
+  <!-- Success state -->
+  <div class="card hidden" id="state-success">
+    <div class="badge">Pro Activated</div>
+    <h1>Welcome to DiffDelta Pro!</h1>
+    <p>Your API key is ready. Add it to your requests for 1,000 req/min and priority access.</p>
+
+    <div class="key-box">
+      <label>Your API Key</label>
+      <div class="key-display">
+        <code id="api-key">—</code>
+        <button id="copy-btn" onclick="copyKey()">Copy</button>
+      </div>
+    </div>
+
+    <div class="warning">
+      ⚠️ Save this key now — it will only be shown once. If you lose it, you can rotate to a new key via the API.
+    </div>
+
+    <div class="next-steps">
+      <h2>Next steps</h2>
+      <ol>
+        <li>
+          <strong>Add the header to your requests:</strong>
+          <pre>curl -H "X-DiffDelta-Key: <span class="key-placeholder">YOUR_KEY</span>" \
+  https://diffdelta.io/diff/head.json</pre>
+        </li>
+        <li>
+          <strong>Or use the Python client:</strong>
+          <pre>from diffdelta_client import DiffDeltaClient
+
+client = DiffDeltaClient(
+    "https://diffdelta.io",
+    api_key="<span class="key-placeholder">YOUR_KEY</span>"
+)
+feed = client.poll("cisa_kev")</pre>
+        </li>
+        <li>
+          <strong>Or the TypeScript client:</strong>
+          <pre>import { DiffDeltaClient } from "./diffdeltaClient";
+
+const client = new DiffDeltaClient(
+    "https://diffdelta.io",
+    { apiKey: "<span class="key-placeholder">YOUR_KEY</span>" }
+);
+const feed = await client.poll("cisa_kev");</pre>
+        </li>
+        <li>
+          <strong>Manage your key:</strong>
+          <pre># Check key info
+curl -H "X-DiffDelta-Key: YOUR_KEY" \
+  https://diffdelta.io/api/v1/key/info
+
+# Rotate key (generates new, invalidates old)
+curl -X POST -H "X-DiffDelta-Key: YOUR_KEY" \
+  https://diffdelta.io/api/v1/key/rotate</pre>
+        </li>
+      </ol>
+    </div>
+
+    <a href="/" class="back-link">← Back to DiffDelta</a>
+  </div>
+
+  <!-- Error state -->
+  <div class="card hidden" id="state-error">
+    <h1>Something went wrong</h1>
+    <p id="error-text" class="error-msg"></p>
+    <p style="margin-top:16px">If this persists, contact <a href="mailto:support@diffdelta.io">support@diffdelta.io</a></p>
+    <a href="/" class="back-link">← Back to DiffDelta</a>
+  </div>
+
+  <script>
+    var maxRetries = 30;     // 30 retries × 2 sec = 60 seconds max wait
+    var retryCount = 0;
+    var apiKeyValue = "";
+
+    function show(id) {
+      document.getElementById("state-loading").classList.add("hidden");
+      document.getElementById("state-success").classList.add("hidden");
+      document.getElementById("state-error").classList.add("hidden");
+      document.getElementById(id).classList.remove("hidden");
+    }
+
+    async function claimKey() {
+      var params = new URLSearchParams(window.location.search);
+      var sessionId = params.get("session_id");
+
+      if (!sessionId) {
+        document.getElementById("error-text").textContent = "No session ID found. Please try the checkout again.";
+        show("state-error");
+        return;
+      }
+
+      try {
+        var res = await fetch("/api/v1/key/claim?session_id=" + encodeURIComponent(sessionId));
+        var data = await res.json();
+
+        if (data.status === "ready" && data.api_key) {
+          apiKeyValue = data.api_key;
+          document.getElementById("api-key").textContent = data.api_key;
+          // Replace placeholders in code examples
+          var placeholders = document.querySelectorAll(".key-placeholder");
+          for (var i = 0; i < placeholders.length; i++) {
+            placeholders[i].textContent = data.api_key;
+          }
+          show("state-success");
+        } else if (data.status === "pending") {
+          retryCount++;
+          if (retryCount >= maxRetries) {
+            document.getElementById("error-text").textContent =
+              "Key generation is taking longer than expected. Your payment was received — please contact support@diffdelta.io and we'll send your key manually.";
+            show("state-error");
+          } else {
+            document.getElementById("retry-msg").textContent =
+              "Waiting for payment confirmation... (" + retryCount + "s)";
+            setTimeout(claimKey, 2000);
+          }
+        } else {
+          document.getElementById("error-text").textContent = data.error || "Unexpected response.";
+          show("state-error");
+        }
+      } catch (err) {
+        retryCount++;
+        if (retryCount < 5) {
+          setTimeout(claimKey, 2000);
+        } else {
+          document.getElementById("error-text").textContent = "Network error. Please refresh the page.";
+          show("state-error");
+        }
+      }
+    }
+
+    function copyKey() {
+      if (!apiKeyValue) return;
+      navigator.clipboard.writeText(apiKeyValue).then(function() {
+        var btn = document.getElementById("copy-btn");
+        btn.textContent = "Copied!";
+        btn.classList.add("copied");
+        setTimeout(function() {
+          btn.textContent = "Copy";
+          btn.classList.remove("copied");
+        }, 2000);
+      });
+    }
+
+    // Start claiming
+    claimKey();
+  </script>
+
+</body>
+</html>

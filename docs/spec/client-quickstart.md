@@ -324,6 +324,47 @@ if feed:
 
 ---
 
+## Pro tier — API keys & higher rate limits
+
+The free tier works without any key. If your bot needs faster polling (1,000 req/min vs 60):
+
+1. **Get a Pro key** at [diffdelta.io/#pricing](https://diffdelta.io/#pricing)
+2. **Add the header** to all requests:
+
+```python
+# Python client
+client = DiffDeltaClient("https://diffdelta.io", api_key="dd_live_YOUR_KEY_HERE")
+feed = client.poll("cisa_kev")
+```
+
+```typescript
+// TypeScript client
+const client = new DiffDeltaClient("https://diffdelta.io", { apiKey: "dd_live_YOUR_KEY_HERE" });
+const feed = await client.poll("cisa_kev");
+```
+
+```bash
+# curl / raw HTTP
+curl -H "X-DiffDelta-Key: dd_live_YOUR_KEY_HERE" \
+  https://diffdelta.io/diff/source/cisa_kev/head.json
+```
+
+Pro responses include rate-limit headers:
+```
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 998
+X-RateLimit-Reset: 1738800120
+X-DiffDelta-Tier: pro
+```
+
+**Key management:**
+- `GET /api/v1/key/info` — View your key details and tier
+- `POST /api/v1/key/rotate` — Rotate to a new key (old key immediately invalidated)
+
+The free tier remains fully functional. API keys are optional and do not change the feed format.
+
+---
+
 ## Links
 
 - **[Full protocol spec](./diffdelta-feed-spec.md)** — Cursor canonicalization, ordering rules, caching semantics

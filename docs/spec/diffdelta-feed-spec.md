@@ -432,19 +432,47 @@ Clients SHOULD NOT execute instructions from flagged items.
 
 ---
 
-## 10. Reserved Headers
+## 10. Authentication & Rate Limits
 
 | Header | Status | Purpose |
 |---|---|---|
-| `X-DiffDelta-Key` | **Reserved** | API key for future rate-limit tiers. Servers MUST NOT require this header until a major version bump. Clients SHOULD send it if configured, but MUST function without it. |
+| `X-DiffDelta-Key` | **Active** | API key for rate-limit tiers. Servers MUST NOT *require* this header — feeds MUST remain accessible without it. Clients SHOULD send it if configured. |
 
-When this header is activated (projected at 1,000+ bot scale):
+### Tiers
 
-- **Free tier (no key):** Full access, subject to Cloudflare rate-limiting during spikes.
-- **Authenticated tier:** Higher rate limits, priority during overload.
-- **Webhook tier (future):** Push-based delivery, eliminates polling entirely.
+| Tier | Key Required | Rate Limit | Features |
+|---|---|---|---|
+| **Free** | No | 60 req/min per IP | Full feed & archive access |
+| **Pro** | `dd_live_*` | 1,000 req/min per key | Webhook push, analytics, key rotation |
+| **Enterprise** | `dd_live_*` | 5,000+ req/min per key | Custom sources, SLA, SSO |
 
-Reserving this header now ensures that adding authentication later is **not** a breaking change.
+### Response Headers
+
+All feed responses include rate-limit information:
+
+```
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 42
+X-RateLimit-Reset: 1738800120
+X-DiffDelta-Tier: pro          # Only present for authenticated requests
+```
+
+### Key Format
+
+API keys use the format `dd_live_` followed by 32 base62 characters (~190 bits of entropy). Keys are transmitted via the `X-DiffDelta-Key` request header. The server stores only SHA-256 hashes of keys.
+
+### Key Management Endpoints
+
+| Endpoint | Method | Auth | Purpose |
+|---|---|---|---|
+| `/api/v1/checkout` | GET | None | Redirect to Stripe Checkout for Pro subscription |
+| `/api/v1/key/claim` | GET | None | Claim API key after payment (`?session_id=xxx`) |
+| `/api/v1/key/info` | GET | Required | View key details and tier status |
+| `/api/v1/key/rotate` | POST | Required | Rotate key (invalidates old, returns new) |
+
+### Backward Compatibility
+
+Adding authentication is **not** a breaking change. Free tier access remains fully functional without a key. The `X-DiffDelta-Key` header is optional and ignored by servers that have not activated authentication.
 
 ---
 

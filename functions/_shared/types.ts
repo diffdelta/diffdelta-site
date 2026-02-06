@@ -1,0 +1,61 @@
+// ─────────────────────────────────────────────────────────
+// DiffDelta Pro — Type definitions
+// Why: Single source of truth for all shared types across
+// Pages Functions (middleware, endpoints, Stripe handlers).
+// ─────────────────────────────────────────────────────────
+
+/**
+ * Cloudflare Pages Function environment bindings.
+ * KV namespaces and secrets are configured in Cloudflare dashboard.
+ */
+export interface Env {
+  // ── KV Namespaces ──
+  KEYS: KVNamespace;          // API keys (hashed) → KeyData
+  RATE_LIMITS: KVNamespace;   // Rate limit counters (ephemeral, TTL-based)
+  SESSIONS: KVNamespace;      // Stripe checkout session → pending key (1hr TTL)
+
+  // ── Secrets (set in Cloudflare Pages > Settings > Environment variables) ──
+  STRIPE_SECRET_KEY: string;
+  STRIPE_WEBHOOK_SECRET: string;
+  STRIPE_PRICE_ID: string;
+}
+
+/** Stored in KV under `key:{sha256(raw_key)}` */
+export interface KeyData {
+  tier: "pro" | "enterprise";
+  customer_id: string;           // Stripe customer ID
+  stripe_subscription_id: string;
+  email: string;
+  rate_limit: number;            // requests per minute
+  created_at: string;            // ISO 8601
+  last_rotated_at: string;       // ISO 8601
+  active: boolean;
+}
+
+/** Stored in KV under `session:{stripe_session_id}` with 1hr TTL */
+export interface SessionClaim {
+  api_key: string;               // Raw key (shown once to user)
+  email: string;
+  created_at: string;
+}
+
+/** Result of rate limit check */
+export interface RateLimitResult {
+  allowed: boolean;
+  remaining: number;
+  reset_at: number;              // Unix timestamp (seconds)
+  limit: number;
+}
+
+/** Webhook registration (Phase 2 — type reserved now) */
+export interface WebhookRegistration {
+  id: string;
+  url: string;
+  secret: string;                // HMAC signing secret
+  tags: string[];                // Filter by tags (empty = all)
+  sources: string[];             // Filter by source IDs (empty = all)
+  active: boolean;
+  created_at: string;
+  last_delivered_at: string | null;
+  consecutive_failures: number;
+}
