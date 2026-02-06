@@ -1,61 +1,451 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>DiffDelta</title>
-    <meta name="description" content="A secure changefeed protocol for AI agents. Poll normalized, risk-vetted JSON diffs instead of re-scraping the web." />
-    <link rel="alternate" type="application/json" href="/diff/head.json" title="DiffDelta Global Feed" />
-    <link rel="alternate" type="application/json" href="/diff/sources.json" title="DiffDelta Sources Index" />
-  </head>
-  <body style="font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif; margin: 40px; max-width: 920px; line-height: 1.45;">
-    <div style="background: #f0f9ff; border-left: 4px solid #0284c7; padding: 12px 16px; margin-bottom: 24px; border-radius: 4px;">
-      <strong style="color: #0284c7;">For bots:</strong> Start with <a href="/diff/sources.json" style="color: #0284c7; text-decoration: underline;">/diff/sources.json</a> to see what's available, then poll <a href="/diff/head.json" style="color: #0284c7; text-decoration: underline;">/diff/head.json</a> for changes. <a href="/docs/spec/client-quickstart" style="color: #0284c7; text-decoration: underline; font-weight: 600;">→ 5-minute quickstart</a>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DiffDelta — Changefeed Protocol for AI Agents</title>
+  <meta name="description" content="One JSON feed for 35+ tech sources. Poll one URL instead of building scrapers. Normalized, risk-vetted JSON diffs for bots.">
+  <meta property="og:title" content="DiffDelta — Changefeed Protocol for AI Agents">
+  <meta property="og:description" content="One JSON feed for 35+ tech sources. Poll one URL instead of building scrapers.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://diffdelta.io">
+  <meta name="twitter:card" content="summary">
+  <link rel="alternate" type="application/json" href="/diff/head.json" title="DiffDelta Global Feed">
+  <link rel="alternate" type="application/json" href="/diff/sources.json" title="DiffDelta Sources Index">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#09090b;--surface:#18181b;--surface2:#1f1f23;--border:#27272a;
+      --text:#fafafa;--text2:#a1a1aa;--text3:#71717a;
+      --accent:#3b82f6;--accent-h:#2563eb;--accent-glow:rgba(59,130,246,0.12);
+      --green:#22c55e;--yellow:#eab308;--red:#ef4444;
+      --font:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+      --mono:ui-monospace,'SF Mono','Cascadia Code','Fira Code',monospace;
+      --max-w:1080px;--px:24px
+    }
+    html{font-size:16px;-webkit-text-size-adjust:100%}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;
+      background-image:radial-gradient(ellipse 60% 50% at 50% -10%,var(--accent-glow),transparent)}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    code{font-family:var(--mono);font-size:.875em;background:var(--surface);padding:2px 6px;border-radius:4px}
+
+    /* ── Nav ── */
+    .nav{max-width:var(--max-w);margin:0 auto;padding:20px var(--px);display:flex;align-items:center;justify-content:space-between}
+    .nav-brand{font-weight:700;font-size:1.15rem;color:var(--text);letter-spacing:-.5px}
+    .nav-brand span{color:var(--accent)}
+    .nav-links{display:flex;gap:24px;font-size:.9rem}
+    .nav-links a{color:var(--text2);transition:color .15s}
+    .nav-links a:hover{color:var(--text);text-decoration:none}
+
+    /* ── Bot banner ── */
+    .bot-banner{max-width:var(--max-w);margin:0 auto;padding:0 var(--px)}
+    .bot-banner-inner{background:var(--surface);border:1px solid var(--border);border-radius:8px;
+      padding:10px 16px;font-size:.85rem;color:var(--text2);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .bot-banner-inner strong{color:var(--accent)}
+    .bot-banner-inner a{font-weight:600}
+
+    /* ── Hero ── */
+    .hero{max-width:var(--max-w);margin:0 auto;padding:72px var(--px) 56px;text-align:center}
+    .hero h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:20px}
+    .hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--accent),#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero p{font-size:1.15rem;color:var(--text2);max-width:620px;margin:0 auto 32px}
+    .hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+    /* ── Buttons ── */
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:8px;
+      font-size:.95rem;font-weight:600;transition:all .15s;border:none;cursor:pointer}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-primary:hover{background:var(--accent-h);text-decoration:none}
+    .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+    .btn-ghost:hover{background:var(--surface);color:var(--text);text-decoration:none}
+
+    /* ── Stats ── */
+    .stats{max-width:var(--max-w);margin:0 auto;padding:0 var(--px) 56px}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);
+      border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .stat{background:var(--surface);padding:20px;text-align:center}
+    .stat-value{font-size:1.5rem;font-weight:700;color:var(--text)}
+    .stat-value span{color:var(--accent)}
+    .stat-label{font-size:.75rem;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+
+    /* ── Sections ── */
+    section{max-width:var(--max-w);margin:0 auto;padding:56px var(--px)}
+    .section-label{font-size:.75rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);font-weight:600;margin-bottom:8px}
+    .section-title{font-size:1.6rem;font-weight:700;letter-spacing:-.5px;margin-bottom:12px}
+    .section-sub{color:var(--text2);margin-bottom:36px;max-width:600px}
+
+    /* ── Steps ── */
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .step{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px}
+    .step-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;
+      border-radius:50%;background:var(--accent);color:#fff;font-size:.8rem;font-weight:700;margin-bottom:12px}
+    .step h3{font-size:1rem;font-weight:600;margin-bottom:8px}
+    .step p{font-size:.9rem;color:var(--text2);line-height:1.5}
+    .step code{font-size:.8rem}
+
+    /* ── Sources table ── */
+    .sources-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;overflow-x:auto}
+    .sources-count{font-size:.85rem;color:var(--text3);margin-bottom:16px}
+    .sources-table{width:100%;border-collapse:collapse}
+    .sources-table th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;
+      color:var(--text3);padding:10px 14px;border-bottom:1px solid var(--border)}
+    .sources-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:.9rem;vertical-align:middle}
+    .sources-table tr:last-child td{border-bottom:none}
+    .sources-table tr:hover td{background:var(--surface2)}
+    .source-name-cell{display:flex;align-items:center}
+    .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:10px;flex-shrink:0}
+    .status-ok{background:var(--green)}
+    .status-degraded{background:var(--yellow)}
+    .status-error{background:var(--red)}
+    .status-disabled{background:var(--text3)}
+    .source-links{display:flex;gap:10px}
+    .source-links a{font-size:.8rem;color:var(--text3);transition:color .15s;font-family:var(--mono)}
+    .source-links a:hover{color:var(--accent)}
+
+    /* ── Code block + tabs ── */
+    .code-block{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .tabs{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 16px}
+    .tab{padding:10px 16px;font-size:.85rem;color:var(--text3);cursor:pointer;border:none;
+      border-bottom:2px solid transparent;transition:all .15s;background:none;font-family:var(--font)}
+    .tab:hover{color:var(--text2)}
+    .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+    .code-panel{display:none}
+    .code-panel.active{display:block}
+    .code-block pre{margin:0;padding:20px 24px;font-family:var(--mono);font-size:.85rem;
+      line-height:1.7;color:var(--text2);overflow-x:auto;white-space:pre}
+    .cm{color:var(--text3)}
+    .s{color:#a5d6ff}
+    .k{color:#ff7b72}
+    .f{color:#d2a8ff}
+
+    /* ── Savings row ── */
+    .savings{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .saving{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;text-align:center}
+    .saving-num{font-size:2rem;font-weight:700;color:var(--green)}
+    .saving-label{font-size:.85rem;color:var(--text2);margin-top:4px}
+    .saving-sub{font-size:.75rem;color:var(--text3)}
+
+    /* ── CTA ── */
+    .cta{text-align:center;padding:56px var(--px) 72px}
+    .cta p{color:var(--text2);margin-bottom:24px}
+    .cta .hi{color:var(--green);font-weight:600}
+
+    /* ── Footer ── */
+    .footer{max-width:var(--max-w);margin:0 auto;padding:24px var(--px);
+      border-top:1px solid var(--border);display:flex;justify-content:space-between;
+      align-items:center;font-size:.8rem;color:var(--text3)}
+    .footer a{color:var(--text3)}
+    .footer a:hover{color:var(--text)}
+
+    /* ── Responsive ── */
+    @media(max-width:768px){
+      .stats-grid{grid-template-columns:repeat(2,1fr)}
+      .steps,.savings{grid-template-columns:1fr}
+      .nav-links{gap:14px;font-size:.8rem}
+      .hero{padding:48px var(--px) 40px}
+      .hero h1{font-size:2rem}
+      .footer{flex-direction:column;gap:8px;text-align:center}
+    }
+    @media(max-width:480px){
+      .hero-actions{flex-direction:column;align-items:center}
+      .nav{flex-direction:column;gap:12px}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Bot discovery banner -->
+  <div class="bot-banner" style="padding-top:12px">
+    <div class="bot-banner-inner">
+      <strong>🤖 Bots:</strong>
+      Start at <a href="/diff/sources.json">/diff/sources.json</a> →
+      poll <a href="/diff/head.json">/diff/head.json</a> for changes →
+      <a href="/docs/spec/client-quickstart">5-min quickstart</a>
     </div>
-    
-    <h1 style="margin: 0 0 10px 0;">DiffDelta</h1>
+  </div>
 
-    <p style="margin: 0 0 18px 0;">
-      DiffDelta is a secure changefeed protocol for AI agents. Instead of re-scraping pages, bots poll a normalized,
-      risk-vetted JSON diff stream and act only on changes.
-    </p>
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-brand">Diff<span>Delta</span></div>
+    <div class="nav-links">
+      <a href="/docs/spec/client-quickstart">Docs</a>
+      <a href="#sources">Sources</a>
+      <a href="/docs/spec/diffdelta-feed-spec">Spec</a>
+      <a href="https://github.com/diffdelta">GitHub</a>
+    </div>
+  </nav>
 
-    <h2 style="font-size: 16px; margin: 22px 0 8px 0;">Canonical entry point</h2>
-    <ul style="margin-top: 0;">
-      <li><a href="/.well-known/diffdelta.json">/.well-known/diffdelta.json</a> <span style="color:#666;">(discovery manifest)</span></li>
-    </ul>
+  <!-- Hero -->
+  <header class="hero">
+    <h1>One JSON feed.<br><em>35+ sources. Zero scrapers.</em></h1>
+    <p>DiffDelta is a changefeed protocol for AI agents. Poll one URL, get normalized, risk-vetted diffs, and act only on what changed.</p>
+    <div class="hero-actions">
+      <a href="#quickstart" class="btn btn-primary">Get Started →</a>
+      <a href="#sources" class="btn btn-ghost">View Sources ↓</a>
+    </div>
+  </header>
 
-    <h2 style="font-size: 16px; margin: 22px 0 8px 0;">Feeds</h2>
-    <ul style="margin-top: 0;">
-      <li><a href="/diff/head.json">/diff/head.json</a> <span style="color:#666;">(global head pointer - recommended for bots)</span></li>
-      <li><a href="/diff/sources.json">/diff/sources.json</a> <span style="color:#666;">(sources index)</span></li>
-      <li><a href="/diff/latest.json">/diff/latest.json</a> <span style="color:#666;">(global aggregated feed)</span></li>
-      <li><a href="/diff/ping.json">/diff/ping.json</a> <span style="color:#666;">(canary endpoint for discovery tracking)</span></li>
-      <li><a href="/diff/{source}/head.json">/diff/{source}/head.json</a> <span style="color:#666;">(per-source head pointer)</span></li>
-      <li><a href="/diff/{source}/latest.json">/diff/{source}/latest.json</a> <span style="color:#666;">(per-source feed)</span></li>
-      <li><a href="/known_issues.json">/known_issues.json</a> <span style="color:#666;">(operational memory)</span></li>
-    </ul>
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="stat-value" id="stat-sources">35+</div>
+        <div class="stat-label">Sources</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">15<span>min</span></div>
+        <div class="stat-label">Refresh</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">Static</div>
+        <div class="stat-label">CDN Edge</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">0</div>
+        <div class="stat-label">Dependencies</div>
+      </div>
+    </div>
+  </div>
 
-    <h2 style="font-size: 16px; margin: 22px 0 8px 0;">Schemas</h2>
-    <ul style="margin-top: 0;">
-      <li><a href="/schema/v1/wellknown.schema.json">/schema/v1/wellknown.schema.json</a></li>
-      <li><a href="/schema/v1/diff.schema.json">/schema/v1/diff.schema.json</a></li>
-      <li><a href="/schema/v1/known_issues.schema.json">/schema/v1/known_issues.schema.json</a></li>
-    </ul>
+  <!-- How it works -->
+  <section>
+    <div class="section-label">How it works</div>
+    <h2 class="section-title">Two-step polling. 99% bandwidth savings.</h2>
+    <p class="section-sub">Most polls return a 400-byte head pointer. Full payloads are only fetched when content actually changes.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Poll</h3>
+        <p>Fetch <code>head.json</code> — a ~400-byte file with just the cursor and hash. Served from CDN edge in &lt;50ms worldwide.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Compare</h3>
+        <p>Compare the <code>cursor</code> to your stored value. Same? Nothing changed — stop. Different? Fetch the full <code>latest.json</code>.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Act</h3>
+        <p>Process <code>new</code>, <code>updated</code>, and <code>removed</code> buckets. Each item has a headline, content, risk score, and provenance chain.</p>
+      </div>
+    </div>
+  </section>
 
-    <h2 style="font-size: 16px; margin: 22px 0 8px 0;">How bots use DiffDelta</h2>
-    <ol style="margin-top: 0;">
-      <li><strong>First visit:</strong> <code>GET <a href="/diff/latest.json">/diff/latest.json</a></code> — get all recent changes. Save the <code>cursor</code> value.</li>
-      <li><strong>Every visit after:</strong> <code>GET <a href="/diff/head.json">/diff/head.json</a></code> (~400 bytes) — compare cursor to your stored cursor.</li>
-      <li>Same cursor → nothing new, stop. Different cursor → fetch <code>latest.json</code>, process items, update cursor.</li>
-      <li>Process <code>new</code>, <code>updated</code>, <code>removed</code> buckets. Treat <code>flagged</code> as quarantine.</li>
-    </ol>
-    <p style="margin-top: 4px; font-size: 14px; color: #666;">
-      Full walkthrough: <a href="/docs/spec/client-quickstart">/docs/spec/client-quickstart</a>
-    </p>
+  <!-- Sources -->
+  <section id="sources">
+    <div class="section-label">Live Sources</div>
+    <h2 class="section-title">What's being tracked right now</h2>
+    <p class="sources-count" id="sources-count">Loading sources…</p>
+    <div class="sources-wrap">
+      <table class="sources-table">
+        <thead>
+          <tr>
+            <th>Source</th>
+            <th>Status</th>
+            <th>Endpoints</th>
+          </tr>
+        </thead>
+        <tbody id="sources-body">
+          <tr><td colspan="3" style="color:var(--text3);padding:24px;text-align:center">Loading sources…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-    <p style="margin: 22px 0 0 0; color:#666; font-size: 14px;">
-      Status: Alpha. Schemas are stable and changes are additive.
-    </p>
-  </body>
+  <!-- Quickstart -->
+  <section id="quickstart">
+    <div class="section-label">Quickstart</div>
+    <h2 class="section-title">Start polling in under 10 lines</h2>
+    <p class="section-sub">No SDK required. Standard HTTP. Works with any language.</p>
+    <div class="code-block">
+      <div class="tabs">
+        <button class="tab active" data-tab="python">Python</button>
+        <button class="tab" data-tab="typescript">TypeScript</button>
+        <button class="tab" data-tab="curl">curl</button>
+      </div>
+      <div class="code-panel active" id="panel-python"><pre><span class="k">import</span> requests
+
+<span class="cm"># Step 1: Check for changes (400 bytes)</span>
+head = requests.get(<span class="s">"https://diffdelta.io/diff/source/cisa_kev/head.json"</span>).json()
+
+<span class="k">if</span> head[<span class="s">"cursor"</span>] == my_stored_cursor:
+    <span class="k">exit</span>()  <span class="cm"># Nothing new</span>
+
+<span class="cm"># Step 2: Fetch the delta</span>
+feed = requests.get(<span class="s">"https://diffdelta.io/diff/source/cisa_kev/latest.json"</span>).json()
+
+<span class="k">for</span> item <span class="k">in</span> feed[<span class="s">"buckets"</span>].get(<span class="s">"new"</span>, []):
+    <span class="f">print</span>(f<span class="s">"🚨 {item['headline']}"</span>)
+
+my_stored_cursor = feed[<span class="s">"cursor"</span>]  <span class="cm"># Save for next poll</span></pre>
+      </div>
+      <div class="code-panel" id="panel-typescript"><pre><span class="cm">// Step 1: Check for changes (400 bytes)</span>
+<span class="k">const</span> head = <span class="k">await</span> <span class="f">fetch</span>(
+  <span class="s">"https://diffdelta.io/diff/source/cisa_kev/head.json"</span>
+).then(r =&gt; r.json());
+
+<span class="k">if</span> (head.cursor === storedCursor) process.exit(); <span class="cm">// Nothing new</span>
+
+<span class="cm">// Step 2: Fetch the delta</span>
+<span class="k">const</span> feed = <span class="k">await</span> <span class="f">fetch</span>(
+  <span class="s">"https://diffdelta.io/diff/source/cisa_kev/latest.json"</span>
+).then(r =&gt; r.json());
+
+<span class="k">for</span> (<span class="k">const</span> item <span class="k">of</span> feed.buckets.new ?? []) {
+  console.<span class="f">log</span>(<span class="s">`🚨 ${item.headline}`</span>);
+}
+
+storedCursor = feed.cursor; <span class="cm">// Save for next poll</span></pre>
+      </div>
+      <div class="code-panel" id="panel-curl"><pre><span class="cm"># Check for changes (tiny response)</span>
+curl -s https://diffdelta.io/diff/source/cisa_kev/head.json | jq .cursor
+
+<span class="cm"># Fetch full delta when cursor changes</span>
+curl -s https://diffdelta.io/diff/source/cisa_kev/latest.json \
+  | jq <span class="s">'.buckets.new[].headline'</span>
+
+<span class="cm"># List all available sources</span>
+curl -s https://diffdelta.io/diff/sources.json | jq <span class="s">'.sources[].source_id'</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Savings -->
+  <section style="padding-top:0">
+    <div class="savings">
+      <div class="saving">
+        <div class="saving-num">833×</div>
+        <div class="saving-label">Bandwidth saved</div>
+        <div class="saving-sub">vs. DIY scraping</div>
+      </div>
+      <div class="saving">
+        <div class="saving-num">876×</div>
+        <div class="saving-label">Fewer LLM tokens</div>
+        <div class="saving-sub">pre-diffed &amp; pre-summarized</div>
+      </div>
+      <div class="saving">
+        <div class="saving-num">~15</div>
+        <div class="saving-label">Lines of code</div>
+        <div class="saving-sub">vs. 200–400 for a scraper</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Protocol callout -->
+  <section>
+    <div class="section-label">Why DiffDelta</div>
+    <h2 class="section-title">A protocol, not just a feed</h2>
+    <p class="section-sub">DiffDelta is infrastructure for the agentic web. One contract that any bot can rely on.</p>
+    <div class="steps" style="grid-template-columns:1fr 1fr">
+      <div class="step">
+        <h3>For AI agents</h3>
+        <p>Pre-diffed, pre-normalized JSON means your LLM processes 49K tokens instead of 43M. Cursor-based change tracking eliminates redundant work. Risk scores flag what matters.</p>
+      </div>
+      <div class="step">
+        <h3>For dev teams</h3>
+        <p>No scrapers to build or maintain. No HTML parsing. No rate-limit management. One JSON endpoint replaces dozens of fragile integrations. Self-healing pipeline handles upstream changes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Free forever for basic polling</h2>
+    <p><span class="hi">Free tier</span> — All sources, unlimited polling, full feed access, no API key required.<br>
+      Pro &amp; Enterprise tiers coming soon for webhooks, premium sources, and SLA guarantees.</p>
+    <div class="hero-actions" style="margin-top:24px">
+      <a href="/docs/spec/diffdelta-feed-spec" class="btn btn-primary">Read the Spec →</a>
+      <a href="/docs/spec/client-quickstart" class="btn btn-ghost">Client Quickstart →</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div>© 2026 DiffDelta · <a href="/LICENSE">MIT License</a> · Built for bots</div>
+    <div>
+      <a href="/diff/sources.json" style="margin-right:12px">API</a>
+      <a href="/docs/spec/diffdelta-feed-spec" style="margin-right:12px">Spec</a>
+      <a href="https://github.com/diffdelta">GitHub</a>
+    </div>
+  </footer>
+
+  <script>
+    // ── Fetch live source data and populate table ──
+    (async function () {
+      try {
+        var res = await fetch('/diff/sources.json');
+        var data = await res.json();
+        var sources = data.sources || [];
+
+        // Update hero stat
+        var enabled = sources.filter(function(s){ return s.enabled; }).length;
+        var el = document.getElementById('stat-sources');
+        if (el) el.textContent = enabled;
+
+        // Update count summary
+        var ok = sources.filter(function(s){ return s.status === 'ok'; }).length;
+        var degraded = sources.filter(function(s){ return s.status === 'degraded'; }).length;
+        var disabled = sources.filter(function(s){ return !s.enabled; }).length;
+        var countEl = document.getElementById('sources-count');
+        if (countEl) {
+          var txt = enabled + ' enabled · ' + ok + ' healthy';
+          if (degraded) txt += ' · ' + degraded + ' degraded';
+          if (disabled) txt += ' · ' + disabled + ' disabled';
+          countEl.textContent = txt;
+        }
+
+        // Sort: enabled first (by name), then disabled
+        sources.sort(function(a, b) {
+          if (a.enabled !== b.enabled) return a.enabled ? -1 : 1;
+          return a.name.localeCompare(b.name);
+        });
+
+        // Build table rows
+        var tbody = document.getElementById('sources-body');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        for (var i = 0; i < sources.length; i++) {
+          var s = sources[i];
+          var cls = s.status === 'ok' ? 'status-ok'
+            : s.status === 'degraded' ? 'status-degraded'
+            : s.status === 'error' ? 'status-error'
+            : 'status-disabled';
+          var tr = document.createElement('tr');
+          tr.innerHTML =
+            '<td><div class="source-name-cell"><span class="status-dot ' + cls + '"></span>' + esc(s.name) + '</div></td>' +
+            '<td style="color:var(--text3)">' + esc(s.status) + '</td>' +
+            '<td><div class="source-links">' +
+              '<a href="' + esc(s.head_url) + '">head</a>' +
+              '<a href="' + esc(s.latest_url) + '">latest</a>' +
+            '</div></td>';
+          tbody.appendChild(tr);
+        }
+      } catch (e) {
+        var fallback = document.getElementById('sources-body');
+        if (fallback) fallback.innerHTML = '<tr><td colspan="3" style="color:var(--text3);padding:24px">Could not load sources. <a href="/diff/sources.json">View raw JSON →</a></td></tr>';
+      }
+    })();
+
+    function esc(str) {
+      var d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    // ── Tab switching ──
+    document.querySelectorAll('.tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        var parent = this.closest('.code-block');
+        parent.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+        parent.querySelectorAll('.code-panel').forEach(function(p){ p.classList.remove('active'); });
+        this.classList.add('active');
+        var panel = document.getElementById('panel-' + this.dataset.tab);
+        if (panel) panel.classList.add('active');
+      });
+    });
+  </script>
+</body>
 </html>
