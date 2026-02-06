@@ -25,34 +25,52 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
 
   const keyData: KeyData = JSON.parse(raw);
-  const now = new Date().toISOString();
 
-  // Generate new key
-  const newApiKey = await generateApiKey();
-  const newKeyHash = await hashKey(newApiKey);
-
-  // Update timestamps
-  keyData.last_rotated_at = now;
-
-  // Store new key
-  await env.KEYS.put(`key:${newKeyHash}`, JSON.stringify(keyData));
-
-  // Update subscription → new key hash mapping
-  if (keyData.stripe_subscription_id) {
-    await env.KEYS.put(
-      `sub:${keyData.stripe_subscription_id}`,
-      newKeyHash
+  // ── Rotation lock: prevent concurrent rotations ──
+  const lockKey = `lock:rotate:${keyData.stripe_subscription_id || auth.key_hash}`;
+  const existingLock = await env.KEYS.get(lockKey);
+  if (existingLock) {
+    return errorResponse(
+      "Key rotation already in progress. Please wait a few seconds and try again.",
+      409
     );
   }
+  // Set lock with 30-second TTL (auto-expires if something crashes)
+  await env.KEYS.put(lockKey, "1", { expirationTtl: 30 });
 
-  // Delete old key (immediate invalidation)
-  await env.KEYS.delete(`key:${auth.key_hash}`);
+  try {
+    const now = new Date().toISOString();
 
-  return jsonResponse({
-    api_key: newApiKey,
-    tier: keyData.tier,
-    rotated_at: now,
-    message:
-      "Key rotated successfully. The old key is now invalid. Save this new key.",
-  });
+    // Generate new key
+    const newApiKey = await generateApiKey();
+    const newKeyHash = await hashKey(newApiKey);
+
+    // Update timestamps
+    keyData.last_rotated_at = now;
+
+    // Store new key FIRST (so there's always a valid key)
+    await env.KEYS.put(`key:${newKeyHash}`, JSON.stringify(keyData));
+
+    // Update subscription → new key hash mapping
+    if (keyData.stripe_subscription_id) {
+      await env.KEYS.put(
+        `sub:${keyData.stripe_subscription_id}`,
+        newKeyHash
+      );
+    }
+
+    // Delete old key LAST (after new key is safely stored)
+    await env.KEYS.delete(`key:${auth.key_hash}`);
+
+    return jsonResponse({
+      api_key: newApiKey,
+      tier: keyData.tier,
+      rotated_at: now,
+      message:
+        "Key rotated successfully. The old key is now invalid. Save this new key.",
+    });
+  } finally {
+    // Release lock
+    await env.KEYS.delete(lockKey);
+  }
 };

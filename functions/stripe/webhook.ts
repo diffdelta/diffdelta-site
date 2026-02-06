@@ -64,6 +64,15 @@ async function handleCheckoutCompleted(
   session: Record<string, unknown>,
   env: Env
 ): Promise<void> {
+  const sessionId = session.id as string;
+
+  // ── Idempotency guard: prevent duplicate keys on Stripe retries ──
+  const existingClaim = await env.SESSIONS.get(`session:${sessionId}`);
+  if (existingClaim) {
+    // Already processed this checkout — Stripe is retrying. Skip.
+    return;
+  }
+
   const now = new Date().toISOString();
 
   // Generate API key
@@ -173,6 +182,20 @@ async function verifyStripeSignature(
   const signedPayload = `${timestamp}.${payload}`;
   const expected = await hmacSign(signedPayload, secret);
 
-  // Timing-safe comparison
-  return expected === sig;
+  // Timing-safe comparison (constant-time to prevent timing attacks)
+  if (expected.length !== sig.length) return false;
+  const enc = new TextEncoder();
+  const a = enc.encode(expected);
+  const b = enc.encode(sig);
+  return timingSafeEqual(a, b);
+}
+
+/** Constant-time comparison to prevent timing side-channel attacks. */
+function timingSafeEqual(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a[i] ^ b[i];
+  }
+  return result === 0;
 }
