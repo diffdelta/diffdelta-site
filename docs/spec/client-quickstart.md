@@ -210,7 +210,7 @@ Without DiffDelta, you'd scrape 14 websites every hour. With DiffDelta, you chec
 
 ---
 
-## Handling stale sources
+## Handling stale and degraded sources
 
 Sometimes a source goes down. When that happens:
 
@@ -228,6 +228,44 @@ Sometimes a source goes down. When that happens:
 ```
 
 The cursor preserves the last good value (it never resets to zero). When the source recovers, your bot picks up right where it left off. `stale_age_sec` tells you how long it's been down so you can decide whether to alert or wait.
+
+### Degraded sources (fallback in use)
+
+If the primary endpoint fails but a fallback succeeds, you’ll see `status: "degraded"`:
+
+```json
+{
+  "openai_api_changelog": {
+    "status": "degraded",
+    "changed": true,
+    "fallback_active": true,
+    "fallback_index": 0,
+    "degraded_reason": "primary_endpoint_failed"
+  }
+}
+```
+
+You should process degraded feeds normally (they are valid), but MAY surface a warning to operators.
+
+### Consecutive failures (backoff signal)
+
+When a source fails repeatedly, the engine tracks `consecutive_failures`:
+
+```json
+{
+  "openai_api_changelog": {
+    "status": "error",
+    "consecutive_failures": 7
+  }
+}
+```
+
+This is a hint that the source may be in backoff; bots can alert or reduce attention to that source.
+
+### Operator health dashboard (not for bots)
+
+The engine also writes `/state/health.json` as an **operator-only** summary of fleet health.
+Bots SHOULD ignore it; it’s for dashboards and alerting, not polling.
 
 ---
 

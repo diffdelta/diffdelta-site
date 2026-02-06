@@ -6,7 +6,7 @@ A secure changefeed protocol for AI agents.
 
 ## Specification
 
-- **[DiffDelta Feed Spec v1](./diffdelta-feed-spec.md)** — Normative protocol definition. Covers resources, cursor semantics, canonicalization, caching, and error handling.
+- **[DiffDelta Feed Spec v1](./diffdelta-feed-spec.md)** — Normative protocol definition. Covers resources, cursor semantics, canonicalization, caching, error handling, degraded/fallback semantics, and the operator health dashboard.
 - **[Client Quickstart](./client-quickstart.md)** — How a bot should poll DiffDelta, with code examples.
 
 ## Reference Clients

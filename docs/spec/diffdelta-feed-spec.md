@@ -16,6 +16,7 @@ All bodies are `application/json; charset=utf-8`.
 | **Head pointer** | `/diff/{source_id}/head.json` | Mutable (overwritten each run) |
 | **Latest feed** | `/diff/{source_id}/latest.json` | Mutable (overwritten each run) |
 | **Archive snapshot** | `/archive/{source_id}/{YYYY}/{MM}/{DD}/{YYYYMMDDTHHMMSSZ}_{cursor_hex}.json` | **Immutable** |
+| **Health dashboard (operator)** | `/state/health.json` | Mutable (overwritten each run) |
 
 A **global** aggregated feed is also available at `/diff/latest.json`.
 
@@ -44,6 +45,12 @@ Contains `buckets` (new, updated, removed, flagged), per-source status, and all 
 Byte-identical copy of `latest.json` at the time it was written.
 Once created, the file MUST NOT be modified or deleted.
 Archive path includes the cursor hex (first 12 chars) for human readability.
+
+### 1.4 Health dashboard (operator)
+
+`/state/health.json` is an **operator-only** endpoint for fleet monitoring.
+It is not required for bot consumption and MAY be private or access-controlled.
+It summarizes per-source status, consecutive failures, stale age, and fallback use.
 
 ---
 
@@ -194,6 +201,7 @@ When a source has `status: "error"` or `status: "disabled"`:
 | `stale_age_sec` | Seconds since `last_ok_at` |
 | `error` | Object with `code` (required) and optional `http_status` — **only** on `status: "error"` |
 | `disabled_reason` | String explaining why the source is disabled — **only** on `status: "disabled"` |
+| `consecutive_failures` | Integer count of sequential failures (optional; **only** on error/backoff states) |
 
 **Key rule:** The engine MUST NOT reset a source's cursor to `null` on error.
 `null` MUST only appear when a source has literally never succeeded.
@@ -209,6 +217,24 @@ When `changed: true`, the per-source entry in the `sources` map MUST include:
 
 This lets bots decide which sources to dig into without scanning bucket arrays.
 When `changed: false`, `delta_counts` MUST be omitted (zero bloat).
+
+### 5.2 Degraded Sources (fallback succeeded)
+
+When a source has `status: "degraded"` it means the **primary endpoint failed**
+but a configured fallback endpoint succeeded. The feed is valid but should be
+treated as degraded until the primary recovers.
+
+Required fields (in addition to normal source status fields):
+
+| Field | Value |
+|---|---|
+| `status` | `"degraded"` |
+| `fallback_active` | `true` |
+| `fallback_index` | Integer index of the successful fallback (0-based) |
+| `degraded_reason` | String (e.g. `"primary_endpoint_failed"`) |
+
+Clients SHOULD continue to process degraded feeds normally, but MAY surface
+a warning to operators.
 
 ---
 
@@ -275,9 +301,50 @@ All feed responses MUST use `Content-Type: application/json; charset=utf-8`.
 
 ---
 
-## 7. Example Request / Response
+## 7. Operator Health Dashboard (`/state/health.json`)
 
-### 7.1 First poll (no stored cursor)
+This endpoint is intended for **operators**, not bots. It allows quick
+diagnosis of fleet health without parsing feed files. Servers MAY restrict
+access or omit it entirely.
+
+**Example:**
+
+```json
+{
+  "generated_at": "2026-02-06T18:00:00Z",
+  "schema_version": "1.1.0",
+  "summary": {
+    "total": 24,
+    "ok": 20,
+    "degraded": 2,
+    "error": 1,
+    "disabled": 1,
+    "health_pct": 91.7
+  },
+  "sources": {
+    "openai_api_changelog": {
+      "status": "degraded",
+      "fallback_active": true,
+      "fallback_index": 0,
+      "degraded_reason": "primary_endpoint_failed"
+    },
+    "github_changelog": {
+      "status": "disabled",
+      "consecutive_failures": 7,
+      "stale": true,
+      "stale_age_sec": 86400
+    }
+  }
+}
+```
+
+Fields are **informational**; bots MUST ignore this endpoint in normal polling.
+
+---
+
+## 8. Example Request / Response
+
+### 8.1 First poll (no stored cursor)
 
 ```http
 GET /diff/aws_whats_new/head.json HTTP/1.1
@@ -303,7 +370,7 @@ Cache-Control: public, max-age=300, must-revalidate
 
 Client sees `changed: true` → fetches `latest_url` for full feed.
 
-### 7.2 Subsequent poll (cursor unchanged → 304)
+### 8.2 Subsequent poll (cursor unchanged → 304)
 
 ```http
 GET /diff/aws_whats_new/head.json HTTP/1.1
