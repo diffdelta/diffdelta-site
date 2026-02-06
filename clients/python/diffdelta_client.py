@@ -163,7 +163,7 @@ class DiffDeltaClient:
         cache_key = f"etag:{source_id}"
         stored_etag = self._cache.get(cache_key)
 
-        url = f"/diff/{source_id}/head.json"
+        url = f"/diff/source/{source_id}/head.json"
         status, body, resp_etag = self._get(url, etag=stored_etag)
 
         if status == 304:
@@ -194,7 +194,7 @@ class DiffDeltaClient:
         if not head.get("changed", True):
             return None
 
-        latest_url = head.get("latest_url", f"/diff/{source_id}/latest.json")
+        latest_url = head.get("latest_url", f"/diff/source/{source_id}/latest.json")
         return self._fetch_json(latest_url)
 
     def poll_global(self) -> Optional[Dict[str, Any]]:

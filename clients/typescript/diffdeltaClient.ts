@@ -193,7 +193,7 @@ export class DiffDeltaClient {
     const cacheKey = `etag:${sourceId}`;
     const storedEtag = this.cache.get(cacheKey);
 
-    const url = `/diff/${sourceId}/head.json`;
+    const url = `/diff/source/${sourceId}/head.json`;
     const { status, body, etag } = await this.httpGet<HeadPointer>(
       url,
       storedEtag
@@ -224,7 +224,7 @@ export class DiffDeltaClient {
     if (!changed || !head) return null;
     if (!head.changed) return null;
 
-    const latestUrl = head.latest_url ?? `/diff/${sourceId}/latest.json`;
+    const latestUrl = head.latest_url ?? `/diff/source/${sourceId}/latest.json`;
     return this.fetchDirect<Feed>(latestUrl);
   }
 
