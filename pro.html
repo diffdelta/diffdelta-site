@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard — DiffDelta Pro</title>
+  <meta name="robots" content="noindex">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#09090b;--surface:#18181b;--surface2:#1f1f23;--border:#27272a;
+      --text:#fafafa;--text2:#a1a1aa;--text3:#71717a;
+      --accent:#3b82f6;--accent-h:#2563eb;--accent-glow:rgba(59,130,246,0.12);
+      --green:#22c55e;--green-bg:rgba(34,197,94,.12);
+      --yellow:#eab308;--yellow-bg:rgba(234,179,8,.12);
+      --red:#ef4444;--red-bg:rgba(239,68,68,.12);
+      --blue:#3b82f6;--blue-bg:rgba(59,130,246,.12);
+      --font:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+      --mono:ui-monospace,'SF Mono','Cascadia Code','Fira Code',monospace;
+      --max-w:800px;--px:24px
+    }
+    html{font-size:16px;-webkit-text-size-adjust:100%}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    code{font-family:var(--mono);font-size:.875em;background:var(--surface2);padding:2px 6px;border-radius:4px}
+
+    /* ── Nav ── */
+    .nav{max-width:var(--max-w);margin:0 auto;padding:20px var(--px);display:flex;align-items:center;justify-content:space-between}
+    .nav-brand{font-weight:700;font-size:1.15rem;color:var(--text);letter-spacing:-.5px}
+    .nav-brand span{color:var(--accent)}
+    .nav-links{display:flex;gap:20px;font-size:.9rem}
+    .nav-links a{color:var(--text2);transition:color .15s}
+    .nav-links a:hover{color:var(--text);text-decoration:none}
+    .nav-links a.active{color:var(--accent)}
+
+    /* ── Centered card (auth states) ── */
+    .center-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 140px)}
+    .auth-card{max-width:480px;width:100%;background:var(--surface);border:1px solid var(--border);
+      border-radius:16px;padding:40px var(--px);text-align:center}
+    .auth-card h1{font-size:1.6rem;font-weight:800;letter-spacing:-1px;margin-bottom:8px}
+    .auth-card p{color:var(--text2);margin-bottom:16px;font-size:.95rem}
+    .auth-card .sub{font-size:.85rem;color:var(--text3)}
+
+    .spinner{width:40px;height:40px;border:3px solid var(--surface2);border-top-color:var(--accent);
+      border-radius:50%;animation:spin 1s linear infinite;margin:20px auto}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ── Form elements ── */
+    .input-group{display:flex;gap:8px;margin:20px 0 12px}
+    .input-group input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;
+      padding:10px 14px;color:var(--text);font-size:.9rem;font-family:var(--mono)}
+    .input-group input:focus{outline:none;border-color:var(--accent)}
+    .input-group input::placeholder{color:var(--text3)}
+
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;
+      font-size:.9rem;font-weight:600;transition:all .15s;border:none;cursor:pointer;font-family:var(--font)}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-primary:hover{background:var(--accent-h);text-decoration:none}
+    .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+    .btn-ghost:hover{background:var(--surface);color:var(--text);text-decoration:none}
+    .btn-danger{background:transparent;color:var(--red);border:1px solid rgba(239,68,68,.3)}
+    .btn-danger:hover{background:var(--red-bg)}
+    .btn-sm{padding:6px 14px;font-size:.8rem}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+
+    .error-msg{color:var(--red);font-size:.85rem;margin-top:8px}
+
+    /* ── Dashboard layout ── */
+    .dashboard{max-width:var(--max-w);margin:0 auto;padding:0 var(--px) 48px}
+    .dash-header{padding:32px 0 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+    .dash-header h1{font-size:1.4rem;font-weight:700;letter-spacing:-.5px}
+
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;
+      font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+    .badge-pro{background:var(--accent-glow);color:var(--accent)}
+    .badge-active{background:var(--green-bg);color:var(--green)}
+    .badge-pending{background:var(--yellow-bg);color:var(--yellow)}
+    .badge-reviewing{background:var(--blue-bg);color:var(--blue)}
+    .badge-rejected{background:var(--red-bg);color:var(--red)}
+
+    .dash-meta{font-size:.85rem;color:var(--text3)}
+
+    /* ── Cards ── */
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px}
+    .card-title{font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--text3);font-weight:600;margin-bottom:16px}
+
+    /* ── API Key section ── */
+    .key-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .key-value{font-family:var(--mono);font-size:.95rem;background:var(--bg);border:1px solid var(--border);
+      border-radius:8px;padding:10px 16px;flex:1;min-width:200px;word-break:break-all;color:var(--text2)}
+    .key-actions{display:flex;gap:8px}
+
+    /* ── Usage section ── */
+    .usage-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .usage-numbers{font-size:1.1rem;font-weight:600}
+    .usage-numbers span{color:var(--text3);font-weight:400}
+    .usage-reset{font-size:.8rem;color:var(--text3)}
+    .progress-track{height:6px;background:var(--bg);border-radius:3px;overflow:hidden}
+    .progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .3s ease}
+    .progress-fill.warn{background:var(--yellow)}
+    .progress-fill.danger{background:var(--red)}
+
+    /* ── Sources table ── */
+    .sources-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .sources-count{font-size:.85rem;color:var(--text3)}
+    .sources-table{width:100%;border-collapse:collapse}
+    .sources-table th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.5px;
+      color:var(--text3);padding:8px 0;border-bottom:1px solid var(--border)}
+    .sources-table td{padding:10px 0;border-bottom:1px solid var(--border);font-size:.9rem}
+    .sources-table tr:last-child td{border-bottom:none}
+    .sources-table .url-cell{color:var(--text3);font-size:.8rem;font-family:var(--mono);
+      max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+    .source-form{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-top:16px;
+      padding-top:16px;border-top:1px solid var(--border)}
+    .source-form label{display:block;font-size:.7rem;font-weight:600;color:var(--text3);
+      text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+    .source-form input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;
+      padding:8px 12px;color:var(--text);font-size:.85rem;font-family:var(--font)}
+    .source-form input:focus{outline:none;border-color:var(--accent)}
+    .source-form input::placeholder{color:var(--text3)}
+    .source-msg{grid-column:1/-1;font-size:.8rem;margin-top:4px}
+    .source-msg.ok{color:var(--green)}
+    .source-msg.err{color:var(--red)}
+    @media(max-width:640px){.source-form{grid-template-columns:1fr}}
+
+    /* ── Billing section ── */
+    .billing-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .billing-info{font-size:.9rem;color:var(--text2)}
+
+    /* ── Empty state ── */
+    .empty{text-align:center;padding:24px 16px;color:var(--text3);font-size:.9rem}
+
+    /* ── Footer ── */
+    .footer{max-width:var(--max-w);margin:0 auto;padding:24px var(--px);
+      border-top:1px solid var(--border);display:flex;justify-content:space-between;
+      align-items:center;font-size:.8rem;color:var(--text3)}
+    .footer a{color:var(--text3)}
+    .footer a:hover{color:var(--text)}
+
+    .hidden{display:none}
+
+    @media(max-width:640px){
+      .nav{flex-direction:column;gap:12px}
+      .dash-header{flex-direction:column;align-items:flex-start}
+      .key-row{flex-direction:column;align-items:stretch}
+      .key-actions{justify-content:flex-start}
+      .billing-row{flex-direction:column;align-items:flex-start}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <a href="/" class="nav-brand" style="text-decoration:none">Diff<span>Delta</span></a>
+    <div class="nav-links">
+      <a href="/pro" class="active">Dashboard</a>
+      <a href="/#sources">Sources</a>
+      <a href="/#quickstart">Docs</a>
+      <a href="https://github.com/diffdelta">GitHub</a>
+    </div>
+  </nav>
+
+  <!-- ═══════ State: No API Key ═══════ -->
+  <div class="center-wrap" id="state-no-key">
+    <div class="auth-card">
+      <h1>DiffDelta Pro Dashboard</h1>
+      <p>Enter your API key to access your account, manage sources, and view usage.</p>
+      <div class="input-group">
+        <input type="text" id="key-input" placeholder="dd_live_..." autocomplete="off" spellcheck="false">
+        <button class="btn btn-primary" id="connect-btn" onclick="connectKey()">Connect</button>
+      </div>
+      <p class="error-msg hidden" id="connect-error"></p>
+      <p class="sub">Don\u2019t have a key? <a href="/#pricing">Get started here</a></p>
+    </div>
+  </div>
+
+  <!-- ═══════ State: Loading ═══════ -->
+  <div class="center-wrap hidden" id="state-loading">
+    <div class="auth-card">
+      <div class="spinner"></div>
+      <p>Loading your dashboard\u2026</p>
+    </div>
+  </div>
+
+  <!-- ═══════ State: Error ═══════ -->
+  <div class="center-wrap hidden" id="state-error">
+    <div class="auth-card">
+      <h1>Couldn\u2019t load dashboard</h1>
+      <p id="error-detail" class="error-msg" style="font-size:.95rem"></p>
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="loadDashboard()">Retry</button>
+        <button class="btn btn-ghost" onclick="clearKey()">Try a Different Key</button>
+      </div>
+      <p class="sub" style="margin-top:16px">Need help? <a href="mailto:human@diffdelta.io">human@diffdelta.io</a></p>
+    </div>
+  </div>
+
+  <!-- ═══════ State: Dashboard ═══════ -->
+  <div class="hidden" id="state-dashboard">
+    <div class="dashboard">
+
+      <!-- Account header -->
+      <div class="dash-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+            <h1 id="dash-greeting">Dashboard</h1>
+            <span class="badge badge-pro" id="dash-tier">Pro</span>
+            <span class="badge badge-active" id="dash-status">Active</span>
+          </div>
+          <div class="dash-meta"><span id="dash-email"></span> · Member since <span id="dash-since"></span></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="logout()">Disconnect</button>
+      </div>
+
+      <!-- API Key -->
+      <div class="card">
+        <div class="card-title">API Key</div>
+        <div class="key-row">
+          <div class="key-value" id="dash-key-display">····</div>
+          <div class="key-actions">
+            <button class="btn btn-ghost btn-sm" id="copy-key-btn" onclick="copyKey()">Copy</button>
+            <button class="btn btn-danger btn-sm" onclick="rotateKey()">Rotate</button>
+          </div>
+        </div>
+        <p style="font-size:.75rem;color:var(--text3);margin-top:10px">
+          Last rotated: <span id="dash-key-rotated">—</span>
+        </p>
+      </div>
+
+      <!-- Usage -->
+      <div class="card">
+        <div class="card-title">Usage (current minute)</div>
+        <div class="usage-row">
+          <div class="usage-numbers"><span id="usage-used">0</span> <span>/ <span id="usage-limit">1,000</span> requests</span></div>
+          <div class="usage-reset">Resets in <span id="usage-countdown">—</span>s</div>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="usage-bar" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- Custom Sources -->
+      <div class="card">
+        <div class="sources-header">
+          <div class="card-title" style="margin-bottom:0">Custom Sources</div>
+          <div class="sources-count"><span id="src-used">0</span> / <span id="src-limit">2</span> used</div>
+        </div>
+
+        <!-- Sources table (or empty state) -->
+        <div id="sources-list"></div>
+
+        <!-- Add source form -->
+        <div id="source-form-wrap"></div>
+      </div>
+
+      <!-- Billing -->
+      <div class="card" id="billing-card">
+        <div class="card-title">Billing</div>
+        <div class="billing-row">
+          <div class="billing-info">Manage your subscription, update payment method, or view invoices.</div>
+          <button class="btn btn-ghost btn-sm" id="billing-btn" onclick="openBilling()">Manage Subscription \u2192</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div>\u00a9 2026 DiffDelta \u00b7 <a href="mailto:human@diffdelta.io">human@diffdelta.io</a></div>
+    <div>
+      <a href="/" style="margin-right:12px">Home</a>
+      <a href="/#quickstart" style="margin-right:12px">Docs</a>
+      <a href="https://github.com/diffdelta">GitHub</a>
+    </div>
+  </footer>
+
+  <script>
+    // ── State management ──
+
+    var apiKey = "";
+    var accountData = null;
+    var usageTimer = null;
+
+    function show(id) {
+      ["state-no-key", "state-loading", "state-error", "state-dashboard"].forEach(function(s) {
+        document.getElementById(s).classList.add("hidden");
+      });
+      document.getElementById(id).classList.remove("hidden");
+    }
+
+    // ── Init: check localStorage for saved key ──
+
+    (function init() {
+      var saved = null;
+      try { saved = localStorage.getItem("dd_api_key"); } catch(e) {}
+      if (saved && saved.startsWith("dd_live_") && saved.length >= 40) {
+        apiKey = saved;
+        loadDashboard();
+      }
+      // else: show the "enter key" state (default)
+    })();
+
+    // ── Connect with a key ──
+
+    function connectKey() {
+      var input = document.getElementById("key-input");
+      var errEl = document.getElementById("connect-error");
+      var val = input.value.trim();
+
+      errEl.classList.add("hidden");
+
+      if (!val) {
+        errEl.textContent = "Please enter your API key.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+      if (!val.startsWith("dd_live_") || val.length < 40) {
+        errEl.textContent = "Invalid key format. Keys start with dd_live_ and are at least 40 characters.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+
+      apiKey = val;
+      try { localStorage.setItem("dd_api_key", apiKey); } catch(e) {}
+      loadDashboard();
+    }
+
+    // Allow pressing Enter in the key input
+    document.getElementById("key-input").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") { e.preventDefault(); connectKey(); }
+    });
+
+    // ── Load dashboard data ──
+
+    async function loadDashboard() {
+      show("state-loading");
+
+      try {
+        var res = await fetch("/api/v1/account", {
+          headers: { "X-DiffDelta-Key": apiKey }
+        });
+
+        if (!res.ok) {
+          var errData = {};
+          try { errData = await res.json(); } catch(e) {}
+          var msg = errData.error || "Server returned " + res.status;
+
+          if (res.status === 401) {
+            msg = "API key not recognized. It may be invalid, deactivated, or rotated.";
+          }
+
+          document.getElementById("error-detail").textContent = msg;
+          show("state-error");
+          return;
+        }
+
+        accountData = await res.json();
+        renderDashboard();
+        show("state-dashboard");
+        startUsageCountdown();
+      } catch (err) {
+        document.getElementById("error-detail").textContent = "Network error. Check your connection and try again.";
+        show("state-error");
+      }
+    }
+
+    // ── Render dashboard from account data ──
+
+    function renderDashboard() {
+      var d = accountData;
+
+      // Header
+      document.getElementById("dash-tier").textContent = d.tier.charAt(0).toUpperCase() + d.tier.slice(1);
+      document.getElementById("dash-status").textContent = d.active ? "Active" : "Inactive";
+      document.getElementById("dash-status").className = "badge " + (d.active ? "badge-active" : "badge-rejected");
+      document.getElementById("dash-email").textContent = d.email || "No email on file";
+      document.getElementById("dash-since").textContent = formatDate(d.created_at);
+
+      // API Key (masked)
+      document.getElementById("dash-key-display").textContent = maskKey(apiKey);
+      document.getElementById("dash-key-rotated").textContent = formatDate(d.last_rotated_at);
+
+      // Usage
+      renderUsage(d.usage.current_window);
+
+      // Custom Sources
+      renderSources(d.custom_sources);
+
+      // Billing
+      var billingCard = document.getElementById("billing-card");
+      if (!d.billing.portal_available) {
+        billingCard.classList.add("hidden");
+      } else {
+        billingCard.classList.remove("hidden");
+      }
+    }
+
+    // ── API Key helpers ──
+
+    function maskKey(key) {
+      if (!key || key.length < 16) return "\u00b7\u00b7\u00b7\u00b7";
+      return key.slice(0, 12) + "\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7" + key.slice(-4);
+    }
+
+    function copyKey() {
+      if (!apiKey) return;
+      navigator.clipboard.writeText(apiKey).then(function() {
+        var btn = document.getElementById("copy-key-btn");
+        btn.textContent = "Copied!";
+        setTimeout(function() { btn.textContent = "Copy"; }, 2000);
+      });
+    }
+
+    async function rotateKey() {
+      if (!confirm("Rotate your API key? The current key will be permanently invalidated. You\u2019ll receive a new key.")) return;
+
+      var btn = document.querySelector(".btn-danger");
+      btn.disabled = true;
+      btn.textContent = "Rotating\u2026";
+
+      try {
+        var res = await fetch("/api/v1/key/rotate", {
+          method: "POST",
+          headers: { "X-DiffDelta-Key": apiKey }
+        });
+
+        var data = await res.json();
+
+        if (!res.ok) {
+          alert("Rotation failed: " + (data.error || "Unknown error"));
+          return;
+        }
+
+        // Update stored key
+        apiKey = data.api_key;
+        try { localStorage.setItem("dd_api_key", apiKey); } catch(e) {}
+
+        // Show the new key unmasked briefly
+        var keyDisplay = document.getElementById("dash-key-display");
+        keyDisplay.textContent = apiKey;
+        keyDisplay.style.color = "var(--green)";
+
+        // Update rotation date locally (don't reload — that would re-mask the key)
+        if (data.rotated_at) {
+          document.getElementById("dash-key-rotated").textContent = formatDate(data.rotated_at);
+          if (accountData) accountData.last_rotated_at = data.rotated_at;
+        }
+
+        alert("Key rotated successfully! Your new key is shown in the dashboard. Copy it now \u2014 it won\u2019t be shown unmasked again after you reload.");
+
+        setTimeout(function() {
+          keyDisplay.textContent = maskKey(apiKey);
+          keyDisplay.style.color = "";
+        }, 30000); // Show unmasked for 30 seconds
+      } catch (err) {
+        alert("Network error during rotation. Your old key may still be valid. Try again.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Rotate";
+      }
+    }
+
+    // ── Usage rendering ──
+
+    function renderUsage(usage) {
+      document.getElementById("usage-used").textContent = usage.used.toLocaleString();
+      document.getElementById("usage-limit").textContent = usage.limit.toLocaleString();
+
+      var pct = usage.limit > 0 ? (usage.used / usage.limit) * 100 : 0;
+      var bar = document.getElementById("usage-bar");
+      bar.style.width = Math.min(pct, 100) + "%";
+      bar.className = "progress-fill" + (pct > 90 ? " danger" : pct > 70 ? " warn" : "");
+    }
+
+    var usageRefreshing = false;
+
+    function startUsageCountdown() {
+      if (usageTimer) clearInterval(usageTimer);
+      usageRefreshing = false;
+
+      usageTimer = setInterval(function() {
+        if (!accountData) return;
+        var resetAt = accountData.usage.current_window.reset_at;
+        var remaining = Math.max(0, resetAt - Math.floor(Date.now() / 1000));
+        document.getElementById("usage-countdown").textContent = remaining;
+
+        // Auto-refresh dashboard when window resets (debounced)
+        if (remaining === 0 && !usageRefreshing) {
+          usageRefreshing = true;
+          clearInterval(usageTimer);
+          loadDashboard();
+        }
+      }, 1000);
+    }
+
+    // ── Custom sources rendering ──
+
+    function renderSources(cs) {
+      document.getElementById("src-used").textContent = cs.used;
+      document.getElementById("src-limit").textContent = cs.limit === -1 ? "\u221e" : cs.limit;
+
+      var listEl = document.getElementById("sources-list");
+
+      if (cs.sources.length === 0) {
+        listEl.innerHTML = '<div class="empty">No custom sources yet. Submit a URL below to get started.</div>';
+      } else {
+        var rows = cs.sources.map(function(s) {
+          var statusClass = "badge-" + s.status;
+          return '<tr>' +
+            '<td style="font-weight:500">' + esc(s.name) + '</td>' +
+            '<td class="url-cell" title="' + escAttr(s.url) + '">' + esc(s.url) + '</td>' +
+            '<td><span class="badge ' + statusClass + '">' + esc(s.status) + '</span></td>' +
+            '<td style="color:var(--text3);font-size:.8rem">' + formatDate(s.submitted_at) + '</td>' +
+            '</tr>';
+        }).join("");
+
+        listEl.innerHTML =
+          '<table class="sources-table"><thead><tr>' +
+          '<th>Name</th><th>URL</th><th>Status</th><th>Submitted</th>' +
+          '</tr></thead><tbody>' + rows + '</tbody></table>';
+      }
+
+      // Show add form only if under limit
+      var formWrap = document.getElementById("source-form-wrap");
+      var canAdd = cs.limit === -1 || cs.used < cs.limit;
+
+      if (canAdd) {
+        formWrap.innerHTML =
+          '<form class="source-form" id="add-source-form" onsubmit="submitSource(event)">' +
+            '<div><label for="src-name">Source name</label>' +
+            '<input type="text" id="src-name" placeholder="e.g. Vercel Status" required></div>' +
+            '<div><label for="src-url">URL</label>' +
+            '<input type="url" id="src-url" placeholder="https://status.vercel.com" required></div>' +
+            '<button type="submit" class="btn btn-primary btn-sm" id="src-submit-btn">Submit for Review</button>' +
+            '<div class="source-msg hidden" id="src-msg"></div>' +
+          '</form>' +
+          '<p style="font-size:.75rem;color:var(--text3);margin-top:8px">' +
+          'Must be a structured technical feed (changelog, status page, advisory, etc.). Subject to review.</p>';
+      } else {
+        formWrap.innerHTML =
+          '<p style="font-size:.85rem;color:var(--text3);margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">' +
+          'Custom source limit reached. <a href="mailto:human@diffdelta.io?subject=DiffDelta%20Enterprise%20inquiry">Contact us</a> to upgrade.</p>';
+      }
+    }
+
+    async function submitSource(e) {
+      e.preventDefault();
+      var name = document.getElementById("src-name").value.trim();
+      var url = document.getElementById("src-url").value.trim();
+      var msg = document.getElementById("src-msg");
+      var btn = document.getElementById("src-submit-btn");
+
+      if (!name || !url) return;
+
+      btn.disabled = true;
+      btn.textContent = "Submitting\u2026";
+      msg.classList.add("hidden");
+
+      try {
+        var res = await fetch("/api/v1/sources/custom", {
+          method: "POST",
+          headers: {
+            "X-DiffDelta-Key": apiKey,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ name: name, url: url })
+        });
+
+        var data = await res.json();
+
+        if (res.ok) {
+          msg.textContent = "\u2713 " + (data.message || "Source submitted for review!");
+          msg.className = "source-msg ok";
+          document.getElementById("src-name").value = "";
+          document.getElementById("src-url").value = "";
+          // Refresh dashboard to show the new source
+          setTimeout(loadDashboard, 1000);
+        } else {
+          msg.textContent = data.error || "Something went wrong.";
+          msg.className = "source-msg err";
+        }
+      } catch (err) {
+        msg.textContent = "Network error. Try again.";
+        msg.className = "source-msg err";
+      }
+
+      msg.classList.remove("hidden");
+      btn.disabled = false;
+      btn.textContent = "Submit for Review";
+    }
+
+    // ── Billing ──
+
+    async function openBilling() {
+      var btn = document.getElementById("billing-btn");
+      btn.disabled = true;
+      btn.textContent = "Opening\u2026";
+
+      try {
+        var res = await fetch("/api/v1/billing/portal", {
+          method: "POST",
+          headers: { "X-DiffDelta-Key": apiKey }
+        });
+
+        var data = await res.json();
+
+        if (res.ok && data.url) {
+          window.location.href = data.url;
+          return;
+        }
+
+        alert("Could not open billing portal: " + (data.error || "Unknown error") +
+          "\n\nContact human@diffdelta.io for help.");
+      } catch (err) {
+        alert("Network error. Try again or contact human@diffdelta.io.");
+      }
+
+      btn.disabled = false;
+      btn.textContent = "Manage Subscription \u2192";
+    }
+
+    // ── Disconnect / clear key ──
+
+    function logout() {
+      clearKey();
+    }
+
+    function clearKey() {
+      apiKey = "";
+      accountData = null;
+      if (usageTimer) clearInterval(usageTimer);
+      try { localStorage.removeItem("dd_api_key"); } catch(e) {}
+      document.getElementById("key-input").value = "";
+      show("state-no-key");
+    }
+
+    // ── Helpers ──
+
+    function esc(str) {
+      if (!str) return "";
+      var d = document.createElement("div");
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
+    /** Escape for use inside HTML attribute values (also escapes quotes) */
+    function escAttr(str) {
+      return esc(str).replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+
+    function formatDate(iso) {
+      if (!iso) return "\u2014";
+      try {
+        var d = new Date(iso);
+        return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+      } catch(e) {
+        return iso.slice(0, 10);
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -30,6 +30,8 @@ export interface KeyData {
   created_at: string;            // ISO 8601
   last_rotated_at: string;       // ISO 8601
   active: boolean;
+  custom_sources_limit: number;  // 2 (pro), -1 (enterprise = unlimited)
+  custom_source_ids: string[];   // IDs of owned custom sources
 }
 
 /** Stored in KV under `session:{stripe_session_id}` with 1hr TTL */
@@ -45,6 +47,19 @@ export interface RateLimitResult {
   remaining: number;
   reset_at: number;              // Unix timestamp (seconds)
   limit: number;
+}
+
+/** Stored in KV under `custom:{id}` */
+export interface CustomSource {
+  id: string;                     // e.g. "cs_a1b2c3d4e5f6"
+  owner_key_hash: string;        // SHA-256 of the owning API key
+  name: string;                   // User-provided display name
+  url: string;                    // Submitted URL to monitor
+  status: "pending" | "reviewing" | "active" | "rejected";
+  review_notes?: string;          // Admin notes on review decision
+  submitted_at: string;           // ISO 8601
+  reviewed_at?: string;           // ISO 8601
+  feed_source_id?: string;        // Generator source_id once active
 }
 
 /** Webhook registration (Phase 2 — type reserved now) */

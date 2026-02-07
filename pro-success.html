@@ -136,14 +136,17 @@ curl -X POST -H "X-DiffDelta-Key: YOUR_KEY" \
       </ol>
     </div>
 
-    <a href="/" class="back-link">← Back to DiffDelta</a>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap">
+      <a href="/pro" class="back-link" style="background:var(--accent);color:#fff;padding:10px 22px;border-radius:8px;font-weight:600">Go to Dashboard →</a>
+      <a href="/" class="back-link">← Back to DiffDelta</a>
+    </div>
   </div>
 
   <!-- Error state -->
   <div class="card hidden" id="state-error">
     <h1>Something went wrong</h1>
     <p id="error-text" class="error-msg"></p>
-    <p style="margin-top:16px">If this persists, contact <a href="mailto:support@diffdelta.io">support@diffdelta.io</a></p>
+    <p style="margin-top:16px">If this persists, contact <a href="mailto:human@diffdelta.io">human@diffdelta.io</a></p>
     <a href="/" class="back-link">← Back to DiffDelta</a>
   </div>
 
@@ -175,6 +178,8 @@ curl -X POST -H "X-DiffDelta-Key: YOUR_KEY" \
 
         if (data.status === "ready" && data.api_key) {
           apiKeyValue = data.api_key;
+          // Save key to localStorage so the dashboard can pick it up
+          try { localStorage.setItem("dd_api_key", data.api_key); } catch(e) {}
           document.getElementById("api-key").textContent = data.api_key;
           // Replace placeholders in code examples
           var placeholders = document.querySelectorAll(".key-placeholder");
@@ -186,7 +191,7 @@ curl -X POST -H "X-DiffDelta-Key: YOUR_KEY" \
           retryCount++;
           if (retryCount >= maxRetries) {
             document.getElementById("error-text").textContent =
-              "Key generation is taking longer than expected. Your payment was received — please contact support@diffdelta.io and we'll send your key manually.";
+              "Key generation is taking longer than expected. Your payment was received \u2014 please contact human@diffdelta.io and we'll send your key manually.";
             show("state-error");
           } else {
             document.getElementById("retry-msg").textContent =

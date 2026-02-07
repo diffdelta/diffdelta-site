@@ -93,6 +93,8 @@ async function handleCheckoutCompleted(
     created_at: now,
     last_rotated_at: now,
     active: true,
+    custom_sources_limit: 2,   // Pro tier: 2 custom source onboardings
+    custom_source_ids: [],     // Empty until user submits sources
   };
 
   // Store hashed key → key data
