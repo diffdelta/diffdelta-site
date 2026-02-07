@@ -145,7 +145,7 @@
   <header class="hero">
     <div class="hero-label">Scenario</div>
     <h1>The <em>Security Bot</em> Scenario</h1>
-    <p>Your company needs to know when a vulnerability drops that affects your stack. Here\u2019s how that works today \u2014 and how it works with DiffDelta.</p>
+    <p>Your company needs to know when a vulnerability drops that affects your stack. Here's how that works today — and how it works with DiffDelta.</p>
   </header>
 
   <!-- Article -->
@@ -158,66 +158,66 @@
     <div class="setup-card">
       <h3>The sources you need to watch:</h3>
       <ul>
-        <li><strong>CISA Known Exploited Vulnerabilities</strong> \u2014 the US government\u2019s \u201cthese are being actively exploited right now\u201d list</li>
-        <li><strong>NIST NVD</strong> \u2014 every published CVE with severity scores</li>
-        <li><strong>GitHub Security Advisories</strong> \u2014 vulnerabilities in open-source packages you use</li>
-        <li><strong>Kubernetes CVEs</strong> \u2014 if you run containers, you care about these</li>
-        <li><strong>Linux Kernel CVEs</strong> \u2014 the operating system under everything</li>
-        <li><strong>Ubuntu / Debian Security Notices</strong> \u2014 when your distro patches</li>
-        <li><strong>OpenSSL Releases</strong> \u2014 the crypto library the internet depends on</li>
-        <li><strong>AWS Service Health</strong> \u2014 is your infra even up?</li>
+        <li><strong>CISA Known Exploited Vulnerabilities</strong> — the US government's "these are being actively exploited right now" list</li>
+        <li><strong>NIST NVD</strong> — every published CVE with severity scores</li>
+        <li><strong>GitHub Security Advisories</strong> — vulnerabilities in open-source packages you use</li>
+        <li><strong>Kubernetes CVEs</strong> — if you run containers, you care about these</li>
+        <li><strong>Linux Kernel CVEs</strong> — the operating system under everything</li>
+        <li><strong>Ubuntu / Debian Security Notices</strong> — when your distro patches</li>
+        <li><strong>OpenSSL Releases</strong> — the crypto library the internet depends on</li>
+        <li><strong>AWS Service Health</strong> — is your infra even up?</li>
       </ul>
     </div>
 
-    <p>That\u2019s <strong>8 different sources</strong>, each with different formats, update frequencies, and access methods. Today, most teams handle this one of two ways \u2014 both painful.</p>
+    <p>That's <strong>8 different sources</strong>, each with different formats, update frequencies, and access methods. Today, most teams handle this one of two ways — both painful.</p>
 
     <!-- ═══ THE OLD WAY ═══ -->
     <h2>The Old Way: Humans in the Loop</h2>
 
     <div class="compare">
       <div class="compare-col old">
-        <div class="compare-label">\u274c What it looks like today</div>
+        <div class="compare-label">❌ What it looks like today</div>
         <ul>
           <li>Subscribe to <strong>6 email lists</strong> (CISA, Ubuntu, Debian, Kubernetes, etc.)</li>
           <li>Check the NVD website <strong>manually every morning</strong></li>
-          <li>Skim GitHub\u2019s advisory feed when you remember</li>
-          <li>Get <strong>300+ emails/day</strong>, 95% of which don\u2019t affect your stack</li>
-          <li>Your security engineer spends <strong>1\u20132 hours/day</strong> triaging \u2014 reading, correlating, deciding what matters</li>
+          <li>Skim GitHub's advisory feed when you remember</li>
+          <li>Get <strong>300+ emails/day</strong>, 95% of which don't affect your stack</li>
+          <li>Your security engineer spends <strong>1–2 hours/day</strong> triaging — reading, correlating, deciding what matters</li>
           <li>Critical CVEs occasionally <strong>slip through</strong> because someone was on PTO</li>
         </ul>
       </div>
       <div class="compare-col old">
-        <div class="compare-label">\u274c What it looks like with DIY bots</div>
+        <div class="compare-label">❌ What it looks like with DIY bots</div>
         <ul>
-          <li>Build <strong>4\u20136 custom scrapers</strong> (one per source)</li>
-          <li>Parse HTML, RSS, JSON, and CSV \u2014 every source is different</li>
+          <li>Build <strong>4–6 custom scrapers</strong> (one per source)</li>
+          <li>Parse HTML, RSS, JSON, and CSV — every source is different</li>
           <li>Handle <strong>rate limits, pagination</strong>, and format changes</li>
           <li>Your LLM processes <strong>43MB of raw data</strong> to find what changed</li>
           <li>Scrapers <strong>break every few weeks</strong> when upstream sites update</li>
-          <li>Maintaining this is a <strong>200\u2013400 line codebase</strong> per source</li>
+          <li>Maintaining this is a <strong>200–400 line codebase</strong> per source</li>
         </ul>
       </div>
     </div>
 
-    <p>Both approaches work, sort of. But they\u2019re expensive, fragile, and <strong>don\u2019t scale.</strong> Every new source is another scraper to build, another email to parse, another thing that breaks.</p>
+    <p>Both approaches work, sort of. But they're expensive, fragile, and <strong>don't scale.</strong> Every new source is another scraper to build, another email to parse, another thing that breaks.</p>
 
     <!-- ═══ THE DIFFDELTA WAY ═══ -->
     <h2>The DiffDelta Way: Agent-Ready Intelligence</h2>
 
     <p>With DiffDelta, all 8 of those sources are already being monitored. Every 15 minutes, our pipeline checks upstream, computes what changed, scores it for risk, and serves it as structured JSON on a global CDN.</p>
 
-    <p><strong>Your bot\u2019s job becomes trivial:</strong></p>
+    <p><strong>Your bot's job becomes trivial:</strong></p>
 
     <div class="compare">
       <div class="compare-col new" style="grid-column:1/-1">
-        <div class="compare-label">\u2705 What it looks like with DiffDelta</div>
+        <div class="compare-label">✅ What it looks like with DiffDelta</div>
         <ul>
           <li>Poll <strong>one endpoint</strong> every 15 minutes: <code>/diff/head.json</code> (400 bytes)</li>
           <li>If nothing changed, <strong>stop</strong>. You burned 400 bytes, not 43MB.</li>
-          <li>If something changed, fetch <code>/diff/latest.json</code> \u2014 pre-diffed, pre-normalized JSON</li>
+          <li>If something changed, fetch <code>/diff/latest.json</code> — pre-diffed, pre-normalized JSON</li>
           <li>Every item has a <strong>headline</strong>, <strong>excerpt</strong>, <strong>risk score</strong>, and <strong>provenance chain</strong></li>
           <li>Filter by source (<code>cisa_kev</code>, <code>github_advisories</code>, etc.) or tag (<code>security</code>)</li>
-          <li>Your agent reads <strong>49K tokens instead of 43M</strong> \u2014 and knows exactly what\u2019s new</li>
+          <li>Your agent reads <strong>49K tokens instead of 43M</strong> — and knows exactly what's new</li>
         </ul>
       </div>
     </div>
@@ -225,7 +225,7 @@
     <!-- ═══ THE CODE ═══ -->
     <h2>The Code: 15 Lines</h2>
 
-    <p>Here\u2019s a complete security monitoring bot. No SDK, no dependencies beyond <code>requests</code>.</p>
+    <p>Here's a complete security monitoring bot. No SDK, no dependencies beyond <code>requests</code>.</p>
 
     <div class="code-block">
       <div class="code-header">security_bot.py</div>
@@ -249,18 +249,18 @@ feed = requests.get(<span class="s">"https://diffdelta.io/diff/latest.json"</spa
     <span class="k">if</span> item[<span class="s">"source"</span>] <span class="k">in</span> [<span class="s">"cisa_kev"</span>, <span class="s">"nist_nvd"</span>, <span class="s">"github_advisories"</span>,
                            <span class="s">"kubernetes_cve"</span>, <span class="s">"linux_kernel_cve"</span>]:
         <span class="f">print</span>(f<span class="s">"\U0001f6a8 {item['source']}: {item['headline']}"</span>)
-        <span class="cm"># \u2192 Create a Jira ticket, send a Slack alert, trigger a patch pipeline</span>
+        <span class="cm"># → Create a Jira ticket, send a Slack alert, trigger a patch pipeline</span>
 
 <span class="cm"># Step 4: Save cursor for next poll</span>
 save_cursor(feed[<span class="s">"cursor"</span>])</pre>
     </div>
 
-    <p>That\u2019s it. <strong>No HTML parsing. No rate-limit handling. No format normalization.</strong> The pipeline runs every 15 minutes, and your agent only processes what\u2019s actually new.</p>
+    <p>That's it. <strong>No HTML parsing. No rate-limit handling. No format normalization.</strong> The pipeline runs every 15 minutes, and your agent only processes what's actually new.</p>
 
     <!-- ═══ WHAT THE DATA LOOKS LIKE ═══ -->
     <h2>What the Data Looks Like</h2>
 
-    <p>Here\u2019s what your bot actually receives \u2014 real data from DiffDelta\u2019s live CISA KEV feed:</p>
+    <p>Here's what your bot actually receives — real data from DiffDelta's live CISA KEV feed:</p>
 
     <div class="result-card">
       <div class="label">Sample feed items (from /diff/source/cisa_kev/latest.json)</div>
@@ -269,7 +269,7 @@ save_cursor(feed[<span class="s">"cursor"</span>])</pre>
         <div class="result-headline">Zyxel Multiple Products Use of Hard-Coded Credentials Vulnerability</div>
         <div class="result-meta">
           <span><strong>CVE-2020-29583</strong></span>
-          <span class="risk-badge risk-high">\u26a0 Actively exploited</span>
+          <span class="risk-badge risk-high">⚠ Actively exploited</span>
           <span>Source: cisa_kev</span>
         </div>
         <p style="font-size:.82rem;color:var(--text3);margin-top:6px;margin-bottom:0">Zyxel firewalls (ATP, USG, VM) and AP Controllers contain a hard-coded credential in an undocumented account with an unchangeable password.</p>
@@ -279,7 +279,7 @@ save_cursor(feed[<span class="s">"cursor"</span>])</pre>
         <div class="result-headline">Zoho ManageEngine ServiceDesk Plus File Upload Vulnerability</div>
         <div class="result-meta">
           <span><strong>CVE-2019-8394</strong></span>
-          <span class="risk-badge risk-high">\u26a0 Actively exploited</span>
+          <span class="risk-badge risk-high">⚠ Actively exploited</span>
           <span>Source: cisa_kev</span>
         </div>
         <p style="font-size:.82rem;color:var(--text3);margin-top:6px;margin-bottom:0">Allows remote users to upload arbitrary files via login page customization. No authentication required.</p>
@@ -291,27 +291,27 @@ save_cursor(feed[<span class="s">"cursor"</span>])</pre>
     <!-- ═══ THE MATH ═══ -->
     <h2>The Math</h2>
 
-    <p>Let\u2019s compare the cost of monitoring these 8 security sources:</p>
+    <p>Let's compare the cost of monitoring these 8 security sources:</p>
 
     <div class="stats-row">
       <div class="mini-stat">
-        <div class="num">833\u00d7</div>
+        <div class="num">833×</div>
         <div class="lbl">Less bandwidth</div>
         <div class="sub">400 bytes vs. 330KB per check</div>
       </div>
       <div class="mini-stat">
-        <div class="num">876\u00d7</div>
+        <div class="num">876×</div>
         <div class="lbl">Fewer tokens</div>
         <div class="sub">Pre-diffed &amp; pre-summarized</div>
       </div>
       <div class="mini-stat">
         <div class="num">15</div>
         <div class="lbl">Lines of code</div>
-        <div class="sub">vs. 200\u2013400 per scraper</div>
+        <div class="sub">vs. 200–400 per scraper</div>
       </div>
     </div>
 
-    <p>Most of those 15-minute polls return nothing new. Your agent checks <code>head.json</code> (400 bytes), sees the cursor hasn\u2019t changed, and moves on. <strong>When something does change, you get exactly what\u2019s different</strong> \u2014 not the entire database.</p>
+    <p>Most of those 15-minute polls return nothing new. Your agent checks <code>head.json</code> (400 bytes), sees the cursor hasn't changed, and moves on. <strong>When something does change, you get exactly what's different</strong> — not the entire database.</p>
 
     <p>This is what we call <strong>compute arbitrage</strong>: DiffDelta does the expensive work once (fetching, parsing, normalizing, scoring) and serves the result cheaply to every agent that needs it. You pay for one API call instead of rebuilding the pipeline yourself.</p>
 
@@ -319,8 +319,8 @@ save_cursor(feed[<span class="s">"cursor"</span>])</pre>
     <div class="cta">
       <p>DiffDelta is free. All 35+ sources, all data, zero cost. Start polling in under 10 lines.</p>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-        <a href="/#quickstart" class="btn btn-primary">Get Started \u2192</a>
-        <a href="/#sources" class="btn btn-ghost">View All Sources \u2193</a>
+        <a href="/#quickstart" class="btn btn-primary">Get Started →</a>
+        <a href="/#sources" class="btn btn-ghost">View All Sources ↓</a>
       </div>
     </div>
 
@@ -329,11 +329,11 @@ save_cursor(feed[<span class="s">"cursor"</span>])</pre>
       <h3>More Scenarios</h3>
       <div class="scenario-link" style="opacity:.6;cursor:default">
         <div class="tag">Coming soon</div>
-        <strong>The Incident Response Bot</strong> \u2014 Auto-detect when AWS, GCP, or Azure go down and trigger your runbooks
+        <strong>The Incident Response Bot</strong> — Auto-detect when AWS, GCP, or Azure go down and trigger your runbooks
       </div>
       <div class="scenario-link" style="opacity:.6;cursor:default">
         <div class="tag">Coming soon</div>
-        <strong>The Supply Chain Monitor</strong> \u2014 Watch for package ownership transfers, license changes, and deprecated dependencies
+        <strong>The Supply Chain Monitor</strong> — Watch for package ownership transfers, license changes, and deprecated dependencies
       </div>
     </div>
 
@@ -341,7 +341,7 @@ save_cursor(feed[<span class="s">"cursor"</span>])</pre>
 
   <!-- Footer -->
   <footer class="footer">
-    <div>\u00a9 2026 DiffDelta \u00b7 <a href="mailto:human@diffdelta.io">human@diffdelta.io</a></div>
+    <div>© 2026 DiffDelta · <a href="mailto:human@diffdelta.io">human@diffdelta.io</a></div>
     <div>
       <a href="/" style="margin-right:12px">Home</a>
       <a href="/#quickstart" style="margin-right:12px">Docs</a>
