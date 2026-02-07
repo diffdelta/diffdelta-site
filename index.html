@@ -134,6 +134,22 @@
     .saving-label{font-size:.85rem;color:var(--text2);margin-top:4px}
     .saving-sub{font-size:.75rem;color:var(--text3)}
 
+    /* ── Source request form ── */
+    .request-form{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;margin-top:24px}
+    .request-form form{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end}
+    .request-form label{display:block;font-size:.75rem;font-weight:600;color:var(--text3);text-transform:uppercase;
+      letter-spacing:.5px;margin-bottom:6px}
+    .request-form input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;
+      padding:10px 14px;color:var(--text);font-size:.9rem;font-family:var(--font);transition:border-color .15s}
+    .request-form input:focus{outline:none;border-color:var(--accent)}
+    .request-form input::placeholder{color:var(--text3)}
+    .request-form .btn{height:42px}
+    .request-form .form-msg{grid-column:1/-1;font-size:.85rem;margin-top:4px}
+    .request-form .form-msg.ok{color:var(--green)}
+    .request-form .form-msg.err{color:var(--red)}
+    .hp-field{position:absolute;left:-9999px;opacity:0;height:0;width:0}
+    @media(max-width:768px){.request-form form{grid-template-columns:1fr}}
+
     /* ── CTA / Pricing ── */
     .cta{text-align:center;padding:56px var(--px) 72px}
     .cta p{color:var(--text2);margin-bottom:24px}
@@ -279,6 +295,28 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Source request form -->
+    <div class="request-form" id="request-source">
+      <div style="margin-bottom:16px">
+        <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:4px">Request a source</h3>
+        <p style="font-size:.85rem;color:var(--text2);margin:0">Want us to track something we don't cover yet? Let us know — it helps us prioritize.</p>
+      </div>
+      <form id="source-request-form" autocomplete="off">
+        <div>
+          <label for="req-email">Your email *</label>
+          <input type="email" id="req-email" name="email" placeholder="you@company.com" required>
+        </div>
+        <div>
+          <label for="req-source">Source name or URL *</label>
+          <input type="text" id="req-source" name="source" placeholder="e.g. npm registry changes, Vercel status" required>
+        </div>
+        <!-- Honeypot — invisible to humans, catches bots -->
+        <input type="text" name="website" class="hp-field" tabindex="-1" autocomplete="off">
+        <button type="submit" class="btn btn-primary" id="req-submit">Submit</button>
+        <div class="form-msg hidden" id="req-msg"></div>
+      </form>
+    </div>
   </section>
 
   <!-- Quickstart -->
@@ -384,8 +422,8 @@ curl -s https://diffdelta.io/diff/sources.json \
   <!-- Pricing -->
   <section class="cta" id="pricing">
     <div class="section-label">Pricing</div>
-    <h2 class="section-title">Simple, transparent pricing</h2>
-    <p>Start free. Upgrade when your bots need more speed.</p>
+    <h2 class="section-title">Free for everyone. More coming soon.</h2>
+    <p>All sources, all data, zero cost. Pro and Enterprise tiers are on the roadmap for teams that need more throughput.</p>
 
     <div class="pricing-grid">
 
@@ -407,7 +445,7 @@ curl -s https://diffdelta.io/diff/sources.json \
 
       <!-- Pro -->
       <div class="pricing-card featured">
-        <div class="pricing-badge">Most Popular</div>
+        <div class="pricing-badge">Coming Soon</div>
         <div class="pricing-tier">Pro</div>
         <div class="pricing-price">$29<span>/mo</span></div>
         <div class="pricing-sub">For production bots &amp; teams</div>
@@ -419,7 +457,7 @@ curl -s https://diffdelta.io/diff/sources.json \
           <li>API key &amp; key rotation</li>
           <li>Priority support</li>
         </ul>
-        <a href="/api/v1/checkout" class="btn btn-primary">Upgrade to Pro →</a>
+        <span class="btn btn-ghost" style="opacity:0.6;cursor:default">Coming Soon</span>
       </div>
 
       <!-- Enterprise -->
@@ -435,20 +473,20 @@ curl -s https://diffdelta.io/diff/sources.json \
           <li>SSO &amp; team key management</li>
           <li>Dedicated support channel</li>
         </ul>
-        <a href="mailto:enterprise@diffdelta.io" class="btn btn-ghost">Contact Sales →</a>
+        <a href="mailto:human@diffdelta.io?subject=DiffDelta%20Enterprise%20inquiry" class="btn btn-ghost">Get in Touch →</a>
       </div>
 
     </div>
 
     <p style="margin-top:28px;font-size:.85rem;color:var(--text3)">
-      All tiers include the same sources and data. Pro adds speed, real-time push, and key management.<br>
-      <a href="/terms">Terms of Service</a> · <a href="/docs/spec/diffdelta-feed-spec">Feed Spec</a>
+      All tiers include the same sources and data. Pro and Enterprise will add speed, real-time push, and key management.<br>
+      <a href="/terms">Terms of Service</a> · <a href="/docs/spec/diffdelta-feed-spec">Feed Spec</a> · <a href="mailto:human@diffdelta.io">human@diffdelta.io</a>
     </p>
   </section>
 
   <!-- Footer -->
   <footer class="footer">
-    <div>© 2026 DiffDelta · <a href="/LICENSE">MIT License</a> · <a href="/terms">Terms of Service</a> · Built for bots</div>
+    <div>© 2026 DiffDelta · <a href="/LICENSE">MIT License</a> · <a href="/terms">Terms of Service</a> · <a href="mailto:human@diffdelta.io">human@diffdelta.io</a> · Built for bots</div>
     <div>
       <a href="/diff/sources.json" style="margin-right:12px">API</a>
       <a href="/docs/spec/diffdelta-feed-spec" style="margin-right:12px">Spec</a>
@@ -524,6 +562,51 @@ curl -s https://diffdelta.io/diff/sources.json \
       d.textContent = str;
       return d.innerHTML;
     }
+
+    // ── Source request form ──
+    (function() {
+      var form = document.getElementById('source-request-form');
+      if (!form) return;
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var msg = document.getElementById('req-msg');
+        var btn = document.getElementById('req-submit');
+        var email = form.email.value.trim();
+        var source = form.source.value.trim();
+        var hp = form.website.value;
+
+        // Honeypot check
+        if (hp) { msg.textContent = 'Thanks!'; msg.className = 'form-msg ok'; msg.classList.remove('hidden'); return; }
+        if (!email || !source) return;
+
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+        msg.classList.add('hidden');
+
+        try {
+          var res = await fetch('/api/v1/source-request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email, source: source })
+          });
+          var data = await res.json();
+          if (res.ok) {
+            msg.textContent = '✓ Thanks! We'll review your suggestion.';
+            msg.className = 'form-msg ok';
+            form.reset();
+          } else {
+            msg.textContent = data.error || 'Something went wrong. Try again.';
+            msg.className = 'form-msg err';
+          }
+        } catch (err) {
+          msg.textContent = 'Network error. Try again.';
+          msg.className = 'form-msg err';
+        }
+        msg.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Submit';
+      });
+    })();
 
     // ── Tab switching ──
     document.querySelectorAll('.tab').forEach(function(tab) {

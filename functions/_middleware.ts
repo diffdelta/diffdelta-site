@@ -67,6 +67,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   if (path.startsWith("/api/")) {
     const isPublicEndpoint =
       path === "/api/v1/checkout" ||
+      path === "/api/v1/source-request" ||
       path.startsWith("/api/v1/key/claim") ||
       path.startsWith("/api/v1/admin/"); // Admin endpoints use their own auth
 
