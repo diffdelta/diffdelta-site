@@ -188,6 +188,7 @@
       .hero{padding:48px var(--px) 40px}
       .hero h1{font-size:2rem}
       .footer{flex-direction:column;gap:8px;text-align:center}
+      .source-packs{grid-template-columns:1fr !important}
     }
     @media(max-width:480px){
       .hero-actions{flex-direction:column;align-items:center}
@@ -286,6 +287,33 @@
   <section id="sources">
     <div class="section-label">Live Sources</div>
     <h2 class="section-title">What's being tracked right now</h2>
+
+    <!-- Source packs -->
+    <div class="source-packs" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+        <div style="font-size:1.1rem;margin-bottom:6px">🔒</div>
+        <div style="font-weight:700;font-size:.95rem;margin-bottom:4px">Security</div>
+        <div style="font-size:.8rem;color:var(--text2);margin-bottom:10px">CVEs, advisories, vulnerability disclosures</div>
+        <div style="font-size:.72rem;color:var(--text3);line-height:1.6;font-family:var(--mono)">cisa_kev · nist_nvd · github_advisories<br>kubernetes_cve · linux_kernel_cve<br>debian_security · ubuntu_security · openssl</div>
+        <div style="font-size:.75rem;color:var(--accent);font-weight:600;margin-top:10px">8 sources</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+        <div style="font-size:1.1rem;margin-bottom:6px">☁️</div>
+        <div style="font-weight:700;font-size:.95rem;margin-bottom:4px">Cloud Status</div>
+        <div style="font-size:.8rem;color:var(--text2);margin-bottom:10px">Infrastructure health for major providers</div>
+        <div style="font-size:.72rem;color:var(--text3);line-height:1.6;font-family:var(--mono)">aws_status · azure_status · gcp_status</div>
+        <div style="font-size:.75rem;color:var(--accent);font-weight:600;margin-top:10px">3 sources</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px">
+        <div style="font-size:1.1rem;margin-bottom:6px">📦</div>
+        <div style="font-weight:700;font-size:.95rem;margin-bottom:4px">Releases</div>
+        <div style="font-size:.8rem;color:var(--text2);margin-bottom:10px">Version updates for tools you depend on</div>
+        <div style="font-size:.72rem;color:var(--text3);line-height:1.6;font-family:var(--mono)">kubernetes · docker · terraform · node<br>python · golang · react · nextjs · redis &hellip;</div>
+        <div style="font-size:.75rem;color:var(--accent);font-weight:600;margin-top:10px">17+ sources</div>
+      </div>
+    </div>
+    <p style="font-size:.82rem;color:var(--text3);margin-bottom:20px"><strong style="color:var(--text2)">Quick filter:</strong> Use <code>dd.poll(tags=["security"])</code> in the Python client or filter <code>/diff/sources.json</code> by tag to get only the pack you care about.</p>
+
     <p class="sources-count" id="sources-count">Loading sources…</p>
     <div class="sources-wrap">
       <table class="sources-table">
@@ -329,15 +357,33 @@
   <!-- Quickstart -->
   <section id="quickstart">
     <div class="section-label">Quickstart</div>
-    <h2 class="section-title">Start polling in under 10 lines</h2>
-    <p class="section-sub">No SDK required. Standard HTTP. Works with any language.</p>
+    <h2 class="section-title">Start polling in 5 lines</h2>
+    <p class="section-sub">Install the client library. It handles cursors, change detection, and filtering automatically.</p>
     <div class="code-block">
       <div class="tabs">
-        <button class="tab active" data-tab="python">Python</button>
+        <button class="tab active" data-tab="recommended">pip install (recommended)</button>
+        <button class="tab" data-tab="raw-python">Raw Python</button>
         <button class="tab" data-tab="typescript">TypeScript</button>
         <button class="tab" data-tab="curl">curl</button>
       </div>
-      <div class="code-panel active" id="panel-python"><pre><span class="k">import</span> requests
+      <div class="code-panel active" id="panel-recommended"><pre><span class="cm"># Install the client</span>
+pip install diffdelta
+
+<span class="cm"># That's it. Now poll:</span></pre>
+<pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0"><span class="k">from</span> diffdelta <span class="k">import</span> DiffDelta
+
+dd = DiffDelta()
+
+<span class="cm"># Poll for new security items (handles cursors automatically)</span>
+<span class="k">for</span> item <span class="k">in</span> dd.poll(tags=[<span class="s">"security"</span>]):
+    <span class="f">print</span>(f<span class="s">"🚨 {item.source}: {item.headline}"</span>)
+
+<span class="cm"># Run again later — only new items since last poll are returned.</span>
+<span class="cm"># Cursor state is saved to ~/.diffdelta/cursors.json automatically.</span></pre>
+<pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0"><span class="cm"># Or watch continuously (runs forever, polls every 15 min):</span>
+dd.<span class="f">watch</span>(<span class="k">lambda</span> item: <span class="f">print</span>(f<span class="s">"🚨 {item.headline}"</span>), tags=[<span class="s">"security"</span>])</pre>
+      </div>
+      <div class="code-panel" id="panel-raw-python"><pre><span class="k">import</span> requests
 
 <span class="cm"># Step 1: Check for changes (400 bytes)</span>
 head = requests.get(<span class="s">"https://diffdelta.io/diff/source/cisa_kev/head.json"</span>).json()
@@ -386,6 +432,7 @@ curl -s https://diffdelta.io/diff/sources.json \
   | jq <span class="s">'[.sources[] | select(.tags | contains(["security"]))]'</span></pre>
       </div>
     </div>
+    <p style="font-size:.85rem;color:var(--text3);margin-top:16px"><strong style="color:var(--text2)">Scheduling tip:</strong> Run your bot on a cron (<code>*/15 * * * * python my_bot.py</code>), as a systemd service, or use <code>dd.watch()</code> for a built-in polling loop. The library handles cursor state between runs automatically.</p>
   </section>
 
   <!-- Savings -->
