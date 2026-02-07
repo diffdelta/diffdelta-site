@@ -49,7 +49,8 @@
     /* ── Form elements ── */
     .input-group{display:flex;gap:8px;margin:20px 0 12px}
     .input-group input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;
-      padding:10px 14px;color:var(--text);font-size:.9rem;font-family:var(--mono)}
+      padding:10px 14px;color:var(--text);font-size:.9rem;font-family:var(--font)}
+    .input-group input.mono-input{font-family:var(--mono)}
     .input-group input:focus{outline:none;border-color:var(--accent)}
     .input-group input::placeholder{color:var(--text3)}
 
@@ -65,6 +66,11 @@
     .btn:disabled{opacity:.5;cursor:not-allowed}
 
     .error-msg{color:var(--red);font-size:.85rem;margin-top:8px}
+    .success-msg{color:var(--green);font-size:.85rem;margin-top:8px}
+
+    /* ── Divider ── */
+    .divider{display:flex;align-items:center;gap:16px;margin:24px 0 20px;color:var(--text3);font-size:.8rem}
+    .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--border)}
 
     /* ── Dashboard layout ── */
     .dashboard{max-width:var(--max-w);margin:0 auto;padding:0 var(--px) 48px}
@@ -78,6 +84,7 @@
     .badge-pending{background:var(--yellow-bg);color:var(--yellow)}
     .badge-reviewing{background:var(--blue-bg);color:var(--blue)}
     .badge-rejected{background:var(--red-bg);color:var(--red)}
+    .badge-session{background:var(--green-bg);color:var(--green)}
 
     .dash-meta{font-size:.85rem;color:var(--text3)}
 
@@ -90,6 +97,8 @@
     .key-value{font-family:var(--mono);font-size:.95rem;background:var(--bg);border:1px solid var(--border);
       border-radius:8px;padding:10px 16px;flex:1;min-width:200px;word-break:break-all;color:var(--text2)}
     .key-actions{display:flex;gap:8px}
+    .key-note{font-size:.75rem;color:var(--text3);margin-top:10px}
+    .key-note.session-note{color:var(--yellow);background:var(--yellow-bg);padding:8px 12px;border-radius:8px;font-size:.8rem;margin-top:12px}
 
     /* ── Usage section ── */
     .usage-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
@@ -163,17 +172,46 @@
     </div>
   </nav>
 
-  <!-- ═══════ State: No API Key ═══════ -->
+  <!-- ═══════ State: No Auth (email + key login) ═══════ -->
   <div class="center-wrap" id="state-no-key">
     <div class="auth-card">
       <h1>DiffDelta Pro Dashboard</h1>
-      <p>Enter your API key to access your account, manage sources, and view usage.</p>
+      <p>Sign in to access your account, manage sources, and view usage.</p>
+
+      <!-- Email sign-in (primary for humans) -->
       <div class="input-group">
-        <input type="text" id="key-input" placeholder="dd_live_..." autocomplete="off" spellcheck="false">
-        <button class="btn btn-primary" id="connect-btn" onclick="connectKey()">Connect</button>
+        <input type="email" id="email-input" placeholder="you@company.com" autocomplete="email" spellcheck="false">
+        <button class="btn btn-primary" id="magic-btn" onclick="sendMagicLink()">Send Sign-In Link</button>
+      </div>
+      <p class="error-msg hidden" id="magic-error"></p>
+      <p class="success-msg hidden" id="magic-success"></p>
+      <p style="font-size:.8rem;color:var(--text3);margin-top:4px">We\u2019ll email you a one-time sign-in link.</p>
+
+      <div class="divider">or paste your API key</div>
+
+      <!-- API key sign-in (for power users / bots) -->
+      <div class="input-group">
+        <input type="text" id="key-input" class="mono-input" placeholder="dd_live_..." autocomplete="off" spellcheck="false">
+        <button class="btn btn-ghost" id="connect-btn" onclick="connectKey()">Connect</button>
       </div>
       <p class="error-msg hidden" id="connect-error"></p>
-      <p class="sub">Don\u2019t have a key? <a href="/#pricing">Get started here</a></p>
+
+      <p class="sub" style="margin-top:20px">Don\u2019t have a key? <a href="/#pricing">Get started here</a></p>
+    </div>
+  </div>
+
+  <!-- ═══════ State: Magic Link Sent ═══════ -->
+  <div class="center-wrap hidden" id="state-magic-sent">
+    <div class="auth-card">
+      <div style="font-size:2.5rem;margin-bottom:16px">\u2709\uFE0F</div>
+      <h1>Check Your Email</h1>
+      <p>We sent a sign-in link to <strong id="sent-email"></strong>.</p>
+      <p style="font-size:.9rem;color:var(--text3)">Click the link in the email to access your dashboard. The link expires in 15 minutes.</p>
+      <div style="margin-top:24px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="sendMagicLink()" id="resend-btn">Resend Link</button>
+        <button class="btn btn-ghost btn-sm" onclick="show('state-no-key')">Try a Different Method</button>
+      </div>
+      <p class="sub" style="margin-top:16px">Didn\u2019t receive it? Check your spam folder or contact <a href="mailto:human@diffdelta.io">human@diffdelta.io</a></p>
     </div>
   </div>
 
@@ -192,7 +230,7 @@
       <p id="error-detail" class="error-msg" style="font-size:.95rem"></p>
       <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap">
         <button class="btn btn-primary" onclick="loadDashboard()">Retry</button>
-        <button class="btn btn-ghost" onclick="clearKey()">Try a Different Key</button>
+        <button class="btn btn-ghost" onclick="fullLogout()">Try a Different Method</button>
       </div>
       <p class="sub" style="margin-top:16px">Need help? <a href="mailto:human@diffdelta.io">human@diffdelta.io</a></p>
     </div>
@@ -205,28 +243,33 @@
       <!-- Account header -->
       <div class="dash-header">
         <div>
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap">
             <h1 id="dash-greeting">Dashboard</h1>
             <span class="badge badge-pro" id="dash-tier">Pro</span>
             <span class="badge badge-active" id="dash-status">Active</span>
+            <span class="badge badge-session hidden" id="dash-auth-mode">Email Session</span>
           </div>
           <div class="dash-meta"><span id="dash-email"></span> · Member since <span id="dash-since"></span></div>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="logout()">Disconnect</button>
+        <button class="btn btn-ghost btn-sm" onclick="fullLogout()">Sign Out</button>
       </div>
 
       <!-- API Key -->
       <div class="card">
         <div class="card-title">API Key</div>
         <div class="key-row">
-          <div class="key-value" id="dash-key-display">····</div>
+          <div class="key-value" id="dash-key-display">\u00b7\u00b7\u00b7\u00b7</div>
           <div class="key-actions">
             <button class="btn btn-ghost btn-sm" id="copy-key-btn" onclick="copyKey()">Copy</button>
-            <button class="btn btn-danger btn-sm" onclick="rotateKey()">Rotate</button>
+            <button class="btn btn-danger btn-sm" id="rotate-key-btn" onclick="rotateKey()">Rotate</button>
           </div>
         </div>
-        <p style="font-size:.75rem;color:var(--text3);margin-top:10px">
-          Last rotated: <span id="dash-key-rotated">—</span>
+        <p class="key-note" id="key-note-normal">
+          Last rotated: <span id="dash-key-rotated">\u2014</span>
+        </p>
+        <p class="key-note session-note hidden" id="key-note-session">
+          \u{1F511} You\u2019re signed in via email. Your raw API key is not available in this session.
+          <strong>Rotate</strong> to get a new key you can copy, or sign in directly with your key.
         </p>
       </div>
 
@@ -235,7 +278,7 @@
         <div class="card-title">Usage (current minute)</div>
         <div class="usage-row">
           <div class="usage-numbers"><span id="usage-used">0</span> <span>/ <span id="usage-limit">1,000</span> requests</span></div>
-          <div class="usage-reset">Resets in <span id="usage-countdown">—</span>s</div>
+          <div class="usage-reset">Resets in <span id="usage-countdown">\u2014</span>s</div>
         </div>
         <div class="progress-track">
           <div class="progress-fill" id="usage-bar" style="width:0%"></div>
@@ -279,32 +322,154 @@
   </footer>
 
   <script>
-    // ── State management ──
+    // ────────────────────────────────────────────────────────
+    // DiffDelta Pro Dashboard — Client-Side Logic
+    // Supports two auth modes:
+    //   1. "key"     — raw API key in localStorage (full access)
+    //   2. "session" — HttpOnly cookie from magic link (no raw key)
+    // ────────────────────────────────────────────────────────
 
-    var apiKey = "";
+    var apiKey = "";          // Raw key (only available in "key" mode)
+    var authMode = "";        // "key" or "session"
     var accountData = null;
     var usageTimer = null;
+    var usageRefreshing = false;
+    var pendingEmail = "";    // Email used for magic link (for resend)
+
+    // ── Show/hide states ──
+
+    var ALL_STATES = ["state-no-key", "state-magic-sent", "state-loading", "state-error", "state-dashboard"];
 
     function show(id) {
-      ["state-no-key", "state-loading", "state-error", "state-dashboard"].forEach(function(s) {
+      ALL_STATES.forEach(function(s) {
         document.getElementById(s).classList.add("hidden");
       });
       document.getElementById(id).classList.remove("hidden");
     }
 
-    // ── Init: check localStorage for saved key ──
+    // ── Helper: build fetch options with auth ──
+
+    function authFetchOpts(extra) {
+      var opts = extra || {};
+      opts.credentials = "same-origin"; // Always send cookies
+
+      if (authMode === "key" && apiKey) {
+        opts.headers = Object.assign({ "X-DiffDelta-Key": apiKey }, opts.headers || {});
+      }
+      // In session mode, the cookie is sent automatically — no header needed
+
+      return opts;
+    }
+
+    // ══════════════════════════════════════════════════════
+    // Init: determine auth state
+    // Priority: 1) localStorage API key, 2) session cookie
+    // ══════════════════════════════════════════════════════
 
     (function init() {
+      // 1. Check localStorage for saved API key
       var saved = null;
       try { saved = localStorage.getItem("dd_api_key"); } catch(e) {}
       if (saved && saved.startsWith("dd_live_") && saved.length >= 40) {
         apiKey = saved;
+        authMode = "key";
         loadDashboard();
+        return;
       }
-      // else: show the "enter key" state (default)
+
+      // 2. Try loading dashboard via session cookie (if one exists)
+      // We do a lightweight probe — if the cookie is valid, /api/v1/account will return 200
+      trySessionAuth();
     })();
 
-    // ── Connect with a key ──
+    async function trySessionAuth() {
+      // Show loading while we probe the session cookie
+      show("state-loading");
+
+      try {
+        var res = await fetch("/api/v1/account", { credentials: "same-origin" });
+        if (res.ok) {
+          authMode = "session";
+          accountData = await res.json();
+          if (accountData.auth_mode) authMode = accountData.auth_mode;
+          renderDashboard();
+          show("state-dashboard");
+          startUsageCountdown();
+          return;
+        }
+      } catch(e) {
+        // Network error or no session — fall through to login screen
+      }
+
+      // No valid session — show login card
+      show("state-no-key");
+    }
+
+    // ══════════════════════════════════════════════════════
+    // Magic Link Auth
+    // ══════════════════════════════════════════════════════
+
+    async function sendMagicLink() {
+      var input = document.getElementById("email-input");
+      var errEl = document.getElementById("magic-error");
+      var okEl = document.getElementById("magic-success");
+      var btn = document.getElementById("magic-btn");
+      var resendBtn = document.getElementById("resend-btn");
+
+      var email = (input ? input.value : pendingEmail).trim().toLowerCase();
+
+      errEl.classList.add("hidden");
+      okEl.classList.add("hidden");
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errEl.textContent = "Please enter a valid email address.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+
+      pendingEmail = email;
+
+      // Disable button while sending
+      var activeBtn = btn;
+      if (document.getElementById("state-magic-sent").classList.contains("hidden") === false) {
+        activeBtn = resendBtn;
+      }
+      activeBtn.disabled = true;
+      activeBtn.textContent = "Sending\u2026";
+
+      try {
+        var res = await fetch("/api/v1/auth/magic-link", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email })
+        });
+
+        var data = await res.json();
+
+        if (res.ok) {
+          document.getElementById("sent-email").textContent = email;
+          show("state-magic-sent");
+        } else {
+          errEl.textContent = data.error || "Something went wrong. Try again.";
+          errEl.classList.remove("hidden");
+        }
+      } catch(err) {
+        errEl.textContent = "Network error. Check your connection and try again.";
+        errEl.classList.remove("hidden");
+      }
+
+      activeBtn.disabled = false;
+      activeBtn.textContent = activeBtn === resendBtn ? "Resend Link" : "Send Sign-In Link";
+    }
+
+    // Allow pressing Enter in the email input
+    document.getElementById("email-input").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") { e.preventDefault(); sendMagicLink(); }
+    });
+
+    // ══════════════════════════════════════════════════════
+    // API Key Auth (existing flow)
+    // ══════════════════════════════════════════════════════
 
     function connectKey() {
       var input = document.getElementById("key-input");
@@ -325,6 +490,7 @@
       }
 
       apiKey = val;
+      authMode = "key";
       try { localStorage.setItem("dd_api_key", apiKey); } catch(e) {}
       loadDashboard();
     }
@@ -334,15 +500,15 @@
       if (e.key === "Enter") { e.preventDefault(); connectKey(); }
     });
 
-    // ── Load dashboard data ──
+    // ══════════════════════════════════════════════════════
+    // Load Dashboard
+    // ══════════════════════════════════════════════════════
 
     async function loadDashboard() {
       show("state-loading");
 
       try {
-        var res = await fetch("/api/v1/account", {
-          headers: { "X-DiffDelta-Key": apiKey }
-        });
+        var res = await fetch("/api/v1/account", authFetchOpts());
 
         if (!res.ok) {
           var errData = {};
@@ -359,6 +525,12 @@
         }
 
         accountData = await res.json();
+
+        // Server tells us the auth mode (in case we guessed wrong)
+        if (accountData.auth_mode) {
+          authMode = accountData.auth_mode;
+        }
+
         renderDashboard();
         show("state-dashboard");
         startUsageCountdown();
@@ -368,10 +540,13 @@
       }
     }
 
-    // ── Render dashboard from account data ──
+    // ══════════════════════════════════════════════════════
+    // Render Dashboard
+    // ══════════════════════════════════════════════════════
 
     function renderDashboard() {
       var d = accountData;
+      var isSession = authMode === "session";
 
       // Header
       document.getElementById("dash-tier").textContent = d.tier.charAt(0).toUpperCase() + d.tier.slice(1);
@@ -380,8 +555,31 @@
       document.getElementById("dash-email").textContent = d.email || "No email on file";
       document.getElementById("dash-since").textContent = formatDate(d.created_at);
 
-      // API Key (masked)
-      document.getElementById("dash-key-display").textContent = maskKey(apiKey);
+      // Auth mode badge
+      var authBadge = document.getElementById("dash-auth-mode");
+      if (isSession) {
+        authBadge.classList.remove("hidden");
+      } else {
+        authBadge.classList.add("hidden");
+      }
+
+      // API Key display
+      if (isSession) {
+        // Session mode: no raw key available
+        document.getElementById("dash-key-display").textContent = "dd_live_\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7\u00b7";
+        document.getElementById("copy-key-btn").disabled = true;
+        document.getElementById("copy-key-btn").title = "Not available in email sign-in mode. Rotate to get a new key.";
+        document.getElementById("key-note-normal").classList.add("hidden");
+        document.getElementById("key-note-session").classList.remove("hidden");
+      } else {
+        // Key mode: show masked key
+        document.getElementById("dash-key-display").textContent = maskKey(apiKey);
+        document.getElementById("copy-key-btn").disabled = false;
+        document.getElementById("copy-key-btn").title = "";
+        document.getElementById("key-note-normal").classList.remove("hidden");
+        document.getElementById("key-note-session").classList.add("hidden");
+      }
+
       document.getElementById("dash-key-rotated").textContent = formatDate(d.last_rotated_at);
 
       // Usage
@@ -399,7 +597,9 @@
       }
     }
 
-    // ── API Key helpers ──
+    // ══════════════════════════════════════════════════════
+    // API Key Helpers
+    // ══════════════════════════════════════════════════════
 
     function maskKey(key) {
       if (!key || key.length < 16) return "\u00b7\u00b7\u00b7\u00b7";
@@ -407,7 +607,7 @@
     }
 
     function copyKey() {
-      if (!apiKey) return;
+      if (!apiKey || authMode === "session") return;
       navigator.clipboard.writeText(apiKey).then(function() {
         var btn = document.getElementById("copy-key-btn");
         btn.textContent = "Copied!";
@@ -418,15 +618,14 @@
     async function rotateKey() {
       if (!confirm("Rotate your API key? The current key will be permanently invalidated. You\u2019ll receive a new key.")) return;
 
-      var btn = document.querySelector(".btn-danger");
+      var btn = document.getElementById("rotate-key-btn");
       btn.disabled = true;
       btn.textContent = "Rotating\u2026";
 
       try {
-        var res = await fetch("/api/v1/key/rotate", {
-          method: "POST",
-          headers: { "X-DiffDelta-Key": apiKey }
-        });
+        var res = await fetch("/api/v1/key/rotate", authFetchOpts({
+          method: "POST"
+        }));
 
         var data = await res.json();
 
@@ -435,8 +634,9 @@
           return;
         }
 
-        // Update stored key
+        // We now have the raw key — switch to key mode!
         apiKey = data.api_key;
+        authMode = "key";
         try { localStorage.setItem("dd_api_key", apiKey); } catch(e) {}
 
         // Show the new key unmasked briefly
@@ -444,7 +644,18 @@
         keyDisplay.textContent = apiKey;
         keyDisplay.style.color = "var(--green)";
 
-        // Update rotation date locally (don't reload — that would re-mask the key)
+        // Enable copy button (now in key mode)
+        document.getElementById("copy-key-btn").disabled = false;
+        document.getElementById("copy-key-btn").title = "";
+
+        // Hide session note, show normal note
+        document.getElementById("key-note-session").classList.add("hidden");
+        document.getElementById("key-note-normal").classList.remove("hidden");
+
+        // Hide auth mode badge
+        document.getElementById("dash-auth-mode").classList.add("hidden");
+
+        // Update rotation date locally
         if (data.rotated_at) {
           document.getElementById("dash-key-rotated").textContent = formatDate(data.rotated_at);
           if (accountData) accountData.last_rotated_at = data.rotated_at;
@@ -464,7 +675,9 @@
       }
     }
 
-    // ── Usage rendering ──
+    // ══════════════════════════════════════════════════════
+    // Usage
+    // ══════════════════════════════════════════════════════
 
     function renderUsage(usage) {
       document.getElementById("usage-used").textContent = usage.used.toLocaleString();
@@ -475,8 +688,6 @@
       bar.style.width = Math.min(pct, 100) + "%";
       bar.className = "progress-fill" + (pct > 90 ? " danger" : pct > 70 ? " warn" : "");
     }
-
-    var usageRefreshing = false;
 
     function startUsageCountdown() {
       if (usageTimer) clearInterval(usageTimer);
@@ -497,7 +708,9 @@
       }, 1000);
     }
 
-    // ── Custom sources rendering ──
+    // ══════════════════════════════════════════════════════
+    // Custom Sources
+    // ══════════════════════════════════════════════════════
 
     function renderSources(cs) {
       document.getElementById("src-used").textContent = cs.used;
@@ -561,14 +774,11 @@
       msg.classList.add("hidden");
 
       try {
-        var res = await fetch("/api/v1/sources/custom", {
+        var res = await fetch("/api/v1/sources/custom", authFetchOpts({
           method: "POST",
-          headers: {
-            "X-DiffDelta-Key": apiKey,
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name: name, url: url })
-        });
+        }));
 
         var data = await res.json();
 
@@ -593,7 +803,9 @@
       btn.textContent = "Submit for Review";
     }
 
-    // ── Billing ──
+    // ══════════════════════════════════════════════════════
+    // Billing
+    // ══════════════════════════════════════════════════════
 
     async function openBilling() {
       var btn = document.getElementById("billing-btn");
@@ -601,10 +813,9 @@
       btn.textContent = "Opening\u2026";
 
       try {
-        var res = await fetch("/api/v1/billing/portal", {
-          method: "POST",
-          headers: { "X-DiffDelta-Key": apiKey }
-        });
+        var res = await fetch("/api/v1/billing/portal", authFetchOpts({
+          method: "POST"
+        }));
 
         var data = await res.json();
 
@@ -623,22 +834,36 @@
       btn.textContent = "Manage Subscription \u2192";
     }
 
-    // ── Disconnect / clear key ──
+    // ══════════════════════════════════════════════════════
+    // Logout / Sign Out
+    // ══════════════════════════════════════════════════════
 
-    function logout() {
-      clearKey();
-    }
-
-    function clearKey() {
+    async function fullLogout() {
+      // Clear localStorage key
       apiKey = "";
       accountData = null;
+      authMode = "";
       if (usageTimer) clearInterval(usageTimer);
       try { localStorage.removeItem("dd_api_key"); } catch(e) {}
+
+      // Clear session cookie via server (HttpOnly — can't clear from JS)
+      try {
+        await fetch("/api/v1/auth/logout", {
+          method: "POST",
+          credentials: "same-origin"
+        });
+      } catch(e) {
+        // Best-effort — even if this fails, localStorage is cleared
+      }
+
       document.getElementById("key-input").value = "";
+      document.getElementById("email-input").value = "";
       show("state-no-key");
     }
 
-    // ── Helpers ──
+    // ══════════════════════════════════════════════════════
+    // Helpers
+    // ══════════════════════════════════════════════════════
 
     function esc(str) {
       if (!str) return "";

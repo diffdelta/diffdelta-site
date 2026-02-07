@@ -59,6 +59,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       );
     }
 
+    // Update email → new key hash mapping (for magic link auth)
+    if (keyData.email) {
+      await env.KEYS.put(`email:${keyData.email}`, newKeyHash);
+    }
+
     // Delete old key LAST (after new key is safely stored)
     await env.KEYS.delete(`key:${auth.key_hash}`);
 

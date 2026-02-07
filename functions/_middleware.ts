@@ -45,6 +45,13 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     return errorResponse(auth.error, 401);
   }
 
+  // If a session cookie was provided but expired/invalid, return the session error
+  // (otherwise user gets confusing "API key required" message)
+  const hasCookie = request.headers.get("Cookie")?.includes("dd_session");
+  if (hasCookie && !auth.authenticated && auth.error) {
+    return errorResponse(auth.error, 401);
+  }
+
   // ── Rate limit ──
   const identifier =
     auth.authenticated && auth.key_hash
@@ -69,7 +76,8 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       path === "/api/v1/checkout" ||
       path === "/api/v1/source-request" ||
       path.startsWith("/api/v1/key/claim") ||
-      path.startsWith("/api/v1/admin/"); // Admin endpoints use their own auth
+      path.startsWith("/api/v1/auth/") ||  // Magic link auth endpoints (own validation)
+      path.startsWith("/api/v1/admin/");   // Admin endpoints use their own auth
 
     if (!isPublicEndpoint && !auth.authenticated) {
       return errorResponse(

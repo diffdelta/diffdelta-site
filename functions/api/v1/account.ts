@@ -59,6 +59,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     created_at: keyData.created_at,
     last_rotated_at: keyData.last_rotated_at,
     active: keyData.active,
+    auth_mode: auth.auth_mode || "key",  // "key" or "session" — tells dashboard how user authenticated
     usage: {
       current_window: {
         used,

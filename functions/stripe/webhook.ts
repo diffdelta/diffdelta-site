@@ -100,6 +100,11 @@ async function handleCheckoutCompleted(
   // Store hashed key → key data
   await env.KEYS.put(`key:${keyHash}`, JSON.stringify(keyData));
 
+  // Store email → key hash mapping (for magic link auth + key recovery)
+  if (keyData.email) {
+    await env.KEYS.put(`email:${keyData.email}`, keyHash);
+  }
+
   // Store subscription → key hash mapping (for deactivation on cancel)
   if (keyData.stripe_subscription_id) {
     await env.KEYS.put(

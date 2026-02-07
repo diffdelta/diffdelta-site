@@ -12,12 +12,14 @@ export interface Env {
   // ── KV Namespaces ──
   KEYS: KVNamespace;          // API keys (hashed) → KeyData
   RATE_LIMITS: KVNamespace;   // Rate limit counters (ephemeral, TTL-based)
-  SESSIONS: KVNamespace;      // Stripe checkout session → pending key (1hr TTL)
+  SESSIONS: KVNamespace;      // Stripe sessions, magic link tokens, auth sessions
 
   // ── Secrets (set in Cloudflare Pages > Settings > Environment variables) ──
   STRIPE_SECRET_KEY: string;
   STRIPE_WEBHOOK_SECRET: string;
   STRIPE_PRICE_ID: string;
+  RESEND_API_KEY: string;     // Email delivery (magic links). Optional — feature disabled if missing
+  ADMIN_SECRET: string;       // Bearer token for admin endpoints
 }
 
 /** Stored in KV under `key:{sha256(raw_key)}` */
@@ -60,6 +62,20 @@ export interface CustomSource {
   submitted_at: string;           // ISO 8601
   reviewed_at?: string;           // ISO 8601
   feed_source_id?: string;        // Generator source_id once active
+}
+
+/** Stored in SESSIONS KV under `magic:{token}` with 15min TTL */
+export interface MagicLinkToken {
+  email: string;
+  key_hash: string;            // The key_hash to authenticate as
+  created_at: string;          // ISO 8601
+}
+
+/** Stored in SESSIONS KV under `auth:{session_id}` with 7-day TTL */
+export interface AuthSession {
+  email: string;
+  key_hash: string;            // Resolved key_hash for this user
+  created_at: string;          // ISO 8601
 }
 
 /** Webhook registration (Phase 2 — type reserved now) */
