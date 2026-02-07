@@ -19,11 +19,11 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     return corsPreflightResponse();
   }
 
-  // ── Skip auth/rate-limit for non-API, non-feed paths ──
-  // Landing page, docs, terms, CSS, images — serve directly
+  // ── Skip middleware for static content ──
+  // /diff/ and /archive/ are static JSON on CDN — let Cloudflare cache them
+  // directly (cf-cache-status: HIT) without burning Function invocations.
+  // Only /api/ and /stripe/ need auth, rate limiting, or signature checks.
   const needsMiddleware =
-    path.startsWith("/diff/") ||
-    path.startsWith("/archive/") ||
     path.startsWith("/api/") ||
     path.startsWith("/stripe/");
 
