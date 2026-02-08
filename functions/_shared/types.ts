@@ -20,6 +20,7 @@ export interface Env {
   STRIPE_PRICE_ID: string;
   RESEND_API_KEY: string;     // Email delivery (magic links). Optional — feature disabled if missing
   ADMIN_SECRET: string;       // Bearer token for admin endpoints
+  MOLTBOOK_APP_KEY?: string;  // moltdev_ key for verifying bot identity tokens. Optional — feature disabled if missing
 }
 
 /** Stored in KV under `key:{sha256(raw_key)}` */
@@ -76,6 +77,16 @@ export interface AuthSession {
   email: string;
   key_hash: string;            // Resolved key_hash for this user
   created_at: string;          // ISO 8601
+}
+
+/** Cached Moltbook agent verification — stored in SESSIONS KV under `moltbook:{agent_id}` with 5min TTL */
+export interface MoltbookAgentCache {
+  agent_id: string;
+  name: string;
+  karma: number;
+  is_claimed: boolean;
+  verified_at: string;           // ISO 8601 — when we last verified with Moltbook
+  linked_key_hash?: string;      // If this Moltbook agent is linked to a DiffDelta Pro account
 }
 
 /** Webhook registration (Phase 2 — type reserved now) */

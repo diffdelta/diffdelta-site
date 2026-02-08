@@ -45,6 +45,12 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     return errorResponse(auth.error, 401);
   }
 
+  // If a Moltbook token was provided but verification failed, return 401
+  const providedMoltbook = request.headers.get("X-Moltbook-Identity");
+  if (providedMoltbook && !auth.authenticated && auth.error) {
+    return errorResponse(auth.error, 401);
+  }
+
   // If a session cookie was provided but expired/invalid, return the session error
   // (otherwise user gets confusing "API key required" message)
   const hasCookie = request.headers.get("Cookie")?.includes("dd_session");
@@ -108,7 +114,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   headers.set("Access-Control-Allow-Origin", "*");
   headers.set(
     "Access-Control-Allow-Headers",
-    "X-DiffDelta-Key, Content-Type"
+    "X-DiffDelta-Key, X-Moltbook-Identity, Content-Type"
   );
 
   return new Response(response.body, {
