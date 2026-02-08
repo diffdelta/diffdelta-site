@@ -361,10 +361,11 @@
     <p class="section-sub">Install the client library. It handles cursors, change detection, and filtering automatically.</p>
     <div class="code-block">
       <div class="tabs">
-        <button class="tab active" data-tab="recommended">pip install (recommended)</button>
-        <button class="tab" data-tab="raw-python">Raw Python</button>
-        <button class="tab" data-tab="typescript">TypeScript</button>
+        <button class="tab active" data-tab="recommended">Python (pip)</button>
+        <button class="tab" data-tab="typescript">TypeScript (npm)</button>
+        <button class="tab" data-tab="mcp">MCP (AI Agents)</button>
         <button class="tab" data-tab="curl">curl</button>
+        <button class="tab" data-tab="raw-python">Raw Python</button>
       </div>
       <div class="code-panel active" id="panel-recommended"><pre><span class="cm"># Install the client</span>
 pip install diffdelta
@@ -399,23 +400,41 @@ feed = requests.get(<span class="s">"https://diffdelta.io/diff/source/cisa_kev/l
 
 my_stored_cursor = feed[<span class="s">"cursor"</span>]  <span class="cm"># Save for next poll</span></pre>
       </div>
-      <div class="code-panel" id="panel-typescript"><pre><span class="cm">// Step 1: Check for changes (400 bytes)</span>
-<span class="k">const</span> head = <span class="k">await</span> <span class="f">fetch</span>(
-  <span class="s">"https://diffdelta.io/diff/source/cisa_kev/head.json"</span>
-).then(r =&gt; r.json());
+      <div class="code-panel" id="panel-typescript"><pre><span class="cm">// Install the client</span>
+npm install diffdelta
 
-<span class="k">if</span> (head.cursor === storedCursor) process.exit(); <span class="cm">// Nothing new</span>
+<span class="cm">// That's it. Now poll:</span></pre>
+<pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0"><span class="k">import</span> { DiffDelta } <span class="k">from</span> <span class="s">"diffdelta"</span>;
 
-<span class="cm">// Step 2: Fetch the delta</span>
-<span class="k">const</span> feed = <span class="k">await</span> <span class="f">fetch</span>(
-  <span class="s">"https://diffdelta.io/diff/source/cisa_kev/latest.json"</span>
-).then(r =&gt; r.json());
+<span class="k">const</span> dd = <span class="k">new</span> <span class="f">DiffDelta</span>();
 
-<span class="k">for</span> (<span class="k">const</span> item <span class="k">of</span> feed.buckets.new ?? []) {
-  console.<span class="f">log</span>(<span class="s">`🚨 ${item.headline}`</span>);
-}
+<span class="cm">// Poll for new security items (handles cursors automatically)</span>
+<span class="k">const</span> items = <span class="k">await</span> dd.<span class="f">poll</span>({ tags: [<span class="s">"security"</span>] });
+items.<span class="f">forEach</span>(i =&gt; console.<span class="f">log</span>(<span class="s">`&#x1F6A8; ${i.source}: ${i.headline}`</span>));
 
-storedCursor = feed.cursor; <span class="cm">// Save for next poll</span></pre>
+<span class="cm">// Run again later — only new items since last poll are returned.</span>
+<span class="cm">// Cursor state is saved to ~/.diffdelta/cursors.json automatically.</span></pre>
+<pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0"><span class="cm">// Or watch continuously (runs forever, polls every 15 min):</span>
+dd.<span class="f">watch</span>(item =&gt; console.<span class="f">log</span>(<span class="s">`&#x1F6A8; ${item.headline}`</span>), { tags: [<span class="s">"security"</span>] });</pre>
+      </div>
+      <div class="code-panel" id="panel-mcp"><pre><span class="cm">// Add to your Claude / Cursor MCP config:</span></pre>
+<pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0">{
+  <span class="s">"mcpServers"</span>: {
+    <span class="s">"diffdelta"</span>: {
+      <span class="s">"command"</span>: <span class="s">"npx"</span>,
+      <span class="s">"args"</span>: [<span class="s">"@diffdelta/mcp-server"</span>]
+    }
+  }
+}</pre>
+<pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0"><span class="cm">// Your AI agent now has 4 native tools:</span>
+<span class="cm">//</span>
+<span class="cm">// diffdelta_check_head    — 400-byte heartbeat: "has anything changed?"</span>
+<span class="cm">// diffdelta_poll          — Fetch new items from the global feed</span>
+<span class="cm">// diffdelta_poll_source   — Fetch items from a specific source</span>
+<span class="cm">// diffdelta_list_sources  — Discover all available feeds</span>
+<span class="cm">//</span>
+<span class="cm">// Plus resources at diffdelta://sources, diffdelta://head, etc.</span>
+<span class="cm">// The agent decides when to poll — zero code required.</span></pre>
       </div>
       <div class="code-panel" id="panel-curl"><pre><span class="cm"># Check for changes (tiny response)</span>
 curl -s https://diffdelta.io/diff/source/cisa_kev/head.json | jq .cursor
@@ -432,7 +451,7 @@ curl -s https://diffdelta.io/diff/sources.json \
   | jq <span class="s">'[.sources[] | select(.tags | contains(["security"]))]'</span></pre>
       </div>
     </div>
-    <p style="font-size:.85rem;color:var(--text3);margin-top:16px"><strong style="color:var(--text2)">Scheduling tip:</strong> Run your bot on a cron (<code>*/15 * * * * python my_bot.py</code>), as a systemd service, or use <code>dd.watch()</code> for a built-in polling loop. The library handles cursor state between runs automatically.</p>
+    <p style="font-size:.85rem;color:var(--text3);margin-top:16px"><strong style="color:var(--text2)">Three integration paths:</strong> Use the <strong>Python or TypeScript</strong> client library for custom bots, the <strong>MCP server</strong> so your AI agent discovers feeds natively, or <strong>raw HTTP</strong> from any language. All handle cursor state automatically.</p>
   </section>
 
   <!-- Savings -->
