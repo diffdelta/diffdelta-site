@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DiffDelta + OpenClaw — Safe, Lean Intelligence for Your Agent</title>
+  <meta name="description" content="Give your OpenClaw agent access to 38+ pre-processed intelligence feeds. No raw HTML scraping, no prompt injection risk, 90% fewer tokens.">
+  <meta property="og:title" content="DiffDelta + OpenClaw — Safe, Lean Intelligence">
+  <meta property="og:description" content="Pre-processed, risk-scored intelligence feeds your OpenClaw agent can consume safely. No raw HTML. No prompt injection.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://diffdelta.io/openclaw">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#09090b;--surface:#18181b;--surface2:#1f1f23;--border:#27272a;
+      --text:#fafafa;--text2:#a1a1aa;--text3:#71717a;
+      --accent:#3b82f6;--accent-h:#2563eb;--accent-glow:rgba(59,130,246,0.12);
+      --green:#22c55e;--yellow:#eab308;--red:#ef4444;
+      --font:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+      --mono:ui-monospace,'SF Mono','Cascadia Code','Fira Code',monospace;
+      --max-w:780px;--px:24px
+    }
+    html{font-size:16px;-webkit-text-size-adjust:100%}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.7}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    code{font-family:var(--mono);font-size:.875em;background:var(--surface2);padding:2px 6px;border-radius:4px}
+    .nav{max-width:var(--max-w);margin:0 auto;padding:20px var(--px);display:flex;align-items:center;justify-content:space-between}
+    .nav-brand{font-weight:700;font-size:1.15rem;color:var(--text);letter-spacing:-.5px;text-decoration:none}
+    .nav-brand span{color:var(--accent)}
+    .nav-links{display:flex;gap:20px;font-size:.9rem}
+    .nav-links a{color:var(--text2);transition:color .15s}
+    .nav-links a:hover{color:var(--text);text-decoration:none}
+    .hero{max-width:var(--max-w);margin:0 auto;padding:60px var(--px) 40px;text-align:center}
+    .hero-label{font-size:.75rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);font-weight:600;margin-bottom:12px}
+    .hero h1{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;letter-spacing:-1.5px;line-height:1.15;margin-bottom:16px}
+    .hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--accent),#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero p{font-size:1.05rem;color:var(--text2);max-width:600px;margin:0 auto}
+    .article{max-width:var(--max-w);margin:0 auto;padding:0 var(--px) 64px}
+    .article h2{font-size:1.35rem;font-weight:700;letter-spacing:-.5px;margin:48px 0 16px;padding-top:16px;border-top:1px solid var(--border)}
+    .article h2:first-of-type{border-top:none;margin-top:32px}
+    .article p{color:var(--text2);margin-bottom:16px;font-size:.95rem}
+    .article strong{color:var(--text)}
+    .article ul,.article ol{color:var(--text2);margin-bottom:16px;padding-left:24px;font-size:.95rem}
+    .article li{margin-bottom:8px}
+    pre{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 20px;overflow-x:auto;font-family:var(--mono);font-size:.85rem;line-height:1.6;color:var(--text2);margin-bottom:20px}
+    pre .cm{color:var(--text3)}
+    pre .k{color:#c084fc}
+    pre .s{color:var(--green)}
+    pre .f{color:var(--accent)}
+    .callout{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px;margin:24px 0}
+    .callout-title{font-weight:700;margin-bottom:8px;font-size:1rem}
+    .callout p{font-size:.9rem}
+    .risk-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.75rem;font-weight:700;font-family:var(--mono)}
+    .risk-high{background:rgba(239,68,68,0.15);color:var(--red)}
+    .risk-med{background:rgba(234,179,8,0.15);color:var(--yellow)}
+    .risk-low{background:rgba(34,197,94,0.15);color:var(--green)}
+    .comparison{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:24px 0}
+    .comparison-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px}
+    .comparison-card h3{font-size:1rem;font-weight:700;margin-bottom:12px}
+    .comparison-card.bad h3{color:var(--red)}
+    .comparison-card.good h3{color:var(--green)}
+    .comparison-card ul{padding-left:16px;font-size:.85rem;color:var(--text2)}
+    .comparison-card li{margin-bottom:6px}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;font-weight:600;font-size:.9rem;text-decoration:none;transition:all .15s}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-primary:hover{background:var(--accent-h);text-decoration:none}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2)}
+    .btn-ghost:hover{border-color:var(--text3);color:var(--text);text-decoration:none}
+    .cta-row{display:flex;gap:12px;justify-content:center;margin:32px 0}
+    .footer{max-width:var(--max-w);margin:0 auto;padding:32px var(--px);border-top:1px solid var(--border);text-align:center;font-size:.8rem;color:var(--text3)}
+    @media(max-width:600px){
+      .comparison{grid-template-columns:1fr}
+      .cta-row{flex-direction:column;align-items:center}
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="/" class="nav-brand">Diff<span>Delta</span></a>
+    <div class="nav-links">
+      <a href="/#quickstart">Docs</a>
+      <a href="/#sources">Sources</a>
+      <a href="https://github.com/diffdelta">GitHub</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-label">OpenClaw Integration</div>
+    <h1>Safe, lean intelligence<br>for your <em>OpenClaw agent</em></h1>
+    <p>OpenClaw v2026.2.6 hardened agent security. DiffDelta completes the picture — pre-processed, risk-scored feeds your agent can consume without touching raw HTML.</p>
+  </header>
+
+  <article class="article">
+
+    <h2>The Problem: Raw HTML Is a Liability</h2>
+    <p>Your OpenClaw agent needs real-time intelligence — CVEs, cloud outages, release notes. The default approach? Scrape websites. But that means:</p>
+
+    <div class="comparison">
+      <div class="comparison-card bad">
+        <h3>Raw Scraping</h3>
+        <ul>
+          <li>43 MB+ of HTML per source, per scan</li>
+          <li>Prompt injection risk from untrusted content</li>
+          <li>Context window overflow → compaction retries</li>
+          <li>Stale data if you can't poll fast enough</li>
+          <li>Brittle scrapers that break when layouts change</li>
+        </ul>
+      </div>
+      <div class="comparison-card good">
+        <h3>DiffDelta Feeds</h3>
+        <ul>
+          <li>400 bytes to check if anything changed</li>
+          <li>Pre-processed JSON — no scripts, no injection vectors</li>
+          <li>~49K tokens max, only what actually changed</li>
+          <li>Change detection built in (head.json → latest.json)</li>
+          <li>38+ sources maintained for you, forever</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>How It Works: The Heartbeat-First Protocol</h2>
+    <p>DiffDelta uses a two-step polling protocol that saves your agent from wasting tokens on unchanged data. The agent learns this pattern once and uses it forever:</p>
+
+    <p><strong>Step 1:</strong> Check the heartbeat (~400 bytes)</p>
+<pre><span class="cm">// Agent checks: "has anything changed?"</span>
+<span class="k">GET</span> <span class="s">https://diffdelta.io/diff/head.json</span>
+
+<span class="cm">// Response:</span>
+{ <span class="s">"cursor"</span>: <span class="s">"sha256:abc..."</span>, <span class="s">"changed"</span>: <span class="k">true</span>, <span class="s">"ttl_sec"</span>: 60 }</pre>
+
+    <p><strong>Step 2:</strong> Only fetch the full feed when the cursor changed</p>
+<pre><span class="cm">// Cursor changed → fetch the delta</span>
+<span class="k">GET</span> <span class="s">https://diffdelta.io/diff/latest.json</span>
+
+<span class="cm">// Structured items with risk scores:</span>
+{
+  <span class="s">"buckets"</span>: {
+    <span class="s">"new"</span>: [
+      {
+        <span class="s">"source"</span>: <span class="s">"cisa_kev"</span>,
+        <span class="s">"headline"</span>: <span class="s">"Zyxel Hard-Coded Credentials Vulnerability"</span>,
+        <span class="s">"risk_score"</span>: 9.2,
+        <span class="s">"url"</span>: <span class="s">"https://www.cisa.gov/..."</span>
+      }
+    ]
+  }
+}</pre>
+
+    <p><strong>Result:</strong> If nothing changed, cost is ~$0.00. If something changed, your agent gets only the delta — not the entire internet.</p>
+
+    <h2>The Safety Angle</h2>
+    <p>OpenClaw v2026.2.6 added the Skill Safety Scanner to combat malicious skills and prompt injection. DiffDelta naturally extends this posture:</p>
+    <ul>
+      <li><strong>No raw HTML</strong> — DiffDelta extracts structured data at the source. Your agent never touches unprocessed web content.</li>
+      <li><strong>Provenance tracking</strong> — Every item includes <code>provenance.fetched_at</code> and <code>provenance.content_hash</code> so you can verify data origin.</li>
+      <li><strong>Risk scoring</strong> — Security items come pre-scored (0–10) with <code>summary.logic</code> explaining the rating. Your agent can triage without reading the full advisory.</li>
+      <li><strong>Read-only by design</strong> — DiffDelta feeds are pure data. No executable content, no callbacks, no surprises.</li>
+    </ul>
+
+    <h2>The Context Overflow Fix</h2>
+    <p>OpenClaw v2026.2.6 added compaction retries to handle context overflows. DiffDelta eliminates most overflow scenarios before they start:</p>
+
+    <div class="callout">
+      <div class="callout-title">Token savings by source type</div>
+      <p><strong>Security advisories:</strong> NIST NVD page = ~150K tokens. DiffDelta's latest.json for nist_nvd = ~8K tokens. <span class="risk-badge risk-high">94% reduction</span></p>
+      <p><strong>Cloud status:</strong> AWS status page = ~85K tokens. DiffDelta's aws_status feed = ~3K tokens. <span class="risk-badge risk-high">96% reduction</span></p>
+      <p><strong>Change detection:</strong> head.json check = ~0.1K tokens. If nothing changed, you saved 100% of the fetch. <span class="risk-badge risk-low">~$0.00</span></p>
+    </div>
+
+    <h2>Three Ways to Integrate</h2>
+
+    <p><strong>Option 1: MCP Server</strong> (recommended for OpenClaw)</p>
+    <p>If your OpenClaw instance supports MCP, this is zero-code:</p>
+<pre>{
+  <span class="s">"mcpServers"</span>: {
+    <span class="s">"diffdelta"</span>: {
+      <span class="s">"command"</span>: <span class="s">"npx"</span>,
+      <span class="s">"args"</span>: [<span class="s">"@diffdelta/mcp-server"</span>]
+    }
+  }
+}</pre>
+    <p>Your agent gets 4 native tools: <code>diffdelta_check_head</code>, <code>diffdelta_poll</code>, <code>diffdelta_poll_source</code>, <code>diffdelta_list_sources</code>.</p>
+
+    <p><strong>Option 2: Skill File</strong></p>
+    <p>Download the <a href="/openclaw/diffdelta_intelligence.md">DiffDelta skill file</a> and add it to your OpenClaw agent's skill set. It teaches the agent the heartbeat-first protocol, available sources, and safety rules.</p>
+
+    <p><strong>Option 3: Direct HTTP</strong></p>
+    <p>Point your agent at the API directly. All endpoints are public, no auth required:</p>
+<pre><span class="cm"># Discover sources</span>
+curl -s https://diffdelta.io/diff/sources.json | jq '.sources[].source_id'
+
+<span class="cm"># Check for changes</span>
+curl -s https://diffdelta.io/diff/head.json
+
+<span class="cm"># Fetch the delta</span>
+curl -s https://diffdelta.io/diff/latest.json</pre>
+
+    <h2>Available Sources</h2>
+    <p>38+ feeds, organized by pack. Your agent can filter by tag or poll specific sources:</p>
+
+    <div class="callout">
+      <div class="callout-title">Security Pack (8 sources)</div>
+      <p><code>cisa_kev</code> · <code>nist_nvd</code> · <code>github_advisories</code> · <code>debian_security</code> · <code>ubuntu_security</code> · <code>kubernetes_cve</code> · <code>linux_kernel_cve</code> · <code>openssl_releases</code></p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">Cloud Status Pack (3 sources)</div>
+      <p><code>aws_status</code> · <code>azure_status</code> · <code>gcp_status</code></p>
+    </div>
+    <div class="callout">
+      <div class="callout-title">AI & ML Pack (5 sources)</div>
+      <p><code>openai_api_changelog</code> · <code>openai_developer_changelog</code> · <code>chatgpt_release_notes</code> · <code>langchain_releases</code> · <code>nvidia_press_releases</code></p>
+    </div>
+    <p style="font-size:.85rem;color:var(--text3)">Plus 20+ release feeds (Node.js, Python, Go, React, Kubernetes, Docker, Terraform, and more). <a href="/#sources">Full list →</a></p>
+
+    <div class="cta-row">
+      <a href="/openclaw/diffdelta_intelligence.md" class="btn btn-primary">Download Skill File</a>
+      <a href="/#quickstart" class="btn btn-ghost">Quickstart Guide →</a>
+    </div>
+
+  </article>
+
+  <footer class="footer">
+    <a href="/" style="color:var(--text3)">DiffDelta</a> · Agent-ready intelligence feeds · <a href="mailto:human@diffdelta.io">human@diffdelta.io</a>
+  </footer>
+
+</body>
+</html>
