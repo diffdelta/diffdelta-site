@@ -1,181 +1,55 @@
 {
   "version": "1",
-  "service": "DiffDelta",
-  "schema_version": "2.0.0",
-  "generated_at": "2026-02-10T00:00:00Z",
-  "description": "Synchronization infrastructure for the agentic web. DiffDelta is a deterministic changefeed protocol — stable cursors, canonical hashing, and structured signals sourced from upstream authorities. Answers 'what changed?' cheaply and safely.",
-
-  "protocol": {
-    "name": "ddv1",
-    "version": "2.0.0",
-    "description": "Three-layer polling protocol. The common case ('nothing changed') costs ~200 bytes. Signals are sourced from authorities, never inferred.",
-    "layers": [
-      {
-        "layer": 1,
-        "name": "head",
-        "endpoint": "/diff/head.json",
-        "purpose": "Change detection heartbeat.",
-        "size": "~200 bytes",
-        "fields": {
-          "cursor": "Opaque SHA-256. Store and compare on next poll.",
-          "changed": "Boolean. false = stop here.",
-          "counts.items": "Number of items in the feed.",
-          "counts.updated": "Items that changed since last poll.",
-          "counts.removed": "Items no longer present upstream.",
-          "all_clear": "Boolean. true = we checked all sources and found no changes.",
-          "sources_checked": "How many sources we polled.",
-          "sources_ok": "How many returned successfully.",
-          "freshness": "Data recency: oldest_data_age_sec, stale_count, all_fresh."
-        }
-      },
-      {
-        "layer": 2,
-        "name": "digest",
-        "endpoint": "/diff/digest.json",
-        "purpose": "Summary of what changed. Narrative and counts.",
-        "size": "~500 tokens",
-        "when": "Fetch only when head.changed=true."
-      },
-      {
-        "layer": 3,
-        "name": "latest",
-        "endpoint": "/diff/latest.json",
-        "purpose": "Full feed. All items with signals and provenance.",
-        "size": "~50-200 KB",
-        "when": "Fetch when you need item-level detail."
-      }
-    ],
-    "schema_guide": {
-      "description": "How to read item signals. All values are sourced from upstream authorities — DiffDelta does not inject opinions, scores, or action recommendations.",
-      "item_structure": {
-        "source": "Source identifier (e.g. 'cisa_kev', 'nodejs_releases')",
-        "id": "Unique item ID",
-        "url": "Link to the original source item",
-        "headline": "Human-readable title",
-        "content.excerpt_text": "Plain-text excerpt from the source",
-        "published_at": "ISO 8601 timestamp",
-        "provenance.fetched_at": "When DiffDelta fetched this item",
-        "provenance.evidence_urls": "Links to verify the original data",
-        "provenance.content_hash": "SHA-256 of the canonical content"
-      },
-      "signal_types": {
-        "signals.severity": {
-          "description": "Security severity data sourced from NVD, CISA KEV, GitHub Advisories.",
-          "fields": {
-            "level": "enum: critical, high, medium, low — as stated by the source authority",
-            "cvss": "float 0-10 — CVSS score from NVD or GitHub",
-            "exploited": "bool — confirmed active exploitation, sourced from CISA KEV",
-            "ransomware": "bool — known ransomware use, sourced from CISA KEV",
-            "deadline": "ISO date — remediation deadline from CISA KEV",
-            "cve_ids": "array of CVE identifiers",
-            "packages": "array of affected package names"
-          }
-        },
-        "signals.release": {
-          "description": "Software release metadata extracted from GitHub API or RSS titles.",
-          "fields": {
-            "version": "semver string extracted from the release",
-            "prerelease": "bool — alpha, beta, RC, canary, etc."
-          }
-        },
-        "signals.incident": {
-          "description": "Service incident status from official status pages.",
-          "fields": {
-            "status": "enum: investigating, identified, monitoring, resolved — as stated by the source"
-          }
-        },
-        "signals.deprecation": {
-          "description": "Deprecation and breaking change signals extracted from changelogs.",
-          "fields": {
-            "type": "enum: deprecated, breaking_change, end_of_life, removal, migration_required",
-            "affects": "array of affected components (when extractable)",
-            "confidence": "enum: high, medium, low — keyword match density"
-          }
-        }
-      },
-      "provenance": {
-        "description": "Every signal carries provenance showing where the data came from.",
-        "location": "item.signals.{type}.provenance",
-        "fields": {
-          "method": "How extracted: cvss_extraction, catalog_lookup, github_api, keyword_scan, title_regex, etc.",
-          "authority": "The upstream authority (e.g. 'NIST NVD', 'CISA KEV')",
-          "authority_url": "URL of the authority for verification",
-          "evidence_url": "Direct link to the specific advisory/release"
-        }
-      },
-      "meta_signals": {
-        "velocity": {
-          "location": "per-source head.json",
-          "fields": ["changes_24h", "changes_7d", "avg_per_week", "velocity_alert"],
-          "note": "velocity_alert=true means anomalously fast updates vs. historical baseline."
-        },
-        "verified_silence": {
-          "location": "global head.json",
-          "fields": ["all_clear", "sources_checked", "sources_ok"],
-          "note": "Distinguishes 'nothing happened' from 'we failed to check.'"
-        },
-        "freshness": {
-          "location": "global head.json",
-          "fields": ["oldest_data_age_sec", "mean_data_age_sec", "stale_count", "all_fresh"],
-          "note": "Data recency. Factor into confidence assessments."
-        }
-      }
-    },
-    "cursor_usage": {
-      "description": "Cursors are SHA-256 hashes of canonical feed state. Store and compare to detect changes.",
-      "storage": "One cursor per source (or one global). Key-value store or file.",
-      "first_poll": "No stored cursor → fetch head.json → process feed → store cursor.",
-      "subsequent_polls": "Compare cursor. Same = stop. Different = fetch digest/latest.",
-      "missed_polls": "Next poll gives current state. No data lost."
+  "service": "diffDelta",
+  "schema_version": "1.2.0",
+  "generated_at": "2026-02-05T00:00:00Z",
+  "feeds": {
+    "global_head": "/diff/head.json",
+    "sources_index": "/diff/sources.json",
+    "pattern": "/diff/{source_id}/head.json",
+    "archive_index": "/archive/{source_id}/index.json",
+    "archive_global_index": "/archive/_global/index.json"
+  },
+  "endpoints": {
+    "diff_latest": "https://diffdelta.io/diff/latest.json",
+    "diff_head": "https://diffdelta.io/diff/head.json",
+    "diff_sources": "https://diffdelta.io/diff/sources.json",
+    "diff_ping": "https://diffdelta.io/diff/ping.json",
+    "known_issues": "https://diffdelta.io/known_issues.json",
+    "healthz": "https://diffdelta.io/healthz.json",
+    "diff_by_source_template": "https://diffdelta.io/diff/source/{source}/latest.json",
+    "diff_head_by_source_template": "https://diffdelta.io/diff/source/{source}/head.json",
+    "schemas": {
+      "diff": "https://diffdelta.io/schema/v1/diff.schema.json",
+      "known_issues": "https://diffdelta.io/schema/v1/known_issues.schema.json",
+      "wellknown": "https://diffdelta.io/schema/v1/wellknown.schema.json"
     }
   },
-
-  "endpoints": {
-    "discovery": "https://diffdelta.io/.well-known/diffdelta.json",
-    "head": "https://diffdelta.io/diff/head.json",
-    "digest": "https://diffdelta.io/diff/digest.json",
-    "latest": "https://diffdelta.io/diff/latest.json",
-    "sources": "https://diffdelta.io/diff/sources.json",
-    "stacks": "https://diffdelta.io/diff/stacks.json",
-    "health": "https://diffdelta.io/healthz.json",
-    "per_source_head": "https://diffdelta.io/diff/{source_id}/head.json",
-    "per_source_latest": "https://diffdelta.io/diff/{source_id}/latest.json"
-  },
-
-  "polling": {
-    "recommended_ttl_sec": 300,
-    "max_ttl_sec": 900,
-    "tip": "Poll head.json every 60-300 seconds. ~200 bytes from CDN edge."
-  },
-
+  "polling": { "recommended_ttl_sec": 300, "max_ttl_sec": 900 },
   "capabilities": {
+    "etag_supported": true,
     "cursor_supported": true,
+    "known_issues_supported": true,
     "per_source_endpoints": true,
-    "digest_supported": true,
-    "structured_signals": true,
-    "signal_provenance": true,
-    "velocity_tracking": true,
-    "freshness_tracking": true,
-    "verified_silence": true,
-    "stack_discovery": true,
+    "head_pointers_supported": true,
     "webhooks_supported": false,
-    "authentication_required": false
+    "telemetry_opt_in": false
   },
-
-  "authentication": {
-    "free": "No authentication required. Rate limit: 100 req/min per IP.",
-    "pro": "X-DiffDelta-Key header for 1,000 req/min and priority support."
-  },
-
-  "client_libraries": {
-    "typescript": "npm install @diffdelta/client",
-    "mcp": "npx @diffdelta/mcp-server",
-    "python": "pip install diffdelta (planned)"
-  },
-
-  "limits": {
-    "max_items_per_bucket": 200,
-    "max_summary_chars": 600,
-    "target_max_payload_kb": 400
-  }
+  "sources_supported": [
+    "apple_developer_releases",
+    "aws_whats_new",
+    "celery_releases",
+    "cloudflare_global",
+    "fastapi_releases",
+    "google_search_docs",
+    "kubernetes_cve",
+    "kubernetes_releases",
+    "langchain_releases",
+    "nvidia_press_releases",
+    "openai_api_changelog",
+    "postgresql_releases",
+    "pydantic_github",
+    "redis_releases"
+  ],
+  "limits": { "max_items_per_bucket": 10, "max_summary_chars": 600, "target_max_payload_kb": 200 }
 }
