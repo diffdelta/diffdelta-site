@@ -1,0 +1,29 @@
+{
+  "cursor": "sha256:16a5ab22cf1358d09d3a1d626190cb3826b9f8f1c8a44205cb5befeb747da7d8",
+  "prev_cursor": "sha256:16a5ab22cf1358d09d3a1d626190cb3826b9f8f1c8a44205cb5befeb747da7d8",
+  "changed": false,
+  "generated_at": "2026-02-09T17:11:23Z",
+  "ttl_sec": 300,
+  "latest_url": "/diff/source/supabase_status/latest.json",
+  "digest_url": "/diff/source/supabase_status/digest.json",
+  "_protocol": {
+    "standard": "ddv1",
+    "discovery": "/.well-known/diffdelta.json",
+    "decision_tree": {
+      "1_check_cursor": "Compare 'cursor' to stored cursor. SAME → STOP, nothing changed. Cost: ~200 bytes.",
+      "2_check_velocity": "If 'velocity.velocity_alert' is true → this source is updating abnormally fast (possible zero-day or critical incident). Treat as high priority.",
+      "3_check_counts": "If cursor differs, read 'counts'. flagged=0 AND new=0 → low priority, metadata only. You MAY defer.",
+      "4_fetch_digest": "If flagged > 0 OR new > 0, fetch digest_url (~500 tokens). Read 'alert_count' and 'narrative'.",
+      "5_assess_alerts": "alert_count=0 → no critical items. Log narrative, move on. Cost: ~500 tokens total.",
+      "6_fetch_latest": "alert_count > 0 → fetch latest_url. Process 'buckets.flagged' first. Each flagged item has 'signals.suggested_action' (PATCH_IMMEDIATELY, VERSION_PIN, REVIEW_CHANGELOG, etc.) — follow it.",
+      "trust_note": "Check 'signal_coverage' in digest. If < 50%, signal extraction has gaps — treat flagged=0 with caution.",
+      "signals_note": "Items carry structured signals: severity (CVE/CVSS), release (version), incident (status), deprecation (breaking changes). All pre-extracted — no parsing needed."
+    }
+  },
+  "counts": {
+    "new": 0,
+    "updated": 0,
+    "removed": 0,
+    "flagged": 0
+  }
+}

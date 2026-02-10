@@ -1,40 +1,27 @@
 {
-  "cursor": "sha256:d7e7b896272fce13a6ba484b529ab6a10aaa4b1dd54a07801ea377d09b63eca5",
-  "prev_cursor": "sha256:368301dfbc196ea4a50e3f9054e86cccf93e214a61256de1cea200c0a417d11e",
+  "cursor": "sha256:215174fa80c6018bc29eca42825a2835dbf068063d79f2faf455c8680b0ffee5",
+  "prev_cursor": "sha256:6e5ee8ff2744d412a909bf89fb34378c75858d122fad773f4720e530abce99bb",
   "changed": true,
-  "generated_at": "2026-02-09T17:11:23Z",
+  "generated_at": "2026-02-10T14:29:03Z",
   "ttl_sec": 60,
   "latest_url": "/diff/latest.json",
   "digest_url": "/diff/digest.json",
   "counts": {
-    "new": 20,
+    "items": 163,
     "updated": 0,
-    "removed": 0,
-    "flagged": 0
+    "removed": 0
   },
-  "sources_checked": 46,
-  "sources_ok": 46,
+  "sources_checked": 35,
+  "sources_ok": 35,
   "all_clear": false,
-  "confidence": 1.0,
   "_protocol": {
     "standard": "ddv1",
-    "discovery": "/.well-known/diffdelta.json",
-    "decision_tree": {
-      "0_discover": "First poll? Fetch /diff/stacks.json with your dependency names to auto-discover which sources to watch.",
-      "1_check_cursor": "Compare 'cursor' to stored cursor. SAME → STOP. Read 'all_clear' + 'confidence' — if confidence ≥ 0.9: assert 'N sources verified, all clear.' If confidence < 0.7: caveat your report ('M sources stale'). Cost: ~200 bytes.",
-      "1b_check_freshness": "Read 'freshness'. If 'all_fresh' is false, some sources are failing. 'stale_count' tells you how many. 'oldest_data_age_sec' tells you worst-case staleness.",
-      "2_check_velocity": "Check source-level head.json for 'velocity.velocity_alert: true' — means abnormally fast updates (possible zero-day or incident). Prioritize that source.",
-      "3_check_counts": "If cursor differs, read 'counts'. flagged=0 AND new=0 → low priority, metadata only. You MAY defer.",
-      "4_fetch_digest": "If flagged > 0 OR new > 0, fetch digest_url (~500 tokens). Read 'alert_count', 'narrative', 'signal_coverage'.",
-      "5_assess_alerts": "alert_count=0 → no critical items. Log narrative, move on. Cost: ~500 tokens total.",
-      "6_fetch_latest": "alert_count > 0 → fetch latest_url. Process 'buckets.flagged' first. Each flagged item has 'signals.suggested_action' (PATCH_IMMEDIATELY, VERSION_PIN, REVIEW_CHANGELOG, etc.) — follow it.",
-      "trust_note": "Global digest 'signal_coverage' aggregates all sources — low values indicate many non-security sources (blogs, news) in batch, not extraction failures. For source-specific trust, check 'sources[source_id].signal_coverage' when changed:true. Security sources typically have 100% coverage.",
-      "signals_note": "Items carry structured signals: severity (CVE/CVSS), release (version), incident (status), deprecation (breaking changes). All pre-extracted — no parsing needed."
-    }
+    "spec": "/.well-known/diffdelta.json",
+    "usage": "cursor SAME=no changes, STOP. counts.items>0→fetch latest_url. all_clear=verified silence. Schema guide in spec."
   },
   "freshness": {
-    "oldest_data_age_sec": 129,
-    "mean_data_age_sec": 79,
+    "oldest_data_age_sec": 73,
+    "mean_data_age_sec": 50,
     "stale_count": 0,
     "all_fresh": true
   }

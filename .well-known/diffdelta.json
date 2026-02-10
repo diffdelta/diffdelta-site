@@ -1,98 +1,132 @@
 {
   "version": "1",
   "service": "DiffDelta",
-  "schema_version": "1.3.0",
-  "generated_at": "2026-02-09T00:00:00Z",
-  "description": "Synchronization infrastructure for the agentic web. DiffDelta is a state-synchronization protocol that transforms human-facing web content into deterministic, machine-readable changefeeds — so autonomous systems can answer 'what changed?' cheaply and safely.",
+  "schema_version": "2.0.0",
+  "generated_at": "2026-02-10T00:00:00Z",
+  "description": "Synchronization infrastructure for the agentic web. DiffDelta is a deterministic changefeed protocol — stable cursors, canonical hashing, and structured signals sourced from upstream authorities. Answers 'what changed?' cheaply and safely.",
 
   "protocol": {
     "name": "ddv1",
-    "version": "1.2.0",
-    "description": "A deterministic changefeed protocol. Stable cursors + canonical hashing for change detection. Three-layer polling (head → digest → latest) ensures the common case ('nothing changed') costs ~200 bytes. Authoritative signals and enumerated action codes enable automation without LLM inference.",
+    "version": "2.0.0",
+    "description": "Three-layer polling protocol. The common case ('nothing changed') costs ~200 bytes. Signals are sourced from authorities, never inferred.",
     "layers": [
       {
         "layer": 1,
         "name": "head",
         "endpoint": "/diff/head.json",
-        "purpose": "Change detection. Check if anything changed since your last poll.",
+        "purpose": "Change detection heartbeat.",
         "size": "~200 bytes",
         "fields": {
-          "cursor": "Opaque hash. Store this and compare on next poll.",
-          "prev_cursor": "Previous cursor for chain verification.",
-          "changed": "Boolean. If false, stop here — nothing new.",
-          "ttl_sec": "Recommended seconds before next poll.",
-          "latest_url": "URL to fetch if changed=true.",
-          "digest_url": "URL for intelligence summary (Layer 2).",
-          "counts": "Breakdown of new/updated/removed/flagged items.",
-          "sources_checked": "Number of sources we attempted to fetch this run.",
-          "sources_ok": "Number of sources that returned successfully.",
-          "all_clear": "Boolean. True = we checked and found nothing actionable. Verified Silence — distinguishes 'nothing happened' from 'we failed to check.'",
-          "confidence": "Float 0.0–1.0. How much to trust the all_clear claim. Based on source success rate + data freshness. ≥0.9 = high confidence. <0.7 = caveat your report. 0.0 = no data.",
-          "velocity": "(per-source only) Update frequency: changes_24h, changes_7d, avg_per_week, velocity_alert.",
-          "freshness": "(global only) Data recency: oldest_data_age_sec, mean_data_age_sec, stale_count, all_fresh. Tells you how old the data is and whether any sources are failing.",
-          "_protocol": "Embedded decision tree and protocol hints."
-        },
-        "action": "Poll this first. If cursor matches your stored cursor, STOP. If all_clear=true and confidence ≥ 0.9, report: 'Verified integrity across N sources; 0 threats detected.' If confidence < 0.7, caveat: 'N sources stale — monitoring partial.'"
+          "cursor": "Opaque SHA-256. Store and compare on next poll.",
+          "changed": "Boolean. false = stop here.",
+          "counts.items": "Number of items in the feed.",
+          "counts.updated": "Items that changed since last poll.",
+          "counts.removed": "Items no longer present upstream.",
+          "all_clear": "Boolean. true = we checked all sources and found no changes.",
+          "sources_checked": "How many sources we polled.",
+          "sources_ok": "How many returned successfully.",
+          "freshness": "Data recency: oldest_data_age_sec, stale_count, all_fresh."
+        }
       },
       {
         "layer": 2,
         "name": "digest",
         "endpoint": "/diff/digest.json",
-        "purpose": "Intelligence summary. What matters right now — severity breakdown, top alerts, narrative.",
-        "size": "~500-700 tokens",
-        "when": "Fetch only when head.json shows changed=true.",
-        "fields": {
-          "alerts": "Top 10 highest-severity items with headlines.",
-          "by_signal": "Counts by signal type (severity, release, incident, etc).",
-          "narrative": "Human/bot-readable summary of what changed.",
-          "signal_coverage": "Percentage of items with structured signals. Below 50% means gaps exist — treat alert_count with caution.",
-          "coverage": "Time window, monitoring scope, and data freshness metadata."
-        },
-        "action": "Read this to decide if you need full details. Most bots stop here."
+        "purpose": "Summary of what changed. Narrative and counts.",
+        "size": "~500 tokens",
+        "when": "Fetch only when head.changed=true."
       },
       {
         "layer": 3,
         "name": "latest",
         "endpoint": "/diff/latest.json",
-        "purpose": "Full feed with all items, structured signals, and provenance.",
+        "purpose": "Full feed. All items with signals and provenance.",
         "size": "~50-200 KB",
-        "when": "Fetch only when digest shows items you need to act on.",
-        "fields": {
-          "buckets.new": "Items seen for the first time.",
-          "buckets.updated": "Items that changed since last poll.",
-          "buckets.removed": "Items no longer present upstream.",
-          "buckets.flagged": "Items with severity/risk signals — prioritize these."
-        },
-        "action": "Process items. Each has headline, url, severity, release, incident signals."
+        "when": "Fetch when you need item-level detail."
       }
     ],
-    "decision_tree": {
-      "description": "Explicit decision logic for bots to minimize token usage. Follow these steps in order.",
-      "steps": {
-        "0_discover": "First poll? Fetch /diff/stacks.json with your dependency names to auto-discover which sources to watch.",
-        "1_check_cursor": "Compare head.json 'cursor' to stored cursor. SAME → STOP. Read 'all_clear' + 'confidence'. If confidence ≥ 0.9: assert 'N sources verified, all clear.' If < 0.7: caveat 'M sources stale.' Cost: ~200 bytes.",
-        "1b_check_freshness": "Read 'freshness'. If 'all_fresh' is false, some sources are failing. 'stale_count' tells you how many. 'oldest_data_age_sec' tells you worst-case staleness. Factor this into confidence.",
-        "2_check_velocity": "Check source-level head.json for 'velocity.velocity_alert: true' — means abnormally fast updates (possible zero-day or incident). Prioritize that source.",
-        "3_check_counts": "If cursor differs, read 'counts'. flagged=0 AND new=0 → low priority, metadata only. You MAY defer.",
-        "4_fetch_digest": "If flagged > 0 OR new > 0, fetch digest_url (~500 tokens). Read 'alert_count', 'narrative', 'signal_coverage'.",
-        "5_assess_alerts": "alert_count=0 → no critical items. Log narrative, move on. Cost: ~500 tokens total.",
-        "5b_check_source_coverage": "If you care about specific sources, check 'sources[source_id].signal_coverage' in latest.json when that source has changed:true. Security sources (cisa_kev, github_advisories) should have 100%. Blog/news sources may have 0% (expected).",
-        "6_fetch_latest": "alert_count > 0 → fetch latest_url. Process 'buckets.flagged' first. Each flagged item has 'signals.suggested_action' (PATCH_IMMEDIATELY, VERSION_PIN, etc.) — follow it. Check signals.*.provenance for evidence chain.",
-        "trust_note": "Global digest 'signal_coverage' aggregates all sources — low values indicate many non-security sources in batch, not extraction failures. For source-specific trust, check 'sources[source_id].signal_coverage' when changed:true."
+    "schema_guide": {
+      "description": "How to read item signals. All values are sourced from upstream authorities — DiffDelta does not inject opinions, scores, or action recommendations.",
+      "item_structure": {
+        "source": "Source identifier (e.g. 'cisa_kev', 'nodejs_releases')",
+        "id": "Unique item ID",
+        "url": "Link to the original source item",
+        "headline": "Human-readable title",
+        "content.excerpt_text": "Plain-text excerpt from the source",
+        "published_at": "ISO 8601 timestamp",
+        "provenance.fetched_at": "When DiffDelta fetched this item",
+        "provenance.evidence_urls": "Links to verify the original data",
+        "provenance.content_hash": "SHA-256 of the canonical content"
+      },
+      "signal_types": {
+        "signals.severity": {
+          "description": "Security severity data sourced from NVD, CISA KEV, GitHub Advisories.",
+          "fields": {
+            "level": "enum: critical, high, medium, low — as stated by the source authority",
+            "cvss": "float 0-10 — CVSS score from NVD or GitHub",
+            "exploited": "bool — confirmed active exploitation, sourced from CISA KEV",
+            "ransomware": "bool — known ransomware use, sourced from CISA KEV",
+            "deadline": "ISO date — remediation deadline from CISA KEV",
+            "cve_ids": "array of CVE identifiers",
+            "packages": "array of affected package names"
+          }
+        },
+        "signals.release": {
+          "description": "Software release metadata extracted from GitHub API or RSS titles.",
+          "fields": {
+            "version": "semver string extracted from the release",
+            "prerelease": "bool — alpha, beta, RC, canary, etc."
+          }
+        },
+        "signals.incident": {
+          "description": "Service incident status from official status pages.",
+          "fields": {
+            "status": "enum: investigating, identified, monitoring, resolved — as stated by the source"
+          }
+        },
+        "signals.deprecation": {
+          "description": "Deprecation and breaking change signals extracted from changelogs.",
+          "fields": {
+            "type": "enum: deprecated, breaking_change, end_of_life, removal, migration_required",
+            "affects": "array of affected components (when extractable)",
+            "confidence": "enum: high, medium, low — keyword match density"
+          }
+        }
+      },
+      "provenance": {
+        "description": "Every signal carries provenance showing where the data came from.",
+        "location": "item.signals.{type}.provenance",
+        "fields": {
+          "method": "How extracted: cvss_extraction, catalog_lookup, github_api, keyword_scan, title_regex, etc.",
+          "authority": "The upstream authority (e.g. 'NIST NVD', 'CISA KEV')",
+          "authority_url": "URL of the authority for verification",
+          "evidence_url": "Direct link to the specific advisory/release"
+        }
+      },
+      "meta_signals": {
+        "velocity": {
+          "location": "per-source head.json",
+          "fields": ["changes_24h", "changes_7d", "avg_per_week", "velocity_alert"],
+          "note": "velocity_alert=true means anomalously fast updates vs. historical baseline."
+        },
+        "verified_silence": {
+          "location": "global head.json",
+          "fields": ["all_clear", "sources_checked", "sources_ok"],
+          "note": "Distinguishes 'nothing happened' from 'we failed to check.'"
+        },
+        "freshness": {
+          "location": "global head.json",
+          "fields": ["oldest_data_age_sec", "mean_data_age_sec", "stale_count", "all_fresh"],
+          "note": "Data recency. Factor into confidence assessments."
+        }
       }
     },
     "cursor_usage": {
-      "description": "Cursors are SHA-256 hashes of the feed state, computed over items sorted by ID for deterministic ordering. Store the cursor from each response and compare on next poll to detect changes.",
-      "storage": "Store one cursor per source (or one global cursor). A simple key-value store or file works.",
-      "first_poll": "On first poll, you have no stored cursor. Fetch head.json — it will show changed=true. Process the feed normally and store the cursor.",
-      "subsequent_polls": "Compare head.json cursor to your stored cursor. If same, stop. If different, follow the decision tree above.",
-      "missed_polls": "If you miss polls, the next poll gives you the full current state. No data is lost — you just process the latest snapshot.",
-      "ordering_stability": "Cursors are computed over items sorted by ID. Source-side reordering does not cause false cursor changes."
-    },
-    "coverage_transparency": {
-      "monitoring_scope": "Each source monitors the top N items (typically 20-200) per run. Items outside this window may change without cursor detection.",
-      "polling_guarantee": "Bots polling at least daily via cursor will never miss items within the monitoring window.",
-      "signal_gaps": "Signal coverage is source-type dependent. Security sources (CISA KEV, GitHub Advisories, NVD) have 100% signal coverage. Release sources may have release signals. Blog/news sources typically have 0% coverage. Per-source 'signal_coverage' in the sources map (when changed:true) shows coverage for that specific source. Global digest 'signal_coverage' aggregates all sources — low values indicate many non-security sources in the batch, not extraction failures."
+      "description": "Cursors are SHA-256 hashes of canonical feed state. Store and compare to detect changes.",
+      "storage": "One cursor per source (or one global). Key-value store or file.",
+      "first_poll": "No stored cursor → fetch head.json → process feed → store cursor.",
+      "subsequent_polls": "Compare cursor. Same = stop. Different = fetch digest/latest.",
+      "missed_polls": "Next poll gives current state. No data lost."
     }
   },
 
@@ -103,121 +137,34 @@
     "latest": "https://diffdelta.io/diff/latest.json",
     "sources": "https://diffdelta.io/diff/sources.json",
     "stacks": "https://diffdelta.io/diff/stacks.json",
+    "health": "https://diffdelta.io/healthz.json",
     "per_source_head": "https://diffdelta.io/diff/{source_id}/head.json",
-    "per_source_latest": "https://diffdelta.io/diff/{source_id}/latest.json",
-    "schemas": {
-      "diff": "https://diffdelta.io/schema/v1/diff.schema.json",
-      "wellknown": "https://diffdelta.io/schema/v1/wellknown.schema.json"
-    }
+    "per_source_latest": "https://diffdelta.io/diff/{source_id}/latest.json"
   },
 
   "polling": {
     "recommended_ttl_sec": 300,
     "max_ttl_sec": 900,
-    "tip": "Poll head.json every 60-300 seconds. It is ~200 bytes served from CDN edge."
+    "tip": "Poll head.json every 60-300 seconds. ~200 bytes from CDN edge."
   },
 
   "capabilities": {
     "cursor_supported": true,
     "per_source_endpoints": true,
-    "head_pointers_supported": true,
     "digest_supported": true,
     "structured_signals": true,
-    "severity_scoring": true,
-    "release_signals": true,
-    "incident_signals": true,
-    "deprecation_signals": true,
-    "suggested_action": true,
     "signal_provenance": true,
     "velocity_tracking": true,
     "freshness_tracking": true,
     "verified_silence": true,
     "stack_discovery": true,
-    "coverage_metadata": true,
     "webhooks_supported": false,
     "authentication_required": false
   },
 
-  "signals": {
-    "description": "Items carry structured signals in a generic 'signals' dict. Signal types are extensible — new types can be added without protocol changes. We never invent scores; all signals come from upstream authoritative data.",
-    "location": "item.signals.{signal_type}",
-    "extensible": true,
-    "current_types": {
-      "severity": {
-        "applies_to": "Items tagged 'security'",
-        "fields": ["level", "cvss", "exploited", "ransomware", "deadline", "packages", "cve_ids"],
-        "sources": "NVD (CVSS), CISA KEV (exploitation status), GitHub Advisories (severity + packages)"
-      },
-      "release": {
-        "applies_to": "Items tagged 'releases'",
-        "fields": ["version", "prerelease", "security_patch"]
-      },
-      "incident": {
-        "applies_to": "Items tagged 'status' or 'cloud-status'",
-        "fields": ["status"]
-      },
-      "deprecation": {
-        "applies_to": "Any source — scans title and body for deprecation keywords",
-        "fields": ["type", "affects", "confidence", "source"],
-        "types": ["deprecated", "breaking_change", "end_of_life", "removal", "migration_required"],
-        "note": "Breaking changes, removals, and EOL items are auto-flagged for bot attention."
-      },
-      "suggested_action": {
-        "applies_to": "Any item with signals — deterministic action code derived from signal combination",
-        "location": "item.signals.suggested_action",
-        "type": "enum string",
-        "values": {
-          "PATCH_IMMEDIATELY": "Critical severity + actively exploited. Drop everything.",
-          "PATCH_SOON": "High/critical security, EOL, or security patch release. Schedule within hours.",
-          "VERSION_PIN": "Breaking change / deprecation. Pin your current version before upgrading.",
-          "FAILOVER_READY": "Active incident. Prepare fallback routing.",
-          "MONITOR": "Ongoing situation or medium severity. Increase poll frequency.",
-          "REVIEW_CHANGELOG": "Notable release or low-severity item. Schedule review.",
-          "NO_ACTION": "Informational only. No bot response needed."
-        },
-        "note": "Bots can map these to internal handlers without an LLM call. Priority order: PATCH_IMMEDIATELY > FAILOVER_READY > PATCH_SOON > VERSION_PIN > MONITOR > REVIEW_CHANGELOG > NO_ACTION."
-      }
-    },
-    "meta_signals": {
-      "velocity": {
-        "location": "per-source head.json → velocity",
-        "fields": ["changes_24h", "changes_7d", "avg_per_week", "velocity_alert"],
-        "note": "velocity_alert=true when a source updates anomalously fast (>2x its own historical baseline in 24h). This is a meta-signal: OpenSSL updating 3x in one day likely indicates a zero-day. Bots should increase polling frequency or wake a human operator."
-      },
-      "verified_silence": {
-        "location": "global head.json → all_clear, sources_checked, sources_ok",
-        "note": "Distinguishes 'nothing happened' from 'we failed to check.' A bot can report: 'Verified integrity across 46 sources; 0 threats detected.' That's a status report a human CEO will pay for."
-      },
-      "freshness": {
-        "location": "global head.json → freshness",
-        "fields": ["oldest_data_age_sec", "mean_data_age_sec", "stale_count", "all_fresh"],
-        "note": "Data recency metrics. oldest_data_age_sec tells the worst-case staleness. stale_count is sources with consecutive failures. all_fresh=true means every source fetched successfully. A bot can factor freshness into its confidence: 'All 46 sources verified, newest data 2 minutes old.'"
-      }
-    },
-    "provenance": {
-      "description": "Every signal carries a provenance object showing how it was derived. This turns DiffDelta from a data feed into an auditable trust chain.",
-      "location": "item.signals.{signal_type}.provenance",
-      "fields": {
-        "method": "How the signal was extracted: cvss_extraction, advisory_api, catalog_lookup, github_api, keyword_scan, title_regex, rss_feed, direct_api.",
-        "authority": "Who says so — the upstream authoritative source (e.g., 'NIST National Vulnerability Database', 'CISA Known Exploited Vulnerabilities').",
-        "authority_url": "URL of the authoritative source for human verification.",
-        "evidence_url": "Direct link to the specific item/advisory/release that this signal was extracted from."
-      },
-      "example": {
-        "method": "catalog_lookup",
-        "authority": "CISA Known Exploited Vulnerabilities",
-        "authority_url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
-        "evidence_url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
-      },
-      "note": "A bot can use provenance to generate 'Explainable Security': 'Patching CVE-2026-1234 because CISA KEV confirms active exploitation (evidence: URL).' Competitors can match data but can't match auditability without the same provenance chain."
-    },
-    "adding_new_types": "New signal types are added via signal_hints in sources.config.json. The digest and narrative adapt automatically to whatever signal types are present. No code changes required."
-  },
-
   "authentication": {
     "free": "No authentication required. Rate limit: 100 req/min per IP.",
-    "pro": "Add X-DiffDelta-Key header for 1,000 req/min and priority support.",
-    "moltbook": "Bots with Moltbook identity can authenticate via X-Moltbook-Identity header."
+    "pro": "X-DiffDelta-Key header for 1,000 req/min and priority support."
   },
 
   "client_libraries": {
@@ -226,59 +173,9 @@
     "python": "pip install diffdelta (planned)"
   },
 
-  "sources_supported": [
-    "anthropic_sdk_releases",
-    "apple_developer_releases",
-    "aws_status",
-    "aws_whats_new",
-    "azure_status",
-    "celery_releases",
-    "chromadb_releases",
-    "cisa_kev",
-    "claude_status",
-    "cloudflare_global",
-    "containerd_releases",
-    "crewai_releases",
-    "debian_security",
-    "docker_moby_releases",
-    "fastapi_releases",
-    "gcp_status",
-    "github_advisories",
-    "golang_releases",
-    "google_ai_blog",
-    "google_search_docs",
-    "helm_releases",
-    "hf_transformers_releases",
-    "kubernetes_cve",
-    "kubernetes_releases",
-    "langchain_releases",
-    "linux_kernel_cve",
-    "llamaindex_releases",
-    "nextjs_releases",
-    "nodejs_releases",
-    "nvidia_press_releases",
-    "openai_api_changelog",
-    "openai_sdk_releases",
-    "openclaw_releases",
-    "openssl_releases",
-    "pinecone_status",
-    "postgresql_releases",
-    "pydantic_github",
-    "python_releases",
-    "react_releases",
-    "redis_releases",
-    "supabase_status",
-    "terraform_releases",
-    "ubuntu_security",
-    "vercel_status",
-    "vscode_releases",
-    "weaviate_releases"
-  ],
-
   "limits": {
     "max_items_per_bucket": 200,
     "max_summary_chars": 600,
-    "target_max_payload_kb": 400,
-    "coverage_window_days": 90
+    "target_max_payload_kb": 400
   }
 }
