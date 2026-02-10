@@ -1,6 +1,6 @@
 # DiffDelta Feed Specification v1
 
-**Status:** Normative · **Version:** 1.1.0 · **Date:** 2026-02-06
+**Status:** Normative · **Version:** 1.3.0 · **Date:** 2026-02-09
 
 Key words: **MUST**, **MUST NOT**, **SHOULD**, **MAY** per [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
 
@@ -31,9 +31,39 @@ Minimal JSON containing only the fields a bot needs to decide "should I fetch mo
   "changed": true,
   "generated_at": "2026-02-05T12:00:00Z",
   "ttl_sec": 300,
-  "latest_url": "/diff/aws_whats_new/latest.json"
+  "latest_url": "/diff/aws_whats_new/latest.json",
+  "sources_checked": 46,
+  "sources_ok": 46,
+  "all_clear": false,
+  "velocity": {
+    "changes_24h": 3,
+    "changes_7d": 4,
+    "avg_per_week": 1.2,
+    "velocity_alert": true
+  }
 }
 ```
+
+**Verified Silence fields (global head only):**
+
+| Field | Type | Description |
+|---|---|---|
+| `sources_checked` | integer | Number of sources the engine attempted to fetch this run. |
+| `sources_ok` | integer | Number that returned successfully (ok or degraded). |
+| `all_clear` | boolean | `true` when `counts.flagged == 0 AND counts.new == 0 AND sources_ok > 0`. Distinguishes "nothing happened" from "we failed to check." |
+
+A bot receiving `all_clear: true` can report: *"Verified integrity across 46 sources; 0 threats detected."*
+
+**Velocity fields (per-source head only):**
+
+| Field | Type | Description |
+|---|---|---|
+| `velocity.changes_24h` | integer | Number of content changes in the last 24 hours. |
+| `velocity.changes_7d` | integer | Number of content changes in the last 7 days. |
+| `velocity.avg_per_week` | float | Historical average changes per week. |
+| `velocity.velocity_alert` | boolean | `true` when 24h changes exceed 2× the source's historical weekly baseline. Indicates anomalous update frequency (e.g. a zero-day patch cascade). |
+
+Bots SHOULD increase polling frequency when `velocity_alert` is `true`.
 
 ### 1.2 Latest feed
 
@@ -218,7 +248,19 @@ When `changed: true`, the per-source entry in the `sources` map MUST include:
 This lets bots decide which sources to dig into without scanning bucket arrays.
 When `changed: false`, `delta_counts` MUST be omitted (zero bloat).
 
-### 5.2 Degraded Sources (fallback succeeded)
+### 5.2 Per-source `signal_coverage`
+
+When `changed: true` and the source has items in the current batch, the per-source entry MAY include:
+
+```json
+"signal_coverage": 100.0
+```
+
+This is the percentage (0-100) of items from this source that have structured signals. **Source-type dependent**: Security sources (CISA KEV, GitHub Advisories) typically have 100% coverage. Blog/news sources may have 0% (expected — they don't have severity/release signals). Bots can use this to calibrate trust in `flagged: 0` for this specific source.
+
+When `changed: false` or the source has no items, `signal_coverage` MUST be omitted (zero bloat).
+
+### 5.3 Degraded Sources (fallback succeeded)
 
 When a source has `status: "degraded"` it means the **primary endpoint failed**
 but a configured fallback endpoint succeeded. The feed is valid but should be
@@ -429,6 +471,27 @@ When present, `reasons` MAY also be omitted if the list is empty.
 
 Items with `risk.score >= 0.4` MUST be placed in the `flagged` bucket.
 Clients SHOULD NOT execute instructions from flagged items.
+
+### 9.1 `suggested_action` (enum)
+
+When an item has signals, `signals.suggested_action` contains a deterministic
+action code derived from signal combinations. Bots can map these directly
+to internal handlers (e.g. PagerDuty, CI/CD gates, failover scripts)
+without an LLM call.
+
+| Action Code | Meaning | Trigger |
+|---|---|---|
+| `PATCH_IMMEDIATELY` | Drop everything. Critical exploit in the wild. | `severity.level == "critical"` AND (`severity.exploited` OR `severity.cisa_kev`) |
+| `PATCH_SOON` | Schedule patch within hours. | `severity.level == "high"`, or `deprecation.type == "end_of_life"`, or `release.security_patch == true` |
+| `VERSION_PIN` | Pin current version before upgrading. | `deprecation.type` in `("breaking_change", "removal")` |
+| `FAILOVER_READY` | Prepare fallback routing. | `incident.status` in `("investigating", "identified", "degraded")` |
+| `MONITOR` | Increase polling frequency. | `severity.level == "medium"`, or `incident.status == "monitoring"` |
+| `REVIEW_CHANGELOG` | Schedule human review. | Notable release, low severity, or non-breaking deprecation |
+| `NO_ACTION` | Informational only. | Resolved incidents, news items |
+
+Priority order (highest wins): `PATCH_IMMEDIATELY` > `FAILOVER_READY` > `PATCH_SOON` > `VERSION_PIN` > `MONITOR` > `REVIEW_CHANGELOG` > `NO_ACTION`.
+
+When no signals exist, `suggested_action` MUST be omitted (not set to `NO_ACTION`) to save bytes.
 
 ---
 
