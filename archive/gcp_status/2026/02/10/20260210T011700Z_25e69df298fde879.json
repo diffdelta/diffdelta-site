@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.2.0",
+  "generated_at": "2026-02-10T01:17:00Z",
+  "source_id": "gcp_status",
+  "hash": "sha256:25e69df298fde87937ce1a2c9196fcc76de94ef368213c25641afa983f08c275",
+  "prev_hash": "sha256:b5927506eeb2c3fcf2a685e4b9b774716907b560bfe03354c83862798830b0a8",
+  "cursor": "sha256:e394ebecc4674675df999be817235dc620755f4be5d312ce56bb76d88e86fd89",
+  "prev_cursor": "sha256:6a31fd058d2ace198b2a7525eb3a32425d3cc8380d3a9ead470c51d8969eb597",
+  "changed": true,
+  "ttl_sec": 300,
+  "sources_included": [
+    "gcp_status"
+  ],
+  "batch_narrative": "gcp_status: 1 updates (1 resolved).",
+  "buckets": {
+    "new": [],
+    "updated": [],
+    "removed": [],
+    "flagged": [
+      {
+        "source": "gcp_status",
+        "id": "tag:status.cloud.google.com,2025:feed:8cY8jdUpEGGbsSMSQk7J.k1VxeGGvFncMpBCv2T7r",
+        "url": "https://status.cloud.google.com/incidents/8cY8jdUpEGGbsSMSQk7J",
+        "published_at": "2026-02-10T01:17:00Z",
+        "updated_at": "2025-07-23T09:26:58Z",
+        "headline": "RESOLVED: We are investigating elevated error rates with multiple products in us-east1",
+        "content": {
+          "excerpt_text": "Incident began at 2025-07-18 07:42 and ended at 2025-07-18 09:47 (all times are US/Pacific ). # Incident Report ## Summary On Friday, 18 July 2025 07:50 US/Pacific, several Google Cloud Platform (GCP) and Google Workspace (GWS) products experienced elevated latencies and error rates in the us-east1 region for a duration of up to 1 hour and 57 minutes. GCP Impact Duration: 18 July 2025 07:50 - 09:47 US/Pacific : 1 hour 57 minutes GWS Impact Duration: 18 July 2025 07:50 - 08:40 US/Pacific : 50...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-10T01:17:00Z",
+          "evidence_urls": [
+            "https://status.cloud.google.com/incidents/8cY8jdUpEGGbsSMSQk7J"
+          ],
+          "content_hash": "sha256:c1e009c0ccc3a5f130bfe7819e0149882b58f8345757580f8afccb1748b2a154"
+        },
+        "signals": {
+          "incident": {
+            "status": "resolved",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "GCP Service Health",
+              "authority_url": "https://status.cloud.google.com/",
+              "evidence_url": "https://status.cloud.google.com/incidents/8cY8jdUpEGGbsSMSQk7J"
+            }
+          },
+          "deprecation": {
+            "type": "removal",
+            "confidence": "low",
+            "source": "keyword_scan",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "GCP Service Health",
+              "authority_url": "https://status.cloud.google.com/",
+              "evidence_url": "https://status.cloud.google.com/incidents/8cY8jdUpEGGbsSMSQk7J"
+            }
+          },
+          "suggested_action": "VERSION_PIN"
+        },
+        "source_payload": {
+          "html": "<p> Incident began at <strong>2025-07-18 07:42</strong> and ended at <strong>2025-07-18 09:47</strong> <span>(all times are <strong>US/Pacific</strong>).</span></p><div class=\"cBIRi14aVDP__status-update-text\"><h2># Incident Report</h2>\n<h2>## Summary</h2>\n<p>On Friday, 18 July 2025 07:50 US/Pacific, several Google Cloud Platform (GCP) and Google Workspace (GWS) products experienced elevated latencies and error rates in the us-east1 region for a duration of up to 1 hour and 57 minutes.</p>\n<p><strong>GCP Impact Duration:</strong>  18 July 2025 07:50 - 09:47 US/Pacific : 1 hour 57 minutes<br />\n<strong>GWS Impact Duration:</strong> 18 July 2025 07:50  - 08:40 US/Pacific : 50 minutes</p>\n<p>We sincerely apologize for this incident, which does not reflect the level of quality and reliability we strive to offer. We are taking immediate steps to improve the platform’s performance and availability.</p>\n<h2></h2>\n<h2>## Root Cause</h2>\n<p>The service interruption was triggered by a procedural error during a planned hardware replacement in our datacenter. An incorrect physical disconnection was made to the active network switch serving our control plane, rather than the redundant unit scheduled for removal. The redundant unit had been properly de-configured as part of the procedure, and the combination of these two events led to partitioning of the network control plane. Our network is designed to withstand this type of control plane failure by failing open, continuing operation.</p>\n<p>However, an operational topology change while the network control plane was in a failed open state caused our network fabric's topology information to become stale. This led to packet loss and service disruption until services were moved away from the fabric and control plane connectivity was restored.</p>\n<h2>## Remediation and Prevention</h2>\n<p>Google engineers were alerted to the outage by our monitoring system on 18 July 2025  07:06 US/Pacific and immediately started an investigation. The following timeline details the remediation and restoration efforts:</p>\n<ul>\n<li><strong>07:39 US/Pacific</strong>: The underlying root cause (device disconnect) was identified and onsite technicians were engaged to reconnect the control plane device and restore control plane connectivity. At that moment, network failure open mechanisms worked as expected and no impact was observed.</li>\n<li><strong>07:50 US/Pacific</strong>: A topology change led to traffic being routed suboptimally, due to the network being in a fail open state. This caused congestion on the subset of links, packet loss, and latency to customer traffic. Engineers made a decision to move traffic away from the affected fabric, which mitigated the impact for the majority of the services.</li>\n<li><strong>08:40 US/Pacific</strong>: Engineers mitigated Workspace impact by shifting traffic away from the affected region.</li>\n<li><strong>09:47 US/Pacific</strong>: Onsite technicians reconnected the device, control plane connectivity was fully restored and all services were back to stable state.</li>\n</ul>\n<p>Google is committed to preventing a repeat of the issue in the future, and is completing the following actions:</p>\n<ul>\n<li>Pause non-critical workflows until safety controls are implemented (complete).</li>\n<li>Strengthen safety controls for hardware upgrade workflows by end of Q3 2025.</li>\n<li>Design and implement a mechanism to prevent control plane partitioning in case of dual failure of upstream routers by end of Q4 2025.</li>\n</ul>\n<h2>## Detailed Description of Impact</h2>\n<p>### GCP Impact:</p>\n<p>Multiple products in us-east1 were affected by the loss of network connectivity, with the most significant impacts seen in us-east1-b. Other regions were not affected.</p>\n<p>The outage caused a range of issues for customers with zonal resources in the region, including packet loss across VPC networks, increased error rates and latency, service unavailable (503) errors, and slow or stuck operations up to loss of networking connectivity. While regional products were briefly impacted, they recovered quickly by failing over to unaffected zones.</p>\n<p>A small number (0.1%) of Persistent Disks in us-east1-b were unavailable for the duration of the outage: these disks became available once the outage was mitigated, with no customer data loss.</p>\n<p>### GWS Impact:</p>\n<p>A small subset of Workspace users, primarily around the Southeast US, experienced varying degrees of unavailability and increased delays across multiple products, including Gmail, Google Meet, Google Drive, Google Chat, Google Calendar, Google Groups, Google Doc/Editors, and Google Voice.</p>\n</div><hr /><p>Affected products: AlloyDB for PostgreSQL, Apigee, Artifact Registry, Certificate Authority Service, Cloud Armor, Cloud Billing, Cloud Build, Cloud External Key Manager, Cloud Firestore, Cloud HSM, Cloud Key Management Service, Cloud Load Balancing, Cloud Memorystore, Cloud Monitoring, Cloud Run, Cloud Spanner, Cloud Storage for Firebase, Cloud Workflows, Database Migration Service, Dataproc Metastore, Dialogflow CX, Eventarc, Google App Engine, Google BigQuery, Google Cloud Bigtable, Google Cloud Console, Google Cloud Dataflow, Google Cloud Dataproc, Google Cloud Pub/Sub, Google Cloud SQL, Google Cloud Storage, Google Cloud Support, Google Cloud Tasks, Google Compute Engine, Google Kubernetes Engine, Hybrid Connectivity, Identity and Access Management, Media CDN, Memorystore for Memcached, Memorystore for Redis, Memorystore for Redis Cluster, Persistent Disk, Private Service Connect, Secret Manager, Service Directory, Vertex AI Online Prediction, Virtual Private Cloud (VPC)</p><p>Affected locations: South Carolina (us-east1)</p>",
+          "link": "https://status.cloud.google.com/incidents/8cY8jdUpEGGbsSMSQk7J",
+          "published": "",
+          "updated": "2025-07-23T09:26:58+00:00",
+          "updated_parsed": [
+            2025,
+            7,
+            23,
+            9,
+            26,
+            58,
+            2,
+            204,
+            0
+          ],
+          "guid": "tag:status.cloud.google.com,2025:feed:8cY8jdUpEGGbsSMSQk7J.k1VxeGGvFncMpBCv2T7r"
+        }
+      }
+    ]
+  },
+  "counts": {
+    "new": 0,
+    "updated": 0,
+    "removed": 0,
+    "flagged": 1
+  },
+  "integrity_reset": false,
+  "integrity_risk": 0.0
+}
