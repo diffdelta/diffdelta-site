@@ -65,7 +65,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
   const inmRaw = request.headers.get("If-None-Match");
   const inm = inmRaw
-    ? inmRaw.replace(/^W\\//, "").replace(/^\"|\"$/g, "")
+    ? inmRaw.replace(/^W\//, "").replace(/^"|"$/g, "")
     : null;
   if (inm && inm === stored.cursor) {
     return new Response(null, { status: 304, headers: res.headers });
