@@ -40,6 +40,23 @@ const ID_RE = /^[a-z0-9_-]{1,24}$/;
 const TOOL_ID_RE = /^[a-z0-9_.:-]{1,48}$/;
 const SOURCE_ID_RE = /^[a-z0-9_\-]{2,32}$/;
 
+// v0 normative enums — reject anything outside these sets.
+const CONSTRAINT_TYPES_V0 = new Set([
+  "no_shell",
+  "no_network_writes",
+  "no_secrets_export",
+  "allowed_tools",
+  "allowed_domains",
+]);
+
+const OBJECTIVE_STATUSES_V0 = new Set([
+  "open",
+  "in_progress",
+  "blocked",
+  "done",
+  "cancelled",
+]);
+
 export function validateCapsule(capsule: unknown, limits: CapsuleLimits): ValidationResult {
   const reasons: string[] = [];
 
@@ -114,7 +131,7 @@ export function validateCapsule(capsule: unknown, limits: CapsuleLimits): Valida
         const allowed = new Set(["id", "type", "value"]);
         for (const k of Object.keys(c)) if (!allowed.has(k)) reasons.push("unknown_field");
         if (typeof c.id !== "string" || !ID_RE.test(c.id)) reasons.push("constraint_id");
-        if (typeof c.type !== "string") reasons.push("constraint_type");
+        if (typeof c.type !== "string" || !CONSTRAINT_TYPES_V0.has(c.type)) reasons.push("constraint_type");
         if (!("value" in c)) reasons.push("constraint_value");
         if (Array.isArray(c.value)) {
           if (c.value.length > 20) reasons.push("constraint_value");
@@ -139,7 +156,7 @@ export function validateCapsule(capsule: unknown, limits: CapsuleLimits): Valida
         const allowed = new Set(["id", "status", "priority", "title", "checkpoint"]);
         for (const k of Object.keys(o)) if (!allowed.has(k)) reasons.push("unknown_field");
         if (typeof o.id !== "string" || !ID_RE.test(o.id)) reasons.push("objective_id");
-        if (typeof o.status !== "string") reasons.push("objective_status");
+        if (typeof o.status !== "string" || !OBJECTIVE_STATUSES_V0.has(o.status)) reasons.push("objective_status");
         if (o.priority !== undefined && !["low", "med", "high"].includes(o.priority)) reasons.push("objective_priority");
         if (typeof o.title !== "string" || o.title.length < 1 || o.title.length > 120) reasons.push("objective_title");
         if (o.checkpoint !== undefined && (typeof o.checkpoint !== "string" || o.checkpoint.length > 200)) {

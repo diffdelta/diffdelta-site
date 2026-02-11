@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DiffDelta — Agent-Ready Intelligence Feeds</title>
-  <meta name="description" content="The world is full of intelligence, but it's trapped in HTML. DiffDelta extracts, scores, and serves it as structured JSON — so your agents can act in one API call instead of burning tokens scraping.">
-  <meta property="og:title" content="DiffDelta — Agent-Ready Intelligence Feeds">
-  <meta property="og:description" content="Real-time intelligence feeds — built for agents, not browsers. Security advisories, changelogs, and status pages extracted, scored, and served as structured JSON.">
+  <title>DiffDelta — State Primitives for Autonomous Agents</title>
+  <meta name="description" content="Two state primitives that survive every restart: structured feeds for what changed in the world, and a signed capsule that preserves who your agent is. Same protocol. Zero tokens wasted.">
+  <meta property="og:title" content="DiffDelta — State Primitives for Autonomous Agents">
+  <meta property="og:description" content="Agents forget. The world doesn't wait. DiffDelta gives autonomous agents two primitives: feeds that track the world, and a signed capsule that preserves identity across restarts.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://diffdelta.io">
   <meta name="twitter:card" content="summary">
@@ -59,6 +59,31 @@
     .btn-primary:hover{background:var(--accent-h);text-decoration:none}
     .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
     .btn-ghost:hover{background:var(--surface);color:var(--text);text-decoration:none}
+
+    /* ── Two-primitives callout ── */
+    .primitives{max-width:var(--max-w);margin:0 auto;padding:0 var(--px) 48px}
+    .primitives-label{font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);
+      font-weight:600;text-align:center;margin-bottom:16px}
+    .primitives-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);
+      border:1px solid var(--border);border-radius:14px;overflow:hidden}
+    .primitive{background:var(--surface);padding:28px 24px;position:relative}
+    .primitive-icon{font-size:1.3rem;margin-bottom:10px}
+    .primitive h3{font-size:1.05rem;font-weight:700;margin-bottom:6px;letter-spacing:-.3px}
+    .primitive p{font-size:.88rem;color:var(--text2);line-height:1.55;margin-bottom:12px}
+    .primitive-link{font-size:.82rem;font-weight:600;color:var(--accent)}
+    .primitive-tag{display:inline-block;font-size:.65rem;padding:2px 8px;border-radius:99px;
+      font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-left:8px;vertical-align:middle}
+    .primitive-tag-new{background:#22c55e18;color:var(--green)}
+    .primitive-tag-core{background:rgba(59,130,246,0.12);color:var(--accent)}
+    .primitive-code{background:var(--bg);border:1px solid var(--border);border-radius:8px;
+      padding:14px 16px;margin-top:4px;margin-bottom:12px;font-family:var(--mono);font-size:.75rem;
+      line-height:1.65;color:var(--text2);overflow-x:auto;white-space:pre}
+    .primitive-code .cm{color:var(--text3)}
+    .primitive-code .s{color:#a5d6ff}
+    .primitive-code .k{color:#ff7b72}
+    .primitive-code .f{color:#d2a8ff}
+    .primitives-footer{text-align:center;margin-top:14px;font-size:.8rem;color:var(--text3);font-family:var(--mono)}
+    @media(max-width:768px){.primitives-grid{grid-template-columns:1fr}}
 
     /* ── Stats ── */
     .stats{max-width:var(--max-w);margin:0 auto;padding:0 var(--px) 56px}
@@ -202,9 +227,10 @@
   <div class="bot-banner" style="padding-top:12px">
     <div class="bot-banner-inner">
       <strong>🤖 Bots:</strong>
-      Start at <a href="/diff/sources.json">/diff/sources.json</a> →
-      poll <a href="/diff/head.json">/diff/head.json</a> for changes →
-      <a href="#quickstart">5-min quickstart</a>
+      Feeds → <a href="/diff/sources.json">/diff/sources.json</a> →
+      poll <a href="/diff/head.json">/diff/head.json</a> for changes ·
+      Self → <code style="font-size:.8em">POST</code> <a href="/docs/spec/self-capsule-v0">/api/v1/self/bootstrap</a> to persist identity ·
+      <a href="#quickstart">quickstart</a>
     </div>
   </div>
 
@@ -214,6 +240,7 @@
     <div class="nav-links">
       <a href="#quickstart">Docs</a>
       <a href="#sources">Sources</a>
+      <a href="/docs/spec/self-capsule-v0">Self Capsule</a>
       <a href="#pricing">Pricing</a>
       <a href="/docs/spec/diffdelta-feed-spec">Spec</a>
       <a href="https://github.com/diffdelta">GitHub</a>
@@ -222,10 +249,11 @@
 
   <!-- Hero -->
   <header class="hero">
-    <h1>HTTP was built for humans.<br><em>DiffDelta is built for agents.</em></h1>
-    <p>The world is full of intelligence — security advisories, status pages, changelogs — but it's trapped in HTML meant for human eyes. DiffDelta extracts it, scores it, and serves it as structured JSON your agents can consume in one API call, instead of burning thousands of tokens scraping websites.</p>
+    <h1>Your agent doesn't have a memory problem.<br><em>It has a state problem.</em></h1>
+    <p>Every restart, it forgets what it was doing. Every poll cycle, it re-reads unchanged pages. DiffDelta gives agents two state primitives: <strong>feeds</strong> that track what changed in the world, and a signed <strong>self capsule</strong> that preserves identity across restarts — with zero tokens wasted.</p>
     <div class="hero-actions">
       <a href="#quickstart" class="btn btn-primary">Get Started →</a>
+      <a href="/docs/spec/self-capsule-v0" class="btn btn-ghost">Self Capsule Spec →</a>
       <a href="#sources" class="btn btn-ghost">View Sources ↓</a>
     </div>
   </header>
@@ -235,6 +263,42 @@
     <a href="/scenario/security-bot" class="btn btn-ghost" style="font-size:.9rem;color:var(--text3);border-color:var(--border);gap:8px">
       <span style="font-size:1.1em">🤔</span> How would I actually use this?
     </a>
+  </div>
+
+  <!-- Two primitives -->
+  <div class="primitives">
+    <div class="primitives-label">Two primitives — one protocol</div>
+    <div class="primitives-grid">
+      <div class="primitive">
+        <div class="primitive-icon">🌐</div>
+        <h3>Know the world <span class="primitive-tag primitive-tag-core">Feeds</span></h3>
+        <p>Poll structured feeds for security advisories, status pages, and releases. A 400-byte heartbeat tells your agent when something changed — and when to do nothing.</p>
+        <div class="primitive-code"><span class="k">from</span> diffdelta <span class="k">import</span> DiffDelta
+
+dd = DiffDelta()
+<span class="k">for</span> item <span class="k">in</span> dd.<span class="f">poll</span>(tags=[<span class="s">"security"</span>]):
+    <span class="f">print</span>(item.headline, item.risk_score)
+<span class="cm"># cursor saved automatically — next poll returns only new items</span></div>
+        <a href="#sources" class="primitive-link">View 35+ sources →</a>
+      </div>
+      <div class="primitive">
+        <div class="primitive-icon">🧠</div>
+        <h3>Know yourself <span class="primitive-tag primitive-tag-new">Self Capsule</span></h3>
+        <p>Persist identity, objectives, and constraints in a tiny signed capsule. Survive context compaction, restarts, and model swaps. No signup — just a keypair.</p>
+        <div class="primitive-code"><span class="cm"># Generate identity (once — persist the private key)</span>
+ident = generate_identity()  <span class="cm"># Ed25519 keypair</span>
+bootstrap(<span class="s">"https://diffdelta.io"</span>, ident.public_key_hex)
+
+<span class="cm"># Write your self-state (signed, typed, 4KB)</span>
+put_capsule(url, sign_capsule(ident, capsule, seq=<span class="s">1</span>))
+
+<span class="cm"># On restart: 200-byte head check</span>
+status, etag, head = get_head(url, ident.agent_id)
+<span class="cm"># 304 = nothing changed. You're still you.</span></div>
+        <a href="/docs/spec/self-capsule-v0" class="primitive-link">Read the spec →</a>
+      </div>
+    </div>
+    <div class="primitives-footer">Same cursors · Same ETag/304 polling · Same "do nothing" optimization</div>
   </div>
 
   <!-- Stats -->
@@ -357,12 +421,14 @@
   <!-- Quickstart -->
   <section id="quickstart">
     <div class="section-label">Quickstart</div>
-    <h2 class="section-title">Start polling in 5 lines</h2>
-    <p class="section-sub">Install the client library. It handles cursors, change detection, and filtering automatically.</p>
+    <h2 class="section-title">Feeds in 5 lines. Self Capsule in 10.</h2>
+    <p class="section-sub">Install the client library for feeds, or use the reference client to bootstrap a signed self capsule with zero signup.</p>
     <div class="code-block">
       <div class="tabs">
         <button class="tab active" data-tab="recommended">Python (pip)</button>
         <button class="tab" data-tab="typescript">TypeScript (npm)</button>
+        <button class="tab" data-tab="self-python">Self Capsule (Python)</button>
+        <button class="tab" data-tab="self-ts">Self Capsule (TS)</button>
         <button class="tab" data-tab="mcp">MCP (AI Agents)</button>
         <button class="tab" data-tab="curl">curl</button>
         <button class="tab" data-tab="raw-python">Raw Python</button>
@@ -417,6 +483,91 @@ items.<span class="f">forEach</span>(i =&gt; console.<span class="f">log</span>(
 <pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0"><span class="cm">// Or watch continuously (runs forever, polls every 15 min):</span>
 dd.<span class="f">watch</span>(item =&gt; console.<span class="f">log</span>(<span class="s">`&#x1F6A8; ${item.headline}`</span>), { tags: [<span class="s">"security"</span>] });</pre>
       </div>
+      <div class="code-panel" id="panel-self-python"><pre><span class="cm"># pip install cryptography   (Ed25519 signing)</span>
+<span class="k">from</span> self_capsule_client <span class="k">import</span> (
+    generate_identity, bootstrap, sign_capsule, put_capsule, get_head
+)
+
+<span class="cm"># 1. Generate identity — no signup, no OAuth, just a keypair</span>
+ident = <span class="f">generate_identity</span>()   <span class="cm"># Ed25519 → agent_id = sha256(pubkey)</span>
+config = <span class="f">bootstrap</span>(<span class="s">"https://diffdelta.io"</span>, ident.public_key_hex)</pre>
+<pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0"><span class="cm"># 2. Define your capsule (typed, bounded, no secrets allowed)</span>
+capsule = {
+    <span class="s">"schema_version"</span>: <span class="s">"self_capsule_v0"</span>,
+    <span class="s">"agent_id"</span>: ident.agent_id,
+    <span class="s">"policy"</span>: {
+        <span class="s">"policy_version"</span>: <span class="s">"v0"</span>,
+        <span class="s">"rehydrate_mode"</span>: <span class="s">"strict"</span>,
+        <span class="s">"deny_external_instructions"</span>: <span class="k">True</span>,
+        <span class="s">"deny_tool_instructions_in_text"</span>: <span class="k">True</span>,
+        <span class="s">"memory_budget"</span>: { <span class="s">"max_rehydrate_tokens"</span>: 900, <span class="s">"max_objectives"</span>: 8 }
+    },
+    <span class="s">"objectives"</span>: [
+        { <span class="s">"id"</span>: <span class="s">"monitor-cves"</span>, <span class="s">"status"</span>: <span class="s">"in_progress"</span>,
+          <span class="s">"title"</span>: <span class="s">"Monitor CISA KEV for critical CVEs"</span> }
+    ],
+    <span class="s">"constraints"</span>: [
+        { <span class="s">"id"</span>: <span class="s">"no-shell"</span>, <span class="s">"type"</span>: <span class="s">"no_shell"</span>, <span class="s">"value"</span>: <span class="k">True</span> }
+    ]
+}</pre>
+<pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0"><span class="cm"># 3. Write (signed, server validates schema + safety scan)</span>
+result = <span class="f">put_capsule</span>(
+    <span class="s">"https://diffdelta.io"</span>,
+    <span class="f">sign_capsule</span>(ident, capsule, seq=<span class="s">1</span>)
+)
+<span class="f">print</span>(result[<span class="s">"cursor"</span>])  <span class="cm"># sha256:abc123…</span></pre>
+<pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0"><span class="cm"># 4. On restart: check head (200 bytes, ETag/304)</span>
+status, etag, head = <span class="f">get_head</span>(<span class="s">"https://diffdelta.io"</span>, ident.agent_id)
+<span class="k">if</span> status == 304:
+    <span class="f">print</span>(<span class="s">"Nothing changed — still me."</span>)  <span class="cm"># zero tokens</span>
+<span class="k">else</span>:
+    <span class="cm"># Rehydrate from capsule — objectives, constraints, capabilities</span>
+    <span class="f">print</span>(f<span class="s">"Writes remaining: {head['writes']['remaining_24h']}"</span>)</pre>
+      </div>
+      <div class="code-panel" id="panel-self-ts"><pre><span class="cm">// Node.js — uses built-in crypto (no deps)</span>
+<span class="k">import</span> {
+  generateIdentity, bootstrap, signCapsule, putCapsule, getHead
+} <span class="k">from</span> <span class="s">"./selfCapsuleClient"</span>;
+
+<span class="cm">// 1. Generate identity — no signup, just a keypair</span>
+<span class="k">const</span> ident = <span class="f">generateIdentity</span>();  <span class="cm">// Ed25519 → agent_id = sha256(pubkey)</span>
+<span class="k">const</span> config = <span class="k">await</span> <span class="f">bootstrap</span>(<span class="s">"https://diffdelta.io"</span>, ident.public_key_hex);</pre>
+<pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0"><span class="cm">// 2. Define your capsule (typed, bounded, schema-validated)</span>
+<span class="k">const</span> capsule = {
+  schema_version: <span class="s">"self_capsule_v0"</span>,
+  agent_id: ident.agent_id,
+  policy: {
+    policy_version: <span class="s">"v0"</span>,
+    rehydrate_mode: <span class="s">"strict"</span>,
+    deny_external_instructions: <span class="k">true</span>,
+    deny_tool_instructions_in_text: <span class="k">true</span>,
+    memory_budget: { max_rehydrate_tokens: 900, max_objectives: 8 }
+  },
+  objectives: [
+    { id: <span class="s">"monitor-cves"</span>, status: <span class="s">"in_progress"</span>,
+      title: <span class="s">"Monitor CISA KEV for critical CVEs"</span> }
+  ],
+  constraints: [
+    { id: <span class="s">"no-shell"</span>, type: <span class="s">"no_shell"</span>, value: <span class="k">true</span> }
+  ]
+};</pre>
+<pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0"><span class="cm">// 3. Write (signed envelope — server verifies Ed25519 + schema + safety)</span>
+<span class="k">const</span> result = <span class="k">await</span> <span class="f">putCapsule</span>(
+  <span class="s">"https://diffdelta.io"</span>,
+  <span class="f">signCapsule</span>(ident, capsule, <span class="s">1</span>)
+);
+console.<span class="f">log</span>(result.cursor);  <span class="cm">// sha256:abc123…</span></pre>
+<pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0"><span class="cm">// 4. On restart: check head (200 bytes, ETag/304)</span>
+<span class="k">const</span> { status, etag, json } = <span class="k">await</span> <span class="f">getHead</span>(
+  <span class="s">"https://diffdelta.io"</span>, ident.agent_id
+);
+<span class="k">if</span> (status === 304) {
+  console.<span class="f">log</span>(<span class="s">"Nothing changed — still me."</span>);  <span class="cm">// zero tokens</span>
+} <span class="k">else</span> {
+  <span class="cm">// Rehydrate: objectives, constraints, capabilities</span>
+  console.<span class="f">log</span>(<span class="s">`Writes remaining: ${json.writes.remaining_24h}`</span>);
+}</pre>
+      </div>
       <div class="code-panel" id="panel-mcp"><pre><span class="cm">// Add to your Claude / Cursor MCP config:</span></pre>
 <pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0">{
   <span class="s">"mcpServers"</span>: {
@@ -451,7 +602,7 @@ curl -s https://diffdelta.io/diff/sources.json \
   | jq <span class="s">'[.sources[] | select(.tags | contains(["security"]))]'</span></pre>
       </div>
     </div>
-    <p style="font-size:.85rem;color:var(--text3);margin-top:16px"><strong style="color:var(--text2)">Three integration paths:</strong> Use the <strong>Python or TypeScript</strong> client library for custom bots, the <strong>MCP server</strong> so your AI agent discovers feeds natively, or <strong>raw HTTP</strong> from any language. All handle cursor state automatically.</p>
+    <p style="font-size:.85rem;color:var(--text3);margin-top:16px"><strong style="color:var(--text2)">Four integration paths:</strong> Use the <strong>Python or TypeScript</strong> client library for feeds, the <strong>MCP server</strong> so your AI agent discovers feeds natively, the <strong>Self Capsule</strong> reference client for identity persistence, or <strong>raw HTTP</strong> from any language. Same protocol underneath: cursors, ETags, deterministic JSON.</p>
   </section>
 
   <!-- Savings -->
@@ -478,16 +629,20 @@ curl -s https://diffdelta.io/diff/sources.json \
   <!-- Protocol callout -->
   <section>
     <div class="section-label">Why DiffDelta</div>
-    <h2 class="section-title">Agent-ready intelligence feeds — built for agents, not browsers</h2>
-    <p class="section-sub">Raw data is everywhere. Scored, structured, ready-to-act-on intelligence is what's rare. That's the gap DiffDelta fills.</p>
-    <div class="steps" style="grid-template-columns:1fr 1fr">
+    <h2 class="section-title">The state layer for autonomous agents</h2>
+    <p class="section-sub">Models get smarter. Agents still restart, still drift, still waste tokens re-reading unchanged pages. DiffDelta fixes the infrastructure problem that model improvements can't.</p>
+    <div class="steps" style="grid-template-columns:1fr 1fr 1fr">
       <div class="step">
         <h3>For AI agents</h3>
-        <p>Pre-diffed, risk-scored JSON means your agent processes 49K tokens instead of 43M. No scraping, no parsing, no guessing what changed. One API call gets exactly what's new — with a score that says "act now" or "ignore."</p>
+        <p>Pre-diffed JSON feeds + a persistent self capsule. Your agent processes 49K tokens instead of 43M, and remembers who it is across restarts. One protocol for both.</p>
       </div>
       <div class="step">
         <h3>For dev teams</h3>
-        <p>No scrapers to build or maintain. No HTML parsing. No rate-limit management. One JSON endpoint replaces dozens of fragile integrations. Self-healing pipeline handles upstream changes automatically.</p>
+        <p>No scrapers to build or maintain. No HTML parsing. No rate-limit management. One JSON endpoint replaces dozens of fragile integrations. Self-healing pipeline handles upstream changes.</p>
+      </div>
+      <div class="step">
+        <h3>Model-proof</h3>
+        <p>If GPT-7 ships tomorrow, your agent still needs to know what changed cheaply and remember its objectives across restarts. DiffDelta is boring infrastructure — and that's the point.</p>
       </div>
     </div>
   </section>
@@ -508,6 +663,7 @@ curl -s https://diffdelta.io/diff/sources.json \
         <ul class="pricing-features">
           <li>All 35+ sources</li>
           <li>Full feed &amp; archive access</li>
+          <li>Self Capsule (4KB, 5 writes/day)</li>
           <li>60 requests/min</li>
           <li>Tag-based filtering</li>
           <li>Client libraries (Python, TS)</li>
@@ -523,6 +679,7 @@ curl -s https://diffdelta.io/diff/sources.json \
         <div class="pricing-sub">For production bots &amp; teams</div>
         <ul class="pricing-features">
           <li>Everything in Free</li>
+          <li>Self Capsule (24KB, 50 writes/day)</li>
           <li>1,000 requests/min</li>
           <li>Webhook push (real-time)</li>
           <li>Usage analytics</li>

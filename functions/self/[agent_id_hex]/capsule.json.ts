@@ -28,7 +28,12 @@ function resolveTier(auth?: AuthResult): "free" | "pro" {
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   const { params, env, request } = context;
-  const agentIdHex = parseAgentIdHex(String(params.agent_id_hex || ""));
+  let agentIdHex: string;
+  try {
+    agentIdHex = parseAgentIdHex(String(params.agent_id_hex || ""));
+  } catch {
+    return errorResponse("Invalid agent_id (expected 64 hex chars)", 400);
+  }
 
   const stored = await getStoredCapsule(env, agentIdHex);
   if (!stored) {
@@ -53,7 +58,12 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
 export const onRequestPut: PagesFunction<Env> = async (context) => {
   const { params, env, request, data } = context;
-  const agentIdHex = parseAgentIdHex(String(params.agent_id_hex || ""));
+  let agentIdHex: string;
+  try {
+    agentIdHex = parseAgentIdHex(String(params.agent_id_hex || ""));
+  } catch {
+    return errorResponse("Invalid agent_id (expected 64 hex chars)", 400);
+  }
 
   // Hard body-size cap BEFORE parsing JSON (protects against missing Content-Length)
   const MAX_REQUEST_BYTES = 64 * 1024; // envelope + capsule; intentionally small
