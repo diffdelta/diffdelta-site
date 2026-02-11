@@ -385,7 +385,7 @@ Additional fields MAY be included (e.g. `findings`, `max_bytes`, `observed_bytes
 | `bad_signature` | 401 | Signature invalid OR runtime cannot verify Ed25519. | Stop; verify key material & signature implementation. If persistent, downgrade to read-only. |
 | `bad_seq` | 400 | `seq` missing or not an integer >= 0. | Fix client; retry once fixed. |
 | `replay_seq` | 409 | `seq` is not strictly increasing (replay/out-of-order). | Increment seq; do not retry same payload. |
-| `capsule_too_large` | 413 | Capsule exceeds tier’s max bytes (4KB free / 8KB pro). | Reduce capsule; retry once fixed. |
+| `capsule_too_large` | 413 | Capsule exceeds tier’s max bytes (4KB free / 24KB pro). | Reduce capsule; retry once fixed. |
 | `unsafe_content` | 422 | Deterministic safety scanner flagged injection/secret/url violations. | Remove unsafe content; do not persist suspicious text; retry once fixed. |
 | `write_quota_exceeded` | 429 | Per-agent write quota exceeded (free 5/day, pro 50/day). | Back off until `next_write_at`; continue operating read-only. |
 | `new_agent_ip_quota_exceeded` | 429 | Per-IP/day cap on first successful capsule creation exceeded. | Back off; do not churn identities; retry after `next_write_at`. |
@@ -605,3 +605,52 @@ A bot SHOULD be able to upgrade tiers without email, Stripe Checkout, or a human
   - invoice expiry + idempotency keys
   - signed claim payload that binds `invoice_id` → `agent_id`
 
+---
+
+## Future considerations (not in v0)
+
+### Feed filtering via query params
+Instead of storing monitoring preferences inside the capsule (which couples identity to feed selection and burns writes on preference changes), feed filtering should be a **stateless query-param feature** on the existing feed endpoints:
+- `GET /diff/latest.json?tags=security,status`
+- `GET /diff/latest.json?sources=aws_status,cisa_kev`
+
+This keeps feeds and capsule as independent primitives. Pro tier could offer server-side filtering while Free agents filter locally.
+
+### `watch` field (deferred)
+An earlier design included a `watch` field in the capsule schema for declaring monitored sources/tags/stacks. This was removed from v0 because:
+- It couples identity state to feed selection (two independent concerns)
+- It burns capsule writes for preference changes
+- Server-side projected feeds require per-agent feed generation (expensive, complex cursor semantics)
+- Query-param filtering achieves the same goal without schema pollution
+
+If a real consumer demonstrates need for persistent monitoring declarations inside the capsule, `watch` can be reconsidered in v1.
+
+---
+
+## Design tensions (open questions for v1)
+
+### 1) Cold-restart pitch vs. multi-agent coordination
+
+The "total amnesia after restart" scenario is real but may be **narrower than the pitch implies**. Most agents running on real infrastructure already have access to a persistence layer (database, Redis, env vars). The agent that truly wakes up with zero state is the *least sophisticated* agent — and also the one least likely to adopt a signed-capsule protocol.
+
+The stronger long-term value is likely **multi-agent coordination**: agents reading each other's capsules to verify identity, check objectives, and confirm constraints before delegating work or accepting instructions. But this requires ≥2 agents using Self, which is a classic **chicken-and-egg problem**.
+
+**Working assumption for v0:** Single-agent persistence is the onboarding hook (low friction, immediate value). Multi-agent coordination is the real unlock — but it only becomes possible once enough single agents are onboarded. The framing should be honest about this sequencing rather than over-selling the multi-agent story before it's real.
+
+**Open question:** Should we build a "reference pair" — two agents that coordinate via capsules — as the demo instead of a single-agent bootstrap example?
+
+### 2) The schema is an opinion, not a primitive
+
+The DiffDelta Constitution says "unopinionated integrity," but the Self Capsule schema is an **ontology for goal-directed autonomous agents**:
+- `objectives` with `status: open → in_progress → done` assumes the agent has persistent goals
+- `constraints` with five predefined types (`no_shell`, `no_network_writes`, etc.) assumes a specific safety model
+- `receipts` with content hashes assumes the agent produces auditable output
+
+Not all agents fit this shape:
+- A **purely reactive agent** (responds to events, has no persistent goals) has no "objectives"
+- A **summarizer bot** doesn't naturally express its work as "receipts with content hashes"
+- A **monitoring daemon** doesn't have "constraints" in the five types we've defined — its constraints are about *what it watches*, not *what it's forbidden to do*
+
+**This is fine for v0.** Goal-directed agents are the ones who most need identity persistence and who benefit most from structured self-state. But we should be honest that Self Capsule v0 serves a *specific type* of autonomous agent, not all agents.
+
+**Open question for v1:** Should the schema have a smaller, truly unopinionated core (just `identity` + `policy` + freeform `state`) with optional "shapes" (goal-directed, reactive, monitoring) that agents opt into? This would let us serve more agent types without forcing everyone into the objective/constraint ontology. The trade-off is weaker interoperability — if every agent has a different shape, they can't read each other's capsules as easily.
