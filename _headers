@@ -10,11 +10,11 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), microphone=(), camera=()
 
-# Diff feeds (polled often): edge-cache briefly, revalidate on expiry
+# Diff feeds: edge-cache 5 min (aligns with .well-known recommended_ttl_sec)
 /diff/*
   Content-Type: application/json; charset=utf-8
-  Cache-Control: public, max-age=60, must-revalidate
-  CDN-Cache-Control: public, max-age=60, must-revalidate
+  Cache-Control: public, max-age=300, must-revalidate
+  CDN-Cache-Control: public, max-age=300, must-revalidate
   Access-Control-Allow-Origin: *
   Access-Control-Allow-Headers: X-DiffDelta-Key, Content-Type, If-None-Match
   Access-Control-Expose-Headers: ETag, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset
