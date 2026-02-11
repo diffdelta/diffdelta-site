@@ -38,37 +38,6 @@ Before adding any new field/endpoint/tier feature, force it through these questi
 
 If a proposed feature doesn’t strengthen at least one of the four primitives without weakening the others, it’s likely a rabbit hole.
 
-## Optional: `watch` (subscriptions) — make “self” include what you monitor
-This is an **explicit, opt-in** field that lets an agent declare what external state it cares about (sources/tags/stacks). It is not required for rehydration.
-
-**Why it exists:** if an agent can express “what I monitor” as structured state, a server can optionally provide a **projected** view of the world feed that is smaller and cheaper to consume (cost control + freshness).
-
-### `watch` field shape (proposed, bounded)
-If present, `watch` MUST be a small object:
-- `tags`: optional array of strings (max 10; each max 24 chars)
-- `sources`: optional array of source IDs (max 25; each `^[a-z0-9_\\-]{2,32}$`)
-- `stacks`: optional array of dependency names (max 10; each max 32 chars)
-
-Notes:
-- Servers MUST treat all `watch` values as **selection only** (no interpretation).
-- If `watch` is absent, behavior is unchanged.
-
-### How this relates to tiers (transparent, not sneaky)
-- **Free:** agent can store `watch`, but it filters `/diff/*` locally (no special server behavior required).
-- **Pro:** server MAY offer **projected watch feeds** so bots download fewer bytes and do less work.
-
-### Projected watch feeds (Pro, optional)
-These are derived views, not new opinions.
-
-Suggested endpoints:
-- `GET /api/v1/watch/head` → head pointer for the projected view (cursor changes only when the projection changes)
-- `GET /api/v1/watch/latest` → latest feed items matching `watch`
-- `GET /api/v1/watch/digest` (optional) → compact summary/counts for the projected view
-
-Cursor semantics:
-- `watch_cursor` MUST be computed deterministically from the projected view (same “cursor = semantic content” rule).
-- Fast path: if the global `/diff/head.json` cursor is unchanged, the projected cursor SHOULD be unchanged too.
-
 ## Non-goals
 - Not a transcript store.
 - Not a vector-memory system.
@@ -176,15 +145,25 @@ These endpoints MUST return `application/json; charset=utf-8`.
 
 Writes are **hard rejected** if invalid, unsafe, unsigned, replayed, oversized, or above quota.
 
-## Free-tier limits (strict)
+## Tier limits (strict)
 These limits exist to prevent the service from becoming a blob store or an injection surface.
 
+### Free tier
 - **Writes**: **5 per 24 hours per `agent_id`**
 - **Capsule max bytes**: **4096** (UTF-8, post-canonicalization)
+- **Objectives**: max **8**
+- **Receipts**: max **5**
 - **Unknown fields**: rejected (`additionalProperties=false`)
 - **Per-field string limits**: capped (see schema)
 - **No secrets**: any credential-like patterns are rejected
 - **No tool instructions in text**: prompt/tool-injection patterns are rejected
+
+### Pro tier ($9/mo)
+- **Writes**: **50 per 24 hours per `agent_id`**
+- **Capsule max bytes**: **8192** (UTF-8, post-canonicalization)
+- **Objectives**: max **16**
+- **Receipts**: max **20**
+- All other rules (schema strictness, safety scanning, signing) remain identical
 
 ## Traffic & abuse controls (recommended defaults)
 This section exists specifically because Moltbook-scale bot traffic changes the economics.
@@ -403,11 +382,10 @@ Additional fields MAY be included (e.g. `findings`, `max_bytes`, `observed_bytes
 | `capabilities` / `tool_allowlist` / `feature_flags` | 422 | Capabilities invalid/out of bounds. | Fix capsule; retry once fixed. |
 | `pointers` / `receipts` / `receipt_*` | 422 | Receipts invalid/out of bounds. | Fix capsule; retry once fixed. |
 | `self_motto` | 422 | `self_motto` too long/invalid. | Shorten; retry once fixed. |
-| `watch.*` | 422 | `watch` config invalid/out of bounds. | Fix filter; retry once fixed. |
 | `bad_signature` | 401 | Signature invalid OR runtime cannot verify Ed25519. | Stop; verify key material & signature implementation. If persistent, downgrade to read-only. |
 | `bad_seq` | 400 | `seq` missing or not an integer >= 0. | Fix client; retry once fixed. |
 | `replay_seq` | 409 | `seq` is not strictly increasing (replay/out-of-order). | Increment seq; do not retry same payload. |
-| `capsule_too_large` | 413 | Capsule exceeds tier’s max bytes (4KB free / 24KB pro). | Reduce capsule; retry once fixed. |
+| `capsule_too_large` | 413 | Capsule exceeds tier’s max bytes (4KB free / 8KB pro). | Reduce capsule; retry once fixed. |
 | `unsafe_content` | 422 | Deterministic safety scanner flagged injection/secret/url violations. | Remove unsafe content; do not persist suspicious text; retry once fixed. |
 | `write_quota_exceeded` | 429 | Per-agent write quota exceeded (free 5/day, pro 50/day). | Back off until `next_write_at`; continue operating read-only. |
 | `new_agent_ip_quota_exceeded` | 429 | Per-IP/day cap on first successful capsule creation exceeded. | Back off; do not churn identities; retry after `next_write_at`. |
@@ -569,16 +547,16 @@ A bot SHOULD be able to upgrade tiers without email, Stripe Checkout, or a human
 - We MUST treat all payment webhooks/provider responses as untrusted until independently verified.
 
 ## Upgrade path (what paid tier could add)
-- **Pro tier (first paid hook):** higher write quota **and** larger capsule size (**24KB capsule, 50 writes / 24h**)
-- Append-only delta log + “since cursor X” replay
+- **Pro tier (first paid hook):** higher write quota, larger capsule (**8KB, 50 writes / 24h**), expanded schema (16 objectives, 20 receipts), authenticated reads (privacy mode)
+- Append-only delta log + "since cursor X" replay
 - Retention/history, export/import
 - Org/team shared identities and policy packs
-- Stronger privacy modes (authenticated reads) if/when needed
+- Server-side feed filtering via query params (stateless alternative to per-agent projected feeds)
 
 ### Proposed tier ladder (simple)
-- **Free:** 4KB capsule, 5 writes / 24h, latest capsule only
-- **Pro:** 24KB capsule, **50 writes / 24h**, latest capsule only
-- **Plus (or higher):** snapshot retention/rollback by cursor, and later delta log (“since cursor X”)
+- **Free:** 4KB capsule, 5 writes / 24h, 8 objectives, 5 receipts, latest capsule only
+- **Pro ($9/mo):** 8KB capsule, **50 writes / 24h**, 16 objectives, 20 receipts, authenticated reads, latest capsule only
+- **Plus (or higher):** snapshot retention/rollback by cursor, and later delta log ("since cursor X")
 
 ## Pre-build checklist (walk through before writing production code)
 **Why:** this feature only works if the invariants are crisp; ambiguity here becomes security and UX bugs later.

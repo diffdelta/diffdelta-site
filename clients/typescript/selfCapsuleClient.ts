@@ -54,7 +54,6 @@ export interface Capsule {
   capabilities?: { tool_allowlist?: string[]; feature_flags?: string[] };
   pointers?: { receipts?: Array<{ name: string; content_hash: string; evidence_url?: string }> };
   self_motto?: string;
-  watch?: { tags?: string[]; sources?: string[]; stacks?: string[] };
 }
 
 export interface SignedCapsuleEnvelope {

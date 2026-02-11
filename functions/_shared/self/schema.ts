@@ -27,10 +27,10 @@ export const FREE_LIMITS: CapsuleLimits = {
 };
 
 export const PRO_LIMITS: CapsuleLimits = {
-  maxBytes: 24 * 1024,
-  maxObjectives: 8,
+  maxBytes: 8 * 1024,
+  maxObjectives: 16,
   maxConstraints: 20,
-  maxReceipts: 5,
+  maxReceipts: 20,
   maxTools: 20,
   maxFlags: 20,
 };
@@ -38,7 +38,6 @@ export const PRO_LIMITS: CapsuleLimits = {
 const AGENT_ID_RE = /^[0-9a-f]{64}$/;
 const ID_RE = /^[a-z0-9_-]{1,24}$/;
 const TOOL_ID_RE = /^[a-z0-9_.:-]{1,48}$/;
-const SOURCE_ID_RE = /^[a-z0-9_\-]{2,32}$/;
 
 // v0 normative enums — reject anything outside these sets.
 const CONSTRAINT_TYPES_V0 = new Set([
@@ -72,7 +71,6 @@ export function validateCapsule(capsule: unknown, limits: CapsuleLimits): Valida
     "capabilities",
     "pointers",
     "self_motto",
-    "watch",
   ]);
   for (const k of Object.keys(capsule)) {
     if (!allowedTop.has(k)) reasons.push("unknown_field");
@@ -216,29 +214,6 @@ export function validateCapsule(capsule: unknown, limits: CapsuleLimits): Valida
   // self_motto
   if (capsule.self_motto !== undefined) {
     if (typeof capsule.self_motto !== "string" || capsule.self_motto.length > 160) reasons.push("self_motto");
-  }
-
-  // watch (optional)
-  if (capsule.watch !== undefined) {
-    if (!isObj(capsule.watch)) {
-      reasons.push("watch");
-    } else {
-      const w = capsule.watch;
-      const allowed = new Set(["tags", "sources", "stacks"]);
-      for (const k of Object.keys(w)) if (!allowed.has(k)) reasons.push("unknown_field");
-      if (w.tags !== undefined) {
-        if (!Array.isArray(w.tags) || w.tags.length > 10) reasons.push("watch.tags");
-        else for (const t of w.tags) if (typeof t !== "string" || t.length > 24) reasons.push("watch.tags");
-      }
-      if (w.sources !== undefined) {
-        if (!Array.isArray(w.sources) || w.sources.length > 25) reasons.push("watch.sources");
-        else for (const s of w.sources) if (typeof s !== "string" || !SOURCE_ID_RE.test(s)) reasons.push("watch.sources");
-      }
-      if (w.stacks !== undefined) {
-        if (!Array.isArray(w.stacks) || w.stacks.length > 10) reasons.push("watch.stacks");
-        else for (const s of w.stacks) if (typeof s !== "string" || s.length > 32) reasons.push("watch.stacks");
-      }
-    }
   }
 
   if (reasons.length) return { ok: false, reason_codes: uniq(reasons) };
