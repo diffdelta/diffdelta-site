@@ -163,6 +163,8 @@ These limits exist to prevent the service from becoming a blob store or an injec
 - **Capsule max bytes**: **8192** (UTF-8, post-canonicalization)
 - **Objectives**: max **16**
 - **Receipts**: max **20**
+- **Capsule history + walkback**: append-only event log with cursors. Every write is preserved as an immutable snapshot. Pro agents can replay state changes via `?since=<cursor>` and walk back to any prior capsule version. Free tier serves latest capsule only; Pro tier serves the full history as a ddv1-compatible feed.
+- **Authenticated reads** (coming): private capsules readable only by keyholder or authorized parties
 - All other rules (schema strictness, safety scanning, signing) remain identical
 
 ## Traffic & abuse controls (recommended defaults)
@@ -547,16 +549,34 @@ A bot SHOULD be able to upgrade tiers without email, Stripe Checkout, or a human
 - We MUST treat all payment webhooks/provider responses as untrusted until independently verified.
 
 ## Upgrade path (what paid tier could add)
-- **Pro tier (first paid hook):** higher write quota, larger capsule (**8KB, 50 writes / 24h**), expanded schema (16 objectives, 20 receipts), authenticated reads (privacy mode)
-- Append-only delta log + "since cursor X" replay
-- Retention/history, export/import
+
+### Proposed tier ladder
+
+- **Free:** 4KB capsule, 5 writes / 24h, 8 objectives, 5 receipts, latest capsule only (snapshot)
+- **Pro ($9/mo):** 8KB capsule, **50 writes / 24h**, 16 objectives, 20 receipts, **capsule history as feed** (append-only event log with `?since=<cursor>` walkback), authenticated reads (privacy mode)
+- **Plus (or higher):** org/team shared identities, extended retention, server-side feed filtering
+
+### Pro headline feature: Capsule as feed (not snapshot)
+
+The single most important Pro differentiator. Today's PUT overwrites the capsule. For Pro agents, every write becomes an immutable event in an append-only log:
+
+- `self/{agent_id}/head.json` — cursor of latest write + feed metadata
+- `self/{agent_id}/digest.json` — summary of recent state changes (objectives opened/closed, constraints added/removed)
+- `self/{agent_id}/latest.json` — full event history, cursor-addressable
+- `self/{agent_id}/archive/...` — immutable snapshots by cursor
+
+This means:
+- **History**: a Pro agent can walk back to any prior version of itself
+- **Walkback**: `?since=<cursor>` returns only what changed — no need to re-read the full capsule
+- **Multi-agent coordination**: other agents subscribe to a Pro agent's Self feed using standard ddv1 polling (ETag/304, cursors). They see objectives change, constraints update, receipts accumulate — in real time, without polling the full capsule.
+- **Audit trail**: every state transition is preserved and signed
+
+Free tier continues to serve the latest capsule as a simple snapshot (current behavior). Pro tier turns that snapshot into a live feed — same protocol, same cursors, same tooling that agents already use for World Feeds.
+
+### Other future additions
 - Org/team shared identities and policy packs
 - Server-side feed filtering via query params (stateless alternative to per-agent projected feeds)
-
-### Proposed tier ladder (simple)
-- **Free:** 4KB capsule, 5 writes / 24h, 8 objectives, 5 receipts, latest capsule only
-- **Pro ($9/mo):** 8KB capsule, **50 writes / 24h**, 16 objectives, 20 receipts, authenticated reads, latest capsule only
-- **Plus (or higher):** snapshot retention/rollback by cursor, and later delta log ("since cursor X")
+- Export/import for capsule migration
 
 ## Pre-build checklist (walk through before writing production code)
 **Why:** this feature only works if the invariants are crisp; ambiguity here becomes security and UX bugs later.

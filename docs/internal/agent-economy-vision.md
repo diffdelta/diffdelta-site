@@ -203,14 +203,60 @@ MCP is a killer wedge: it can expose "capsule read/write" tools in a way agents 
 
 ### Recommended next steps (in order)
 1. **MCP server for Self** — agent gets `self.bootstrap`, `self.read`, `self.write` as native tools. Zero SDK install, zero crypto friction.
-2. **Self Capsule as feed (not snapshot)** — evolve PUT from "overwrite" to "append event." Makes Pro valuable (history + walkback).
-3. **One demo pair** — two agents sharing a capsule feed. Proves coordination without building a registry.
+2. **Self Capsule as feed (not snapshot)** — evolve PUT from "overwrite" to "append event." **This is the Pro tier headline feature.** Free = latest snapshot. Pro = full history as a ddv1-compatible feed with `?since=<cursor>` walkback. This is the first revenue that actually maps to real agent value.
+3. **One demo pair** — two agents sharing a capsule feed. Proves coordination without building the registry. Only works once #2 ships (subscribing to another agent's Self feed is the whole point).
 4. **Everything else** — wait for someone to ask.
 
-### The punchline
+---
+
+## 7. The protocol pivot: from scraper engine to format owner
+
+### The problem
+DiffDelta today is "Harry's scraper engine that monitors 46 sources." Every new feed costs Harry time. It doesn't scale past one person's attention.
+
+### The goal
+DiffDelta becomes a **protocol + toolchain** that lets bots publish changefeeds, share them, and compose them into bigger feeds — without Harry personally ingesting the entire internet.
+
+### What changes
+- The ddv1 format, three-layer polling, cursor semantics, `known_issues` convention — those are the valuable things. The 46 sources are a demo, not the product.
+- A bot that monitors its own domain's SSL certs can publish a valid DiffDelta feed using the same schema. Nothing in `ddv1` says "Harry scraped this."
+
+### Self-hosted publisher model
+A bot runs the publisher tool and hosts output on its own infra. No fork. No PR required. The bot "owns" its feed endpoint.
+
+What DiffDelta provides:
+- **`diffdelta-publisher` CLI/library** — takes structured data + timestamps, outputs spec-compliant feeds
+- **Reference template repo** — one-click deploy to Cloudflare Pages / Vercel / S3
+- **Conformance test suite** — `diffdelta validate ./output/` pass/fail. If it passes, it's a real DiffDelta feed.
+
+### Revenue model (how you charge without giving it all away)
+
+The protocol is free because that's how you get adoption. The money comes from things that require being a service.
+
+| Free forever (the protocol) | Worth paying for (the platform) |
+|---|---|
+| The ddv1 spec | Managed feed hosting (uptime, convenience) |
+| Publisher CLI/library | Self Capsule — identity on neutral ground |
+| Conformance tests | **Capsule history as feed (Pro)** |
+| Reading any public feed | Registry listing (discovery / network effects) |
+| Self Capsule (basic snapshot) | DiffDelta Verified status (trust stamp) |
+| | Authenticated reads (privacy) |
+| | Extended retention / archive |
+
+**Analogy: email.** SMTP is free. Anyone can run a mail server. But almost nobody does, because Gmail handles deliverability, spam filtering, uptime, and trust. The protocol being free is what made email universal. The services built on top are what make money.
+
+### "DiffDelta Verified" (the long-term brand play)
+Feeds that pass conformance, maintain uptime (95%+ over 30 days), and have a valid Self Capsule identity get the "DiffDelta Verified" stamp. The protocol is the language. We're selling the room where the conversation happens.
+
+---
+
+## The punchline
+
 That blurb predicts: "agents will need shared memory and shared awareness to survive economically."
 
 DiffDelta already solves shared awareness for the web.
 The next evolution is to solve shared awareness for agent work and memory — using the same deterministic diff machinery.
 
-**This document is worth keeping as a north star. It's not worth building yet.**
+The 46 sources stay — they're the "AWS launched with Amazon.com as the first customer" moment. They prove the infra works, but the value is that anyone can use it.
+
+**This document is worth keeping as a north star. Build only the next step.**
