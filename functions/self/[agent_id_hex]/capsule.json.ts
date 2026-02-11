@@ -37,13 +37,15 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
   // Return the last-known-good capsule only (no secrets, strictly typed).
   const res = jsonResponse(stored.capsule);
-  const etag = `"${stored.cursor}"`;
+  const cursorHex = stored.cursor.startsWith("sha256:") ? stored.cursor.slice("sha256:".length) : stored.cursor;
+  const etag = `"${cursorHex}"`;
   res.headers.set("ETag", etag);
   const inmRaw = request.headers.get("If-None-Match");
   const inm = inmRaw
     ? inmRaw.replace(/^W\//, "").replace(/^"|"$/g, "")
     : null;
-  if (inm && inm === stored.cursor) {
+  const inmToken = inm && inm.startsWith("sha256:") ? inm.slice("sha256:".length) : inm;
+  if (inmToken && inmToken === cursorHex) {
     return new Response(null, { status: 304, headers: res.headers });
   }
   return res;
