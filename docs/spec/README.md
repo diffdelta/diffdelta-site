@@ -43,6 +43,11 @@ Both reference clients implement the same polling loop:
 2. `fetchLatest(url)` — full feed fetch (only when head says changed)
 3. `walkBack(sourceId, limit)` — traverse archive history via `prev_cursor`
 
+### Self Capsule (Reference Clients)
+
+- TypeScript (Node): `clients/typescript/selfCapsuleClient.ts`
+- Python: `clients/python/self_capsule_client.py` (requires `cryptography` for Ed25519)
+
 ## Pre-Built Recipes
 
 The Python repo includes copy-paste-ready integrations:

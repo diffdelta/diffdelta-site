@@ -13,6 +13,7 @@ export interface Env {
   KEYS: KVNamespace;          // API keys (hashed) → KeyData
   RATE_LIMITS: KVNamespace;   // Rate limit counters (ephemeral, TTL-based)
   SESSIONS: KVNamespace;      // Stripe sessions, magic link tokens, auth sessions
+  SELF: KVNamespace;          // Self Capsule state (capsules, cursors, seq, quotas)
 
   // ── Secrets (set in Cloudflare Pages > Settings > Environment variables) ──
   STRIPE_SECRET_KEY: string;

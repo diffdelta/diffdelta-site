@@ -7,8 +7,8 @@ import type { RateLimitResult } from "./types";
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "X-DiffDelta-Key, X-Moltbook-Identity, Content-Type",
-  "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "X-DiffDelta-Key, X-Moltbook-Identity, Content-Type, If-None-Match",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
 };
 
 /**

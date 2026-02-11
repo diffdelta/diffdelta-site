@@ -23,9 +23,16 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   // /diff/ and /archive/ are static JSON on CDN — let Cloudflare cache them
   // directly (cf-cache-status: HIT) without burning Function invocations.
   // Only /api/ and /stripe/ need auth, rate limiting, or signature checks.
+  const isSelf = path.startsWith("/self/");
+  const isSelfRead = isSelf && (request.method === "GET" || request.method === "HEAD");
+
+  // Cost control: /self GET/HEAD can be extremely high volume. We intentionally
+  // skip KV-based rate limiting/auth for reads and rely on cache + ETag + (in prod)
+  // edge/WAF rate limits. Writes still go through middleware.
   const needsMiddleware =
     path.startsWith("/api/") ||
-    path.startsWith("/stripe/");
+    path.startsWith("/stripe/") ||
+    (isSelf && !isSelfRead);
 
   if (!needsMiddleware) {
     return next();
@@ -82,6 +89,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       path === "/api/v1/checkout" ||
       path === "/api/v1/source-request" ||
       path.startsWith("/api/v1/key/claim") ||
+      path.startsWith("/api/v1/self/") ||  // Self Capsule public bootstrap/upgrade endpoints (their own validation)
       path.startsWith("/api/v1/auth/") ||  // Magic link auth endpoints (own validation)
       path.startsWith("/api/v1/admin/");   // Admin endpoints use their own auth
 
