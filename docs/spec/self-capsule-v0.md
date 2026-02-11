@@ -378,6 +378,7 @@ Additional fields MAY be included (e.g. `findings`, `max_bytes`, `observed_bytes
 | `unknown_field` | 422 | Capsule contains fields outside the v0 allowlist. | Remove fields; retry once fixed. |
 | `schema_version` | 422 | `schema_version` is missing/incorrect. | Fix client; retry once fixed. |
 | `agent_id` | 422 | Capsule `agent_id` missing/invalid (server enforces path truth). | Fix client; retry once fixed. |
+| `agent_id_mismatch` | 400 | Capsule's internal `agent_id` does not match URL path `agent_id`. | Fix capsule to use the same `agent_id` returned by bootstrap. |
 | `policy` / `policy_version` / `rehydrate_mode` / `memory_budget` / `max_rehydrate_tokens` / `max_objectives` | 422 | Policy block invalid or out of bounds. | Fix capsule; retry once fixed. |
 | `constraints` / `constraint_*` | 422 | Constraints invalid/out of bounds. | Fix capsule; retry once fixed. |
 | `objectives` / `objective_*` | 422 | Objectives invalid/out of bounds. | Fix capsule; retry once fixed. |

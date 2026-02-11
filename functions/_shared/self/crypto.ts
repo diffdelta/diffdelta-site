@@ -51,6 +51,11 @@ export async function verifyEd25519Envelope(env: SignedCapsuleEnvelope): Promise
     throw new Error("Unsupported signature_alg (v0: ed25519 only)");
   }
 
+  // Guard: required envelope fields must be present and be strings.
+  if (typeof env.public_key !== "string") throw new Error("Missing public_key");
+  if (typeof env.signature !== "string") throw new Error("Missing signature");
+  if (env.capsule === undefined || env.capsule === null) throw new Error("Missing capsule");
+
   const agentIdHex = parseAgentIdHex(env.agent_id);
 
   // public_key: require 32-byte hex for v0

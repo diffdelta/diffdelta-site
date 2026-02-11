@@ -118,11 +118,15 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     headers.set("X-DiffDelta-Tier", auth.tier);
   }
 
-  // Ensure CORS headers are present
+  // Ensure CORS headers are present (must match response.ts)
   headers.set("Access-Control-Allow-Origin", "*");
   headers.set(
     "Access-Control-Allow-Headers",
-    "X-DiffDelta-Key, X-Moltbook-Identity, Content-Type"
+    "X-DiffDelta-Key, X-Moltbook-Identity, Content-Type, If-None-Match"
+  );
+  headers.set(
+    "Access-Control-Expose-Headers",
+    "ETag, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset"
   );
 
   return new Response(response.body, {

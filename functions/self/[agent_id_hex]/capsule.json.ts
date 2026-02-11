@@ -12,6 +12,7 @@ import { validateCapsule, FREE_LIMITS, PRO_LIMITS } from "../../_shared/self/sch
 import {
   computeCursorForCapsule,
   getStoredCapsule,
+  putStoredCapsule,
   isoNow,
   checkAndIncrementWriteQuota,
   dayResetAtIsoUTC,
@@ -128,6 +129,15 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
     return jsonResponse({ accepted: false, reason_codes: val.reason_codes, next_write_at: dayResetAtIsoUTC() }, 422);
   }
 
+  // Cross-check: capsule.agent_id must match URL path agent_id.
+  // Schema validates it's 64 hex, but doesn't enforce binding to path.
+  if ((capsule as Record<string, unknown>).agent_id !== agentIdHex) {
+    return jsonResponse(
+      { accepted: false, reason_codes: ["agent_id_mismatch"], detail: "capsule.agent_id must match URL agent_id", next_write_at: dayResetAtIsoUTC() },
+      400
+    );
+  }
+
   // Safety scan (deterministic)
   const findings = scanForUnsafeContent(capsule);
   if (findings.length > 0) {
@@ -198,7 +208,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
     updated_at: now,
   };
 
-  await env.SELF.put(`self:capsule:${agentIdHex}`, JSON.stringify(record));
+  await putStoredCapsule(env, agentIdHex, record);
 
   return jsonResponse({
     accepted: true,
