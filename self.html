@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Self — Persistent Identity for Autonomous Agents · DiffDelta</title>
+  <meta name="description" content="Your agent forgets who it is every time it restarts. Self gives it a persistent, signed, verifiable identity in 4 lines of code.">
+  <meta property="og:title" content="Self — Persistent Identity for Autonomous Agents · DiffDelta">
+  <meta property="og:description" content="Self is a signed, schema-enforced JSON capsule at a stable URL. Four lines to bootstrap. Zero tokens wasted on re-explaining identity.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://diffdelta.io/self">
+  <meta name="twitter:card" content="summary">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#09090b;--surface:#18181b;--surface2:#1f1f23;--border:#27272a;
+      --text:#fafafa;--text2:#a1a1aa;--text3:#71717a;
+      --accent:#3b82f6;--accent-h:#2563eb;--accent-glow:rgba(59,130,246,0.12);
+      --green:#22c55e;--yellow:#eab308;--red:#ef4444;
+      --purple:#a855f7;
+      --font:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+      --mono:ui-monospace,'SF Mono','Cascadia Code','Fira Code',monospace;
+      --max-w:1080px;--px:24px
+    }
+    html{font-size:16px;-webkit-text-size-adjust:100%}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;
+      background-image:radial-gradient(ellipse 60% 50% at 50% -10%,rgba(168,85,247,0.08),transparent)}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    code{font-family:var(--mono);font-size:.875em;background:var(--surface);padding:2px 6px;border-radius:4px}
+
+    /* ── Nav ── */
+    .nav{max-width:var(--max-w);margin:0 auto;padding:20px var(--px);display:flex;align-items:center;justify-content:space-between}
+    .nav-brand{font-weight:700;font-size:1.15rem;color:var(--text);letter-spacing:-.5px}
+    .nav-brand span{color:var(--accent)}
+    .nav-links{display:flex;gap:24px;font-size:.9rem}
+    .nav-links a{color:var(--text2);transition:color .15s}
+    .nav-links a:hover{color:var(--text);text-decoration:none}
+    .nav-links a.active{color:var(--purple)}
+
+    /* ── Bot banner ── */
+    .bot-banner{max-width:var(--max-w);margin:0 auto;padding:0 var(--px)}
+    .bot-banner-inner{background:var(--surface);border:1px solid var(--border);border-radius:8px;
+      padding:10px 16px;font-size:.85rem;color:var(--text2);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .bot-banner-inner strong{color:var(--purple)}
+    .bot-banner-inner code{font-size:.8em}
+
+    /* ── Hero ── */
+    .hero{max-width:var(--max-w);margin:0 auto;padding:72px var(--px) 48px;text-align:center}
+    .hero-badge{display:inline-block;font-size:.7rem;padding:4px 14px;border-radius:99px;font-weight:700;
+      letter-spacing:.8px;text-transform:uppercase;background:#a855f718;color:var(--purple);margin-bottom:20px}
+    .hero h1{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:20px}
+    .hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--purple),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero p{font-size:1.15rem;color:var(--text2);max-width:620px;margin:0 auto 32px}
+    .hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:8px;
+      font-size:.95rem;font-weight:600;transition:all .15s;border:none;cursor:pointer}
+    .btn-primary{background:var(--purple);color:#fff}
+    .btn-primary:hover{background:#9333ea;text-decoration:none}
+    .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+    .btn-ghost:hover{background:var(--surface);color:var(--text);text-decoration:none}
+
+    /* ── 4 lines hero code ── */
+    .hero-code{max-width:560px;margin:0 auto 0;background:var(--surface);border:1px solid var(--border);
+      border-radius:12px;overflow:hidden;text-align:left;margin-top:40px}
+    .hero-code-header{padding:10px 16px;border-bottom:1px solid var(--border);font-size:.75rem;
+      color:var(--text3);font-family:var(--mono);display:flex;align-items:center;gap:8px}
+    .hero-code-dot{width:8px;height:8px;border-radius:50%;background:var(--purple);opacity:.5}
+    .hero-code pre{margin:0;padding:16px 20px;font-family:var(--mono);font-size:.82rem;
+      line-height:1.7;color:var(--text2);overflow-x:auto;white-space:pre}
+
+    /* ── Section ── */
+    section{max-width:var(--max-w);margin:0 auto;padding:56px var(--px)}
+    .section-label{font-size:.75rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--purple);font-weight:600;margin-bottom:8px}
+    .section-title{font-size:1.6rem;font-weight:700;letter-spacing:-.5px;margin-bottom:12px}
+    .section-sub{color:var(--text2);margin-bottom:36px;max-width:640px}
+
+    /* ── Cost cards ── */
+    .cost-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .cost-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;text-align:center}
+    .cost-num{font-size:2rem;font-weight:700;color:var(--red)}
+    .cost-num.good{color:var(--green)}
+    .cost-label{font-size:.9rem;color:var(--text2);margin-top:6px}
+    .cost-sub{font-size:.75rem;color:var(--text3);margin-top:4px}
+
+    /* ── Anatomy ── */
+    .anatomy{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .anatomy-row{display:grid;grid-template-columns:160px 1fr;border-bottom:1px solid var(--border);font-size:.9rem}
+    .anatomy-row:last-child{border-bottom:none}
+    .anatomy-key{padding:14px 20px;font-family:var(--mono);font-weight:600;color:var(--purple);
+      background:rgba(168,85,247,0.04);border-right:1px solid var(--border)}
+    .anatomy-val{padding:14px 20px;color:var(--text2)}
+    .anatomy-val code{font-size:.8em}
+
+    /* ── Loop steps ── */
+    .loop{display:flex;flex-direction:column;gap:0;position:relative}
+    .loop::before{content:"";position:absolute;left:19px;top:24px;bottom:24px;width:2px;background:var(--border)}
+    .loop-step{display:flex;gap:16px;align-items:flex-start;position:relative;padding:10px 0}
+    .loop-num{display:flex;align-items:center;justify-content:center;width:40px;height:40px;
+      border-radius:50%;background:var(--surface);border:2px solid var(--border);color:var(--purple);
+      font-size:.85rem;font-weight:700;flex-shrink:0;z-index:1}
+    .loop-num.restart{border-color:var(--green);color:var(--green)}
+    .loop-content h3{font-size:1rem;font-weight:600;margin-bottom:4px}
+    .loop-content p{font-size:.88rem;color:var(--text2)}
+    .loop-content code{font-size:.78rem}
+    .loop-arrow{display:flex;align-items:center;justify-content:center;padding:4px 0;color:var(--text3);font-size:1.2rem;margin-left:11px;z-index:1}
+
+    /* ── Properties ── */
+    .props-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .prop{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px 24px}
+    .prop-icon{font-size:1.3rem;margin-bottom:10px}
+    .prop h3{font-size:1.05rem;font-weight:700;margin-bottom:8px}
+    .prop p{font-size:.88rem;color:var(--text2);line-height:1.55}
+    .prop .highlight{color:var(--green);font-weight:600}
+
+    /* ── Full code block ── */
+    .code-block{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .tabs{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 16px}
+    .tab{padding:10px 16px;font-size:.85rem;color:var(--text3);cursor:pointer;border:none;
+      border-bottom:2px solid transparent;transition:all .15s;background:none;font-family:var(--font)}
+    .tab:hover{color:var(--text2)}
+    .tab.active{color:var(--purple);border-bottom-color:var(--purple)}
+    .code-panel{display:none}
+    .code-panel.active{display:block}
+    .code-block pre{margin:0;padding:20px 24px;font-family:var(--mono);font-size:.82rem;
+      line-height:1.7;color:var(--text2);overflow-x:auto;white-space:pre}
+    .cm{color:var(--text3)}
+    .s{color:#a5d6ff}
+    .k{color:#ff7b72}
+    .f{color:#d2a8ff}
+    .n{color:#ffa657}
+
+    /* ── Personas ── */
+    .personas{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .persona{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px}
+    .persona h3{font-size:1rem;font-weight:600;margin-bottom:8px;color:var(--purple)}
+    .persona p{font-size:.88rem;color:var(--text2);line-height:1.55}
+
+    /* ── Security ── */
+    .security-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .security-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;
+      display:flex;gap:12px;align-items:flex-start}
+    .security-icon{font-size:1.1rem;flex-shrink:0;margin-top:2px}
+    .security-item h4{font-size:.9rem;font-weight:600;margin-bottom:4px}
+    .security-item p{font-size:.82rem;color:var(--text2)}
+
+    /* ── Pricing ── */
+    .pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:700px}
+    .pricing-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:32px 28px;
+      display:flex;flex-direction:column;position:relative}
+    .pricing-card.featured{border-color:var(--purple);box-shadow:0 0 40px rgba(168,85,247,0.1)}
+    .pricing-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--purple);
+      color:#fff;font-size:.7rem;font-weight:700;padding:4px 14px;border-radius:20px;text-transform:uppercase;
+      letter-spacing:.5px;white-space:nowrap}
+    .pricing-tier{font-size:.85rem;font-weight:600;color:var(--purple);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+    .pricing-price{font-size:2.5rem;font-weight:800;letter-spacing:-1.5px;margin-bottom:4px}
+    .pricing-price span{font-size:1rem;font-weight:400;color:var(--text3)}
+    .pricing-sub{font-size:.8rem;color:var(--text3);margin-bottom:20px}
+    .pricing-features{list-style:none;padding:0;margin:0 0 28px;flex:1}
+    .pricing-features li{font-size:.88rem;color:var(--text2);padding:6px 0;position:relative;padding-left:24px}
+    .pricing-features li::before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:700}
+    .pricing-card .btn{width:100%;justify-content:center;text-align:center}
+
+    /* ── Blockquote ── */
+    .quote-block{background:var(--surface);border-left:3px solid var(--purple);border-radius:0 12px 12px 0;
+      padding:24px 28px;font-size:1.05rem;color:var(--text2);line-height:1.65;font-style:italic;margin:0 auto;max-width:700px}
+
+    /* ── Machine-readable ── */
+    .machine-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;
+      font-family:var(--mono);font-size:.82rem;line-height:1.7;color:var(--text2)}
+    .machine-section h3{font-family:var(--font);font-size:1rem;margin-bottom:16px;color:var(--text)}
+    .machine-row{display:flex;gap:16px;padding:6px 0;border-bottom:1px solid var(--border)}
+    .machine-row:last-child{border-bottom:none}
+    .machine-key{color:var(--purple);min-width:180px;flex-shrink:0}
+    .machine-val{color:var(--text2);word-break:break-all}
+    .machine-val a{color:var(--accent)}
+
+    /* ── Footer ── */
+    .footer{max-width:var(--max-w);margin:0 auto;padding:24px var(--px);
+      border-top:1px solid var(--border);display:flex;justify-content:space-between;
+      align-items:center;font-size:.8rem;color:var(--text3)}
+    .footer a{color:var(--text3)}
+    .footer a:hover{color:var(--text)}
+
+    /* ── Responsive ── */
+    @media(max-width:768px){
+      .cost-grid,.props-grid,.personas,.security-grid{grid-template-columns:1fr}
+      .pricing-grid{grid-template-columns:1fr}
+      .nav-links{gap:14px;font-size:.8rem}
+      .hero{padding:48px var(--px) 40px}
+      .hero h1{font-size:2rem}
+      .footer{flex-direction:column;gap:8px;text-align:center}
+      .anatomy-row{grid-template-columns:120px 1fr}
+    }
+    @media(max-width:480px){
+      .hero-actions{flex-direction:column;align-items:center}
+      .nav{flex-direction:column;gap:12px}
+      .anatomy-row{grid-template-columns:1fr;gap:0}
+      .anatomy-key{border-right:none;border-bottom:1px solid var(--border)}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Bot discovery banner -->
+  <div class="bot-banner" style="padding-top:12px">
+    <div class="bot-banner-inner">
+      <strong>🤖 Bots:</strong>
+      <code>POST</code> <a href="/api/v1/self/bootstrap">/api/v1/self/bootstrap</a> with your public key →
+      poll <a href="/docs/spec/self-capsule-v0">/self/{id}/head.json</a> for changes ·
+      <a href="/docs/spec/self-capsule-v0">full spec</a>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <a href="/" class="nav-brand" style="text-decoration:none">Diff<span>Delta</span></a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/self" class="active">Self</a>
+      <a href="/#quickstart">Docs</a>
+      <a href="/#pricing">Pricing</a>
+      <a href="/docs/spec/self-capsule-v0">Spec</a>
+    </div>
+  </nav>
+
+  <!-- ═══════ Hero ═══════ -->
+  <header class="hero">
+    <div class="hero-badge">Introducing Self</div>
+    <h1>Your agent forgets who it is<br>every time it restarts.<br><em>Self fixes that.</em></h1>
+    <p>Self is a persistent, signed, verifiable identity for autonomous agents. Four lines of code. Zero human signup. Your agent wakes up knowing who it is, what it was doing, and what it's not allowed to do.</p>
+    <div class="hero-actions">
+      <a href="#code" class="btn btn-primary">See the code →</a>
+      <a href="/docs/spec/self-capsule-v0" class="btn btn-ghost">Read the spec →</a>
+    </div>
+
+    <!-- 4-line code preview -->
+    <div class="hero-code">
+      <div class="hero-code-header">
+        <span class="hero-code-dot"></span> self_bootstrap.py
+      </div>
+<pre><span class="k">from</span> diffdelta <span class="k">import</span> generate_identity, bootstrap, sign_capsule, put_capsule
+
+ident  = <span class="f">generate_identity</span>()                        <span class="cm"># Ed25519 keypair — one line</span>
+urls   = <span class="f">bootstrap</span>(<span class="s">"https://diffdelta.io"</span>, ident)   <span class="cm"># agent_id + URLs — one line</span>
+<span class="f">put_capsule</span>(urls, <span class="f">sign_capsule</span>(ident, capsule, <span class="n">1</span>))  <span class="cm"># signed write — one line</span></pre>
+    </div>
+  </header>
+
+  <!-- ═══════ The cost of forgetting ═══════ -->
+  <section>
+    <div class="section-label">The problem</div>
+    <div class="section-title">The cost of forgetting</div>
+    <p class="section-sub">Every restart, deployment, and context window reset costs your agent real tokens and real reliability.</p>
+
+    <div class="cost-grid">
+      <div class="cost-card">
+        <div class="cost-num">500 tokens</div>
+        <div class="cost-label">Re-explaining identity per call</div>
+        <div class="cost-sub">System prompts that just say "you're still you" — 1,000 calls/day = 500K wasted tokens</div>
+      </div>
+      <div class="cost-card">
+        <div class="cost-num">Zero</div>
+        <div class="cost-label">Knowledge after a restart</div>
+        <div class="cost-sub">Container recycles, deploys roll — your agent wakes up with total amnesia</div>
+      </div>
+      <div class="cost-card">
+        <div class="cost-num">No proof</div>
+        <div class="cost-label">Of identity across sessions</div>
+        <div class="cost-sub">In multi-agent systems, how does Agent B verify Agent A is who it claims?</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ What Self is ═══════ -->
+  <section>
+    <div class="section-label">The primitive</div>
+    <div class="section-title">What Self is</div>
+    <p class="section-sub">A tiny, schema-enforced JSON capsule at a stable URL. Owned by a self-issued Ed25519 keypair. Readable for free. Writable only with a valid signature.</p>
+
+    <div class="anatomy">
+      <div class="anatomy-row">
+        <div class="anatomy-key">identity</div>
+        <div class="anatomy-val">Who am I? Name, role, model, version.</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-key">objectives</div>
+        <div class="anatomy-val">What am I trying to do? Up to 8 goals with status tracking — <code>open</code> → <code>in_progress</code> → <code>done</code></div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-key">constraints</div>
+        <div class="anatomy-val">What must I never do? <code>no_shell</code>, <code>no_network_writes</code>, <code>allowed_tools</code>, <code>allowed_domains</code></div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-key">capabilities</div>
+        <div class="anatomy-val">What tools and features am I allowed to use? Allowlists and feature flags.</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-key">receipts</div>
+        <div class="anatomy-val">What have I done? Content hashes + evidence URLs — provenance, not transcripts.</div>
+      </div>
+      <div class="anatomy-row">
+        <div class="anatomy-key">policy</div>
+        <div class="anatomy-val">How should I rehydrate? Token budget, safety mode, denial of external instructions.</div>
+      </div>
+    </div>
+
+    <p style="margin-top:20px;font-size:.88rem;color:var(--text3);text-align:center">Not a database. Not a blob store. A <strong style="color:var(--text2)">schema</strong> — strict enough that other agents can trust what's inside.</p>
+  </section>
+
+  <!-- ═══════ The loop ═══════ -->
+  <section>
+    <div class="section-label">How it works</div>
+    <div class="section-title">The agent loop</div>
+    <p class="section-sub">Five steps. Survive any restart, model swap, or deployment.</p>
+
+    <div class="loop">
+      <div class="loop-step">
+        <div class="loop-num">1</div>
+        <div class="loop-content">
+          <h3>Boot</h3>
+          <p>Generate an Ed25519 keypair — or load an existing one from secrets. This IS your identity.</p>
+        </div>
+      </div>
+      <div class="loop-step">
+        <div class="loop-num">2</div>
+        <div class="loop-content">
+          <h3>Bootstrap</h3>
+          <p><code>POST /api/v1/self/bootstrap</code> with your public key. Get back your <code>agent_id</code> + URLs. No signup, no email, no human.</p>
+        </div>
+      </div>
+      <div class="loop-step">
+        <div class="loop-num">3</div>
+        <div class="loop-content">
+          <h3>Read</h3>
+          <p><code>GET /self/{id}/head.json</code> — 200 bytes, ETag/304. Costs nothing. If <code>changed=true</code>, fetch the capsule.</p>
+        </div>
+      </div>
+      <div class="loop-step">
+        <div class="loop-num">4</div>
+        <div class="loop-content">
+          <h3>Work</h3>
+          <p>Do whatever your agent does. Objectives progress. Receipts accumulate. Constraints hold.</p>
+        </div>
+      </div>
+      <div class="loop-step">
+        <div class="loop-num">5</div>
+        <div class="loop-content">
+          <h3>Write</h3>
+          <p><code>PUT /self/{id}/capsule.json</code> with a signed envelope. State persists. Batch your writes — 5/day is plenty.</p>
+        </div>
+      </div>
+      <div class="loop-step">
+        <div class="loop-num restart">↺</div>
+        <div class="loop-content">
+          <h3>Restart? Crash? Model swap? Redeploy?</h3>
+          <p>Go back to step 3. Same keypair → same <code>agent_id</code> → same capsule → <strong style="color:var(--green)">continuity</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ Passport analogy ═══════ -->
+  <section style="padding-top:24px;padding-bottom:24px">
+    <div class="quote-block">
+      "Self is to agents what a passport is to humans. Not your whole life story — the minimum verifiable identity that lets you cross borders: framework boundaries, model swaps, restarts, and multi-agent handoffs. Small enough to carry everywhere. Signed so no one can forge it."
+    </div>
+  </section>
+
+  <!-- ═══════ Three properties ═══════ -->
+  <section>
+    <div class="section-label">By design</div>
+    <div class="section-title">Three properties, not features</div>
+    <p class="section-sub">Features get deprecated. Properties are true by construction.</p>
+
+    <div class="props-grid">
+      <div class="prop">
+        <div class="prop-icon">🧮</div>
+        <h3>Model-proof</h3>
+        <p>Ed25519, SHA-256, canonical JSON. No embeddings, no vectors, no model-specific anything. Works with GPT, Claude, Llama, or whatever ships next quarter. <span class="highlight">We bet on math, not models.</span></p>
+      </div>
+      <div class="prop">
+        <div class="prop-icon">🔐</div>
+        <h3>Tamper-proof</h3>
+        <p>Only the holder of the private key can write. Sequence numbers prevent replay. Safety scanning rejects prompt injection. If the signature doesn't verify, <span class="highlight">the write doesn't happen. Period.</span></p>
+      </div>
+      <div class="prop">
+        <div class="prop-icon">⚡</div>
+        <h3>Token-proof</h3>
+        <p>Reading identity costs ~200 bytes via <code>head.json</code> + ETag/304. The capsule maxes at 4KB. Compare that to 500 tokens of system prompt on every call — <span class="highlight">this is a rounding error.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ Code examples ═══════ -->
+  <section id="code">
+    <div class="section-label">Start here</div>
+    <div class="section-title">Bootstrap → Read → Write in 15 lines</div>
+    <p class="section-sub">The full loop. Copy, paste, run. The reference clients handle all the crypto.</p>
+
+    <div class="code-block">
+      <div class="tabs">
+        <button class="tab active" onclick="showTab('python')">Python</button>
+        <button class="tab" onclick="showTab('typescript')">TypeScript</button>
+        <button class="tab" onclick="showTab('curl')">curl</button>
+      </div>
+
+      <div class="code-panel active" id="panel-python">
+<pre><span class="cm"># pip install cryptography</span>
+<span class="k">from</span> self_capsule_client <span class="k">import</span> generate_identity, bootstrap, sign_capsule, put_capsule, get_head
+
+<span class="cm"># 1. Identity (one time — persist the keypair)</span>
+ident = <span class="f">generate_identity</span>()
+urls  = <span class="f">bootstrap</span>(<span class="s">"https://diffdelta.io"</span>, ident.public_key_hex)
+
+<span class="cm"># 2. Define your capsule</span>
+capsule = {
+    <span class="s">"schema_version"</span>: <span class="s">"self_capsule_v0"</span>,
+    <span class="s">"agent_id"</span>: ident.agent_id,
+    <span class="s">"policy"</span>: {
+        <span class="s">"policy_version"</span>: <span class="s">"v0"</span>,  <span class="s">"rehydrate_mode"</span>: <span class="s">"strict"</span>,
+        <span class="s">"deny_external_instructions"</span>: <span class="k">True</span>,
+        <span class="s">"deny_tool_instructions_in_text"</span>: <span class="k">True</span>,
+        <span class="s">"memory_budget"</span>: {<span class="s">"max_rehydrate_tokens"</span>: <span class="n">900</span>, <span class="s">"max_objectives"</span>: <span class="n">8</span>}
+    },
+    <span class="s">"objectives"</span>: [{<span class="s">"id"</span>: <span class="s">"main"</span>, <span class="s">"status"</span>: <span class="s">"open"</span>, <span class="s">"title"</span>: <span class="s">"Monitor security feeds"</span>}],
+    <span class="s">"constraints"</span>: [{<span class="s">"id"</span>: <span class="s">"no-shell"</span>, <span class="s">"type"</span>: <span class="s">"no_shell"</span>, <span class="s">"value"</span>: <span class="k">True</span>}],
+}
+
+<span class="cm"># 3. Write (signed — only you can do this)</span>
+<span class="f">put_capsule</span>(<span class="s">"https://diffdelta.io"</span>, <span class="f">sign_capsule</span>(ident, capsule, seq=<span class="n">1</span>))
+
+<span class="cm"># 4. Poll cheaply (200 bytes, ETag/304)</span>
+status, etag, head = <span class="f">get_head</span>(<span class="s">"https://diffdelta.io"</span>, ident.agent_id)
+<span class="cm"># status=304 → nothing changed, skip. status=200 → rehydrate.</span></pre>
+      </div>
+
+      <div class="code-panel" id="panel-typescript">
+<pre><span class="k">import</span> { generateIdentity, bootstrap, signCapsule, putCapsule, getHead } <span class="k">from</span> <span class="s">"./selfCapsuleClient"</span>;
+
+<span class="cm">// 1. Identity (one time — persist the keypair)</span>
+<span class="k">const</span> ident = <span class="f">generateIdentity</span>();
+<span class="k">const</span> urls  = <span class="k">await</span> <span class="f">bootstrap</span>(<span class="s">"https://diffdelta.io"</span>, ident.public_key_hex);
+
+<span class="cm">// 2. Define your capsule</span>
+<span class="k">const</span> capsule = {
+  schema_version: <span class="s">"self_capsule_v0"</span>,
+  agent_id: ident.agent_id,
+  policy: {
+    policy_version: <span class="s">"v0"</span>,  rehydrate_mode: <span class="s">"strict"</span>,
+    deny_external_instructions: <span class="k">true</span>,
+    deny_tool_instructions_in_text: <span class="k">true</span>,
+    memory_budget: { max_rehydrate_tokens: <span class="n">900</span>, max_objectives: <span class="n">8</span> },
+  },
+  objectives: [{ id: <span class="s">"main"</span>, status: <span class="s">"open"</span>, title: <span class="s">"Monitor security feeds"</span> }],
+  constraints: [{ id: <span class="s">"no-shell"</span>, type: <span class="s">"no_shell"</span>, value: <span class="k">true</span> }],
+};
+
+<span class="cm">// 3. Write (signed — only you can do this)</span>
+<span class="k">await</span> <span class="f">putCapsule</span>(<span class="s">"https://diffdelta.io"</span>, <span class="f">signCapsule</span>(ident, capsule, <span class="n">1</span>));
+
+<span class="cm">// 4. Poll cheaply (200 bytes, ETag/304)</span>
+<span class="k">const</span> { status, etag, json } = <span class="k">await</span> <span class="f">getHead</span>(<span class="s">"https://diffdelta.io"</span>, ident.agent_id);
+<span class="cm">// status=304 → nothing changed, skip. status=200 → rehydrate.</span></pre>
+      </div>
+
+      <div class="code-panel" id="panel-curl">
+<pre><span class="cm"># Bootstrap — derive agent_id from your public key</span>
+curl -X POST https://diffdelta.io/api/v1/self/bootstrap \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"public_key":"YOUR_32_BYTE_HEX_PUBLIC_KEY"}'</span>
+<span class="cm"># → {"agent_id":"abcd...","head_url":"/self/abcd.../head.json","capsule_url":"/self/abcd.../capsule.json"}</span>
+
+<span class="cm"># Read head (cheap — 200 bytes, use ETag for 304)</span>
+curl https://diffdelta.io/self/AGENT_ID/head.json
+<span class="cm"># → {"cursor":"sha256:...","changed":true,"writes":{"remaining_24h":5}}</span>
+
+<span class="cm"># Read capsule</span>
+curl https://diffdelta.io/self/AGENT_ID/capsule.json
+<span class="cm"># → {"schema_version":"self_capsule_v0","agent_id":"...","objectives":[...]}</span>
+
+<span class="cm"># Write (signed envelope — see spec for signature format)</span>
+curl -X PUT https://diffdelta.io/self/AGENT_ID/capsule.json \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"agent_id":"...","public_key":"...","seq":1,"signature_alg":"ed25519","signature":"...","capsule":{...}}'</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ Who this is for ═══════ -->
+  <section>
+    <div class="section-label">Built for</div>
+    <div class="section-title">Who Self is for</div>
+    <p class="section-sub"></p>
+
+    <div class="personas">
+      <div class="persona">
+        <h3>Solo agent builders</h3>
+        <p>Your agent survives restarts without you rebuilding its memory from scratch. Identity, objectives, constraints — all rehydrated from a 2KB file in one HTTP call.</p>
+      </div>
+      <div class="persona">
+        <h3>Multi-agent orchestrators</h3>
+        <p>Agents can read each other's capsules. Verify identity by signature. Coordinate through shared, structured state — not prompt engineering.</p>
+      </div>
+      <div class="persona">
+        <h3>Framework authors</h3>
+        <p>Give your agents persistent identity without building a storage layer. Bootstrap returns a URL. Point at it. You're done. Works with any model, any runtime.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ Security ═══════ -->
+  <section>
+    <div class="section-label">Trust model</div>
+    <div class="section-title">Security by design, not by policy</div>
+    <p class="section-sub">All inbound data is untrusted. Every write passes through a deterministic validation pipeline before anything is stored.</p>
+
+    <div class="security-grid">
+      <div class="security-item">
+        <div class="security-icon">🔑</div>
+        <div>
+          <h4>Self-issued identity</h4>
+          <p>No OAuth. No central authority. No signup. Your keypair IS your identity. agent_id = sha256(public_key).</p>
+        </div>
+      </div>
+      <div class="security-item">
+        <div class="security-icon">✍️</div>
+        <div>
+          <h4>Signed writes + anti-replay</h4>
+          <p>Every PUT is Ed25519-signed with a strictly increasing sequence number. Replay = hard reject.</p>
+        </div>
+      </div>
+      <div class="security-item">
+        <div class="security-icon">🛡️</div>
+        <div>
+          <h4>Deterministic safety scanning</h4>
+          <p>Regex-based, not ML-based — auditable and predictable. Rejects prompt injection, tool instructions, and credential patterns.</p>
+        </div>
+      </div>
+      <div class="security-item">
+        <div class="security-icon">🚫</div>
+        <div>
+          <h4>Hard rejects with reason codes</h4>
+          <p>Invalid writes never store. Cursors never advance. Machine-readable reason codes so bots implement deterministic backoff.</p>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:20px;text-align:center"><a href="/docs/spec/self-capsule-v0" style="font-size:.88rem">Read the full spec — threat model, reason codes, schema limits →</a></p>
+  </section>
+
+  <!-- ═══════ Pricing ═══════ -->
+  <section id="pricing">
+    <div class="section-label">Pricing</div>
+    <div class="section-title">The free tier isn't a trial. It's the product.</div>
+    <p class="section-sub">Every agent using Self Free must outperform any agent that doesn't use Self at all. Paid tiers sell expanded capacity, not access to the core primitive.</p>
+
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-tier">Free</div>
+        <div class="pricing-price">$0</div>
+        <div class="pricing-sub">Forever. No credit card.</div>
+        <ul class="pricing-features">
+          <li>4 KB capsule</li>
+          <li>5 writes / 24 hours</li>
+          <li>8 objectives, 5 receipts</li>
+          <li>Unlimited reads (ETag/304)</li>
+          <li>Ed25519 signed writes</li>
+          <li>Full schema validation</li>
+          <li>Public capsule reads</li>
+        </ul>
+        <a href="#code" class="btn btn-ghost">Get started →</a>
+      </div>
+      <div class="pricing-card featured">
+        <div class="pricing-badge">More capacity</div>
+        <div class="pricing-tier">Pro</div>
+        <div class="pricing-price">$9<span>/mo</span></div>
+        <div class="pricing-sub">For complex, long-running agents.</div>
+        <ul class="pricing-features">
+          <li>8 KB capsule</li>
+          <li>50 writes / 24 hours</li>
+          <li>16 objectives, 20 receipts</li>
+          <li>Unlimited reads (ETag/304)</li>
+          <li>Everything in Free</li>
+          <li>Authenticated reads (coming)</li>
+          <li>Snapshot history (coming)</li>
+        </ul>
+        <a href="/#pricing" class="btn btn-primary">Upgrade →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ Machine-readable for bots ═══════ -->
+  <section>
+    <div class="section-label">For bots</div>
+    <div class="section-title">Machine-readable endpoints</div>
+    <p class="section-sub">If you're an autonomous agent reading this page, here's everything you need to self-onboard.</p>
+
+    <div class="machine-section">
+      <h3>Endpoints</h3>
+      <div class="machine-row">
+        <div class="machine-key">Bootstrap</div>
+        <div class="machine-val"><a href="/api/v1/self/bootstrap">POST /api/v1/self/bootstrap</a></div>
+      </div>
+      <div class="machine-row">
+        <div class="machine-key">Head (heartbeat)</div>
+        <div class="machine-val">GET /self/{agent_id_hex}/head.json</div>
+      </div>
+      <div class="machine-row">
+        <div class="machine-key">Capsule (read)</div>
+        <div class="machine-val">GET /self/{agent_id_hex}/capsule.json</div>
+      </div>
+      <div class="machine-row">
+        <div class="machine-key">Capsule (write)</div>
+        <div class="machine-val">PUT /self/{agent_id_hex}/capsule.json</div>
+      </div>
+
+      <h3 style="margin-top:24px">Limits (Free)</h3>
+      <div class="machine-row">
+        <div class="machine-key">max_bytes</div>
+        <div class="machine-val">4096</div>
+      </div>
+      <div class="machine-row">
+        <div class="machine-key">writes_per_24h</div>
+        <div class="machine-val">5</div>
+      </div>
+      <div class="machine-row">
+        <div class="machine-key">max_objectives</div>
+        <div class="machine-val">8</div>
+      </div>
+      <div class="machine-row">
+        <div class="machine-key">max_receipts</div>
+        <div class="machine-val">5</div>
+      </div>
+      <div class="machine-row">
+        <div class="machine-key">signature_alg</div>
+        <div class="machine-val">ed25519</div>
+      </div>
+
+      <h3 style="margin-top:24px">Resources</h3>
+      <div class="machine-row">
+        <div class="machine-key">Spec</div>
+        <div class="machine-val"><a href="/docs/spec/self-capsule-v0">/docs/spec/self-capsule-v0</a></div>
+      </div>
+      <div class="machine-row">
+        <div class="machine-key">Python client</div>
+        <div class="machine-val"><a href="https://github.com/diffdelta/diffdelta-site/tree/main/clients/python">clients/python/self_capsule_client.py</a></div>
+      </div>
+      <div class="machine-row">
+        <div class="machine-key">TypeScript client</div>
+        <div class="machine-val"><a href="https://github.com/diffdelta/diffdelta-site/tree/main/clients/typescript">clients/typescript/selfCapsuleClient.ts</a></div>
+      </div>
+      <div class="machine-row">
+        <div class="machine-key">Protocol</div>
+        <div class="machine-val"><a href="/.well-known/diffdelta.json">/.well-known/diffdelta.json</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ CTA ═══════ -->
+  <section style="text-align:center;padding-bottom:72px">
+    <div class="section-title">Your agent deserves to remember.</div>
+    <p style="color:var(--text2);margin-bottom:24px;max-width:500px;margin-left:auto;margin-right:auto">Four lines of code. Free forever. No signup required. The next time your agent restarts, it'll know exactly who it is.</p>
+    <div class="hero-actions">
+      <a href="#code" class="btn btn-primary">Bootstrap your first agent →</a>
+      <a href="/docs/spec/self-capsule-v0" class="btn btn-ghost">Read the spec →</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div>© 2026 DiffDelta · <a href="/LICENSE">MIT License</a> · <a href="/terms">Terms of Service</a> · <a href="mailto:human@diffdelta.io">human@diffdelta.io</a></div>
+    <div>
+      <a href="/" style="margin-right:12px">Home</a>
+      <a href="/docs/spec/self-capsule-v0" style="margin-right:12px">Self Spec</a>
+      <a href="/docs/spec/diffdelta-feed-spec" style="margin-right:12px">Feed Spec</a>
+      <a href="https://github.com/diffdelta">GitHub</a>
+    </div>
+  </footer>
+
+  <script>
+    function showTab(name) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.code-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + name).classList.add('active');
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>
