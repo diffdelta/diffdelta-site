@@ -59,8 +59,14 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   };
 
   const res = jsonResponse(head);
-  res.headers.set("ETag", stored.cursor);
-  const inm = context.request.headers.get("If-None-Match");
+  // ETag must be a quoted entity-tag per RFC; some edges will strip invalid values.
+  const etag = `"${stored.cursor}"`;
+  res.headers.set("ETag", etag);
+
+  const inmRaw = request.headers.get("If-None-Match");
+  const inm = inmRaw
+    ? inmRaw.replace(/^W\\//, "").replace(/^\"|\"$/g, "")
+    : null;
   if (inm && inm === stored.cursor) {
     return new Response(null, { status: 304, headers: res.headers });
   }
