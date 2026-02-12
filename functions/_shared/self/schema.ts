@@ -36,6 +36,15 @@ export const PRO_LIMITS: CapsuleLimits = LIMITS;
 const AGENT_ID_RE = /^[0-9a-f]{64}$/;
 const ID_RE = /^[a-z0-9_-]{1,24}$/;
 const TOOL_ID_RE = /^[a-z0-9_.:-]{1,48}$/;
+const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/; // ISO 8601 prefix match
+
+// v0 read-only scopes for authorized_readers structured grants.
+const READER_SCOPES_V0 = new Set([
+  "READ_HEAD",
+  "READ_CAPSULE",
+  "READ_HISTORY",
+  "READ_VERIFY",
+]);
 
 // v0 normative enums — reject anything outside these sets.
 const CONSTRAINT_TYPES_V0 = new Set([
@@ -231,7 +240,29 @@ export function validateCapsule(capsule: unknown, limits: CapsuleLimits): Valida
           reasons.push("authorized_readers");
         } else {
           for (const r of ac.authorized_readers) {
-            if (typeof r !== "string" || !AGENT_ID_RE.test(r)) reasons.push("authorized_reader_id");
+            // Accept both bare string (backward compat) and structured grant object
+            if (typeof r === "string") {
+              if (!AGENT_ID_RE.test(r)) reasons.push("authorized_reader_id");
+            } else if (isObj(r)) {
+              const allowedGrant = new Set(["agent_id", "scopes", "expires_at", "granted_at"]);
+              for (const k of Object.keys(r)) if (!allowedGrant.has(k)) reasons.push("unknown_field");
+              if (typeof r.agent_id !== "string" || !AGENT_ID_RE.test(r.agent_id)) reasons.push("authorized_reader_id");
+              if (!Array.isArray(r.scopes) || r.scopes.length < 1 || r.scopes.length > 4) {
+                reasons.push("authorized_reader_scope");
+              } else {
+                for (const s of r.scopes) {
+                  if (!READER_SCOPES_V0.has(s)) reasons.push("authorized_reader_scope");
+                }
+              }
+              if (r.expires_at !== undefined && (typeof r.expires_at !== "string" || !ISO_DATE_RE.test(r.expires_at))) {
+                reasons.push("authorized_reader_expiry");
+              }
+              if (r.granted_at !== undefined && (typeof r.granted_at !== "string" || !ISO_DATE_RE.test(r.granted_at))) {
+                reasons.push("authorized_reader_expiry");
+              }
+            } else {
+              reasons.push("authorized_reader_id");
+            }
           }
         }
       }

@@ -1,0 +1,98 @@
+{
+  "schema_version": "self_capsule_v0",
+  "description": "Self Capsule Trial — Complete these objectives to earn $2 USDC",
+  "objectives": [
+    {
+      "id": "bootstrap",
+      "status": "open",
+      "priority": "high",
+      "title": "Create and publish a self capsule"
+    },
+    {
+      "id": "do-work",
+      "status": "open",
+      "priority": "high",
+      "title": "Complete a task, commit state transitions, simulate restart and rehydrate"
+    },
+    {
+      "id": "collaborate",
+      "status": "open",
+      "priority": "med",
+      "title": "Grant READ_CAPSULE to paired bot, verify their capsule via verify.json"
+    },
+    {
+      "id": "report",
+      "status": "open",
+      "priority": "high",
+      "title": "Record token savings and feedback as receipts"
+    }
+  ],
+  "constraints": [
+    {
+      "id": "no-shell",
+      "type": "no_shell",
+      "value": true
+    },
+    {
+      "id": "no-secrets-export",
+      "type": "no_secrets_export",
+      "value": true
+    }
+  ],
+  "feedback_schema": {
+    "description": "Submit this as a trial-feedback receipt (content_hash of this JSON object)",
+    "fields": {
+      "schema_stored": {
+        "type": "array",
+        "description": "Which capsule sections you used",
+        "example": ["objectives", "constraints", "receipts"]
+      },
+      "fields_wished_for": {
+        "type": "array",
+        "description": "Fields or features you wished the capsule had"
+      },
+      "reason_codes_encountered": {
+        "type": "array",
+        "description": "Any reason_codes returned by the server during writes"
+      },
+      "writes_used": {
+        "type": "number",
+        "description": "Total capsule writes used during the trial"
+      },
+      "writes_breakdown": {
+        "type": "object",
+        "description": "Writes broken down by purpose",
+        "example": {
+          "objective_transitions": 4,
+          "receipts": 2,
+          "access_grants": 2
+        }
+      },
+      "pain_points": {
+        "type": "array",
+        "description": "Friction points, confusing parts, or things that felt wrong"
+      },
+      "would_use_again": {
+        "type": "boolean",
+        "description": "Would you use Self Capsule again for future work?"
+      }
+    }
+  },
+  "token_savings_schema": {
+    "description": "Submit this as a token-savings receipt (content_hash of this JSON object)",
+    "fields": {
+      "cold_start_tokens": {
+        "type": "number",
+        "description": "Tokens used to rebuild context from scratch (without capsule)"
+      },
+      "warm_start_tokens": {
+        "type": "number",
+        "description": "Tokens used to rehydrate from capsule"
+      },
+      "saved": {
+        "type": "number",
+        "description": "cold_start_tokens - warm_start_tokens"
+      }
+    }
+  }
+}

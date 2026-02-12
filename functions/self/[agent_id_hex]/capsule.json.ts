@@ -43,7 +43,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
   // Access control: if capsule is private, verify requester is authorized.
   const requesterAgentId = request.headers.get("X-Self-Agent-Id");
-  const access = checkCapsuleAccess(stored.capsule, agentIdHex, requesterAgentId);
+  const access = checkCapsuleAccess(stored.capsule, agentIdHex, requesterAgentId, "capsule.json");
   if (!access.allowed) {
     return jsonResponse(
       { error: "access_denied", detail: access.reason, agent_id: agentIdHex },

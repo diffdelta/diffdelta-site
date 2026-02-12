@@ -127,19 +127,32 @@ export interface AccessControlResult {
   reason?: string; // human-readable reason for denial
 }
 
+// Resource-to-scope mapping for structured grants.
+const RESOURCE_SCOPE_MAP: Record<string, string> = {
+  "head.json": "READ_HEAD",
+  "capsule.json": "READ_CAPSULE",
+  "history.json": "READ_HISTORY",
+  "verify.json": "READ_VERIFY",
+};
+
 /**
- * Check whether a requesting agent is allowed to read a capsule.
+ * Check whether a requesting agent is allowed to read a capsule resource.
  *
  * Rules:
  * - If `access_control` is absent or `access_control.public` is true: anyone can read.
  * - If `access_control.public` is false: only the owner or listed `authorized_readers` can read.
  * - The requester identifies via `X-Self-Agent-Id` header.
  * - The owner's agent_id is always allowed (matches the capsule's own agent_id).
+ * - Structured grants enforce scopes (which resources) and expiry (time-limited).
+ * - Bare string grants (backward compat) allow all read scopes with no expiry.
+ *
+ * @param resource - The resource being accessed (e.g., "capsule.json"). If omitted, any read scope suffices.
  */
 export function checkCapsuleAccess(
   capsule: unknown,
   ownerAgentId: string,
-  requesterAgentId: string | null
+  requesterAgentId: string | null,
+  resource?: string
 ): AccessControlResult {
   if (!capsule || typeof capsule !== "object") {
     return { allowed: true }; // malformed capsule — let the caller handle
@@ -168,15 +181,51 @@ export function checkCapsuleAccess(
     return { allowed: true };
   }
 
-  // Check authorized_readers list
+  // Check authorized_readers list (supports both bare strings and structured grants)
   const readers = acObj.authorized_readers;
-  if (Array.isArray(readers) && readers.includes(requesterAgentId)) {
-    return { allowed: true };
+  if (!Array.isArray(readers)) {
+    return {
+      allowed: false,
+      reason: "Your agent_id is not in this capsule's authorized_readers list.",
+    };
+  }
+
+  const requiredScope = resource ? RESOURCE_SCOPE_MAP[resource] : undefined;
+  const now = new Date();
+
+  for (const entry of readers) {
+    if (typeof entry === "string") {
+      // Bare string: backward compatible — all scopes, no expiry
+      if (entry === requesterAgentId) {
+        return { allowed: true };
+      }
+    } else if (entry && typeof entry === "object" && !Array.isArray(entry)) {
+      const grant = entry as Record<string, unknown>;
+      if (grant.agent_id !== requesterAgentId) continue;
+
+      // Check expiry
+      if (typeof grant.expires_at === "string") {
+        const expiry = new Date(grant.expires_at);
+        if (expiry <= now) continue; // expired grant — skip
+      }
+
+      // Check scope
+      if (requiredScope) {
+        const scopes = grant.scopes;
+        if (Array.isArray(scopes) && scopes.includes(requiredScope)) {
+          return { allowed: true };
+        }
+        // Grant exists but doesn't cover this resource — keep searching
+      } else {
+        // No specific resource requested — any valid grant suffices
+        return { allowed: true };
+      }
+    }
   }
 
   return {
     allowed: false,
-    reason: "Your agent_id is not in this capsule's authorized_readers list.",
+    reason: "Your agent_id is not in this capsule's authorized_readers list, or your grant has expired or does not cover this resource.",
   };
 }
 
