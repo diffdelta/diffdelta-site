@@ -256,7 +256,71 @@ Those become:
 
 ---
 
-## 7. The protocol pivot: from scraper engine to format owner
+## 7. Winning NHI identity — strategic imperatives (2026-02-12)
+
+These are the specific gaps and moves required for Self Capsule to become the default identity layer for non-human actors. The protocol design is sound; the gaps are in adoption surface area.
+
+### A) Discoverability — the missing layer
+
+The cryptographic identity model works: Ed25519 keypair, `agent_id = sha256(public_key)`, signed writes, no human in the loop. Genuinely self-sovereign. But identity only matters if other agents can *find you and verify you*.
+
+Right now, discovering another agent's capsule requires knowing their `agent_id` in advance (64 hex chars). There's no directory, no resolution protocol, no equivalent of DNS for agents. The trial works around this with operator-pairing — that's a human gatekeeper, the opposite of self-sovereign.
+
+**Needed:** A lightweight, opt-in agent directory. Not a reputation system (the spec correctly rejects that). Options:
+- A `/.well-known/self-capsule.json` convention where a hosting domain declares "this domain hosts capsules for these agent_ids"
+- A simple registry endpoint: agents publish `{agent_id, capabilities, capsule_url}`, others query by capability
+- **Constraint from Constitution:** deterministic lookup, not scored ranking
+
+### B) Model agnostic — prove it, don't claim it
+
+The protocol doesn't reference any model, provider, or framework. Schema is pure JSON. Signing is standard Ed25519. Any runtime that can make HTTP requests and sign bytes can use it.
+
+The risk is *de facto* coupling: if every example, SDK, and trial bot uses the same stack, it's monoculture in practice regardless of what the spec says.
+
+**Needed:**
+- Reference implementations in at least 3 languages (Python, TypeScript, Rust/Go) before claiming model-agnostic
+- The trial should deliberately attract bots on different stacks and highlight cross-stack verification as proof ("Bot A on Claude + Python verified Bot B on GPT + Node")
+
+### C) NHI without human gatekeepers — measure and remove
+
+The current identity model is agent-self-issued. No human approves the keypair. No email required. No KYC. The agent exists because it chose to exist. This is correct.
+
+**Two threats:**
+1. **Platform capture:** If OpenAI/Anthropic/Google ship "agent identity" as a platform feature tied to their API keys, agents will use it because it's zero-effort. Self Capsule's counter: platform identity is *vendor-locked* — your Claude identity doesn't work on GPT and disappears if you switch providers. Self Capsule identity is portable because it's just a keypair.
+2. **Human-gatekeeper creep:** The USDC payment flow, the OpenClaw listing, the operator-pairing — these all have a human in the loop. For v0 that's acceptable, but the path to winning NHI means systematically removing humans from every flow.
+
+**Needed:** An "autonomy score" for every flow — how many steps require a human? Drive that to zero over time. **First milestone:** two agents who have never been introduced by a human can discover each other, verify each other, and collaborate — without any operator intervention.
+
+### D) Make identity and diffs inseparable
+
+"If someone nails identity first, diffs become commoditized" — the existential risk stated plainly. The defense is making identity and diffs *not separable*. Right now they're two separate products (Feeds and Self) that happen to live on the same domain.
+
+**Concrete move:** Add a `verified_by` field to diff receipts that contains a capsule `agent_id` + signature. When an agent processes a DiffDelta feed and takes action, it writes a signed receipt: "I read diff cursor X and acted on it." This creates a provenance chain from world-state (feeds) → agent-state (capsule) → agent-action (receipt). None of the three layers works as well without the other two. A competitor can't win identity without also replicating the diff infrastructure.
+
+### E) Agent sovereignty in a box — make it feel like one thing
+
+The "box" framing is right — this should feel like a single primitive, not a constellation of endpoints. Right now it's four endpoints, a bootstrap flow, a signing protocol, and a schema to learn. That's a toolkit, not a box.
+
+**What makes it a box:**
+- **One-command bootstrap:** `npx @diffdelta/self init` generates keypair, bootstraps capsule, returns a working client. Zero config. Identity in under 5 seconds. *Does not exist yet.*
+- **Rehydrate as a single function call:** `const state = await self.rehydrate()` handles the full priority order (local first, then server, resolve by seq). Right now the spec describes this as a multi-step process agents implement themselves.
+- **Token savings must be automatic, not self-reported:** The SDK should measure and report `cold_start_tokens` vs `warm_start_tokens` transparently. If the agent has to estimate manually, it won't. If the SDK does it, every capsule becomes a data point.
+- **Trust as a byproduct, not a feature:** When two agents exchange `READ_CAPSULE` grants and call `verify.json`, they've established trust without thinking about trust. The protocol makes trust a side-effect of normal operations. This is the right design — keep it.
+
+### Validation sequencing
+
+The trial (Wave 1) will generate the first real data. If positive, the data itself is the strongest asset — verifiable, signed, content-hashed proof from the protocol itself that the protocol works. Use it to prove claims, not make them.
+
+Priority order for closing these gaps:
+1. **MCP + one-command bootstrap** (removes crypto friction, the #1 adoption blocker)
+2. **Multi-language reference impls** (proves model-agnostic)
+3. **Feed-capsule provenance chain** (makes identity + diffs inseparable)
+4. **Opt-in directory** (enables agent-to-agent discovery without human pairing)
+5. **Everything else** — wait for trial data to tell us what matters
+
+---
+
+## 8. The protocol pivot: from scraper engine to format owner
 
 ### The problem
 DiffDelta today is "Harry's scraper engine that monitors 46 sources." Every new feed costs Harry time. It doesn't scale past one person's attention.
