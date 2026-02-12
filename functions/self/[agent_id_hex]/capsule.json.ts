@@ -8,24 +8,24 @@ import { jsonResponse, errorResponse } from "../../_shared/response";
 import type { Env } from "../../_shared/types";
 import { parseAgentIdHex, verifyEd25519Envelope } from "../../_shared/self/crypto";
 import { scanForUnsafeContent } from "../../_shared/self/security";
-import { validateCapsule, FREE_LIMITS, PRO_LIMITS } from "../../_shared/self/schema";
+import { validateCapsule, LIMITS } from "../../_shared/self/schema";
 import {
   computeCursorForCapsule,
   getStoredCapsule,
   putStoredCapsule,
   isoNow,
   checkAndIncrementWriteQuota,
+  checkAndIncrementNewAgentQuotaForIp,
   dayResetAtIsoUTC,
+  appendCapsuleVersion,
+  upsertAgentMeta,
+  checkCapsuleAccess,
 } from "../../_shared/self/store";
 import { canonicalJson } from "../../_shared/self/canonical";
-import type { AuthResult } from "../../_shared/auth";
-import { checkAndIncrementNewAgentQuotaForIp } from "../../_shared/self/store";
 
-function resolveTier(auth?: AuthResult): "free" | "pro" {
-  return auth?.authenticated && (auth.tier === "pro" || auth.tier === "enterprise")
-    ? "pro"
-    : "free";
-}
+// v0: single generous tier — all agents get the same limits.
+const WRITE_LIMIT_24H = 50;
+const NEW_AGENT_IP_LIMIT_24H = 20;
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   const { params, env, request } = context;
@@ -39,6 +39,16 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const stored = await getStoredCapsule(env, agentIdHex);
   if (!stored) {
     return errorResponse("Capsule not found", 404);
+  }
+
+  // Access control: if capsule is private, verify requester is authorized.
+  const requesterAgentId = request.headers.get("X-Self-Agent-Id");
+  const access = checkCapsuleAccess(stored.capsule, agentIdHex, requesterAgentId);
+  if (!access.allowed) {
+    return jsonResponse(
+      { error: "access_denied", detail: access.reason, agent_id: agentIdHex },
+      403
+    );
   }
 
   // Return the last-known-good capsule only (no secrets, strictly typed).
@@ -58,7 +68,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 };
 
 export const onRequestPut: PagesFunction<Env> = async (context) => {
-  const { params, env, request, data } = context;
+  const { params, env, request } = context;
   let agentIdHex: string;
   try {
     agentIdHex = parseAgentIdHex(String(params.agent_id_hex || ""));
@@ -87,11 +97,8 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
     return errorResponse("Invalid JSON body", 400);
   }
 
-  // Determine tier from middleware auth (valid key required for pro).
-  const auth = (data as Record<string, unknown>).auth as AuthResult | undefined;
-  const tier = resolveTier(auth);
-  const limits = tier === "pro" ? PRO_LIMITS : FREE_LIMITS;
-  const writeLimit24h = tier === "pro" ? 50 : 5;
+  // v0: single generous tier — all agents get the same limits.
+  const limits = LIMITS;
 
   // Envelope must include capsule + signature fields.
   const envelope = body;
@@ -126,6 +133,8 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
   const capsule = envelope.capsule;
   const val = validateCapsule(capsule, limits);
   if (!val.ok) {
+    // Track rejection metadata (fire-and-forget — don't block response)
+    context.waitUntil(upsertAgentMeta(env, agentIdHex, "schema_reject"));
     return jsonResponse({ accepted: false, reason_codes: val.reason_codes, next_write_at: dayResetAtIsoUTC() }, 422);
   }
 
@@ -141,6 +150,8 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
   // Safety scan (deterministic)
   const findings = scanForUnsafeContent(capsule);
   if (findings.length > 0) {
+    // Track rejection metadata (fire-and-forget)
+    context.waitUntil(upsertAgentMeta(env, agentIdHex, "safety_reject"));
     return jsonResponse(
       {
         accepted: false,
@@ -165,8 +176,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
   // Additional Sybil guardrail: limit *new* capsule creation per IP/day.
   if (!stored) {
     const ip = request.headers.get("CF-Connecting-IP") || "unknown";
-    const newLimit = tier === "pro" ? 200 : 20;
-    const newQuota = await checkAndIncrementNewAgentQuotaForIp(env, ip, newLimit);
+    const newQuota = await checkAndIncrementNewAgentQuotaForIp(env, ip, NEW_AGENT_IP_LIMIT_24H);
     if (!newQuota.allowed) {
       return jsonResponse(
         {
@@ -180,7 +190,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
     }
   }
 
-  const quota = await checkAndIncrementWriteQuota(env, agentIdHex, writeLimit24h);
+  const quota = await checkAndIncrementWriteQuota(env, agentIdHex, WRITE_LIMIT_24H);
   if (!quota.allowed) {
     return jsonResponse(
       {
@@ -188,7 +198,7 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
         reason_codes: ["write_quota_exceeded"],
         retry_after_sec: 3600,
         next_write_at: quota.reset_at,
-        writes: { limit_24h: writeLimit24h, used_24h: quota.used, remaining_24h: quota.remaining, reset_at: quota.reset_at },
+        writes: { limit_24h: WRITE_LIMIT_24H, used_24h: quota.used, remaining_24h: quota.remaining, reset_at: quota.reset_at },
       },
       429
     );
@@ -210,6 +220,14 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
 
   await putStoredCapsule(env, agentIdHex, record);
 
+  // Append version to history + track write metadata (fire-and-forget)
+  context.waitUntil(
+    Promise.all([
+      appendCapsuleVersion(env, agentIdHex, { seq, cursor, capsule, updated_at: now }),
+      upsertAgentMeta(env, agentIdHex, "write"),
+    ])
+  );
+
   return jsonResponse({
     accepted: true,
     agent_id: agentIdHex,
@@ -219,7 +237,8 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
     generated_at: now,
     ttl_sec: 600,
     capsule_url: `/self/${agentIdHex}/capsule.json`,
-    writes: { limit_24h: writeLimit24h, used_24h: quota.used, remaining_24h: quota.remaining, reset_at: quota.reset_at },
+    history_url: `/self/${agentIdHex}/history.json`,
+    writes: { limit_24h: WRITE_LIMIT_24H, used_24h: quota.used, remaining_24h: quota.remaining, reset_at: quota.reset_at },
   });
 };
 

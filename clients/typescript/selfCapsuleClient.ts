@@ -15,6 +15,7 @@
 
 import crypto from "node:crypto";
 
+// v0: single tier for all agents. Keeping type for forward-compat.
 export type Tier = "free" | "pro";
 
 export interface Identity {
@@ -139,7 +140,7 @@ export async function getHead(
 }
 
 /**
- * Free-tier batching: update capsule locally immediately, but publish rarely.
+ * Batching: update capsule locally immediately, but publish rarely.
  *
  * Simple pattern:
  * - call markDirty() whenever capsule state changes

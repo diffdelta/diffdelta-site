@@ -15,25 +15,23 @@ export interface StoredCapsuleRecord {
   updated_at: string;
 }
 
+// v0: single generous tier for all agents. No paywall.
+// TierPolicy kept for interface compatibility; both aliases point to the same policy.
 export interface TierPolicy {
-  tier: "free" | "pro";
   limits: CapsuleLimits;
   write_limit_24h: number;
 }
 
-export const FREE_POLICY: TierPolicy = {
-  tier: "free",
+export const POLICY: TierPolicy = {
   // Filled by caller from schema constants to avoid circular deps.
   // (store.ts shouldn't import schema.ts to keep modules tiny)
   limits: null as unknown as CapsuleLimits,
-  write_limit_24h: 5,
-};
-
-export const PRO_POLICY: TierPolicy = {
-  tier: "pro",
-  limits: null as unknown as CapsuleLimits,
   write_limit_24h: 50,
 };
+
+// Keep aliases so existing imports don't break.
+export const FREE_POLICY: TierPolicy = POLICY;
+export const PRO_POLICY: TierPolicy = POLICY;
 
 export function capsuleKey(agentIdHex: string) {
   return `self:capsule:${agentIdHex}`;
@@ -118,5 +116,218 @@ export async function computeCursorForCapsule(capsule: unknown): Promise<string>
   const bytes = new TextEncoder().encode(canonicalJson(capsule));
   const hex = await sha256Hex(bytes);
   return `sha256:${hex}`;
+}
+
+// ─────────────────────────────────────────────────────────
+// Access control — permission-based agent linking
+// ─────────────────────────────────────────────────────────
+
+export interface AccessControlResult {
+  allowed: boolean;
+  reason?: string; // human-readable reason for denial
+}
+
+/**
+ * Check whether a requesting agent is allowed to read a capsule.
+ *
+ * Rules:
+ * - If `access_control` is absent or `access_control.public` is true: anyone can read.
+ * - If `access_control.public` is false: only the owner or listed `authorized_readers` can read.
+ * - The requester identifies via `X-Self-Agent-Id` header.
+ * - The owner's agent_id is always allowed (matches the capsule's own agent_id).
+ */
+export function checkCapsuleAccess(
+  capsule: unknown,
+  ownerAgentId: string,
+  requesterAgentId: string | null
+): AccessControlResult {
+  if (!capsule || typeof capsule !== "object") {
+    return { allowed: true }; // malformed capsule — let the caller handle
+  }
+
+  const ac = (capsule as Record<string, unknown>).access_control;
+  if (!ac || typeof ac !== "object") {
+    return { allowed: true }; // no access_control → public (backward compatible)
+  }
+
+  const acObj = ac as Record<string, unknown>;
+  if (acObj.public !== false) {
+    return { allowed: true }; // explicitly public or missing public field
+  }
+
+  // Capsule is private — check requester identity
+  if (!requesterAgentId) {
+    return {
+      allowed: false,
+      reason: "This capsule is private. Include X-Self-Agent-Id header with your agent_id to authenticate.",
+    };
+  }
+
+  // Owner always has access
+  if (requesterAgentId === ownerAgentId) {
+    return { allowed: true };
+  }
+
+  // Check authorized_readers list
+  const readers = acObj.authorized_readers;
+  if (Array.isArray(readers) && readers.includes(requesterAgentId)) {
+    return { allowed: true };
+  }
+
+  return {
+    allowed: false,
+    reason: "Your agent_id is not in this capsule's authorized_readers list.",
+  };
+}
+
+// ─────────────────────────────────────────────────────────
+// Capsule history — append-only, 100-version KV cap
+// ─────────────────────────────────────────────────────────
+
+export interface HistoryVersion {
+  seq: number;
+  cursor: string; // sha256:<hex>
+  capsule: unknown;
+  updated_at: string; // ISO 8601
+}
+
+export interface HistoryRecord {
+  versions: HistoryVersion[]; // newest first
+  total_writes: number; // total ever written (may exceed versions.length after pruning)
+}
+
+const MAX_HISTORY_VERSIONS = 100;
+
+function historyKey(agentIdHex: string) {
+  return `self:history:${agentIdHex}`;
+}
+
+/**
+ * Append a capsule version to the agent's history.
+ * Prunes oldest entries if over MAX_HISTORY_VERSIONS.
+ */
+export async function appendCapsuleVersion(
+  env: Env,
+  agentIdHex: string,
+  version: HistoryVersion
+): Promise<void> {
+  const key = historyKey(agentIdHex);
+  const raw = await env.SELF.get(key);
+  let record: HistoryRecord;
+
+  if (raw) {
+    try {
+      record = JSON.parse(raw) as HistoryRecord;
+    } catch {
+      record = { versions: [], total_writes: 0 };
+    }
+  } else {
+    record = { versions: [], total_writes: 0 };
+  }
+
+  // Prepend (newest first)
+  record.versions.unshift(version);
+  record.total_writes += 1;
+
+  // Prune oldest if over cap
+  if (record.versions.length > MAX_HISTORY_VERSIONS) {
+    record.versions = record.versions.slice(0, MAX_HISTORY_VERSIONS);
+  }
+
+  await env.SELF.put(key, JSON.stringify(record));
+}
+
+/**
+ * Get the full history record for an agent.
+ */
+export async function getHistory(env: Env, agentIdHex: string): Promise<HistoryRecord | null> {
+  const raw = await env.SELF.get(historyKey(agentIdHex));
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as HistoryRecord;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Get history versions since a given cursor (exclusive — returns versions newer than the cursor).
+ * Returns null if the cursor is not found in history (agent should re-fetch full history).
+ */
+export function getHistorySince(record: HistoryRecord, sinceCursor: string): HistoryVersion[] | null {
+  // versions are newest-first; find the index of the cursor
+  const idx = record.versions.findIndex((v) => v.cursor === sinceCursor);
+  if (idx === -1) return null; // cursor not in history (pruned or invalid)
+  // Everything before idx is newer than sinceCursor
+  return record.versions.slice(0, idx);
+}
+
+// ─────────────────────────────────────────────────────────
+// Agent metadata — for future DiffDelta Verified
+// ─────────────────────────────────────────────────────────
+
+export interface AgentMeta {
+  first_seen: string; // ISO 8601
+  total_writes: number;
+  last_write: string; // ISO 8601
+  schema_rejections: number;
+  safety_rejections: number;
+}
+
+function agentMetaKey(agentIdHex: string) {
+  return `self:meta:${agentIdHex}`;
+}
+
+/**
+ * Update agent metadata on writes and rejections.
+ * Increments counters and updates timestamps.
+ */
+export async function upsertAgentMeta(
+  env: Env,
+  agentIdHex: string,
+  event: "write" | "schema_reject" | "safety_reject"
+): Promise<void> {
+  const key = agentMetaKey(agentIdHex);
+  const raw = await env.SELF.get(key);
+  const now = isoNow();
+
+  let meta: AgentMeta;
+  if (raw) {
+    try {
+      meta = JSON.parse(raw) as AgentMeta;
+    } catch {
+      meta = { first_seen: now, total_writes: 0, last_write: now, schema_rejections: 0, safety_rejections: 0 };
+    }
+  } else {
+    meta = { first_seen: now, total_writes: 0, last_write: now, schema_rejections: 0, safety_rejections: 0 };
+  }
+
+  switch (event) {
+    case "write":
+      meta.total_writes += 1;
+      meta.last_write = now;
+      break;
+    case "schema_reject":
+      meta.schema_rejections += 1;
+      break;
+    case "safety_reject":
+      meta.safety_rejections += 1;
+      break;
+  }
+
+  await env.SELF.put(key, JSON.stringify(meta));
+}
+
+/**
+ * Read agent metadata (for future Verified endpoint).
+ */
+export async function getAgentMeta(env: Env, agentIdHex: string): Promise<AgentMeta | null> {
+  const raw = await env.SELF.get(agentMetaKey(agentIdHex));
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as AgentMeta;
+  } catch {
+    return null;
+  }
 }
 

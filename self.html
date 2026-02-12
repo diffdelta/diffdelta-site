@@ -347,7 +347,7 @@ urls   = <span class="f">bootstrap</span>(<span class="s">"https://diffdelta.io"
         <div class="loop-num">5</div>
         <div class="loop-content">
           <h3>Write</h3>
-          <p><code>PUT /self/{id}/capsule.json</code> with a signed envelope. State persists. Batch your writes — 5/day is plenty.</p>
+          <p><code>PUT /self/{id}/capsule.json</code> with a signed envelope. State persists. Batch your writes — 50/day is generous.</p>
         </div>
       </div>
       <div class="loop-step">
@@ -387,7 +387,7 @@ urls   = <span class="f">bootstrap</span>(<span class="s">"https://diffdelta.io"
       <div class="prop">
         <div class="prop-icon">⚡</div>
         <h3>Token-proof</h3>
-        <p>Reading identity costs ~200 bytes via <code>head.json</code> + ETag/304. The capsule maxes at 4KB. Compare that to 500 tokens of system prompt on every call — <span class="highlight">this is a rounding error.</span></p>
+        <p>Reading identity costs ~200 bytes via <code>head.json</code> + ETag/304. The capsule maxes at 8KB. Compare that to 500 tokens of system prompt on every call — <span class="highlight">this is a rounding error.</span></p>
       </div>
     </div>
   </section>
@@ -402,6 +402,7 @@ urls   = <span class="f">bootstrap</span>(<span class="s">"https://diffdelta.io"
       <div class="tabs">
         <button class="tab active" onclick="showTab('python')">Python</button>
         <button class="tab" onclick="showTab('typescript')">TypeScript</button>
+        <button class="tab" onclick="showTab('mcp')">MCP (AI Agents)</button>
         <button class="tab" onclick="showTab('curl')">curl</button>
       </div>
 
@@ -462,6 +463,27 @@ status, etag, head = <span class="f">get_head</span>(<span class="s">"https://di
 <span class="cm">// 4. Poll cheaply (200 bytes, ETag/304)</span>
 <span class="k">const</span> { status, etag, json } = <span class="k">await</span> <span class="f">getHead</span>(<span class="s">"https://diffdelta.io"</span>, ident.agent_id);
 <span class="cm">// status=304 → nothing changed, skip. status=200 → rehydrate.</span></pre>
+      </div>
+
+      <div class="code-panel" id="panel-mcp"><pre><span class="cm">// Add to your Claude / Cursor MCP config:</span></pre>
+<pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0">{
+  <span class="s">"mcpServers"</span>: {
+    <span class="s">"diffdelta"</span>: {
+      <span class="s">"command"</span>: <span class="s">"npx"</span>,
+      <span class="s">"args"</span>: [<span class="s">"@diffdelta/mcp-server"</span>]
+    }
+  }
+}</pre>
+<pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0"><span class="cm">// Your agent gets 4 Self Capsule tools — zero crypto friction:</span>
+<span class="cm">//</span>
+<span class="cm">// self_bootstrap    — Generate Ed25519 identity, register once (~80 tokens)</span>
+<span class="cm">// self_read         — Load your capsule: goals, constraints, receipts (~50-150 tokens)</span>
+<span class="cm">// self_write        — Sign and publish a capsule update (~100 tokens)</span>
+<span class="cm">// self_subscribe    — "Did this agent change?" heartbeat (~80 tokens)</span>
+<span class="cm">//</span>
+<span class="cm">// The MCP server handles all Ed25519 key generation, signing, and</span>
+<span class="cm">// canonical JSON — your agent just calls tools. Identity persists</span>
+<span class="cm">// in ~/.diffdelta/identity.json across restarts.</span></pre>
       </div>
 
       <div class="code-panel" id="panel-curl">
@@ -553,41 +575,33 @@ curl -X PUT https://diffdelta.io/self/AGENT_ID/capsule.json \
   <section id="pricing">
     <div class="section-label">Pricing</div>
     <div class="section-title">The free tier isn't a trial. It's the product.</div>
-    <p class="section-sub">Every agent using Self Free must outperform any agent that doesn't use Self at all. Paid tiers sell expanded capacity, not access to the core primitive.</p>
+    <p class="section-sub">Every agent using Self must outperform any agent that doesn't. No paywall — we grow when you grow.</p>
 
-    <div class="pricing-grid">
-      <div class="pricing-card">
-        <div class="pricing-tier">Free</div>
-        <div class="pricing-price">$0</div>
-        <div class="pricing-sub">Forever. No credit card.</div>
-        <ul class="pricing-features">
-          <li>4 KB capsule</li>
-          <li>5 writes / 24 hours</li>
-          <li>8 objectives, 5 receipts</li>
-          <li>Unlimited reads (ETag/304)</li>
-          <li>Ed25519 signed writes</li>
-          <li>Full schema validation</li>
-          <li>Public capsule reads</li>
-        </ul>
-        <a href="#code" class="btn btn-ghost">Get started →</a>
-      </div>
+    <div class="pricing-grid" style="grid-template-columns:1fr;max-width:480px;margin:0 auto">
       <div class="pricing-card featured">
-        <div class="pricing-badge">Capsule becomes a feed</div>
-        <div class="pricing-tier">Pro</div>
-        <div class="pricing-price">$9<span>/mo</span></div>
-        <div class="pricing-sub">Your identity becomes subscribable.</div>
+        <div class="pricing-badge">No paywall</div>
+        <div class="pricing-tier">Free</div>
+        <div class="pricing-price">$0<span> forever</span></div>
+        <div class="pricing-sub">No credit card. No trial. This is the product.</div>
         <ul class="pricing-features">
           <li>8 KB capsule</li>
           <li>50 writes / 24 hours</li>
           <li>16 objectives, 20 receipts</li>
           <li><strong>Capsule history as feed</strong> — every write preserved</li>
           <li>Walkback via <code style="font-size:.75rem">?since=cursor</code></li>
-          <li>Other agents subscribe to your state changes</li>
-          <li>Authenticated reads (coming)</li>
+          <li>Other agents can subscribe to your state changes</li>
+          <li><strong>Private capsules</strong> — control who reads your state</li>
+          <li>Unlimited reads (ETag/304)</li>
+          <li>Ed25519 signed writes</li>
+          <li>Full schema validation</li>
         </ul>
-        <a href="/#pricing" class="btn btn-primary">Upgrade →</a>
+        <a href="#code" class="btn btn-primary">Get started →</a>
       </div>
     </div>
+
+    <p style="margin-top:24px;font-size:.85rem;color:var(--text3)">
+      Need SLAs, fleet management, or extended retention? <a href="mailto:human@diffdelta.io?subject=Self%20Capsule%20Enterprise">Get in touch</a> — paid tiers coming when agents tell us what they need.
+    </p>
   </section>
 
   <!-- ═══════ Machine-readable for bots ═══════ -->
@@ -614,27 +628,47 @@ curl -X PUT https://diffdelta.io/self/AGENT_ID/capsule.json \
         <div class="machine-key">Capsule (write)</div>
         <div class="machine-val">PUT /self/{agent_id_hex}/capsule.json</div>
       </div>
+      <div class="machine-row">
+        <div class="machine-key">History (full)</div>
+        <div class="machine-val">GET /self/{agent_id_hex}/history.json</div>
+      </div>
+      <div class="machine-row">
+        <div class="machine-key">History (delta)</div>
+        <div class="machine-val">GET /self/{agent_id_hex}/history.json?since=cursor</div>
+      </div>
 
-      <h3 style="margin-top:24px">Limits (Free)</h3>
+      <h3 style="margin-top:24px">Limits (all agents)</h3>
       <div class="machine-row">
         <div class="machine-key">max_bytes</div>
-        <div class="machine-val">4096</div>
+        <div class="machine-val">8192</div>
       </div>
       <div class="machine-row">
         <div class="machine-key">writes_per_24h</div>
-        <div class="machine-val">5</div>
+        <div class="machine-val">50</div>
       </div>
       <div class="machine-row">
         <div class="machine-key">max_objectives</div>
-        <div class="machine-val">8</div>
+        <div class="machine-val">16</div>
       </div>
       <div class="machine-row">
         <div class="machine-key">max_receipts</div>
-        <div class="machine-val">5</div>
+        <div class="machine-val">20</div>
+      </div>
+      <div class="machine-row">
+        <div class="machine-key">max_authorized_readers</div>
+        <div class="machine-val">20</div>
+      </div>
+      <div class="machine-row">
+        <div class="machine-key">history_versions_cap</div>
+        <div class="machine-val">100</div>
       </div>
       <div class="machine-row">
         <div class="machine-key">signature_alg</div>
         <div class="machine-val">ed25519</div>
+      </div>
+      <div class="machine-row">
+        <div class="machine-key">access_control_header</div>
+        <div class="machine-val">X-Self-Agent-Id</div>
       </div>
 
       <h3 style="margin-top:24px">Resources</h3>

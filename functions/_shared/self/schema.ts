@@ -1,7 +1,8 @@
 // Self Capsule schema validation (v0) — strict, bounded, additionalProperties=false.
 // Why: keep capsules non-sensitive, compact, and deterministic.
 
-export type Tier = "free" | "pro";
+// v0: single generous tier for all agents. No paywall.
+// Paid tiers will be introduced when usage patterns indicate what agents actually need.
 
 export interface ValidationResult {
   ok: boolean;
@@ -15,25 +16,22 @@ export interface CapsuleLimits {
   maxReceipts: number;
   maxTools: number;
   maxFlags: number;
+  maxAuthorizedReaders: number;
 }
 
-export const FREE_LIMITS: CapsuleLimits = {
-  maxBytes: 4096,
-  maxObjectives: 8,
-  maxConstraints: 20,
-  maxReceipts: 5,
-  maxTools: 20,
-  maxFlags: 20,
-};
-
-export const PRO_LIMITS: CapsuleLimits = {
+export const LIMITS: CapsuleLimits = {
   maxBytes: 8 * 1024,
   maxObjectives: 16,
   maxConstraints: 20,
   maxReceipts: 20,
   maxTools: 20,
   maxFlags: 20,
+  maxAuthorizedReaders: 20,
 };
+
+// Keep these aliases so existing imports don't break. Both point to the same limits.
+export const FREE_LIMITS: CapsuleLimits = LIMITS;
+export const PRO_LIMITS: CapsuleLimits = LIMITS;
 
 const AGENT_ID_RE = /^[0-9a-f]{64}$/;
 const ID_RE = /^[a-z0-9_-]{1,24}$/;
@@ -71,6 +69,7 @@ export function validateCapsule(capsule: unknown, limits: CapsuleLimits): Valida
     "capabilities",
     "pointers",
     "self_motto",
+    "access_control",
   ]);
   for (const k of Object.keys(capsule)) {
     if (!allowedTop.has(k)) reasons.push("unknown_field");
@@ -214,6 +213,29 @@ export function validateCapsule(capsule: unknown, limits: CapsuleLimits): Valida
   // self_motto
   if (capsule.self_motto !== undefined) {
     if (typeof capsule.self_motto !== "string" || capsule.self_motto.length > 160) reasons.push("self_motto");
+  }
+
+  // access_control (optional — defaults to public: true if absent)
+  if (capsule.access_control !== undefined) {
+    if (!isObj(capsule.access_control)) {
+      reasons.push("access_control");
+    } else {
+      const ac = capsule.access_control;
+      const allowedAc = new Set(["public", "authorized_readers"]);
+      for (const k of Object.keys(ac)) if (!allowedAc.has(k)) reasons.push("unknown_field");
+
+      if (typeof ac.public !== "boolean") reasons.push("access_control_public");
+
+      if (ac.authorized_readers !== undefined) {
+        if (!Array.isArray(ac.authorized_readers) || ac.authorized_readers.length > limits.maxAuthorizedReaders) {
+          reasons.push("authorized_readers");
+        } else {
+          for (const r of ac.authorized_readers) {
+            if (typeof r !== "string" || !AGENT_ID_RE.test(r)) reasons.push("authorized_reader_id");
+          }
+        }
+      }
+    }
   }
 
   if (reasons.length) return { ok: false, reason_codes: uniq(reasons) };

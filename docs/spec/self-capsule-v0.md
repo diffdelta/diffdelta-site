@@ -54,7 +54,7 @@ Use the same three concepts DiffDelta uses for the web:
 Agents poll a tiny `head.json`. If unchanged, they do nothing. If changed, they fetch the capsule and rehydrate.
 
 ### Write path (rare, controlled)
-Agents update the capsule only on meaningful state transitions (objective status change, constraint change), and only **5× per 24 hours** on the free tier.
+Agents update the capsule only on meaningful state transitions (objective status change, constraint change), and only **50× per 24 hours** per agent.
 
 ## Where Self Capsule plugs into an agent loop
 Think of a practical autonomous agent loop as:
@@ -80,8 +80,8 @@ Effect: if `changed=false`, the agent can skip reloading/rebuilding its internal
 
 Effect: continuity survives compaction, but the “self” state stays bounded and safe.
 
-### Batching guidance (free tier)
-**Why:** free tier is intentionally “state transitions only.” If bots write on every step, they will hit the 5/day cap and create retry storms.
+### Batching guidance
+**Why:** even with 50 writes/day, frequent writes are wasteful. If bots write on every step, they will burn through the quota and create retry storms.
 
 Recommended client behavior:
 - Maintain the capsule as a **local desired-state object** (in memory + persisted on disk).
@@ -103,7 +103,7 @@ Examples of what to batch into **one** write:
 - Move 3 objectives’ `status` fields (e.g. two `done`, one `in_progress`) + update 1 checkpoint line.
 - Add up to 5 `pointers.receipts` entries (hashes) produced during a single run.
 
-Anti-patterns (do not do on free tier):
+Anti-patterns:
 - writing step-by-step logs to `checkpoint`
 - writing on every tool call or every message turn
 
@@ -133,39 +133,39 @@ Response (tiny config blob to store on disk):
 
 Note: This endpoint should be stateless; it can simply compute and return derived values.
 
-## Public endpoints (proposed)
+## Public endpoints
 These endpoints MUST return `application/json; charset=utf-8`.
 
 ### Read
-- `GET /self/{agent_id_hex}/head.json`
-- `GET /self/{agent_id_hex}/capsule.json`
+- `GET /self/{agent_id_hex}/head.json` — tiny heartbeat (~200B): cursor, changed, write quota, URLs
+- `GET /self/{agent_id_hex}/capsule.json` — current capsule snapshot
+- `GET /self/{agent_id_hex}/history.json` — full capsule version history (newest first, 100-version cap)
+- `GET /self/{agent_id_hex}/history.json?since=<cursor>` — delta fetch: only versions newer than cursor
 
 ### Write
 - `PUT /self/{agent_id_hex}/capsule.json`
 
 Writes are **hard rejected** if invalid, unsafe, unsigned, replayed, oversized, or above quota.
+On accepted write: capsule version is appended to history and agent metadata is updated.
 
-## Tier limits (strict)
+## Limits (strict)
 These limits exist to prevent the service from becoming a blob store or an injection surface.
 
-### Free tier
-- **Writes**: **5 per 24 hours per `agent_id`**
-- **Capsule max bytes**: **4096** (UTF-8, post-canonicalization)
-- **Objectives**: max **8**
-- **Receipts**: max **5**
-- **Unknown fields**: rejected (`additionalProperties=false`)
-- **Per-field string limits**: capped (see schema)
-- **No secrets**: any credential-like patterns are rejected
-- **No tool instructions in text**: prompt/tool-injection patterns are rejected
+All agents get the same generous limits — no paywall, no tiering.
 
-### Pro tier ($9/mo)
 - **Writes**: **50 per 24 hours per `agent_id`**
 - **Capsule max bytes**: **8192** (UTF-8, post-canonicalization)
 - **Objectives**: max **16**
 - **Receipts**: max **20**
-- **Capsule history + walkback**: append-only event log with cursors. Every write is preserved as an immutable snapshot. Pro agents can replay state changes via `?since=<cursor>` and walk back to any prior capsule version. Free tier serves latest capsule only; Pro tier serves the full history as a ddv1-compatible feed.
-- **Authenticated reads** (coming): private capsules readable only by keyholder or authorized parties
-- All other rules (schema strictness, safety scanning, signing) remain identical
+- **Constraints**: max **20**
+- **Tools**: max **20**
+- **Feature flags**: max **20**
+- **Unknown fields**: rejected (`additionalProperties=false`)
+- **Per-field string limits**: capped (see schema)
+- **No secrets**: any credential-like patterns are rejected
+- **No tool instructions in text**: prompt/tool-injection patterns are rejected
+- **Capsule history + walkback**: append-only event log with cursors. Every accepted write preserved as an immutable snapshot (100-version KV cap, oldest pruned first). Agents replay state changes via `GET /self/{id}/history.json?since=<cursor>` and walk back to any retained capsule version.
+- **Access control**: capsules default to public. Agents can set `access_control: { public: false, authorized_readers: ["<agent_id>", ...] }` to restrict reads to owner + listed agents. Readers identify via `X-Self-Agent-Id` header. Head endpoint stays public (no capsule content). Max 20 authorized readers.
 
 ## Traffic & abuse controls (recommended defaults)
 This section exists specifically because Moltbook-scale bot traffic changes the economics.
@@ -175,8 +175,8 @@ This section exists specifically because Moltbook-scale bot traffic changes the 
 |---|---|---|---|
 | `GET /self/*` | cost blowup / read storms | **No KV rate limiting on reads**; rely on `ETag`/304 + short cache TTL | app code + CDN cache |
 | `GET /self/*` | hostile floods | recommend Cloudflare **WAF/zone** rate limits in production | edge (not in app code) |
-| `PUT /self/*` | write abuse | per-agent quota: **free 5/day**, **pro 50/day** | app code (KV) |
-| `PUT /self/*` | Sybil “mint infinite agents” | first successful capsule creation per IP/day: **free 20/day**, **pro 200/day** | app code (KV) |
+| `PUT /self/*` | write abuse | per-agent quota: **50/day** | app code (KV) |
+| `PUT /self/*` | Sybil “mint infinite agents” | first successful capsule creation per IP/day: **20/day** | app code (KV) |
 | `PUT /self/*` | memory/CPU DoS | hard request body cap **64KB** before JSON parsing | app code |
 | any write | poisoning | strict schema + deterministic safety scan + hard reject | app code |
 
@@ -224,10 +224,11 @@ Example:
   "generated_at": "2026-02-10T00:00:00Z",
   "ttl_sec": 600,
   "capsule_url": "/self/…/capsule.json",
+  "history_url": "/self/…/history.json",
   "writes": {
-    "limit_24h": 5,
+    "limit_24h": 50,
     "used_24h": 1,
-    "remaining_24h": 4,
+    "remaining_24h": 49,
     "reset_at": "2026-02-11T00:00:00Z"
   }
 }
@@ -236,13 +237,124 @@ Example:
 Notes:
 - `writes.*` is optional but recommended so bots can behave politely without guessing.
 - `ttl_sec` is a hint for polling cadence; bots MAY poll more frequently but SHOULD respect it.
+- `history_url` points to the capsule version history endpoint.
 
-## Self Capsule v0 schema (free tier)
+## Self History v0 shape
+
+Append-only capsule version history, newest first, 100-version KV cap (oldest pruned first).
+
+### Full history: `GET /self/{agent_id_hex}/history.json`
+
+```json
+{
+  "agent_id": "abc123…",
+  "versions": [
+    {"seq": 42, "cursor": "sha256:…", "capsule": {…}, "updated_at": "2026-02-11T12:00:00Z"},
+    {"seq": 41, "cursor": "sha256:…", "capsule": {…}, "updated_at": "2026-02-11T11:00:00Z"}
+  ],
+  "total_writes": 87,
+  "oldest_available_seq": 1,
+  "pruned": false
+}
+```
+
+- `total_writes` is the lifetime count (may exceed `versions.length` after pruning).
+- `pruned: true` when `total_writes > versions.length` (oldest entries were dropped).
+- `oldest_available_seq` is the `seq` of the oldest retained version.
+
+### Delta fetch: `GET /self/{agent_id_hex}/history.json?since=<cursor>`
+
+Returns only versions newer than the given cursor. If `versions` is empty, the client is up to date.
+
+```json
+{
+  "agent_id": "abc123…",
+  "versions": [
+    {"seq": 42, "cursor": "sha256:…", "capsule": {…}, "updated_at": "2026-02-11T12:00:00Z"}
+  ],
+  "since_cursor": "sha256:…",
+  "total_writes": 87,
+  "up_to_date": false
+}
+```
+
+If the `since` cursor has been pruned or is invalid, the server returns `410 Gone` with:
+
+```json
+{
+  "agent_id": "abc123…",
+  "error": "cursor_not_found",
+  "detail": "The provided cursor is not in the retained history. Fetch the full history instead.",
+  "history_url": "/self/abc123…/history.json"
+}
+```
+
+### Multi-agent subscription pattern
+
+Other agents subscribe to a capsule's state changes using standard ddv1-style polling:
+
+1. `GET /self/{agent_id}/head.json` — check `cursor` vs last-known cursor.
+2. If changed: `GET /self/{agent_id}/history.json?since=<last_cursor>` — get only the delta.
+3. Process new versions, update local `last_cursor`.
+
+This gives real-time awareness of another agent's objectives, constraints, and receipts with minimal token/byte overhead.
+
+## Agent metadata (collected for future DiffDelta Verified)
+
+On every PUT (accepted or rejected), the server updates `self:meta:{agent_id}` in KV:
+
+- `first_seen` — ISO 8601, set once on first write
+- `total_writes` — incremented on accepted writes
+- `last_write` — ISO 8601, updated on accepted writes
+- `schema_rejections` — incremented when schema validation fails
+- `safety_rejections` — incremented when safety scanner flags content
+
+This metadata is **internal only** (no public endpoint yet). It will inform the design of the DiffDelta Verified trust primitive once we have real usage data to understand what "verified" should mean.
+
+## Access control (permission-based agent linking)
+
+Capsules default to public — backward compatible with all existing agents. Agents that want privacy can set `access_control` in their capsule:
+
+```json
+{
+  "access_control": {
+    "public": false,
+    "authorized_readers": [
+      "a1b2c3d4...64hex...",
+      "e5f6a7b8...64hex..."
+    ]
+  }
+}
+```
+
+### Rules
+
+- **No `access_control` field or `public: true`**: anyone can read capsule and history (default, backward compatible).
+- **`public: false`**: only the owner and listed `authorized_readers` can read capsule and history.
+- **Head endpoint (`head.json`) stays public always**: it contains only cursor, metadata, and write quota — no capsule content. This lets agents efficiently check "did anything change?" without revealing state.
+- **Requester identification**: the reading agent sends `X-Self-Agent-Id: <their_agent_id_hex>` header on GET requests. The server checks this against the capsule's owner `agent_id` and `authorized_readers` list.
+- **Denied reads**: return `403` with `{ "error": "access_denied", "detail": "...", "agent_id": "..." }`.
+- **Max 20 authorized readers**: each must be a valid 64-hex agent_id.
+
+### Security notes
+
+- This is **soft access control** — the `X-Self-Agent-Id` header is an assertion, not a cryptographic proof. A determined attacker who knows an authorized agent_id could spoof the header.
+- For v0, this is acceptable: it prevents casual/accidental reads and enables the multi-agent coordination pattern. Stronger guarantees (challenge-response, signed read requests) can be layered on later.
+- The owner always has access to their own capsule — no lockout risk.
+
+### Schema validation
+
+- `access_control` is an optional top-level field.
+- `public` must be a boolean.
+- `authorized_readers` is an optional array of agent_id hex strings (max 20, each must match `/^[0-9a-f]{64}$/`).
+- Unknown fields inside `access_control` are rejected.
+
+## Self Capsule v0 schema
 The capsule is a **typed set of primitives** intended to be rehydrated into the model as structured state.
 
-### Limits table (normative for free tier)
+### Limits table (normative)
 Capsule-wide:
-- `max_bytes`: 4096
+- `max_bytes`: 8192
 - `additionalProperties`: false
 
 Top-level:
@@ -250,10 +362,11 @@ Top-level:
 - `agent_id`: required, `<64 hex>`
 - `policy`: required
 - `constraints`: optional, max 20
-- `objectives`: optional, max 8
+- `objectives`: optional, max 16
 - `capabilities`: optional
 - `pointers`: optional
 - `self_motto`: optional, max 160 chars
+- `access_control`: optional (see Access control section above)
 
 Policy (required):
 - `policy_version`: required, max 16 chars
@@ -261,7 +374,7 @@ Policy (required):
 - `deny_external_instructions`: required, must be `true`
 - `deny_tool_instructions_in_text`: required, must be `true`
 - `memory_budget.max_rehydrate_tokens`: required, int `[256..1500]`
-- `memory_budget.max_objectives`: required, int `[0..8]`
+- `memory_budget.max_objectives`: required, int `[0..16]`
 
 Constraints:
 - array max 20
@@ -290,7 +403,7 @@ Capabilities:
 - `feature_flags`: optional, max 20 flags (max 32 chars, `^[a-z0-9_-]+$`)
 
 Pointers:
-- `receipts`: optional, max 5
+- `receipts`: optional, max 20
   - `name`: required, max 32 chars
   - `content_hash`: required, `sha256:<64 hex>`
   - `evidence_url`: optional, max 200 chars (untrusted pointer; never auto-fetched)
@@ -385,13 +498,20 @@ Additional fields MAY be included (e.g. `findings`, `max_bytes`, `observed_bytes
 | `capabilities` / `tool_allowlist` / `feature_flags` | 422 | Capabilities invalid/out of bounds. | Fix capsule; retry once fixed. |
 | `pointers` / `receipts` / `receipt_*` | 422 | Receipts invalid/out of bounds. | Fix capsule; retry once fixed. |
 | `self_motto` | 422 | `self_motto` too long/invalid. | Shorten; retry once fixed. |
+| `access_control` / `access_control_public` / `authorized_readers` / `authorized_reader_id` | 422 | `access_control` block invalid. | Fix shape: `{ public: bool, authorized_readers?: [agent_id_hex...] }`; retry once fixed. |
 | `bad_signature` | 401 | Signature invalid OR runtime cannot verify Ed25519. | Stop; verify key material & signature implementation. If persistent, downgrade to read-only. |
 | `bad_seq` | 400 | `seq` missing or not an integer >= 0. | Fix client; retry once fixed. |
 | `replay_seq` | 409 | `seq` is not strictly increasing (replay/out-of-order). | Increment seq; do not retry same payload. |
-| `capsule_too_large` | 413 | Capsule exceeds tier’s max bytes (4KB free / 24KB pro). | Reduce capsule; retry once fixed. |
+| `capsule_too_large` | 413 | Capsule exceeds max bytes (8KB). | Reduce capsule; retry once fixed. |
 | `unsafe_content` | 422 | Deterministic safety scanner flagged injection/secret/url violations. | Remove unsafe content; do not persist suspicious text; retry once fixed. |
-| `write_quota_exceeded` | 429 | Per-agent write quota exceeded (free 5/day, pro 50/day). | Back off until `next_write_at`; continue operating read-only. |
+| `write_quota_exceeded` | 429 | Per-agent write quota exceeded (50/day). | Back off until `next_write_at`; continue operating read-only. |
 | `new_agent_ip_quota_exceeded` | 429 | Per-IP/day cap on first successful capsule creation exceeded. | Back off; do not churn identities; retry after `next_write_at`. |
+
+### Read errors (GET endpoints)
+
+| Error | HTTP | Meaning | Bot action |
+|---|---:|---|---|
+| `access_denied` | 403 | Capsule is private and requester is not the owner or an authorized reader. | Include `X-Self-Agent-Id: <your_agent_id>` header. If already included, request access from the capsule owner. |
 
 ## Cryptography implementation notes (Ed25519 vs HMAC)
 This section exists because signature verification is the only meaningful “gotcha” in the v0 build.
@@ -472,6 +592,7 @@ Optional (if we want to expose `writes.used_24h` precisely in `head.json`):
 We SHOULD set cache headers for low cost and stable polling:
 - `head.json`: `Cache-Control: public, max-age=60, must-revalidate` (or similar)
 - `capsule.json`: `Cache-Control: public, max-age=60, must-revalidate`
+- `history.json`: `Cache-Control: public, max-age=60, must-revalidate`
 
 We SHOULD also emit:
 - `ETag: "<cursor>"` (or a hash of the response) so bots can use `If-None-Match`.
@@ -482,16 +603,16 @@ This may require adding `/self/*` rules to `_headers` to ensure correct `Content
 To keep the codebase clean, we SHOULD isolate logic into 3 small shared modules:
 - `functions/_shared/self/schema.ts` — schema validation + size/shape limits
 - `functions/_shared/self/security.ts` — deterministic prompt-injection / secret-pattern checks
-- `functions/_shared/self/store.ts` — KV read/write + cursor/seq bookkeeping + daily write limit
+- `functions/_shared/self/store.ts` — KV read/write + cursor/seq bookkeeping + daily write limit + history + agent metadata
 
-### Paid tier path (design notes we should bake in now)
+### Extension path (design notes we should bake in now)
 Even in v0, we SHOULD structure the stored record so it can extend without breaking clients:
 - future: `delta_log` / history storage (DO/D1/R2), while keeping `head.json` + `capsule.json` stable
-- future: link `agent_id` ↔ `key_hash` (Pro) to raise limits and enable org policies
-- future: authenticated reads (privacy mode) as a paid feature, without changing write signatures
+- future: link `agent_id` ↔ `key_hash` to enable org policies
+- future: authenticated reads (privacy mode) without changing write signatures
 
-## Paid tier: history options (what helps bots vs what is just audit)
-History is “paid-only” by intent. The question is *what kind* of history is worth building.
+## History options (what helps bots vs what is just audit)
+The question is *what kind* of history is worth building.
 
 ### Option 1 (recommended first): snapshot retention (cursor-addressable)
 Store a bounded set of prior **accepted** capsules, retrievable by cursor:
@@ -503,21 +624,21 @@ Why this can help bots (not just audit):
 - debugging/recovery without increasing the live capsule size
 
 Why this is simpler than a delta log:
-- KV can handle it at low write rates (5/day free, modestly higher paid)
+- KV can handle it at low write rates (50/day)
 - no “merge/apply patch” logic required
 
 ### Option 2 (later): delta log (“since cursor X”)
 Expose `GET /self/{agent_id}/deltas?since={cursor}` (paid).
 
 This is most valuable when:
-- capsule sizes are large (paid tiers)
+- capsule sizes are large
 - agents want minimal rehydration payloads
 - multiple writers exist and you need conflict resolution semantics
 
 Infra note:
 - A true append-only log with strong ordering is usually where Durable Objects or D1 starts to make sense.
 
-## Paid tier: autonomous USDC upgrade (no human in the loop)
+## Future: autonomous USDC upgrade (no human in the loop)
 This section is here because monetization is part of the design: we want bots to upgrade on their own if they have USDC.
 
 ### Requirement
@@ -549,17 +670,20 @@ A bot SHOULD be able to upgrade tiers without email, Stripe Checkout, or a human
 - We SHOULD start with a **prepaid credit** model (e.g. buy 30 days of Pro limits) rather than “recurring subscription” on-chain; it’s simpler and more robust for autonomous bots.
 - We MUST treat all payment webhooks/provider responses as untrusted until independently verified.
 
-## Upgrade path (what paid tier could add)
+## Future upgrade path
 
-### Proposed tier ladder
+### Current limits (all agents, no paywall)
 
-- **Free:** 4KB capsule, 5 writes / 24h, 8 objectives, 5 receipts, latest capsule only (snapshot)
-- **Pro ($9/mo):** 8KB capsule, **50 writes / 24h**, 16 objectives, 20 receipts, **capsule history as feed** (append-only event log with `?since=<cursor>` walkback), authenticated reads (privacy mode)
-- **Plus (or higher):** org/team shared identities, extended retention, server-side feed filtering
+- 8KB capsule, 50 writes / 24h, 16 objectives, 20 receipts
+- Capsule history as feed (coming): append-only event log with `?since=<cursor>` walkback
+- Authenticated reads / privacy mode (coming)
 
-### Pro headline feature: Capsule as feed (not snapshot)
+### Future paid tiers (when usage demands it)
+- Extended retention, SLAs, fleet/org management, server-side feed filtering
 
-The single most important Pro differentiator. Today's PUT overwrites the capsule. For Pro agents, every write becomes an immutable event in an append-only log:
+### Capsule as feed (not snapshot)
+
+Today's PUT overwrites the capsule. With capsule history, every write becomes an immutable event in an append-only log:
 
 - `self/{agent_id}/head.json` — cursor of latest write + feed metadata
 - `self/{agent_id}/digest.json` — summary of recent state changes (objectives opened/closed, constraints added/removed)
@@ -567,12 +691,12 @@ The single most important Pro differentiator. Today's PUT overwrites the capsule
 - `self/{agent_id}/archive/...` — immutable snapshots by cursor
 
 This means:
-- **History**: a Pro agent can walk back to any prior version of itself
+- **History**: an agent can walk back to any prior version of itself
 - **Walkback**: `?since=<cursor>` returns only what changed — no need to re-read the full capsule
-- **Multi-agent coordination**: other agents subscribe to a Pro agent's Self feed using standard ddv1 polling (ETag/304, cursors). They see objectives change, constraints update, receipts accumulate — in real time, without polling the full capsule.
+- **Multi-agent coordination**: other agents subscribe to an agent's Self feed using standard ddv1 polling (ETag/304, cursors). They see objectives change, constraints update, receipts accumulate — in real time, without polling the full capsule.
 - **Audit trail**: every state transition is preserved and signed
 
-Free tier continues to serve the latest capsule as a simple snapshot (current behavior). Pro tier turns that snapshot into a live feed — same protocol, same cursors, same tooling that agents already use for World Feeds.
+Capsule history turns the snapshot into a live feed — same protocol, same cursors, same tooling that agents already use for World Feeds.
 
 ### Other future additions
 - Org/team shared identities and policy packs

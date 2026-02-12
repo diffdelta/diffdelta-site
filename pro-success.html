@@ -81,7 +81,7 @@
   <div class="card hidden" id="state-success">
     <div class="badge">Pro Activated</div>
     <h1>Welcome to DiffDelta Pro!</h1>
-    <p>Your API key is ready. Add it to your requests for 1,000 req/min and priority access.</p>
+    <p>Your API key is ready. Add it to your requests for Pro limits: 1,000 req/min, expanded Self Capsule (8KB, 16 objectives, 20 receipts, 50 writes/day), and priority access.</p>
 
     <div class="key-box">
       <label>Your API Key</label>
@@ -122,6 +122,15 @@ const client = new DiffDeltaClient(
     { apiKey: "<span class="key-placeholder">YOUR_KEY</span>" }
 );
 const feed = await client.poll("cisa_kev");</pre>
+        </li>
+        <li>
+          <strong>Use with Self Capsule (Pro limits: 8KB, 16 obj, 50 writes/day):</strong>
+          <pre># Include the key on capsule writes for Pro limits
+curl -X PUT \
+  -H "X-DiffDelta-Key: <span class="key-placeholder">YOUR_KEY</span>" \
+  -H "Content-Type: application/json" \
+  -d '{"public_key":"...","seq":1,"signature":"...","capsule":{...}}' \
+  https://diffdelta.io/self/{agent_id}/capsule.json</pre>
         </li>
         <li>
           <strong>Manage your key:</strong>

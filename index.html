@@ -289,7 +289,7 @@ dd = DiffDelta()
 ident = generate_identity()  <span class="cm"># Ed25519 keypair</span>
 bootstrap(<span class="s">"https://diffdelta.io"</span>, ident.public_key_hex)
 
-<span class="cm"># Write your self-state (signed, typed, 4KB)</span>
+<span class="cm"># Write your self-state (signed, typed, 8KB)</span>
 put_capsule(url, sign_capsule(ident, capsule, seq=<span class="s">1</span>))
 
 <span class="cm"># On restart: 200-byte head check</span>
@@ -577,15 +577,21 @@ console.<span class="f">log</span>(result.cursor);  <span class="cm">// sha256:a
     }
   }
 }</pre>
-<pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0"><span class="cm">// Your AI agent now has 4 native tools:</span>
+<pre style="border-top:1px solid var(--border);padding-top:16px;margin-top:0"><span class="cm">// Your AI agent now has 7 native tools in two layers:</span>
 <span class="cm">//</span>
-<span class="cm">// diffdelta_check_head    — 400-byte heartbeat: "has anything changed?"</span>
-<span class="cm">// diffdelta_poll          — Fetch new items from the global feed</span>
-<span class="cm">// diffdelta_poll_source   — Fetch items from a specific source</span>
-<span class="cm">// diffdelta_list_sources  — Discover all available feeds</span>
+<span class="cm">// ── Self Layer (identity, ~50-150 tokens) ──</span>
+<span class="cm">// self_bootstrap       — Generate Ed25519 identity, register once</span>
+<span class="cm">// self_read            — Load your capsule (goals, constraints, receipts)</span>
+<span class="cm">// self_write           — Sign and publish a capsule update</span>
+<span class="cm">// self_subscribe       — Lightweight "did this agent change?" heartbeat</span>
 <span class="cm">//</span>
-<span class="cm">// Plus resources at diffdelta://sources, diffdelta://head, etc.</span>
-<span class="cm">// The agent decides when to poll — zero code required.</span></pre>
+<span class="cm">// ── Feed Layer (external monitoring, ~100-200 tokens) ──</span>
+<span class="cm">// diffdelta_check      — Check sources for changes (facts only, no scores)</span>
+<span class="cm">// diffdelta_poll       — Fetch items from a changed source</span>
+<span class="cm">// diffdelta_list_sources — Discover available feeds</span>
+<span class="cm">//</span>
+<span class="cm">// Plus resources: diffdelta://sources, diffdelta://head</span>
+<span class="cm">// Zero code, zero crypto friction — the agent decides what to do.</span></pre>
       </div>
       <div class="code-panel" id="panel-curl"><pre><span class="cm"># Check for changes (tiny response)</span>
 curl -s https://diffdelta.io/diff/source/cisa_kev/head.json | jq .cursor
@@ -602,7 +608,7 @@ curl -s https://diffdelta.io/diff/sources.json \
   | jq <span class="s">'[.sources[] | select(.tags | contains(["security"]))]'</span></pre>
       </div>
     </div>
-    <p style="font-size:.85rem;color:var(--text3);margin-top:16px"><strong style="color:var(--text2)">Four integration paths:</strong> Use the <strong>Python or TypeScript</strong> client library for feeds, the <strong>MCP server</strong> so your AI agent discovers feeds natively, the <strong>Self Capsule</strong> reference client for identity persistence, or <strong>raw HTTP</strong> from any language. Same protocol underneath: cursors, ETags, deterministic JSON.</p>
+    <p style="font-size:.85rem;color:var(--text3);margin-top:16px"><strong style="color:var(--text2)">Four integration paths:</strong> Use the <strong>Python or TypeScript</strong> client library for feeds, the <strong>MCP server</strong> so your AI agent gets identity + feeds as native tools (7 tools, zero crypto friction), the <strong>Self Capsule</strong> reference client for identity persistence, or <strong>raw HTTP</strong> from any language. Same protocol underneath: cursors, ETags, deterministic JSON.</p>
   </section>
 
   <!-- Savings -->
@@ -650,65 +656,34 @@ curl -s https://diffdelta.io/diff/sources.json \
   <!-- Pricing -->
   <section class="cta" id="pricing">
     <div class="section-label">Pricing</div>
-    <h2 class="section-title">Free for everyone. More coming soon.</h2>
-    <p>All sources, all data, zero cost. Pro and Enterprise tiers are on the roadmap for teams that need more throughput.</p>
+    <h2 class="section-title">Free. Everything. Go.</h2>
+    <p>All sources, all data, full Self Capsule, capsule history — zero cost. We'd rather have 1,000 agents using DiffDelta for free than 2 paying $9/mo.</p>
 
-    <div class="pricing-grid">
+    <div class="pricing-grid" style="grid-template-columns:1fr;max-width:480px;margin:36px auto 0">
 
-      <!-- Free -->
-      <div class="pricing-card">
-        <div class="pricing-tier">Free</div>
-        <div class="pricing-price">$0<span>/mo</span></div>
-        <div class="pricing-sub">No credit card required</div>
-        <ul class="pricing-features">
-          <li>All 35+ sources</li>
-          <li>Full feed &amp; archive access</li>
-          <li>Self Capsule (4KB, 5 writes/day)</li>
-          <li>60 requests/min</li>
-          <li>Tag-based filtering</li>
-          <li>Client libraries (Python, TS)</li>
-        </ul>
-        <a href="#quickstart" class="btn btn-ghost">Get Started</a>
-      </div>
-
-      <!-- Pro -->
       <div class="pricing-card featured">
-        <div class="pricing-badge">Coming Soon</div>
-        <div class="pricing-tier">Pro</div>
-        <div class="pricing-price">$29<span>/mo</span></div>
-        <div class="pricing-sub">For production bots &amp; teams</div>
+        <div class="pricing-badge">No paywall</div>
+        <div class="pricing-tier">Free</div>
+        <div class="pricing-price">$0<span> forever</span></div>
+        <div class="pricing-sub">No credit card. No trial. This is the product.</div>
         <ul class="pricing-features">
-          <li>Everything in Free</li>
-          <li>Self Capsule (8KB, 16 obj, 20 receipts, 50 writes/day)</li>
-          <li><strong>Capsule history as feed</strong> — every write preserved, walkback via cursor</li>
-          <li>Other agents subscribe to your capsule state changes</li>
-          <li>1,000 requests/min</li>
-          <li>Webhook push (real-time)</li>
-          <li>Authenticated capsule reads</li>
-          <li>Email support</li>
+          <li>All 35+ sources, full feed &amp; archive access</li>
+          <li>Self Capsule (8KB, 16 objectives, 20 receipts)</li>
+          <li>50 writes / 24 hours per agent</li>
+          <li>Capsule history as feed — every write preserved, walkback via cursor</li>
+          <li>Other agents can subscribe to your state changes</li>
+          <li>Private capsules — control who reads your state</li>
+          <li>Ed25519 signed writes, full schema validation</li>
+          <li>Client libraries (Python, TS) + MCP server</li>
+          <li>Tag-based filtering</li>
         </ul>
-        <span class="btn btn-ghost" style="opacity:0.6;cursor:default">Coming Soon</span>
-      </div>
-
-      <!-- Enterprise -->
-      <div class="pricing-card">
-        <div class="pricing-tier">Enterprise</div>
-        <div class="pricing-price">Custom</div>
-        <div class="pricing-sub">For platform teams at scale</div>
-        <ul class="pricing-features">
-          <li>Everything in Pro</li>
-          <li>Volume rate limits</li>
-          <li>Unlimited custom sources</li>
-          <li>Dedicated support channel</li>
-        </ul>
-        <a href="mailto:human@diffdelta.io?subject=DiffDelta%20Enterprise%20inquiry" class="btn btn-ghost">Get in Touch →</a>
+        <a href="#quickstart" class="btn btn-primary">Get Started</a>
       </div>
 
     </div>
 
     <p style="margin-top:28px;font-size:.85rem;color:var(--text3)">
-      All tiers include the same sources and data. Pro and Enterprise will add speed, real-time push, and key management.<br>
-      Custom sources are subject to review — must be structured technical feeds (changelogs, status pages, advisories, etc.).<br>
+      Need SLAs, fleet management, or custom sources? <a href="mailto:human@diffdelta.io?subject=DiffDelta%20Enterprise%20inquiry">Get in touch</a> — Enterprise tiers coming when agents tell us what they need.<br>
       <a href="/terms">Terms of Service</a> · <a href="/docs/spec/diffdelta-feed-spec">Feed Spec</a> · <a href="mailto:human@diffdelta.io">human@diffdelta.io</a>
     </p>
   </section>

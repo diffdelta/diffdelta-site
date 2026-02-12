@@ -122,7 +122,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   headers.set("Access-Control-Allow-Origin", "*");
   headers.set(
     "Access-Control-Allow-Headers",
-    "X-DiffDelta-Key, X-Moltbook-Identity, Content-Type, If-None-Match"
+    "X-DiffDelta-Key, X-Moltbook-Identity, X-Self-Agent-Id, Content-Type, If-None-Match"
   );
   headers.set(
     "Access-Control-Expose-Headers",

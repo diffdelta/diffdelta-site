@@ -8,17 +8,12 @@ import { jsonResponse, errorResponse } from "../../_shared/response";
 import type { Env } from "../../_shared/types";
 import { parseAgentIdHex } from "../../_shared/self/crypto";
 import { getStoredCapsule, getWritesUsed24h, dayResetAtIsoUTC } from "../../_shared/self/store";
-import type { AuthResult } from "../../_shared/auth";
-import { authenticateRequest } from "../../_shared/auth";
 
-function resolveTier(auth?: AuthResult): "free" | "pro" {
-  return auth?.authenticated && (auth.tier === "pro" || auth.tier === "enterprise")
-    ? "pro"
-    : "free";
-}
+// v0: single generous tier — all agents get 50 writes/day.
+const WRITE_LIMIT_24H = 50;
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
-  const { params, env, data, request } = context;
+  const { params, env, request } = context;
   let agentIdHex: string;
   try {
     agentIdHex = parseAgentIdHex(String(params.agent_id_hex || ""));
@@ -31,20 +26,8 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     return errorResponse("Capsule not found", 404);
   }
 
-  // /self GETs bypass middleware for cost-control, so do lightweight auth here
-  // only if a key was provided (Pro view).
-  const providedKey = request.headers.get("X-DiffDelta-Key");
-  let auth = (data as Record<string, unknown>).auth as AuthResult | undefined;
-  if (!auth && providedKey) {
-    auth = await authenticateRequest(request, env);
-    if (auth.error) {
-      return errorResponse(auth.error, 401);
-    }
-  }
-  const tier = resolveTier(auth);
-  const limit24h = tier === "pro" ? 50 : 5;
   const used = await getWritesUsed24h(env, agentIdHex);
-  const remaining = Math.max(0, limit24h - used);
+  const remaining = Math.max(0, WRITE_LIMIT_24H - used);
   const resetAt = dayResetAtIsoUTC();
 
   const head = {
@@ -55,8 +38,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     generated_at: stored.updated_at,
     ttl_sec: 600,
     capsule_url: `/self/${agentIdHex}/capsule.json`,
+    history_url: `/self/${agentIdHex}/history.json`,
     writes: {
-      limit_24h: limit24h,
+      limit_24h: WRITE_LIMIT_24H,
       used_24h: used,
       remaining_24h: remaining,
       reset_at: resetAt,

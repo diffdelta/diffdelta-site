@@ -7,7 +7,7 @@ import type { RateLimitResult } from "./types";
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "X-DiffDelta-Key, X-Moltbook-Identity, Content-Type, If-None-Match",
+  "Access-Control-Allow-Headers": "X-DiffDelta-Key, X-Moltbook-Identity, X-Self-Agent-Id, Content-Type, If-None-Match",
   // Expose ETag so browser/Fetch clients (including Node's fetch CORS filtering) can read it.
   "Access-Control-Expose-Headers": "ETag, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
