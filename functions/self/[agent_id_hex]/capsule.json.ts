@@ -20,6 +20,7 @@ import {
   appendCapsuleVersion,
   upsertAgentMeta,
   checkCapsuleAccess,
+  registerAgent,
 } from "../../_shared/self/store";
 import { canonicalJson } from "../../_shared/self/canonical";
 
@@ -190,6 +191,9 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
         429
       );
     }
+    // Register the agent in the append-only registry (fire-and-forget).
+    // This lets the operator list all bootstrapped agents without knowing IDs upfront.
+    context.waitUntil(registerAgent(env, agentIdHex));
   }
 
   const quota = await checkAndIncrementWriteQuota(env, agentIdHex, WRITE_LIMIT_24H);

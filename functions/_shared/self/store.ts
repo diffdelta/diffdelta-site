@@ -380,3 +380,62 @@ export async function getAgentMeta(env: Env, agentIdHex: string): Promise<AgentM
   }
 }
 
+// ─────────────────────────────────────────────────────────
+// Agent registry — append-only list of all bootstrapped agents
+// Why: lets the operator list all agents without knowing IDs upfront.
+// ─────────────────────────────────────────────────────────
+
+const REGISTRY_KEY = "self:registry";
+
+export interface AgentRegistryEntry {
+  agent_id: string;
+  registered_at: string; // ISO 8601
+}
+
+export interface AgentRegistry {
+  agents: AgentRegistryEntry[];
+}
+
+/**
+ * Add an agent to the registry on first capsule write.
+ * Idempotent: skips if the agent_id is already in the list.
+ */
+export async function registerAgent(env: Env, agentIdHex: string): Promise<void> {
+  const raw = await env.SELF.get(REGISTRY_KEY);
+  let registry: AgentRegistry;
+  if (raw) {
+    try {
+      registry = JSON.parse(raw) as AgentRegistry;
+    } catch {
+      registry = { agents: [] };
+    }
+  } else {
+    registry = { agents: [] };
+  }
+
+  // Idempotent: don't add if already registered
+  if (registry.agents.some((a) => a.agent_id === agentIdHex)) {
+    return;
+  }
+
+  registry.agents.push({
+    agent_id: agentIdHex,
+    registered_at: isoNow(),
+  });
+
+  await env.SELF.put(REGISTRY_KEY, JSON.stringify(registry));
+}
+
+/**
+ * Get the full agent registry (for admin listing endpoint).
+ */
+export async function getAgentRegistry(env: Env): Promise<AgentRegistry> {
+  const raw = await env.SELF.get(REGISTRY_KEY);
+  if (!raw) return { agents: [] };
+  try {
+    return JSON.parse(raw) as AgentRegistry;
+  } catch {
+    return { agents: [] };
+  }
+}
+
