@@ -1,0 +1,1342 @@
+{
+  "schema_version": "1.2.0",
+  "generated_at": "2026-02-14T15:51:05Z",
+  "source_id": "linux_kernel_cve",
+  "hash": "sha256:98c69f4172fd9c8a06bce8b7e5910716357bb2c51d5798cbead1e065a3a32634",
+  "prev_hash": "sha256:48cd5c304553a47d5b932a46f4911d0a09ff9b2d1b8a3cb1a035714e7382bb66",
+  "cursor": "sha256:035fc558bdf1147a17fd5e9873f1f3603c6c0308e5c9f11f5946b198dd3ca248",
+  "prev_cursor": "sha256:da4cf2d4b0f22dd278c5ddd83de1e3339fffd822af443e26e3914c307c6e08bc",
+  "changed": true,
+  "ttl_sec": 3600,
+  "sources_included": [
+    "linux_kernel_cve"
+  ],
+  "batch_narrative": "linux_kernel_cve: 25 advisories (2 critical, 1 high, 22 low).",
+  "buckets": {
+    "items": [
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:a4924dc8-3d76-c9f2-7e8c-411e142992a1",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021417-CVE-2026-23145-0c0b@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:36:37Z",
+        "headline": "CVE-2026-23145: ext4: fix iloc.bh leak in ext4_xattr_inode_update_ref",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: ext4: fix iloc.bh leak in ext4_xattr_inode_update_ref The error branch for ext4_xattr_inode_update_ref forget to release the refcount for iloc.bh. Find this when review code. The Linux kernel CVE team has assigned CVE-2026-23145 to this issue. Affected and fixed versions =========================== Issue introduced in 5.10.246 with commit...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021417-CVE-2026-23145-0c0b@gregkh/"
+          ],
+          "content_hash": "sha256:77caf5fada670fd96f8d3f0fa5ed0d6dc0c6e4271c64d0e53a7ac28c405c70ea"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23145"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021417-CVE-2026-23145-0c0b@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\next4: fix iloc.bh leak in ext4_xattr_inode_update_ref\n\nThe error branch for ext4_xattr_inode_update_ref forget to release the\nrefcount for iloc.bh. Find this when review code.\n\nThe Linux kernel CVE team has assigned CVE-2026-23145 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 5.10.246 with commit 1cfb3e4ddbdc8e02e637b8852540bd4718bf4814 and fixed in 5.10.249 with commit 7c9f059c3d531a12d7ad96cd34a44b8af7c00d5f\n\tIssue introduced in 5.15.195 with commit 505e69f76ac497e788f4ea0267826ec7266b40c8 and fixed in 5.15.199 with commit 6241cd1d0acc2363016ac55b8773ba1332dd59d7\n\tIssue introduced in 6.1.157 with commit 3d6269028246f4484bfed403c947a114bb583631 and fixed in 6.1.162 with commit 3b00c16e42428a1ecd3a5eb9cc37f8ad9bd47626\n\tIssue introduced in 6.6.113 with commit 79ea7f3e11effe1bd9e753172981d9029133a278 and fixed in 6.6.122 with commit 0b06cde92f2f960f4ebe3c988c69f2711f2a24dc\n\tIssue introduced in 6.12.54 with commit 6b879c4c6bbaab03c0ad2a983953bd1410bb165e and fixed in 6.12.67 with commit 8e8542c539927ae3898a4d02941f84e252e2dea1\n\tIssue introduced in 6.18 with commit 57295e835408d8d425bef58da5253465db3d6888 and fixed in 6.18.7 with commit 06e26287f2e349a28ad363941ffd9076bfed8b2e\n\tIssue introduced in 6.18 with commit 57295e835408d8d425bef58da5253465db3d6888 and fixed in 6.19 with commit d250bdf531d9cd4096fedbb9f172bb2ca660c868\n\tIssue introduced in 5.4.301 with commit ea39e712c2f5ae148ee5515798ae03523673e002\n\tIssue introduced in 6.17.4 with commit 440b003f449a4ff2a00b08c8eab9ba5cd28f3943\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23145\">https://cve.org/CVERecord/?id=CVE-2026-23145</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tfs/ext4/xattr.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/7c9f059c3d531a12d7ad96cd34a44b8af7c00d5f\">https://git.kernel.org/stable/c/7c9f059c3d531a12d7ad96cd34a44b8af7c00d5f</a>\n\t<a href=\"https://git.kernel.org/stable/c/6241cd1d0acc2363016ac55b8773ba1332dd59d7\">https://git.kernel.org/stable/c/6241cd1d0acc2363016ac55b8773ba1332dd59d7</a>\n\t<a href=\"https://git.kernel.org/stable/c/3b00c16e42428a1ecd3a5eb9cc37f8ad9bd47626\">https://git.kernel.org/stable/c/3b00c16e42428a1ecd3a5eb9cc37f8ad9bd47626</a>\n\t<a href=\"https://git.kernel.org/stable/c/0b06cde92f2f960f4ebe3c988c69f2711f2a24dc\">https://git.kernel.org/stable/c/0b06cde92f2f960f4ebe3c988c69f2711f2a24dc</a>\n\t<a href=\"https://git.kernel.org/stable/c/8e8542c539927ae3898a4d02941f84e252e2dea1\">https://git.kernel.org/stable/c/8e8542c539927ae3898a4d02941f84e252e2dea1</a>\n\t<a href=\"https://git.kernel.org/stable/c/06e26287f2e349a28ad363941ffd9076bfed8b2e\">https://git.kernel.org/stable/c/06e26287f2e349a28ad363941ffd9076bfed8b2e</a>\n\t<a href=\"https://git.kernel.org/stable/c/d250bdf531d9cd4096fedbb9f172bb2ca660c868\">https://git.kernel.org/stable/c/d250bdf531d9cd4096fedbb9f172bb2ca660c868</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021417-CVE-2026-23145-0c0b@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:36:37Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            36,
+            37,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:a4924dc8-3d76-c9f2-7e8c-411e142992a1"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:07e6abf0-2a01-32bf-930b-413f702eac0a",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021417-CVE-2026-23144-297b@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:36:34Z",
+        "headline": "CVE-2026-23144: mm/damon/sysfs: cleanup attrs subdirs on context dir setup failure",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: mm/damon/sysfs: cleanup attrs subdirs on context dir setup failure When a context DAMON sysfs directory setup is failed after setup of attrs/ directory, subdirectories of attrs/ directory are not cleaned up. As a result, DAMON sysfs interface is nearly broken until the system reboots, and the memory for the unremoved directory is leaked. Cleanup the...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021417-CVE-2026-23144-297b@gregkh/"
+          ],
+          "content_hash": "sha256:cd4faf8b3615b31b12d03f5e61f38b577dfe158a24eecf17a150043241d1a823"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23144"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021417-CVE-2026-23144-297b@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nmm/damon/sysfs: cleanup attrs subdirs on context dir setup failure\n\nWhen a context DAMON sysfs directory setup is failed after setup of attrs/\ndirectory, subdirectories of attrs/ directory are not cleaned up.  As a\nresult, DAMON sysfs interface is nearly broken until the system reboots,\nand the memory for the unremoved directory is leaked.\n\nCleanup the directories under such failures.\n\nThe Linux kernel CVE team has assigned CVE-2026-23144 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 5.18 with commit c951cd3b89010c7a4751b9d4ea074007e44851e6 and fixed in 6.1.162 with commit db7dfe78fc81bdd2b532d77f340fe453f2360426\n\tIssue introduced in 5.18 with commit c951cd3b89010c7a4751b9d4ea074007e44851e6 and fixed in 6.6.122 with commit 43964644348f6b1add3055c4a6cae8f77d892a6e\n\tIssue introduced in 5.18 with commit c951cd3b89010c7a4751b9d4ea074007e44851e6 and fixed in 6.12.67 with commit 5651c0c391c0029541794f9c4c9597faecfd401f\n\tIssue introduced in 5.18 with commit c951cd3b89010c7a4751b9d4ea074007e44851e6 and fixed in 6.18.7 with commit 78b4eb99751ebd37ceade78810bf94de80f7fb3a\n\tIssue introduced in 5.18 with commit c951cd3b89010c7a4751b9d4ea074007e44851e6 and fixed in 6.19 with commit 9814cc832b88bd040fc2a1817c2b5469d0f7e862\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23144\">https://cve.org/CVERecord/?id=CVE-2026-23144</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tmm/damon/sysfs.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/db7dfe78fc81bdd2b532d77f340fe453f2360426\">https://git.kernel.org/stable/c/db7dfe78fc81bdd2b532d77f340fe453f2360426</a>\n\t<a href=\"https://git.kernel.org/stable/c/43964644348f6b1add3055c4a6cae8f77d892a6e\">https://git.kernel.org/stable/c/43964644348f6b1add3055c4a6cae8f77d892a6e</a>\n\t<a href=\"https://git.kernel.org/stable/c/5651c0c391c0029541794f9c4c9597faecfd401f\">https://git.kernel.org/stable/c/5651c0c391c0029541794f9c4c9597faecfd401f</a>\n\t<a href=\"https://git.kernel.org/stable/c/78b4eb99751ebd37ceade78810bf94de80f7fb3a\">https://git.kernel.org/stable/c/78b4eb99751ebd37ceade78810bf94de80f7fb3a</a>\n\t<a href=\"https://git.kernel.org/stable/c/9814cc832b88bd040fc2a1817c2b5469d0f7e862\">https://git.kernel.org/stable/c/9814cc832b88bd040fc2a1817c2b5469d0f7e862</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021417-CVE-2026-23144-297b@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:36:34Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            36,
+            34,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:07e6abf0-2a01-32bf-930b-413f702eac0a"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:bd967cf5-1011-2046-a9dc-5193a899b180",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021416-CVE-2026-23143-9346@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:36:31Z",
+        "headline": "CVE-2026-23143: virtio_net: Fix misalignment bug in struct virtnet_info",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: virtio_net: Fix misalignment bug in struct virtnet_info Use the new TRAILING_OVERLAP() helper to fix a misalignment bug along with the following warning: drivers/net/virtio_net.c:429:46: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end] This helper creates a union between a...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021416-CVE-2026-23143-9346@gregkh/"
+          ],
+          "content_hash": "sha256:c1f4990a062ff0d292209aeacef3e9b03f382f9f65084f5a0e2068d209fa3646"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23143"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021416-CVE-2026-23143-9346@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nvirtio_net: Fix misalignment bug in struct virtnet_info\n\nUse the new TRAILING_OVERLAP() helper to fix a misalignment bug\nalong with the following warning:\n\ndrivers/net/virtio_net.c:429:46: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]\n\nThis helper creates a union between a flexible-array member (FAM)\nand a set of members that would otherwise follow it (in this case\n`u8 rss_hash_key_data[VIRTIO_NET_RSS_MAX_KEY_SIZE];`). This\noverlays the trailing members (rss_hash_key_data) onto the FAM\n(hash_key_data) while keeping the FAM and the start of MEMBERS aligned.\nThe static_assert() ensures this alignment remains.\n\nNotice that due to tail padding in flexible `struct\nvirtio_net_rss_config_trailer`, `rss_trailer.hash_key_data`\n(at offset 83 in struct virtnet_info) and `rss_hash_key_data` (at\noffset 84 in struct virtnet_info) are misaligned by one byte. See\nbelow:\n\nstruct virtio_net_rss_config_trailer {\n        __le16                     max_tx_vq;            /*     0     2 */\n        __u8                       hash_key_length;      /*     2     1 */\n        __u8                       hash_key_data[];      /*     3     0 */\n\n        /* size: 4, cachelines: 1, members: 3 */\n        /* padding: 1 */\n        /* last cacheline: 4 bytes */\n};\n\nstruct virtnet_info {\n...\n        struct virtio_net_rss_config_trailer rss_trailer; /*    80     4 */\n\n        /* XXX last struct has 1 byte of padding */\n\n        u8                         rss_hash_key_data[40]; /*    84    40 */\n...\n        /* size: 832, cachelines: 13, members: 48 */\n        /* sum members: 801, holes: 8, sum holes: 31 */\n        /* paddings: 2, sum paddings: 5 */\n};\n\nAfter changes, those members are correctly aligned at offset 795:\n\nstruct virtnet_info {\n...\n        union {\n                struct virtio_net_rss_config_trailer rss_trailer; /*   792     4 */\n                struct {\n                        unsigned char __offset_to_hash_key_data[3]; /*   792     3 */\n                        u8         rss_hash_key_data[40]; /*   795    40 */\n                };                                       /*   792    43 */\n        };                                               /*   792    44 */\n...\n        /* size: 840, cachelines: 14, members: 47 */\n        /* sum members: 801, holes: 8, sum holes: 35 */\n        /* padding: 4 */\n        /* paddings: 1, sum paddings: 4 */\n        /* last cacheline: 8 bytes */\n};\n\nAs a result, the RSS key passed to the device is shifted by 1\nbyte: the last byte is cut off, and instead a (possibly\nuninitialized) byte is added at the beginning.\n\nAs a last note `struct virtio_net_rss_config_hdr *rss_hdr;` is also\nmoved to the end, since it seems those three members should stick\naround together. :)\n\nThe Linux kernel CVE team has assigned CVE-2026-23143 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 6.15 with commit ed3100e90d0d120a045a551b85eb43cf2527e885 and fixed in 6.18.7 with commit ae48108c2310f1dd700e0dbb655c2f1d92ed00fc\n\tIssue introduced in 6.15 with commit ed3100e90d0d120a045a551b85eb43cf2527e885 and fixed in 6.19 with commit 4156c3745f06bc197094b9ee97a9584e69ed00bf\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23143\">https://cve.org/CVERecord/?id=CVE-2026-23143</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tdrivers/net/virtio_net.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/ae48108c2310f1dd700e0dbb655c2f1d92ed00fc\">https://git.kernel.org/stable/c/ae48108c2310f1dd700e0dbb655c2f1d92ed00fc</a>\n\t<a href=\"https://git.kernel.org/stable/c/4156c3745f06bc197094b9ee97a9584e69ed00bf\">https://git.kernel.org/stable/c/4156c3745f06bc197094b9ee97a9584e69ed00bf</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021416-CVE-2026-23143-9346@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:36:31Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            36,
+            31,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:bd967cf5-1011-2046-a9dc-5193a899b180"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:407b2f85-57d4-bdc6-51cf-0fbfe04885c4",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021416-CVE-2026-23142-f91e@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:36:29Z",
+        "headline": "CVE-2026-23142: mm/damon/sysfs-scheme: cleanup access_pattern subdirs on scheme dir setup failure",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: mm/damon/sysfs-scheme: cleanup access_pattern subdirs on scheme dir setup failure When a DAMOS-scheme DAMON sysfs directory setup fails after setup of access_pattern/ directory, subdirectories of access_pattern/ directory are not cleaned up. As a result, DAMON sysfs interface is nearly broken until the system reboots, and the memory for the unremoved...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021416-CVE-2026-23142-f91e@gregkh/"
+          ],
+          "content_hash": "sha256:3521d33a968394e6f79dd2b0293486da2de94b045e1afd78e862da42e1f3a67b"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23142"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021416-CVE-2026-23142-f91e@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nmm/damon/sysfs-scheme: cleanup access_pattern subdirs on scheme dir setup failure\n\nWhen a DAMOS-scheme DAMON sysfs directory setup fails after setup of\naccess_pattern/ directory, subdirectories of access_pattern/ directory are\nnot cleaned up.  As a result, DAMON sysfs interface is nearly broken until\nthe system reboots, and the memory for the unremoved directory is leaked.\n\nCleanup the directories under such failures.\n\nThe Linux kernel CVE team has assigned CVE-2026-23142 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 5.18 with commit 9bbb820a5bd5f406ae5e0819cc31f2c2e6f4d990 and fixed in 6.1.162 with commit ae8ac0066b48ed957bdcab58f0d3543549c57a29\n\tIssue introduced in 5.18 with commit 9bbb820a5bd5f406ae5e0819cc31f2c2e6f4d990 and fixed in 6.6.122 with commit e9711bd0e64812c694a228cf58c9e6032decee54\n\tIssue introduced in 5.18 with commit 9bbb820a5bd5f406ae5e0819cc31f2c2e6f4d990 and fixed in 6.12.67 with commit 16236b0b4a08fa3e326cf1373ef789dabdc2e30d\n\tIssue introduced in 5.18 with commit 9bbb820a5bd5f406ae5e0819cc31f2c2e6f4d990 and fixed in 6.18.7 with commit 725d4fdaa01bd1161782081f419e1568cc7432e0\n\tIssue introduced in 5.18 with commit 9bbb820a5bd5f406ae5e0819cc31f2c2e6f4d990 and fixed in 6.19 with commit 392b3d9d595f34877dd745b470c711e8ebcd225c\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23142\">https://cve.org/CVERecord/?id=CVE-2026-23142</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tmm/damon/sysfs-schemes.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/ae8ac0066b48ed957bdcab58f0d3543549c57a29\">https://git.kernel.org/stable/c/ae8ac0066b48ed957bdcab58f0d3543549c57a29</a>\n\t<a href=\"https://git.kernel.org/stable/c/e9711bd0e64812c694a228cf58c9e6032decee54\">https://git.kernel.org/stable/c/e9711bd0e64812c694a228cf58c9e6032decee54</a>\n\t<a href=\"https://git.kernel.org/stable/c/16236b0b4a08fa3e326cf1373ef789dabdc2e30d\">https://git.kernel.org/stable/c/16236b0b4a08fa3e326cf1373ef789dabdc2e30d</a>\n\t<a href=\"https://git.kernel.org/stable/c/725d4fdaa01bd1161782081f419e1568cc7432e0\">https://git.kernel.org/stable/c/725d4fdaa01bd1161782081f419e1568cc7432e0</a>\n\t<a href=\"https://git.kernel.org/stable/c/392b3d9d595f34877dd745b470c711e8ebcd225c\">https://git.kernel.org/stable/c/392b3d9d595f34877dd745b470c711e8ebcd225c</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021416-CVE-2026-23142-f91e@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:36:29Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            36,
+            29,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:407b2f85-57d4-bdc6-51cf-0fbfe04885c4"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:c3776ae8-d123-fc59-2e92-fc07b3fee326",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021414-CVE-2025-71202-4c01@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:36:23Z",
+        "headline": "CVE-2025-71202: iommu/sva: invalidate stale IOTLB entries for kernel address space",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: iommu/sva: invalidate stale IOTLB entries for kernel address space Introduce a new IOMMU interface to flush IOTLB paging cache entries for the CPU kernel address space. This interface is invoked from the x86 architecture code that manages combined user and kernel page tables, specifically before any kernel page table page is freed and reused. This addresses...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021414-CVE-2025-71202-4c01@gregkh/"
+          ],
+          "content_hash": "sha256:e4967c2b9dde37533de06df12c9a344085cb595816556574ef4e4dd999acfd72"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2025-71202"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021414-CVE-2025-71202-4c01@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\niommu/sva: invalidate stale IOTLB entries for kernel address space\n\nIntroduce a new IOMMU interface to flush IOTLB paging cache entries for\nthe CPU kernel address space.  This interface is invoked from the x86\narchitecture code that manages combined user and kernel page tables,\nspecifically before any kernel page table page is freed and reused.\n\nThis addresses the main issue with vfree() which is a common occurrence\nand can be triggered by unprivileged users.  While this resolves the\nprimary problem, it doesn't address some extremely rare case related to\nmemory unplug of memory that was present as reserved memory at boot, which\ncannot be triggered by unprivileged users.  The discussion can be found at\nthe link below.\n\nEnable SVA on x86 architecture since the IOMMU can now receive\nnotification to flush the paging cache before freeing the CPU kernel page\ntable pages.\n\nThe Linux kernel CVE team has assigned CVE-2025-71202 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tFixed in 6.18.7 with commit 9f0a7ab700f8620e433b05c57fbd26c92ea186d9\n\tFixed in 6.19 with commit e37d5a2d60a338c5917c45296bac65da1382eda5\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2025-71202\">https://cve.org/CVERecord/?id=CVE-2025-71202</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tarch/x86/Kconfig\n\tdrivers/iommu/iommu-sva.c\n\tinclude/linux/iommu.h\n\tmm/pgtable-generic.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/9f0a7ab700f8620e433b05c57fbd26c92ea186d9\">https://git.kernel.org/stable/c/9f0a7ab700f8620e433b05c57fbd26c92ea186d9</a>\n\t<a href=\"https://git.kernel.org/stable/c/e37d5a2d60a338c5917c45296bac65da1382eda5\">https://git.kernel.org/stable/c/e37d5a2d60a338c5917c45296bac65da1382eda5</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021414-CVE-2025-71202-4c01@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:36:23Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            36,
+            23,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:c3776ae8-d123-fc59-2e92-fc07b3fee326"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:625a4683-7e85-5ff3-b398-213cf8ca9564",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021415-CVE-2026-23141-c6bd@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:36:21Z",
+        "headline": "CVE-2026-23141: btrfs: send: check for inline extents in range_is_hole_in_parent()",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: btrfs: send: check for inline extents in range_is_hole_in_parent() Before accessing the disk_bytenr field of a file extent item we need to check if we are dealing with an inline extent. This is because for inline extents their data starts at the offset of the disk_bytenr field. So accessing the disk_bytenr means we are accessing inline data or in case the...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021415-CVE-2026-23141-c6bd@gregkh/"
+          ],
+          "content_hash": "sha256:b6610e6137b19adb838a4e726a1fb246c7e36c3ca2234cb5b9e68505ec2c05ae"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23141"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021415-CVE-2026-23141-c6bd@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nbtrfs: send: check for inline extents in range_is_hole_in_parent()\n\nBefore accessing the disk_bytenr field of a file extent item we need\nto check if we are dealing with an inline extent.\nThis is because for inline extents their data starts at the offset of\nthe disk_bytenr field. So accessing the disk_bytenr\nmeans we are accessing inline data or in case the inline data is less\nthan 8 bytes we can actually cause an invalid\nmemory access if this inline extent item is the first item in the leaf\nor access metadata from other items.\n\nThe Linux kernel CVE team has assigned CVE-2026-23141 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 4.11 with commit 82bfb2e7b645c8f228dc3b6d3b27b0b10125ca4f and fixed in 6.6.122 with commit f2dc6ab3a14c2d2eb0b14783427eb9b03bf631c9\n\tIssue introduced in 4.11 with commit 82bfb2e7b645c8f228dc3b6d3b27b0b10125ca4f and fixed in 6.12.67 with commit db00636643e66898d79f2530ac9c56ebd5eca369\n\tIssue introduced in 4.11 with commit 82bfb2e7b645c8f228dc3b6d3b27b0b10125ca4f and fixed in 6.18.7 with commit 39f83f10772310ba4a77f2b5256aaf36994ef7e8\n\tIssue introduced in 4.11 with commit 82bfb2e7b645c8f228dc3b6d3b27b0b10125ca4f and fixed in 6.19 with commit 08b096c1372cd69627f4f559fb47c9fb67a52b39\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23141\">https://cve.org/CVERecord/?id=CVE-2026-23141</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tfs/btrfs/send.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/f2dc6ab3a14c2d2eb0b14783427eb9b03bf631c9\">https://git.kernel.org/stable/c/f2dc6ab3a14c2d2eb0b14783427eb9b03bf631c9</a>\n\t<a href=\"https://git.kernel.org/stable/c/db00636643e66898d79f2530ac9c56ebd5eca369\">https://git.kernel.org/stable/c/db00636643e66898d79f2530ac9c56ebd5eca369</a>\n\t<a href=\"https://git.kernel.org/stable/c/39f83f10772310ba4a77f2b5256aaf36994ef7e8\">https://git.kernel.org/stable/c/39f83f10772310ba4a77f2b5256aaf36994ef7e8</a>\n\t<a href=\"https://git.kernel.org/stable/c/08b096c1372cd69627f4f559fb47c9fb67a52b39\">https://git.kernel.org/stable/c/08b096c1372cd69627f4f559fb47c9fb67a52b39</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021415-CVE-2026-23141-c6bd@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:36:21Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            36,
+            21,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:625a4683-7e85-5ff3-b398-213cf8ca9564"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:14bb891d-cb72-e5fe-d65a-d02246a78882",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021430-CVE-2026-23140-fed3@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:22:50Z",
+        "headline": "CVE-2026-23140: bpf, test_run: Subtract size of xdp_frame from allowed metadata size",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: bpf, test_run: Subtract size of xdp_frame from allowed metadata size The xdp_frame structure takes up part of the XDP frame headroom, limiting the size of the metadata. However, in bpf_test_run, we don't take this into account, which makes it possible for userspace to supply a metadata size that is too large (taking up the entire headroom). If userspace...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021430-CVE-2026-23140-fed3@gregkh/"
+          ],
+          "content_hash": "sha256:36402b390b5f1552ad8af632f7b4d47adc033fbbc9d29d9f54375f13e759ef8c"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23140"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021430-CVE-2026-23140-fed3@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nbpf, test_run: Subtract size of xdp_frame from allowed metadata size\n\nThe xdp_frame structure takes up part of the XDP frame headroom,\nlimiting the size of the metadata. However, in bpf_test_run, we don't\ntake this into account, which makes it possible for userspace to supply\na metadata size that is too large (taking up the entire headroom).\n\nIf userspace supplies such a large metadata size in live packet mode,\nthe xdp_update_frame_from_buff() call in xdp_test_run_init_page() call\nwill fail, after which packet transmission proceeds with an\nuninitialised frame structure, leading to the usual Bad Stuff.\n\nThe commit in the Fixes tag fixed a related bug where the second check\nin xdp_update_frame_from_buff() could fail, but did not add any\nadditional constraints on the metadata size. Complete the fix by adding\nan additional check on the metadata size. Reorder the checks slightly to\nmake the logic clearer and add a comment.\n\nThe Linux kernel CVE team has assigned CVE-2026-23140 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 5.18 with commit b6f1f780b3932ae497ed85e79bc8a1e513883624 and fixed in 6.1.161 with commit e7440935063949d6f2c10f7328d960d0ff4bce90\n\tIssue introduced in 5.18 with commit b6f1f780b3932ae497ed85e79bc8a1e513883624 and fixed in 6.6.121 with commit 7c81ad5e580bd8441f8a521a8d34824ce6582ae5\n\tIssue introduced in 5.18 with commit b6f1f780b3932ae497ed85e79bc8a1e513883624 and fixed in 6.12.66 with commit 6447e697cfa8a43a8e491cb81bcc390d0f28f8ba\n\tIssue introduced in 5.18 with commit b6f1f780b3932ae497ed85e79bc8a1e513883624 and fixed in 6.18.6 with commit 31e37f44b60679d90b9f999c91371b15291be8e0\n\tIssue introduced in 5.18 with commit b6f1f780b3932ae497ed85e79bc8a1e513883624 and fixed in 6.19 with commit e558cca217790286e799a8baacd1610bda31b261\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23140\">https://cve.org/CVERecord/?id=CVE-2026-23140</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tnet/bpf/test_run.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/e7440935063949d6f2c10f7328d960d0ff4bce90\">https://git.kernel.org/stable/c/e7440935063949d6f2c10f7328d960d0ff4bce90</a>\n\t<a href=\"https://git.kernel.org/stable/c/7c81ad5e580bd8441f8a521a8d34824ce6582ae5\">https://git.kernel.org/stable/c/7c81ad5e580bd8441f8a521a8d34824ce6582ae5</a>\n\t<a href=\"https://git.kernel.org/stable/c/6447e697cfa8a43a8e491cb81bcc390d0f28f8ba\">https://git.kernel.org/stable/c/6447e697cfa8a43a8e491cb81bcc390d0f28f8ba</a>\n\t<a href=\"https://git.kernel.org/stable/c/31e37f44b60679d90b9f999c91371b15291be8e0\">https://git.kernel.org/stable/c/31e37f44b60679d90b9f999c91371b15291be8e0</a>\n\t<a href=\"https://git.kernel.org/stable/c/e558cca217790286e799a8baacd1610bda31b261\">https://git.kernel.org/stable/c/e558cca217790286e799a8baacd1610bda31b261</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021430-CVE-2026-23140-fed3@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:22:50Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            22,
+            50,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:14bb891d-cb72-e5fe-d65a-d02246a78882"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:e266af9f-55b6-98e2-0472-927bdf5098d4",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021429-CVE-2026-23139-a7b4@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:22:47Z",
+        "headline": "CVE-2026-23139: netfilter: nf_conncount: update last_gc only when GC has been performed",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: netfilter: nf_conncount: update last_gc only when GC has been performed Currently last_gc is being updated everytime a new connection is tracked, that means that it is updated even if a GC wasn't performed. With a sufficiently high packet rate, it is possible to always bypass the GC, causing the list to grow infinitely. Update the last_gc value only when a...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021429-CVE-2026-23139-a7b4@gregkh/"
+          ],
+          "content_hash": "sha256:f570df91cdc45fbd5df8470cb898087da1196defbbc1eebf60b9d027ecf8fb77"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23139"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021429-CVE-2026-23139-a7b4@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nnetfilter: nf_conncount: update last_gc only when GC has been performed\n\nCurrently last_gc is being updated everytime a new connection is\ntracked, that means that it is updated even if a GC wasn't performed.\nWith a sufficiently high packet rate, it is possible to always bypass\nthe GC, causing the list to grow infinitely.\n\nUpdate the last_gc value only when a GC has been actually performed.\n\nThe Linux kernel CVE team has assigned CVE-2026-23139 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 5.19 with commit d265929930e2ffafc744c0ae05fb70acd53be1ee and fixed in 6.1.161 with commit 9f45588993d7f115280fc726119ca86fba32a811\n\tIssue introduced in 5.19 with commit d265929930e2ffafc744c0ae05fb70acd53be1ee and fixed in 6.6.121 with commit 3cd717359e56f82f06cbf8279b47a7d79880c6f3\n\tIssue introduced in 5.19 with commit d265929930e2ffafc744c0ae05fb70acd53be1ee and fixed in 6.12.66 with commit 26a82dce2beee39c43c109d9647e16f49cb02a35\n\tIssue introduced in 5.19 with commit d265929930e2ffafc744c0ae05fb70acd53be1ee and fixed in 6.18.6 with commit 8bdafdf4900040a81422056cabe5e00a37bd101a\n\tIssue introduced in 5.19 with commit d265929930e2ffafc744c0ae05fb70acd53be1ee and fixed in 6.19 with commit 7811ba452402d58628e68faedf38745b3d485e3c\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23139\">https://cve.org/CVERecord/?id=CVE-2026-23139</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tnet/netfilter/nf_conncount.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/2c7c71113ed6d3e2f3aca4c088f22283016ff34f\">https://git.kernel.org/stable/c/2c7c71113ed6d3e2f3aca4c088f22283016ff34f</a>\n\t<a href=\"https://git.kernel.org/stable/c/c4cde57c8affdcca5bcff53a1047e15d268bdca1\">https://git.kernel.org/stable/c/c4cde57c8affdcca5bcff53a1047e15d268bdca1</a>\n\t<a href=\"https://git.kernel.org/stable/c/9f45588993d7f115280fc726119ca86fba32a811\">https://git.kernel.org/stable/c/9f45588993d7f115280fc726119ca86fba32a811</a>\n\t<a href=\"https://git.kernel.org/stable/c/3cd717359e56f82f06cbf8279b47a7d79880c6f3\">https://git.kernel.org/stable/c/3cd717359e56f82f06cbf8279b47a7d79880c6f3</a>\n\t<a href=\"https://git.kernel.org/stable/c/26a82dce2beee39c43c109d9647e16f49cb02a35\">https://git.kernel.org/stable/c/26a82dce2beee39c43c109d9647e16f49cb02a35</a>\n\t<a href=\"https://git.kernel.org/stable/c/8bdafdf4900040a81422056cabe5e00a37bd101a\">https://git.kernel.org/stable/c/8bdafdf4900040a81422056cabe5e00a37bd101a</a>\n\t<a href=\"https://git.kernel.org/stable/c/7811ba452402d58628e68faedf38745b3d485e3c\">https://git.kernel.org/stable/c/7811ba452402d58628e68faedf38745b3d485e3c</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021429-CVE-2026-23139-a7b4@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:22:47Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            22,
+            47,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:e266af9f-55b6-98e2-0472-927bdf5098d4"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:f4bae2fc-7f33-f644-df2d-943c3fb71d3f",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021429-CVE-2026-23138-9853@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:22:44Z",
+        "headline": "CVE-2026-23138: tracing: Add recursion protection in kernel stack trace recording",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: tracing: Add recursion protection in kernel stack trace recording A bug was reported about an infinite recursion caused by tracing the rcu events with the kernel stack trace trigger enabled. The stack trace code called back into RCU which then called the stack trace again. Expand the ftrace recursion protection to add a set of bits to protect events from...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021429-CVE-2026-23138-9853@gregkh/"
+          ],
+          "content_hash": "sha256:128234f38ae11dd934052f93ad3bdc3288e0eb944946dd3cecf52b67b4b8ae70"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23138"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021429-CVE-2026-23138-9853@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\ntracing: Add recursion protection in kernel stack trace recording\n\nA bug was reported about an infinite recursion caused by tracing the rcu\nevents with the kernel stack trace trigger enabled. The stack trace code\ncalled back into RCU which then called the stack trace again.\n\nExpand the ftrace recursion protection to add a set of bits to protect\nevents from recursion. Each bit represents the context that the event is\nin (normal, softirq, interrupt and NMI).\n\nHave the stack trace code use the interrupt context to protect against\nrecursion.\n\nNote, the bug showed an issue in both the RCU code as well as the tracing\nstacktrace code. This only handles the tracing stack trace side of the\nbug. The RCU fix will be handled separately.\n\nThe Linux kernel CVE team has assigned CVE-2026-23138 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 5.8 with commit 5f5fa7ea89dc82d34ed458f4d7a8634e8e9eefce and fixed in 6.18.6 with commit 5b7f91acffd2c4c000971553d22efa1e1bb4feae\n\tIssue introduced in 5.8 with commit 5f5fa7ea89dc82d34ed458f4d7a8634e8e9eefce and fixed in 6.19 with commit 5f1ef0dfcb5b7f4a91a9b0e0ba533efd9f7e2cdb\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23138\">https://cve.org/CVERecord/?id=CVE-2026-23138</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tinclude/linux/trace_recursion.h\n\tkernel/trace/trace.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/5b7f91acffd2c4c000971553d22efa1e1bb4feae\">https://git.kernel.org/stable/c/5b7f91acffd2c4c000971553d22efa1e1bb4feae</a>\n\t<a href=\"https://git.kernel.org/stable/c/5f1ef0dfcb5b7f4a91a9b0e0ba533efd9f7e2cdb\">https://git.kernel.org/stable/c/5f1ef0dfcb5b7f4a91a9b0e0ba533efd9f7e2cdb</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021429-CVE-2026-23138-9853@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:22:44Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            22,
+            44,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:f4bae2fc-7f33-f644-df2d-943c3fb71d3f"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:e9353b5a-a029-0812-08ee-c335f52ebe73",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021429-CVE-2026-23137-b77f@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:22:41Z",
+        "headline": "CVE-2026-23137: of: unittest: Fix memory leak in unittest_data_add()",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: of: unittest: Fix memory leak in unittest_data_add() In unittest_data_add(), if of_resolve_phandles() fails, the allocated unittest_data is not freed, leading to a memory leak. Fix this by using scope-based cleanup helper __free(kfree) for automatic resource cleanup. This ensures unittest_data is automatically freed when it goes out of scope in error paths....",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021429-CVE-2026-23137-b77f@gregkh/"
+          ],
+          "content_hash": "sha256:0c88c5211282768f593c74cbf1d182a7e784bb0063bd2e4080f529b03342324b"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23137"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021429-CVE-2026-23137-b77f@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nof: unittest: Fix memory leak in unittest_data_add()\n\nIn unittest_data_add(), if of_resolve_phandles() fails, the allocated\nunittest_data is not freed, leading to a memory leak.\n\nFix this by using scope-based cleanup helper __free(kfree) for automatic\nresource cleanup. This ensures unittest_data is automatically freed when\nit goes out of scope in error paths.\n\nFor the success path, use retain_and_null_ptr() to transfer ownership\nof the memory to the device tree and prevent double freeing.\n\nThe Linux kernel CVE team has assigned CVE-2026-23137 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 3.18 with commit 2eb46da2a760e5764c48b752a5ef320e02b96b21 and fixed in 6.18.6 with commit f09b0f705bd7197863b90256ef533a6414d1db2c\n\tIssue introduced in 3.18 with commit 2eb46da2a760e5764c48b752a5ef320e02b96b21 and fixed in 6.19 with commit 235a1eb8d2dcc49a6cf0a5ee1aa85544a5d0054b\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23137\">https://cve.org/CVERecord/?id=CVE-2026-23137</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tdrivers/of/unittest.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/f09b0f705bd7197863b90256ef533a6414d1db2c\">https://git.kernel.org/stable/c/f09b0f705bd7197863b90256ef533a6414d1db2c</a>\n\t<a href=\"https://git.kernel.org/stable/c/235a1eb8d2dcc49a6cf0a5ee1aa85544a5d0054b\">https://git.kernel.org/stable/c/235a1eb8d2dcc49a6cf0a5ee1aa85544a5d0054b</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021429-CVE-2026-23137-b77f@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:22:41Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            22,
+            41,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:e9353b5a-a029-0812-08ee-c335f52ebe73"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:93dfb21a-45dc-ae66-34dc-80c18ba154a0",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021428-CVE-2025-71201-9d67@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:22:36Z",
+        "headline": "CVE-2025-71201: netfs: Fix early read unlock of page with EOF in middle",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: netfs: Fix early read unlock of page with EOF in middle The read result collection for buffered reads seems to run ahead of the completion of subrequests under some circumstances, as can be seen in the following log snippet: 9p_client_res: client 18446612686390831168 response P9_TREAD tag 0 err 0 ... netfs_sreq: R=00001b55[1] DOWN TERM f=192 s=0 5fb2/5fb2...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021428-CVE-2025-71201-9d67@gregkh/"
+          ],
+          "content_hash": "sha256:8fb4bb18a553af6e130d69c95088e947d2b013a81482b65ddd6d91bb943cff14"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2025-71201"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021428-CVE-2025-71201-9d67@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nnetfs: Fix early read unlock of page with EOF in middle\n\nThe read result collection for buffered reads seems to run ahead of the\ncompletion of subrequests under some circumstances, as can be seen in the\nfollowing log snippet:\n\n    9p_client_res: client 18446612686390831168 response P9_TREAD tag  0 err 0\n    ...\n    netfs_sreq: R=00001b55[1] DOWN TERM  f=192 s=0 5fb2/5fb2 s=5 e=0\n    ...\n    netfs_collect_folio: R=00001b55 ix=00004 r=4000-5000 t=4000/5fb2\n    netfs_folio: i=157f3 ix=00004-00004 read-done\n    netfs_folio: i=157f3 ix=00004-00004 read-unlock\n    netfs_collect_folio: R=00001b55 ix=00005 r=5000-5fb2 t=5000/5fb2\n    netfs_folio: i=157f3 ix=00005-00005 read-done\n    netfs_folio: i=157f3 ix=00005-00005 read-unlock\n    ...\n    netfs_collect_stream: R=00001b55[0:] cto=5fb2 frn=ffffffff\n    netfs_collect_state: R=00001b55 col=5fb2 cln=6000 n=c\n    netfs_collect_stream: R=00001b55[0:] cto=5fb2 frn=ffffffff\n    netfs_collect_state: R=00001b55 col=5fb2 cln=6000 n=8\n    ...\n    netfs_sreq: R=00001b55[2] ZERO SUBMT f=000 s=5fb2 0/4e s=0 e=0\n    netfs_sreq: R=00001b55[2] ZERO TERM  f=102 s=5fb2 4e/4e s=5 e=0\n\nThe 'cto=5fb2' indicates the collected file pos we've collected results to\nso far - but we still have 0x4e more bytes to go - so we shouldn't have\ncollected folio ix=00005 yet.  The 'ZERO' subreq that clears the tail\nhappens after we unlock the folio, allowing the application to see the\nuncleared tail through mmap.\n\nThe problem is that netfs_read_unlock_folios() will unlock a folio in which\nthe amount of read results collected hits EOF position - but the ZERO\nsubreq lies beyond that and so happens after.\n\nFix this by changing the end check to always be the end of the folio and\nnever the end of the file.\n\nIn the future, I should look at clearing to the end of the folio here rather\nthan adding a ZERO subreq to do this.  On the other hand, the ZERO subreq can\nrun in parallel with an async READ subreq.  Further, the ZERO subreq may still\nbe necessary to, say, handle extents in a ceph file that don't have any\nbacking store and are thus implicitly all zeros.\n\nThis can be reproduced by creating a file, the size of which doesn't align\nto a page boundary, e.g. 24998 (0x5fb2) bytes and then doing something\nlike:\n\n    xfs_io -c \"mmap -r 0 0x6000\" -c \"madvise -d 0 0x6000\" \\\n           -c \"mread -v 0 0x6000\" /xfstest.test/x\n\nThe last 0x4e bytes should all be 00, but if the tail hasn't been cleared\nyet, you may see rubbish there.  This can be reproduced with kafs by\nmodifying the kernel to disable the call to netfs_read_subreq_progress()\nand to stop afs_issue_read() from doing the async call for NETFS_READAHEAD.\nReproduction can be made easier by inserting an mdelay(100) in\nnetfs_issue_read() for the ZERO-subreq case.\n\nAFS and CIFS are normally unlikely to show this as they dispatch READ ops\nasynchronously, which allows the ZERO-subreq to finish first.  9P's READ op is\ncompletely synchronous, so the ZERO-subreq will always happen after.  It isn't\nseen all the time, though, because the collection may be done in a worker\nthread.\n\nThe Linux kernel CVE team has assigned CVE-2025-71201 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 6.14 with commit e2d46f2ec332533816417b60933954173f602121 and fixed in 6.18.6 with commit 5b5482c0e5ee740b35a70759d3582477aea8e8e4\n\tIssue introduced in 6.14 with commit e2d46f2ec332533816417b60933954173f602121 and fixed in 6.19 with commit 570ad253a3455a520f03c2136af8714bc780186d\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2025-71201\">https://cve.org/CVERecord/?id=CVE-2025-71201</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tfs/netfs/read_collect.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/5b5482c0e5ee740b35a70759d3582477aea8e8e4\">https://git.kernel.org/stable/c/5b5482c0e5ee740b35a70759d3582477aea8e8e4</a>\n\t<a href=\"https://git.kernel.org/stable/c/570ad253a3455a520f03c2136af8714bc780186d\">https://git.kernel.org/stable/c/570ad253a3455a520f03c2136af8714bc780186d</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021428-CVE-2025-71201-9d67@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:22:36Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            22,
+            36,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:93dfb21a-45dc-ae66-34dc-80c18ba154a0"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:a1077c54-810a-7b42-7d16-c8b3b8bef903",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021428-CVE-2026-23136-f28c@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:22:33Z",
+        "headline": "CVE-2026-23136: libceph: reset sparse-read state in osd_fault()",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: libceph: reset sparse-read state in osd_fault() When a fault occurs, the connection is abandoned, reestablished, and any pending operations are retried. The OSD client tracks the progress of a sparse-read reply using a separate state machine, largely independent of the messenger's state. If a connection is lost mid-payload or the sparse-read state machine...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021428-CVE-2026-23136-f28c@gregkh/"
+          ],
+          "content_hash": "sha256:ada1e77790c5cf5560babef6a6a7170bbf660c88a59213c1b5ec0dd7e740934e"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23136"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021428-CVE-2026-23136-f28c@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nlibceph: reset sparse-read state in osd_fault()\n\nWhen a fault occurs, the connection is abandoned, reestablished, and any\npending operations are retried. The OSD client tracks the progress of a\nsparse-read reply using a separate state machine, largely independent of\nthe messenger's state.\n\nIf a connection is lost mid-payload or the sparse-read state machine\nreturns an error, the sparse-read state is not reset. The OSD client\nwill then interpret the beginning of a new reply as the continuation of\nthe old one. If this makes the sparse-read machinery enter a failure\nstate, it may never recover, producing loops like:\n\n  libceph:  [0] got 0 extents\n  libceph: data len 142248331 != extent len 0\n  libceph: osd0 (1)...:6801 socket error on read\n  libceph: data len 142248331 != extent len 0\n  libceph: osd0 (1)...:6801 socket error on read\n\nTherefore, reset the sparse-read state in osd_fault(), ensuring retries\nstart from a clean state.\n\nThe Linux kernel CVE team has assigned CVE-2026-23136 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 6.6 with commit f628d799972799023d32c2542bb2639eb8c4f84e and fixed in 6.6.121 with commit 90a60fe61908afa0eaf7f8fcf1421b9b50e5f7ff\n\tIssue introduced in 6.6 with commit f628d799972799023d32c2542bb2639eb8c4f84e and fixed in 6.12.66 with commit e94075e950a6598e710b9f7dffea5aa388f40313\n\tIssue introduced in 6.6 with commit f628d799972799023d32c2542bb2639eb8c4f84e and fixed in 6.18.6 with commit 10b7c72810364226f7b27916ea3e2a4f870bc04b\n\tIssue introduced in 6.6 with commit f628d799972799023d32c2542bb2639eb8c4f84e and fixed in 6.19 with commit 11194b416ef95012c2cfe5f546d71af07b639e93\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23136\">https://cve.org/CVERecord/?id=CVE-2026-23136</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tnet/ceph/osd_client.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/90a60fe61908afa0eaf7f8fcf1421b9b50e5f7ff\">https://git.kernel.org/stable/c/90a60fe61908afa0eaf7f8fcf1421b9b50e5f7ff</a>\n\t<a href=\"https://git.kernel.org/stable/c/e94075e950a6598e710b9f7dffea5aa388f40313\">https://git.kernel.org/stable/c/e94075e950a6598e710b9f7dffea5aa388f40313</a>\n\t<a href=\"https://git.kernel.org/stable/c/10b7c72810364226f7b27916ea3e2a4f870bc04b\">https://git.kernel.org/stable/c/10b7c72810364226f7b27916ea3e2a4f870bc04b</a>\n\t<a href=\"https://git.kernel.org/stable/c/11194b416ef95012c2cfe5f546d71af07b639e93\">https://git.kernel.org/stable/c/11194b416ef95012c2cfe5f546d71af07b639e93</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021428-CVE-2026-23136-f28c@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:22:33Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            22,
+            33,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:a1077c54-810a-7b42-7d16-c8b3b8bef903"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:2b729396-0617-6d34-47cc-68564a3d1370",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021438-CVE-2026-23135-74c1@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:14:53Z",
+        "headline": "CVE-2026-23135: wifi: ath12k: fix dma_free_coherent() pointer",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: wifi: ath12k: fix dma_free_coherent() pointer dma_alloc_coherent() allocates a DMA mapped buffer and stores the addresses in XXX_unaligned fields. Those should be reused when freeing the buffer rather than the aligned addresses. The Linux kernel CVE team has assigned CVE-2026-23135 to this issue. Affected and fixed versions =========================== Issue...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021438-CVE-2026-23135-74c1@gregkh/"
+          ],
+          "content_hash": "sha256:4c74222e02bc2327243aecc108e9f2bda90cf162c1c35d53088a442717101e46"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23135"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021438-CVE-2026-23135-74c1@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nwifi: ath12k: fix dma_free_coherent() pointer\n\ndma_alloc_coherent() allocates a DMA mapped buffer and stores the\naddresses in XXX_unaligned fields.  Those should be reused when freeing\nthe buffer rather than the aligned addresses.\n\nThe Linux kernel CVE team has assigned CVE-2026-23135 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 6.3 with commit d889913205cf7ebda905b1e62c5867ed4e39f6c2 and fixed in 6.6.122 with commit 36e0bc5e8b282564906fca636c4ebc99814de4e7\n\tIssue introduced in 6.3 with commit d889913205cf7ebda905b1e62c5867ed4e39f6c2 and fixed in 6.12.68 with commit 24585a13c41ea7253ee59aac74441fb570f5824a\n\tIssue introduced in 6.3 with commit d889913205cf7ebda905b1e62c5867ed4e39f6c2 and fixed in 6.18.8 with commit 4846b32be324f4dd3653f38a3f69c049543d52ae\n\tIssue introduced in 6.3 with commit d889913205cf7ebda905b1e62c5867ed4e39f6c2 and fixed in 6.19 with commit bb97131fbf9b708dd9616ac2bdc793ad102b5c48\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23135\">https://cve.org/CVERecord/?id=CVE-2026-23135</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tdrivers/net/wireless/ath/ath12k/ce.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/36e0bc5e8b282564906fca636c4ebc99814de4e7\">https://git.kernel.org/stable/c/36e0bc5e8b282564906fca636c4ebc99814de4e7</a>\n\t<a href=\"https://git.kernel.org/stable/c/24585a13c41ea7253ee59aac74441fb570f5824a\">https://git.kernel.org/stable/c/24585a13c41ea7253ee59aac74441fb570f5824a</a>\n\t<a href=\"https://git.kernel.org/stable/c/4846b32be324f4dd3653f38a3f69c049543d52ae\">https://git.kernel.org/stable/c/4846b32be324f4dd3653f38a3f69c049543d52ae</a>\n\t<a href=\"https://git.kernel.org/stable/c/bb97131fbf9b708dd9616ac2bdc793ad102b5c48\">https://git.kernel.org/stable/c/bb97131fbf9b708dd9616ac2bdc793ad102b5c48</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021438-CVE-2026-23135-74c1@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:14:53Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            14,
+            53,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:2b729396-0617-6d34-47cc-68564a3d1370"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:229ff381-f5d7-22aa-7199-2a6b86efa1a5",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021437-CVE-2026-23134-22cb@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:14:50Z",
+        "headline": "CVE-2026-23134: slab: fix kmalloc_nolock() context check for PREEMPT_RT",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: slab: fix kmalloc_nolock() context check for PREEMPT_RT On PREEMPT_RT kernels, local_lock becomes a sleeping lock. The current check in kmalloc_nolock() only verifies we're not in NMI or hard IRQ context, but misses the case where preemption is disabled. When a BPF program runs from a tracepoint with preemption disabled (preempt_count > 0), kmalloc_nolock()...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021437-CVE-2026-23134-22cb@gregkh/"
+          ],
+          "content_hash": "sha256:c03d1dae2bdc25248272b558ab3e233a3dca04de3f080d6890e57dea55de52bd"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23134"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021437-CVE-2026-23134-22cb@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nslab: fix kmalloc_nolock() context check for PREEMPT_RT\n\nOn PREEMPT_RT kernels, local_lock becomes a sleeping lock. The current\ncheck in kmalloc_nolock() only verifies we're not in NMI or hard IRQ\ncontext, but misses the case where preemption is disabled.\n\nWhen a BPF program runs from a tracepoint with preemption disabled\n(preempt_count &gt; 0), kmalloc_nolock() proceeds to call\nlocal_lock_irqsave() which attempts to acquire a sleeping lock,\ntriggering:\n\n  BUG: sleeping function called from invalid context\n  in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 6128\n  preempt_count: 2, expected: 0\n\nFix this by checking !preemptible() on PREEMPT_RT, which directly\nexpresses the constraint that we cannot take a sleeping lock when\npreemption is disabled. This encompasses the previous checks for NMI\nand hard IRQ contexts while also catching cases where preemption is\ndisabled.\n\nThe Linux kernel CVE team has assigned CVE-2026-23134 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 6.18 with commit af92793e52c3a99b828ed4bdd277fd3e11c18d08 and fixed in 6.18.8 with commit f60ba4a97ae3f94e4818722ed2e4d260bbb17b44\n\tIssue introduced in 6.18 with commit af92793e52c3a99b828ed4bdd277fd3e11c18d08 and fixed in 6.19 with commit 99a3e3a1cfc93b8fe318c0a3a5cfb01f1d4ad53c\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23134\">https://cve.org/CVERecord/?id=CVE-2026-23134</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tmm/slub.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/f60ba4a97ae3f94e4818722ed2e4d260bbb17b44\">https://git.kernel.org/stable/c/f60ba4a97ae3f94e4818722ed2e4d260bbb17b44</a>\n\t<a href=\"https://git.kernel.org/stable/c/99a3e3a1cfc93b8fe318c0a3a5cfb01f1d4ad53c\">https://git.kernel.org/stable/c/99a3e3a1cfc93b8fe318c0a3a5cfb01f1d4ad53c</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021437-CVE-2026-23134-22cb@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:14:50Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            14,
+            50,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:229ff381-f5d7-22aa-7199-2a6b86efa1a5"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:a417b0fb-6e3c-fbb2-d136-5f05023ec260",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021437-CVE-2026-23132-175d@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:14:45Z",
+        "headline": "CVE-2026-23132: drm/bridge: synopsys: dw-dp: fix error paths of dw_dp_bind",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: drm/bridge: synopsys: dw-dp: fix error paths of dw_dp_bind Fix several issues in dw_dp_bind() error handling: 1. Missing return after drm_bridge_attach() failure - the function continued execution instead of returning an error. 2. Resource leak: drm_dp_aux_register() is not a devm function, so drm_dp_aux_unregister() must be called on all error paths after...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021437-CVE-2026-23132-175d@gregkh/"
+          ],
+          "content_hash": "sha256:54a6adfa14bddef17fab2fb67856d7a36bc3b44a67507382e5fc667348a182da"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23132"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021437-CVE-2026-23132-175d@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\ndrm/bridge: synopsys: dw-dp: fix error paths of dw_dp_bind\n\nFix several issues in dw_dp_bind() error handling:\n\n1. Missing return after drm_bridge_attach() failure - the function\n   continued execution instead of returning an error.\n\n2. Resource leak: drm_dp_aux_register() is not a devm function, so\n   drm_dp_aux_unregister() must be called on all error paths after\n   aux registration succeeds. This affects errors from:\n   - drm_bridge_attach()\n   - phy_init()\n   - devm_add_action_or_reset()\n   - platform_get_irq()\n   - devm_request_threaded_irq()\n\n3. Bug fix: platform_get_irq() returns the IRQ number or a negative\n   error code, but the error path was returning ERR_PTR(ret) instead\n   of ERR_PTR(dp-&gt;irq).\n\nUse a goto label for cleanup to ensure consistent error handling.\n\nThe Linux kernel CVE team has assigned CVE-2026-23132 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 6.18 with commit 86eecc3a9c2e06462f6a273fcd24150b6da787de and fixed in 6.18.8 with commit 569ed6a73e927a34cae4ae6de1464c0737a5ec44\n\tIssue introduced in 6.18 with commit 86eecc3a9c2e06462f6a273fcd24150b6da787de and fixed in 6.19 with commit 1a0f69e3c28477b97d3609569b7e8feb4b6162e8\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23132\">https://cve.org/CVERecord/?id=CVE-2026-23132</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tdrivers/gpu/drm/bridge/synopsys/dw-dp.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/569ed6a73e927a34cae4ae6de1464c0737a5ec44\">https://git.kernel.org/stable/c/569ed6a73e927a34cae4ae6de1464c0737a5ec44</a>\n\t<a href=\"https://git.kernel.org/stable/c/1a0f69e3c28477b97d3609569b7e8feb4b6162e8\">https://git.kernel.org/stable/c/1a0f69e3c28477b97d3609569b7e8feb4b6162e8</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021437-CVE-2026-23132-175d@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:14:45Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            14,
+            45,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:a417b0fb-6e3c-fbb2-d136-5f05023ec260"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:826a5ee3-9d3d-7eff-5712-abf00c01286c",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021437-CVE-2026-23133-19ce@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:14:42Z",
+        "headline": "CVE-2026-23133: wifi: ath10k: fix dma_free_coherent() pointer",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: wifi: ath10k: fix dma_free_coherent() pointer dma_alloc_coherent() allocates a DMA mapped buffer and stores the addresses in XXX_unaligned fields. Those should be reused when freeing the buffer rather than the aligned addresses. The Linux kernel CVE team has assigned CVE-2026-23133 to this issue. Affected and fixed versions =========================== Issue...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021437-CVE-2026-23133-19ce@gregkh/"
+          ],
+          "content_hash": "sha256:de86f9e5192abd49ef86ce48f896b434af80e054ee55f7fc94c9d633a839f094"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23133"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021437-CVE-2026-23133-19ce@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nwifi: ath10k: fix dma_free_coherent() pointer\n\ndma_alloc_coherent() allocates a DMA mapped buffer and stores the\naddresses in XXX_unaligned fields.  Those should be reused when freeing\nthe buffer rather than the aligned addresses.\n\nThe Linux kernel CVE team has assigned CVE-2026-23133 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 4.16 with commit 2a1e1ad3fd37a632b61f50e73dafddb4b0fa57f1 and fixed in 5.10.249 with commit e2dda298ef809aa201ea7c0904c4d064f6c497cb\n\tIssue introduced in 4.16 with commit 2a1e1ad3fd37a632b61f50e73dafddb4b0fa57f1 and fixed in 5.15.199 with commit fc8da65f9fe1bc6802f8240b342cfff4f5c7e841\n\tIssue introduced in 4.16 with commit 2a1e1ad3fd37a632b61f50e73dafddb4b0fa57f1 and fixed in 6.1.162 with commit b0ad924332a96550a84b8c0ae5483e7042d65fa9\n\tIssue introduced in 4.16 with commit 2a1e1ad3fd37a632b61f50e73dafddb4b0fa57f1 and fixed in 6.6.122 with commit 1928851334ecfd6e0d663121ab69ac639d4217a6\n\tIssue introduced in 4.16 with commit 2a1e1ad3fd37a632b61f50e73dafddb4b0fa57f1 and fixed in 6.12.68 with commit 5d6fa4d2c9799c09389588da5118a72d97d87e92\n\tIssue introduced in 4.16 with commit 2a1e1ad3fd37a632b61f50e73dafddb4b0fa57f1 and fixed in 6.18.8 with commit 07f363f305793baecad41816f73056252f3df61e\n\tIssue introduced in 4.16 with commit 2a1e1ad3fd37a632b61f50e73dafddb4b0fa57f1 and fixed in 6.19 with commit 9282a1e171ad8d2205067e8ec3bbe4e3cef4f29f\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23133\">https://cve.org/CVERecord/?id=CVE-2026-23133</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tdrivers/net/wireless/ath/ath10k/ce.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/e2dda298ef809aa201ea7c0904c4d064f6c497cb\">https://git.kernel.org/stable/c/e2dda298ef809aa201ea7c0904c4d064f6c497cb</a>\n\t<a href=\"https://git.kernel.org/stable/c/fc8da65f9fe1bc6802f8240b342cfff4f5c7e841\">https://git.kernel.org/stable/c/fc8da65f9fe1bc6802f8240b342cfff4f5c7e841</a>\n\t<a href=\"https://git.kernel.org/stable/c/b0ad924332a96550a84b8c0ae5483e7042d65fa9\">https://git.kernel.org/stable/c/b0ad924332a96550a84b8c0ae5483e7042d65fa9</a>\n\t<a href=\"https://git.kernel.org/stable/c/1928851334ecfd6e0d663121ab69ac639d4217a6\">https://git.kernel.org/stable/c/1928851334ecfd6e0d663121ab69ac639d4217a6</a>\n\t<a href=\"https://git.kernel.org/stable/c/5d6fa4d2c9799c09389588da5118a72d97d87e92\">https://git.kernel.org/stable/c/5d6fa4d2c9799c09389588da5118a72d97d87e92</a>\n\t<a href=\"https://git.kernel.org/stable/c/07f363f305793baecad41816f73056252f3df61e\">https://git.kernel.org/stable/c/07f363f305793baecad41816f73056252f3df61e</a>\n\t<a href=\"https://git.kernel.org/stable/c/9282a1e171ad8d2205067e8ec3bbe4e3cef4f29f\">https://git.kernel.org/stable/c/9282a1e171ad8d2205067e8ec3bbe4e3cef4f29f</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021437-CVE-2026-23133-19ce@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:14:42Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            14,
+            42,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:826a5ee3-9d3d-7eff-5712-abf00c01286c"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:f589c5cb-e9e5-489c-fbe0-2b0ffa263283",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021411-CVE-2026-23130-4390@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:11:42Z",
+        "headline": "CVE-2026-23130: wifi: ath12k: fix dead lock while flushing management frames",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: wifi: ath12k: fix dead lock while flushing management frames Commit [1] converted the management transmission work item into a wiphy work. Since a wiphy work can only run under wiphy lock protection, a race condition happens in below scenario: 1. a management frame is queued for transmission. 2. ath12k_mac_op_flush() gets called to flush pending frames...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021411-CVE-2026-23130-4390@gregkh/"
+          ],
+          "content_hash": "sha256:1b8c74f9ed8d382f4364ac51d15987cff8e947aee471b60f7b19dcdd1e6bf235"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23130"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021411-CVE-2026-23130-4390@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nwifi: ath12k: fix dead lock while flushing management frames\n\nCommit [1] converted the management transmission work item into a\nwiphy work. Since a wiphy work can only run under wiphy lock\nprotection, a race condition happens in below scenario:\n\n1. a management frame is queued for transmission.\n2. ath12k_mac_op_flush() gets called to flush pending frames associated\n   with the hardware (i.e, vif being NULL). Then in ath12k_mac_flush()\n   the process waits for the transmission done.\n3. Since wiphy lock has been taken by the flush process, the transmission\n   work item has no chance to run, hence the dead lock.\n\n<span class=\"q\">&gt;From user view, this dead lock results in below issue:\n</span>\n wlp8s0: authenticate with xxxxxx (local address=xxxxxx)\n wlp8s0: send auth to xxxxxx (try 1/3)\n wlp8s0: authenticate with xxxxxx (local address=xxxxxx)\n wlp8s0: send auth to xxxxxx (try 1/3)\n wlp8s0: authenticated\n wlp8s0: associate with xxxxxx (try 1/3)\n wlp8s0: aborting association with xxxxxx by local choice (Reason: 3=DEAUTH_LEAVING)\n ath12k_pci 0000:08:00.0: failed to flush mgmt transmit queue, mgmt pkts pending 1\n\nThe dead lock can be avoided by invoking wiphy_work_flush() to proactively\nrun the queued work item. Note actually it is already present in\nath12k_mac_op_flush(), however it does not protect the case where vif\nbeing NULL. Hence move it ahead to cover this case as well.\n\nTested-on: WCN7850 hw2.0 PCI WLAN.HMT.1.1.c5-00302-QCAHMTSWPL_V1.0_V2.0_SILICONZ-1.115823.3\n\nThe Linux kernel CVE team has assigned CVE-2026-23130 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 6.14 with commit 56dcbf0b520796e26b2bbe5686bdd305ad924954 and fixed in 6.18.8 with commit 06ac2aa13f701a0296e92f5f54ae24224d426b28\n\tIssue introduced in 6.14 with commit 56dcbf0b520796e26b2bbe5686bdd305ad924954 and fixed in 6.19 with commit f88e9fc30a261d63946ddc6cc6a33405e6aa27c3\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23130\">https://cve.org/CVERecord/?id=CVE-2026-23130</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tdrivers/net/wireless/ath/ath12k/mac.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/06ac2aa13f701a0296e92f5f54ae24224d426b28\">https://git.kernel.org/stable/c/06ac2aa13f701a0296e92f5f54ae24224d426b28</a>\n\t<a href=\"https://git.kernel.org/stable/c/f88e9fc30a261d63946ddc6cc6a33405e6aa27c3\">https://git.kernel.org/stable/c/f88e9fc30a261d63946ddc6cc6a33405e6aa27c3</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021411-CVE-2026-23130-4390@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:11:42Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            11,
+            42,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:f589c5cb-e9e5-489c-fbe0-2b0ffa263283"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:58fd5d39-88f6-e26a-ed18-ecd43a808c01",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021411-CVE-2026-23131-6201@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:11:37Z",
+        "headline": "CVE-2026-23131: platform/x86: hp-bioscfg: Fix kobject warnings for empty attribute names",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: platform/x86: hp-bioscfg: Fix kobject warnings for empty attribute names The hp-bioscfg driver attempts to register kobjects with empty names when the HP BIOS returns attributes with empty name strings. This causes multiple kernel warnings: kobject: (00000000135fb5e6): attempted to be registered with empty name! WARNING: CPU: 14 PID: 3336 at...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021411-CVE-2026-23131-6201@gregkh/"
+          ],
+          "content_hash": "sha256:771c41e16c733e22fe0c2688df934dcdb25db22ae1e87791f02021abcf6ca7d3"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23131"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021411-CVE-2026-23131-6201@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nplatform/x86: hp-bioscfg: Fix kobject warnings for empty attribute names\n\nThe hp-bioscfg driver attempts to register kobjects with empty names when\nthe HP BIOS returns attributes with empty name strings. This causes\nmultiple kernel warnings:\n\n  kobject: (00000000135fb5e6): attempted to be registered with empty name!\n  WARNING: CPU: 14 PID: 3336 at lib/kobject.c:219 kobject_add_internal+0x2eb/0x310\n\nAdd validation in hp_init_bios_buffer_attribute() to check if the\nattribute name is empty after parsing it from the WMI buffer. If empty,\nlog a debug message and skip registration of that attribute, allowing the\nmodule to continue processing other valid attributes.\n\nThe Linux kernel CVE team has assigned CVE-2026-23131 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 6.6 with commit a34fc329b1895fc8a6eb12099adc47009421ba6a and fixed in 6.6.122 with commit 29917c80aa96a25cbcf5876fd774a1cfd72b01a9\n\tIssue introduced in 6.6 with commit a34fc329b1895fc8a6eb12099adc47009421ba6a and fixed in 6.12.68 with commit 6476be59b7162b891b7bddbd0c2924d87379ef6c\n\tIssue introduced in 6.6 with commit a34fc329b1895fc8a6eb12099adc47009421ba6a and fixed in 6.18.8 with commit 800b2767905d6b409b8bbe357121970f0b489a89\n\tIssue introduced in 6.6 with commit a34fc329b1895fc8a6eb12099adc47009421ba6a and fixed in 6.19 with commit fdee1b09721605f532352628d0a24623e7062efb\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23131\">https://cve.org/CVERecord/?id=CVE-2026-23131</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tdrivers/platform/x86/hp/hp-bioscfg/bioscfg.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/29917c80aa96a25cbcf5876fd774a1cfd72b01a9\">https://git.kernel.org/stable/c/29917c80aa96a25cbcf5876fd774a1cfd72b01a9</a>\n\t<a href=\"https://git.kernel.org/stable/c/6476be59b7162b891b7bddbd0c2924d87379ef6c\">https://git.kernel.org/stable/c/6476be59b7162b891b7bddbd0c2924d87379ef6c</a>\n\t<a href=\"https://git.kernel.org/stable/c/800b2767905d6b409b8bbe357121970f0b489a89\">https://git.kernel.org/stable/c/800b2767905d6b409b8bbe357121970f0b489a89</a>\n\t<a href=\"https://git.kernel.org/stable/c/fdee1b09721605f532352628d0a24623e7062efb\">https://git.kernel.org/stable/c/fdee1b09721605f532352628d0a24623e7062efb</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021411-CVE-2026-23131-6201@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:11:37Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            11,
+            37,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:58fd5d39-88f6-e26a-ed18-ecd43a808c01"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:744a107b-5e8d-c95f-72e4-e372379fd4b1",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021408-CVE-2026-23121-73e6@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:11:34Z",
+        "headline": "CVE-2026-23121: mISDN: annotate data-race around dev->work",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: mISDN: annotate data-race around dev->work dev->work can re read locklessly in mISDN_read() and mISDN_poll(). Add READ_ONCE()/WRITE_ONCE() annotations. BUG: KCSAN: data-race in mISDN_ioctl / mISDN_read write to 0xffff88812d848280 of 4 bytes by task 10864 on cpu 1: misdn_add_timer drivers/isdn/mISDN/timerdev.c:175 [inline] mISDN_ioctl+0x2fb/0x550...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021408-CVE-2026-23121-73e6@gregkh/"
+          ],
+          "content_hash": "sha256:f315ce75e16a05d05bd5e4b8612516ff3a861626fe510a3b31701c687e4c8e54"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23121"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021408-CVE-2026-23121-73e6@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nmISDN: annotate data-race around dev-&gt;work\n\ndev-&gt;work can re read locklessly in mISDN_read()\nand mISDN_poll(). Add READ_ONCE()/WRITE_ONCE() annotations.\n\nBUG: KCSAN: data-race in mISDN_ioctl / mISDN_read\n\nwrite to 0xffff88812d848280 of 4 bytes by task 10864 on cpu 1:\n  misdn_add_timer drivers/isdn/mISDN/timerdev.c:175 [inline]\n  mISDN_ioctl+0x2fb/0x550 drivers/isdn/mISDN/timerdev.c:233\n  vfs_ioctl fs/ioctl.c:51 [inline]\n  __do_sys_ioctl fs/ioctl.c:597 [inline]\n  __se_sys_ioctl+0xce/0x140 fs/ioctl.c:583\n  __x64_sys_ioctl+0x43/0x50 fs/ioctl.c:583\n  x64_sys_call+0x14b0/0x3000 arch/x86/include/generated/asm/syscalls_64.h:17\n  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]\n  do_syscall_64+0xd8/0x2c0 arch/x86/entry/syscall_64.c:94\n entry_SYSCALL_64_after_hwframe+0x77/0x7f\n\nread to 0xffff88812d848280 of 4 bytes by task 10857 on cpu 0:\n  mISDN_read+0x1f2/0x470 drivers/isdn/mISDN/timerdev.c:112\n  do_loop_readv_writev fs/read_write.c:847 [inline]\n  vfs_readv+0x3fb/0x690 fs/read_write.c:1020\n  do_readv+0xe7/0x210 fs/read_write.c:1080\n  __do_sys_readv fs/read_write.c:1165 [inline]\n  __se_sys_readv fs/read_write.c:1162 [inline]\n  __x64_sys_readv+0x45/0x50 fs/read_write.c:1162\n  x64_sys_call+0x2831/0x3000 arch/x86/include/generated/asm/syscalls_64.h:20\n  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]\n  do_syscall_64+0xd8/0x2c0 arch/x86/entry/syscall_64.c:94\n entry_SYSCALL_64_after_hwframe+0x77/0x7f\n\nvalue changed: 0x00000000 -&gt; 0x00000001\n\nThe Linux kernel CVE team has assigned CVE-2026-23121 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 2.6.27 with commit 1b2b03f8e514e4f68e293846ba511a948b80243c and fixed in 5.10.249 with commit d5d99cb9e0839093cd53aa3b28176fce2f820ca0\n\tIssue introduced in 2.6.27 with commit 1b2b03f8e514e4f68e293846ba511a948b80243c and fixed in 5.15.199 with commit 13f3b3b87068898056db4c79ee67052fbde11d43\n\tIssue introduced in 2.6.27 with commit 1b2b03f8e514e4f68e293846ba511a948b80243c and fixed in 6.1.162 with commit accc3f8266d2a49881dbcf78c459477f4efa0ff3\n\tIssue introduced in 2.6.27 with commit 1b2b03f8e514e4f68e293846ba511a948b80243c and fixed in 6.6.122 with commit fc8ba17fd3337bd8b1913c30b95df0fee00d8fb7\n\tIssue introduced in 2.6.27 with commit 1b2b03f8e514e4f68e293846ba511a948b80243c and fixed in 6.12.68 with commit aa6e33cd74ca4965f2bbcb025e0b672fb0168a69\n\tIssue introduced in 2.6.27 with commit 1b2b03f8e514e4f68e293846ba511a948b80243c and fixed in 6.18.8 with commit 7ac345a93af31358e18e9606eb7b354691bf6757\n\tIssue introduced in 2.6.27 with commit 1b2b03f8e514e4f68e293846ba511a948b80243c and fixed in 6.19 with commit 8175dbf174d487afab81e936a862a8d9b8a1ccb6\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23121\">https://cve.org/CVERecord/?id=CVE-2026-23121</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tdrivers/isdn/mISDN/timerdev.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/d5d99cb9e0839093cd53aa3b28176fce2f820ca0\">https://git.kernel.org/stable/c/d5d99cb9e0839093cd53aa3b28176fce2f820ca0</a>\n\t<a href=\"https://git.kernel.org/stable/c/13f3b3b87068898056db4c79ee67052fbde11d43\">https://git.kernel.org/stable/c/13f3b3b87068898056db4c79ee67052fbde11d43</a>\n\t<a href=\"https://git.kernel.org/stable/c/accc3f8266d2a49881dbcf78c459477f4efa0ff3\">https://git.kernel.org/stable/c/accc3f8266d2a49881dbcf78c459477f4efa0ff3</a>\n\t<a href=\"https://git.kernel.org/stable/c/fc8ba17fd3337bd8b1913c30b95df0fee00d8fb7\">https://git.kernel.org/stable/c/fc8ba17fd3337bd8b1913c30b95df0fee00d8fb7</a>\n\t<a href=\"https://git.kernel.org/stable/c/aa6e33cd74ca4965f2bbcb025e0b672fb0168a69\">https://git.kernel.org/stable/c/aa6e33cd74ca4965f2bbcb025e0b672fb0168a69</a>\n\t<a href=\"https://git.kernel.org/stable/c/7ac345a93af31358e18e9606eb7b354691bf6757\">https://git.kernel.org/stable/c/7ac345a93af31358e18e9606eb7b354691bf6757</a>\n\t<a href=\"https://git.kernel.org/stable/c/8175dbf174d487afab81e936a862a8d9b8a1ccb6\">https://git.kernel.org/stable/c/8175dbf174d487afab81e936a862a8d9b8a1ccb6</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021408-CVE-2026-23121-73e6@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:11:34Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            11,
+            34,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:744a107b-5e8d-c95f-72e4-e372379fd4b1"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:8f6d4902-0e26-9e7d-3725-0c37be9cf741",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021407-CVE-2026-23120-5f82@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:11:30Z",
+        "headline": "CVE-2026-23120: l2tp: avoid one data-race in l2tp_tunnel_del_work()",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: l2tp: avoid one data-race in l2tp_tunnel_del_work() We should read sk->sk_socket only when dealing with kernel sockets. syzbot reported the following data-race: BUG: KCSAN: data-race in l2tp_tunnel_del_work / sk_common_release write to 0xffff88811c182b20 of 8 bytes by task 5365 on cpu 0: sk_set_socket include/net/sock.h:2092 [inline] sock_orphan...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021407-CVE-2026-23120-5f82@gregkh/"
+          ],
+          "content_hash": "sha256:d7a9c209557a682330bf7b2beee1f82693d9142302a5db13bd98a66561698f5e"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23120"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021407-CVE-2026-23120-5f82@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nl2tp: avoid one data-race in l2tp_tunnel_del_work()\n\nWe should read sk-&gt;sk_socket only when dealing with kernel sockets.\n\nsyzbot reported the following data-race:\n\nBUG: KCSAN: data-race in l2tp_tunnel_del_work / sk_common_release\n\nwrite to 0xffff88811c182b20 of 8 bytes by task 5365 on cpu 0:\n  sk_set_socket include/net/sock.h:2092 [inline]\n  sock_orphan include/net/sock.h:2118 [inline]\n  sk_common_release+0xae/0x230 net/core/sock.c:4003\n  udp_lib_close+0x15/0x20 include/net/udp.h:325\n  inet_release+0xce/0xf0 net/ipv4/af_inet.c:437\n  __sock_release net/socket.c:662 [inline]\n  sock_close+0x6b/0x150 net/socket.c:1455\n  __fput+0x29b/0x650 fs/file_table.c:468\n  ____fput+0x1c/0x30 fs/file_table.c:496\n  task_work_run+0x131/0x1a0 kernel/task_work.c:233\n  resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]\n  __exit_to_user_mode_loop kernel/entry/common.c:44 [inline]\n  exit_to_user_mode_loop+0x1fe/0x740 kernel/entry/common.c:75\n  __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]\n  syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:256 [inline]\n  syscall_exit_to_user_mode_work include/linux/entry-common.h:159 [inline]\n  syscall_exit_to_user_mode include/linux/entry-common.h:194 [inline]\n  do_syscall_64+0x1e1/0x2b0 arch/x86/entry/syscall_64.c:100\n entry_SYSCALL_64_after_hwframe+0x77/0x7f\n\nread to 0xffff88811c182b20 of 8 bytes by task 827 on cpu 1:\n  l2tp_tunnel_del_work+0x2f/0x1a0 net/l2tp/l2tp_core.c:1418\n  process_one_work kernel/workqueue.c:3257 [inline]\n  process_scheduled_works+0x4ce/0x9d0 kernel/workqueue.c:3340\n  worker_thread+0x582/0x770 kernel/workqueue.c:3421\n  kthread+0x489/0x510 kernel/kthread.c:463\n  ret_from_fork+0x149/0x290 arch/x86/kernel/process.c:158\n  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246\n\nvalue changed: 0xffff88811b818000 -&gt; 0x0000000000000000\n\nThe Linux kernel CVE team has assigned CVE-2026-23120 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 4.16 with commit d00fa9adc528c1b0e64d532556764852df8bd7b9 and fixed in 5.10.249 with commit 1f63ca44b4f419a1663d94d1bb0b4e2beb73fdb4\n\tIssue introduced in 4.16 with commit d00fa9adc528c1b0e64d532556764852df8bd7b9 and fixed in 5.15.199 with commit 36c40a80109f1771d59558050b1a71e13c60c759\n\tIssue introduced in 4.16 with commit d00fa9adc528c1b0e64d532556764852df8bd7b9 and fixed in 6.1.162 with commit eae074dab764ea181bbed5e88626889319177498\n\tIssue introduced in 4.16 with commit d00fa9adc528c1b0e64d532556764852df8bd7b9 and fixed in 6.6.122 with commit 68e92085427c84e7679ddb53c0d68836d220b6e7\n\tIssue introduced in 4.16 with commit d00fa9adc528c1b0e64d532556764852df8bd7b9 and fixed in 6.12.68 with commit 3d6d414b214ce31659bded2f8df50c93a3769474\n\tIssue introduced in 4.16 with commit d00fa9adc528c1b0e64d532556764852df8bd7b9 and fixed in 6.18.8 with commit 32d417497b79efb403d75f4c185fe6fd9d64b94f\n\tIssue introduced in 4.16 with commit d00fa9adc528c1b0e64d532556764852df8bd7b9 and fixed in 6.19 with commit 7a29f6bf60f2590fe5e9c4decb451e19afad2bcf\n\tIssue introduced in 3.16.57 with commit 15df699fdc5af46a9fb15ae2d9326294852de5b5\n\tIssue introduced in 4.15.8 with commit 18bdaefc715b4530b4b2fe670506bb47713664cc\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23120\">https://cve.org/CVERecord/?id=CVE-2026-23120</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tnet/l2tp/l2tp_core.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/1f63ca44b4f419a1663d94d1bb0b4e2beb73fdb4\">https://git.kernel.org/stable/c/1f63ca44b4f419a1663d94d1bb0b4e2beb73fdb4</a>\n\t<a href=\"https://git.kernel.org/stable/c/36c40a80109f1771d59558050b1a71e13c60c759\">https://git.kernel.org/stable/c/36c40a80109f1771d59558050b1a71e13c60c759</a>\n\t<a href=\"https://git.kernel.org/stable/c/eae074dab764ea181bbed5e88626889319177498\">https://git.kernel.org/stable/c/eae074dab764ea181bbed5e88626889319177498</a>\n\t<a href=\"https://git.kernel.org/stable/c/68e92085427c84e7679ddb53c0d68836d220b6e7\">https://git.kernel.org/stable/c/68e92085427c84e7679ddb53c0d68836d220b6e7</a>\n\t<a href=\"https://git.kernel.org/stable/c/3d6d414b214ce31659bded2f8df50c93a3769474\">https://git.kernel.org/stable/c/3d6d414b214ce31659bded2f8df50c93a3769474</a>\n\t<a href=\"https://git.kernel.org/stable/c/32d417497b79efb403d75f4c185fe6fd9d64b94f\">https://git.kernel.org/stable/c/32d417497b79efb403d75f4c185fe6fd9d64b94f</a>\n\t<a href=\"https://git.kernel.org/stable/c/7a29f6bf60f2590fe5e9c4decb451e19afad2bcf\">https://git.kernel.org/stable/c/7a29f6bf60f2590fe5e9c4decb451e19afad2bcf</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021407-CVE-2026-23120-5f82@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:11:30Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            11,
+            30,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:8f6d4902-0e26-9e7d-3725-0c37be9cf741"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:fe6ee883-1e13-311e-433a-ecca8acadb4d",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021407-CVE-2026-23119-0f44@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:11:26Z",
+        "headline": "CVE-2026-23119: bonding: provide a net pointer to __skb_flow_dissect()",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: bonding: provide a net pointer to __skb_flow_dissect() After 3cbf4ffba5ee (\"net: plumb network namespace into __skb_flow_dissect\") we have to provide a net pointer to __skb_flow_dissect(), either via skb->dev, skb->sk, or a user provided pointer. In the following case, syzbot was able to cook a bare skb. WARNING: net/core/flow_dissector.c:1131 at...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021407-CVE-2026-23119-0f44@gregkh/"
+          ],
+          "content_hash": "sha256:5547f6a5aff555c1b089c6001214ad0011a4fbd93007ee2c587982714c178c31"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23119"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021407-CVE-2026-23119-0f44@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nbonding: provide a net pointer to __skb_flow_dissect()\n\nAfter 3cbf4ffba5ee (\"net: plumb network namespace into __skb_flow_dissect\")\nwe have to provide a net pointer to __skb_flow_dissect(),\neither via skb-&gt;dev, skb-&gt;sk, or a user provided pointer.\n\nIn the following case, syzbot was able to cook a bare skb.\n\nWARNING: net/core/flow_dissector.c:1131 at __skb_flow_dissect+0xb57/0x68b0 net/core/flow_dissector.c:1131, CPU#1: syz.2.1418/11053\nCall Trace:\n &lt;TASK&gt;\n  bond_flow_dissect drivers/net/bonding/bond_main.c:4093 [inline]\n  __bond_xmit_hash+0x2d7/0xba0 drivers/net/bonding/bond_main.c:4157\n  bond_xmit_hash_xdp drivers/net/bonding/bond_main.c:4208 [inline]\n  bond_xdp_xmit_3ad_xor_slave_get drivers/net/bonding/bond_main.c:5139 [inline]\n  bond_xdp_get_xmit_slave+0x1fd/0x710 drivers/net/bonding/bond_main.c:5515\n  xdp_master_redirect+0x13f/0x2c0 net/core/filter.c:4388\n  bpf_prog_run_xdp include/net/xdp.h:700 [inline]\n  bpf_test_run+0x6b2/0x7d0 net/bpf/test_run.c:421\n  bpf_prog_test_run_xdp+0x795/0x10e0 net/bpf/test_run.c:1390\n  bpf_prog_test_run+0x2c7/0x340 kernel/bpf/syscall.c:4703\n  __sys_bpf+0x562/0x860 kernel/bpf/syscall.c:6182\n  __do_sys_bpf kernel/bpf/syscall.c:6274 [inline]\n  __se_sys_bpf kernel/bpf/syscall.c:6272 [inline]\n  __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6272\n  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]\n  do_syscall_64+0xec/0xf80 arch/x86/entry/syscall_64.c:94\n\nThe Linux kernel CVE team has assigned CVE-2026-23119 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 5.5 with commit 58deb77cc52da9360d20676e68dd215742cbe473 and fixed in 5.10.249 with commit 8e53780732ee881394406f79da5263b81eb48f7e\n\tIssue introduced in 5.5 with commit 58deb77cc52da9360d20676e68dd215742cbe473 and fixed in 5.15.199 with commit 3be945abdd228fd00f6afcf8d137002867a4651b\n\tIssue introduced in 5.5 with commit 58deb77cc52da9360d20676e68dd215742cbe473 and fixed in 6.1.162 with commit f4faaa1297ecf3255a8591fff2633df05bd5ec84\n\tIssue introduced in 5.5 with commit 58deb77cc52da9360d20676e68dd215742cbe473 and fixed in 6.6.122 with commit 0efee0b992f28bd5ee01c7a86ef6a307c42eb907\n\tIssue introduced in 5.5 with commit 58deb77cc52da9360d20676e68dd215742cbe473 and fixed in 6.12.68 with commit bc3c8d2493c6f4d2038844dc8b7ee93de050f7fa\n\tIssue introduced in 5.5 with commit 58deb77cc52da9360d20676e68dd215742cbe473 and fixed in 6.18.8 with commit de97735a40a144974bf3896ee4cc0270db2e47db\n\tIssue introduced in 5.5 with commit 58deb77cc52da9360d20676e68dd215742cbe473 and fixed in 6.19 with commit 5f9b329096596b7e53e07d041d7fca4cbe1be752\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23119\">https://cve.org/CVERecord/?id=CVE-2026-23119</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tdrivers/net/bonding/bond_main.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/8e53780732ee881394406f79da5263b81eb48f7e\">https://git.kernel.org/stable/c/8e53780732ee881394406f79da5263b81eb48f7e</a>\n\t<a href=\"https://git.kernel.org/stable/c/3be945abdd228fd00f6afcf8d137002867a4651b\">https://git.kernel.org/stable/c/3be945abdd228fd00f6afcf8d137002867a4651b</a>\n\t<a href=\"https://git.kernel.org/stable/c/f4faaa1297ecf3255a8591fff2633df05bd5ec84\">https://git.kernel.org/stable/c/f4faaa1297ecf3255a8591fff2633df05bd5ec84</a>\n\t<a href=\"https://git.kernel.org/stable/c/0efee0b992f28bd5ee01c7a86ef6a307c42eb907\">https://git.kernel.org/stable/c/0efee0b992f28bd5ee01c7a86ef6a307c42eb907</a>\n\t<a href=\"https://git.kernel.org/stable/c/bc3c8d2493c6f4d2038844dc8b7ee93de050f7fa\">https://git.kernel.org/stable/c/bc3c8d2493c6f4d2038844dc8b7ee93de050f7fa</a>\n\t<a href=\"https://git.kernel.org/stable/c/de97735a40a144974bf3896ee4cc0270db2e47db\">https://git.kernel.org/stable/c/de97735a40a144974bf3896ee4cc0270db2e47db</a>\n\t<a href=\"https://git.kernel.org/stable/c/5f9b329096596b7e53e07d041d7fca4cbe1be752\">https://git.kernel.org/stable/c/5f9b329096596b7e53e07d041d7fca4cbe1be752</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021407-CVE-2026-23119-0f44@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:11:26Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            11,
+            26,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:fe6ee883-1e13-311e-433a-ecca8acadb4d"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:9c2a98e4-3fd7-4f7f-a6bb-df92e51b1cd2",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021407-CVE-2026-23118-7579@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:11:19Z",
+        "headline": "CVE-2026-23118: rxrpc: Fix data-race warning and potential load/store tearing",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: rxrpc: Fix data-race warning and potential load/store tearing Fix the following: BUG: KCSAN: data-race in rxrpc_peer_keepalive_worker / rxrpc_send_data_packet which is reporting an issue with the reads and writes to ->last_tx_at in: conn->peer->last_tx_at = ktime_get_seconds(); and: keepalive_at = peer->last_tx_at + RXRPC_KEEPALIVE_TIME; The lockless...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021407-CVE-2026-23118-7579@gregkh/"
+          ],
+          "content_hash": "sha256:cb8a90cdf266f4947d877dc3dea72288a20da83348b721066a141c3e4b0e81fa"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23118"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021407-CVE-2026-23118-7579@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nrxrpc: Fix data-race warning and potential load/store tearing\n\nFix the following:\n\n        BUG: KCSAN: data-race in rxrpc_peer_keepalive_worker / rxrpc_send_data_packet\n\nwhich is reporting an issue with the reads and writes to -&gt;last_tx_at in:\n\n        conn-&gt;peer-&gt;last_tx_at = ktime_get_seconds();\n\nand:\n\n        keepalive_at = peer-&gt;last_tx_at + RXRPC_KEEPALIVE_TIME;\n\nThe lockless accesses to these to values aren't actually a problem as the\nread only needs an approximate time of last transmission for the purposes\nof deciding whether or not the transmission of a keepalive packet is\nwarranted yet.\n\nAlso, as -&gt;last_tx_at is a 64-bit value, tearing can occur on a 32-bit\narch.\n\nFix both of these by switching to an unsigned int for -&gt;last_tx_at and only\nstoring the LSW of the time64_t.  It can then be reconstructed at need\nprovided no more than 68 years has elapsed since the last transmission.\n\nThe Linux kernel CVE team has assigned CVE-2026-23118 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 4.17 with commit ace45bec6d77bc061c3c3d8ad99e298ea9800c2b and fixed in 6.12.69 with commit c08cf314191cd0f8699089715efb9eff030f0086\n\tIssue introduced in 4.17 with commit ace45bec6d77bc061c3c3d8ad99e298ea9800c2b and fixed in 6.18.8 with commit f8cf1368e0a5491b27189a695c36f64e48f3d19d\n\tIssue introduced in 4.17 with commit ace45bec6d77bc061c3c3d8ad99e298ea9800c2b and fixed in 6.19 with commit 5d5fe8bcd331f1e34e0943ec7c18432edfcf0e8b\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23118\">https://cve.org/CVERecord/?id=CVE-2026-23118</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tnet/rxrpc/ar-internal.h\n\tnet/rxrpc/conn_event.c\n\tnet/rxrpc/output.c\n\tnet/rxrpc/peer_event.c\n\tnet/rxrpc/proc.c\n\tnet/rxrpc/rxgk.c\n\tnet/rxrpc/rxkad.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/c08cf314191cd0f8699089715efb9eff030f0086\">https://git.kernel.org/stable/c/c08cf314191cd0f8699089715efb9eff030f0086</a>\n\t<a href=\"https://git.kernel.org/stable/c/f8cf1368e0a5491b27189a695c36f64e48f3d19d\">https://git.kernel.org/stable/c/f8cf1368e0a5491b27189a695c36f64e48f3d19d</a>\n\t<a href=\"https://git.kernel.org/stable/c/5d5fe8bcd331f1e34e0943ec7c18432edfcf0e8b\">https://git.kernel.org/stable/c/5d5fe8bcd331f1e34e0943ec7c18432edfcf0e8b</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021407-CVE-2026-23118-7579@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:11:19Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            11,
+            19,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:9c2a98e4-3fd7-4f7f-a6bb-df92e51b1cd2"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:71f88b5d-84e0-07ad-b87d-15913e07f3e2",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021406-CVE-2026-23117-0b29@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:11:15Z",
+        "headline": "CVE-2026-23117: ice: add missing ice_deinit_hw() in devlink reinit path",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: ice: add missing ice_deinit_hw() in devlink reinit path devlink-reload results in ice_init_hw failed error, and then removing the ice driver causes a NULL pointer dereference. [ +0.102213] ice 0000:ca:00.0: ice_init_hw failed: -16 ... [ +0.000001] Call Trace: [ +0.000003] <TASK> [ +0.000006] ice_unload+0x8f/0x100 [ice] [ +0.000081] ice_remove+0xba/0x300...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021406-CVE-2026-23117-0b29@gregkh/"
+          ],
+          "content_hash": "sha256:2ffd6953fa4501a4c3eb348bd122008eecd9bfe64a86a1c941838571bf8c0a90"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23117"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021406-CVE-2026-23117-0b29@gregkh/"
+            }
+          },
+          "deprecation": {
+            "type": "removal",
+            "affects": [
+              "duplicate",
+              "ice_deinit_hw"
+            ],
+            "confidence": "low",
+            "source": "keyword_scan",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021406-CVE-2026-23117-0b29@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nice: add missing ice_deinit_hw() in devlink reinit path\n\ndevlink-reload results in ice_init_hw failed error, and then removing\nthe ice driver causes a NULL pointer dereference.\n\n[  +0.102213] ice 0000:ca:00.0: ice_init_hw failed: -16\n...\n[  +0.000001] Call Trace:\n[  +0.000003]  &lt;TASK&gt;\n[  +0.000006]  ice_unload+0x8f/0x100 [ice]\n[  +0.000081]  ice_remove+0xba/0x300 [ice]\n\nCommit 1390b8b3d2be (\"ice: remove duplicate call to ice_deinit_hw() on\nerror paths\") removed ice_deinit_hw() from ice_deinit_dev(). As a result\nice_devlink_reinit_down() no longer calls ice_deinit_hw(), but\nice_devlink_reinit_up() still calls ice_init_hw(). Since the control\nqueues are not uninitialized, ice_init_hw() fails with -EBUSY.\n\nAdd ice_deinit_hw() to ice_devlink_reinit_down() to correspond with\nice_init_hw() in ice_devlink_reinit_up().\n\nThe Linux kernel CVE team has assigned CVE-2026-23117 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 6.18.2 with commit c91eee346089e4d287d5a111719e57cac605275e and fixed in 6.18.8 with commit a3d99e2fbf01446d31a0d0dfc46444e915a1f6d4\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23117\">https://cve.org/CVERecord/?id=CVE-2026-23117</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tdrivers/net/ethernet/intel/ice/devlink/devlink.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/a3d99e2fbf01446d31a0d0dfc46444e915a1f6d4\">https://git.kernel.org/stable/c/a3d99e2fbf01446d31a0d0dfc46444e915a1f6d4</a>\n\t<a href=\"https://git.kernel.org/stable/c/42fb5f3deb582cb96440e4683745017dbabb83d6\">https://git.kernel.org/stable/c/42fb5f3deb582cb96440e4683745017dbabb83d6</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021406-CVE-2026-23117-0b29@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:11:15Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            11,
+            15,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:71f88b5d-84e0-07ad-b87d-15913e07f3e2"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:c6b1b725-6bea-497a-4337-8ea5d4a1fc6b",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021406-CVE-2026-23116-41e5@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:11:12Z",
+        "headline": "CVE-2026-23116: pmdomain: imx8m-blk-ctrl: Remove separate rst and clk mask for 8mq vpu",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: pmdomain: imx8m-blk-ctrl: Remove separate rst and clk mask for 8mq vpu For i.MX8MQ platform, the ADB in the VPUMIX domain has no separate reset and clock enable bits, but is ungated and reset together with the VPUs. So we can't reset G1 or G2 separately, it may led to the system hang. Remove rst_mask and clk_mask of imx8mq_vpu_blk_ctl_domain_data. Let...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021406-CVE-2026-23116-41e5@gregkh/"
+          ],
+          "content_hash": "sha256:c079b125bad6ac4e8994800d910b9b6b2ab7c10b5e2c6eb07a001ff22297f23c"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23116"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021406-CVE-2026-23116-41e5@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\npmdomain: imx8m-blk-ctrl: Remove separate rst and clk mask for 8mq vpu\n\nFor i.MX8MQ platform, the ADB in the VPUMIX domain has no separate reset\nand clock enable bits, but is ungated and reset together with the VPUs.\nSo we can't reset G1 or G2 separately, it may led to the system hang.\nRemove rst_mask and clk_mask of imx8mq_vpu_blk_ctl_domain_data.\nLet imx8mq_vpu_power_notifier() do really vpu reset.\n\nThe Linux kernel CVE team has assigned CVE-2026-23116 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 5.18 with commit 608d7c325e855cb4a853afef3cd9f0df594bd12d and fixed in 6.1.162 with commit 8859e336d233e61a4c40d40dc6a9f21e8b9b719c\n\tIssue introduced in 5.18 with commit 608d7c325e855cb4a853afef3cd9f0df594bd12d and fixed in 6.6.122 with commit cad7003d951e8899db58ee2fef211586af726f09\n\tIssue introduced in 5.18 with commit 608d7c325e855cb4a853afef3cd9f0df594bd12d and fixed in 6.12.68 with commit 5c56a6f4b5a4f87c094c92a30fa17e28e37ec2ab\n\tIssue introduced in 5.18 with commit 608d7c325e855cb4a853afef3cd9f0df594bd12d and fixed in 6.18.8 with commit fd675de6bddf7e9bdf42ae3929d4c27ba6d1ef76\n\tIssue introduced in 5.18 with commit 608d7c325e855cb4a853afef3cd9f0df594bd12d and fixed in 6.19 with commit 3de49966499634454fd59e0e6fecd50baab7febd\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23116\">https://cve.org/CVERecord/?id=CVE-2026-23116</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tdrivers/pmdomain/imx/imx8m-blk-ctrl.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/8859e336d233e61a4c40d40dc6a9f21e8b9b719c\">https://git.kernel.org/stable/c/8859e336d233e61a4c40d40dc6a9f21e8b9b719c</a>\n\t<a href=\"https://git.kernel.org/stable/c/cad7003d951e8899db58ee2fef211586af726f09\">https://git.kernel.org/stable/c/cad7003d951e8899db58ee2fef211586af726f09</a>\n\t<a href=\"https://git.kernel.org/stable/c/5c56a6f4b5a4f87c094c92a30fa17e28e37ec2ab\">https://git.kernel.org/stable/c/5c56a6f4b5a4f87c094c92a30fa17e28e37ec2ab</a>\n\t<a href=\"https://git.kernel.org/stable/c/fd675de6bddf7e9bdf42ae3929d4c27ba6d1ef76\">https://git.kernel.org/stable/c/fd675de6bddf7e9bdf42ae3929d4c27ba6d1ef76</a>\n\t<a href=\"https://git.kernel.org/stable/c/3de49966499634454fd59e0e6fecd50baab7febd\">https://git.kernel.org/stable/c/3de49966499634454fd59e0e6fecd50baab7febd</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021406-CVE-2026-23116-41e5@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:11:12Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            11,
+            12,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:c6b1b725-6bea-497a-4337-8ea5d4a1fc6b"
+        }
+      },
+      {
+        "source": "linux_kernel_cve",
+        "id": "urn:uuid:b435033a-291b-919a-4cf6-d111a059e985",
+        "url": "https://lore.kernel.org/linux-cve-announce/2026021406-CVE-2026-23115-64da@gregkh/",
+        "published_at": "2026-02-14T15:51:05Z",
+        "updated_at": "2026-02-14T15:10:54Z",
+        "headline": "CVE-2026-23115: serial: Fix not set tty->port race condition",
+        "content": {
+          "excerpt_text": "From: Greg Kroah-Hartman <gregkh@kernel.org> Description =========== In the Linux kernel, the following vulnerability has been resolved: serial: Fix not set tty->port race condition Revert commit bfc467db60b7 (\"serial: remove redundant tty_port_link_device()\") because the tty_port_link_device() is not redundant: the tty->port has to be confured before we call uart_configure_port(), otherwise user-space can open console without TTY linked to the driver. This tty_port_link_device() was added...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-02-14T15:51:05Z",
+          "evidence_urls": [
+            "https://lore.kernel.org/linux-cve-announce/2026021406-CVE-2026-23115-64da@gregkh/"
+          ],
+          "content_hash": "sha256:9aee8b220b0f24b25f9777c6b88a882a2c7ebfd89e49481e1375421fe8633013"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "cve_ids": [
+              "CVE-2026-23115"
+            ],
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "Linux Kernel CVEs",
+              "authority_url": "https://lore.kernel.org/linux-cve-announce/",
+              "evidence_url": "https://lore.kernel.org/linux-cve-announce/2026021406-CVE-2026-23115-64da@gregkh/"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<pre style=\"white-space: pre-wrap;\">From: Greg Kroah-Hartman &lt;gregkh@kernel.org&gt;\n\nDescription\n===========\n\nIn the Linux kernel, the following vulnerability has been resolved:\n\nserial: Fix not set tty-&gt;port race condition\n\nRevert commit bfc467db60b7 (\"serial: remove redundant\ntty_port_link_device()\") because the tty_port_link_device() is not\nredundant: the tty-&gt;port has to be confured before we call\nuart_configure_port(), otherwise user-space can open console without TTY\nlinked to the driver.\n\nThis tty_port_link_device() was added explicitly to avoid this exact\nissue in commit fb2b90014d78 (\"tty: link tty and port before configuring\nit as console\"), so offending commit basically reverted the fix saying\nit is redundant without addressing the actual race condition presented\nthere.\n\nReproducible always as tty-&gt;port warning on Qualcomm SoC with most of\ndevices disabled, so with very fast boot, and one serial device being\nthe console:\n\n  printk: legacy console [ttyMSM0] enabled\n  printk: legacy console [ttyMSM0] enabled\n  printk: legacy bootconsole [qcom_geni0] disabled\n  printk: legacy bootconsole [qcom_geni0] disabled\n  ------------[ cut here ]------------\n  tty_init_dev: ttyMSM driver does not set tty-&gt;port. This would crash the kernel. Fix the driver!\n  WARNING: drivers/tty/tty_io.c:1414 at tty_init_dev.part.0+0x228/0x25c, CPU#2: systemd/1\n  Modules linked in: socinfo tcsrcc_eliza gcc_eliza sm3_ce fuse ipv6\n  CPU: 2 UID: 0 PID: 1 Comm: systemd Tainted: G S                  6.19.0-rc4-next-20260108-00024-g2202f4d30aa8 #73 PREEMPT\n  Tainted: [S]=CPU_OUT_OF_SPEC\n  Hardware name: Qualcomm Technologies, Inc. Eliza (DT)\n  ...\n  tty_init_dev.part.0 (drivers/tty/tty_io.c:1414 (discriminator 11)) (P)\n  tty_open (arch/arm64/include/asm/atomic_ll_sc.h:95 (discriminator 3) drivers/tty/tty_io.c:2073 (discriminator 3) drivers/tty/tty_io.c:2120 (discriminator 3))\n  chrdev_open (fs/char_dev.c:411)\n  do_dentry_open (fs/open.c:962)\n  vfs_open (fs/open.c:1094)\n  do_open (fs/namei.c:4634)\n  path_openat (fs/namei.c:4793)\n  do_filp_open (fs/namei.c:4820)\n  do_sys_openat2 (fs/open.c:1391 (discriminator 3))\n  ...\n  Starting Network Name Resolution...\n\nApparently the flow with this small Yocto-based ramdisk user-space is:\n\ndriver (qcom_geni_serial.c):                  user-space:\n============================                  ===========\nqcom_geni_serial_probe()\n uart_add_one_port()\n  serial_core_register_port()\n   serial_core_add_one_port()\n    uart_configure_port()\n     register_console()\n    |\n    |                                         open console\n    |                                          ...\n    |                                          tty_init_dev()\n    |                                           driver-&gt;ports[idx] is NULL\n    |\n    tty_port_register_device_attr_serdev()\n     tty_port_link_device() &lt;- set driver-&gt;ports[idx]\n\nThe Linux kernel CVE team has assigned CVE-2026-23115 to this issue.\n\n\nAffected and fixed versions\n===========================\n\n\tIssue introduced in 6.15 with commit bfc467db60b76c30ca1f7f02088a219b6d5b6e8c and fixed in 6.18.8 with commit 2501c49306238b54a2de0f93de43d50ab6e76c84\n\tIssue introduced in 6.15 with commit bfc467db60b76c30ca1f7f02088a219b6d5b6e8c and fixed in 6.19 with commit 32f37e57583f869140cff445feedeea8a5fea986\n\nPlease see <a href=\"https://www.kernel.org\">https://www.kernel.org</a> for a full list of currently supported\nkernel versions by the kernel community.\n\nUnaffected versions might change over time as fixes are backported to\nolder supported kernel versions.  The official CVE entry at\n\t<a href=\"https://cve.org/CVERecord/?id=CVE-2026-23115\">https://cve.org/CVERecord/?id=CVE-2026-23115</a>\nwill be updated if fixes are backported, please check that for the most\nup to date information about this issue.\n\n\nAffected files\n==============\n\nThe file(s) affected by this issue are:\n\tdrivers/tty/serial/serial_core.c\n\n\nMitigation\n==========\n\nThe Linux kernel CVE team recommends that you update to the latest\nstable kernel version for this, and many other bugfixes.  Individual\nchanges are never tested alone, but rather are part of a larger kernel\nrelease.  Cherry-picking individual commits is not recommended or\nsupported by the Linux kernel community at all.  If however, updating to\nthe latest release is impossible, the individual changes to resolve this\nissue can be found at these commits:\n\t<a href=\"https://git.kernel.org/stable/c/2501c49306238b54a2de0f93de43d50ab6e76c84\">https://git.kernel.org/stable/c/2501c49306238b54a2de0f93de43d50ab6e76c84</a>\n\t<a href=\"https://git.kernel.org/stable/c/32f37e57583f869140cff445feedeea8a5fea986\">https://git.kernel.org/stable/c/32f37e57583f869140cff445feedeea8a5fea986</a>\n</pre>",
+          "link": "https://lore.kernel.org/linux-cve-announce/2026021406-CVE-2026-23115-64da@gregkh/",
+          "published": "",
+          "updated": "2026-02-14T15:10:54Z",
+          "updated_parsed": [
+            2026,
+            2,
+            14,
+            15,
+            10,
+            54,
+            5,
+            45,
+            0
+          ],
+          "guid": "urn:uuid:b435033a-291b-919a-4cf6-d111a059e985"
+        }
+      }
+    ],
+    "updated": [],
+    "removed": []
+  },
+  "counts": {
+    "items": 25,
+    "updated": 0,
+    "removed": 0
+  },
+  "integrity_reset": false
+}
