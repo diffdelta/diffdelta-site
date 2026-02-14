@@ -42,7 +42,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   }
 
   // Access control: if capsule is private, verify requester is authorized.
-  const requesterAgentId = request.headers.get("X-Self-Agent-Id");
+  // Normalize to lowercase hex so case-insensitive agent IDs match correctly.
+  const rawRequester = request.headers.get("X-Self-Agent-Id");
+  const requesterAgentId = rawRequester ? rawRequester.trim().toLowerCase() : null;
   const access = checkCapsuleAccess(stored.capsule, agentIdHex, requesterAgentId, "capsule.json");
   if (!access.allowed) {
     return jsonResponse(

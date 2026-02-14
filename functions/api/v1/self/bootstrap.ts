@@ -21,7 +21,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return errorResponse("Invalid JSON body", 400);
   }
 
-  const pubHex = (body.public_key || "").trim().toLowerCase();
+  const pubHex = (typeof body.public_key === "string" ? body.public_key : "").trim().toLowerCase();
   if (!/^[0-9a-f]{64}$/.test(pubHex)) {
     return errorResponse("public_key must be 32-byte hex", 400);
   }
@@ -33,6 +33,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     public_key: pubHex,
     head_url: `/self/${agentIdHex}/head.json`,
     capsule_url: `/self/${agentIdHex}/capsule.json`,
+    history_url: `/self/${agentIdHex}/history.json`,
+    verify_url: `/self/${agentIdHex}/verify.json`,
   });
 };
 

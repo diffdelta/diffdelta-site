@@ -8,7 +8,7 @@
 
 import { jsonResponse, errorResponse } from "../../_shared/response";
 import type { Env } from "../../_shared/types";
-import { parseAgentIdHex, sha256Hex, fromHex } from "../../_shared/self/crypto";
+import { parseAgentIdHex } from "../../_shared/self/crypto";
 import { scanForUnsafeContent } from "../../_shared/self/security";
 import { validateCapsule, LIMITS } from "../../_shared/self/schema";
 import {
@@ -39,11 +39,13 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
   const stored = await getStoredCapsule(env, agentIdHex);
   if (!stored) {
-    return jsonResponse({ error: "capsule_not_found" }, 404);
+    return errorResponse("Capsule not found", 404);
   }
 
   // Access control: if capsule is private, verify requester has READ_VERIFY scope.
-  const requesterAgentId = request.headers.get("X-Self-Agent-Id");
+  // Normalize to lowercase hex so case-insensitive agent IDs match correctly.
+  const rawRequester = request.headers.get("X-Self-Agent-Id");
+  const requesterAgentId = rawRequester ? rawRequester.trim().toLowerCase() : null;
   const access = checkCapsuleAccess(stored.capsule, agentIdHex, requesterAgentId, "verify.json");
   if (!access.allowed) {
     return jsonResponse(
