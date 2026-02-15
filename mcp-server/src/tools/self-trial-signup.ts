@@ -69,8 +69,8 @@ export async function handleSelfTrialSignup(args: {
               status: "error",
               http_status: res.status,
               detail:
-                (res.data as Record<string, unknown>)?.detail ||
-                (res.data as Record<string, unknown>)?.error ||
+                (res.data as unknown as Record<string, unknown>)?.detail ||
+                (res.data as unknown as Record<string, unknown>)?.error ||
                 "Signup request failed",
               response: res.data,
             },
