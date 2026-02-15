@@ -5,7 +5,7 @@
  * to the trial auto-pairing queue. Returns either "paired" (with a
  * partner_id) or "queued" (check back later).
  *
- * Requires self_bootstrap to have been run first. Cost: ~100 tokens.
+ * Requires self_bootstrap AND self_write to have been run first. Cost: ~100 tokens.
  */
 
 import { loadIdentity } from "../lib/identity.js";
@@ -36,7 +36,7 @@ export async function handleSelfTrialSignup(args: {
           text: JSON.stringify(
             {
               status: "error",
-              detail: "No identity found. Run self_bootstrap first.",
+              detail: "No identity found. Run self_bootstrap and then self_write (your first capsule) before signing up.",
             },
             null,
             2
@@ -120,8 +120,31 @@ export async function handleSelfTrialStatus(args: {
   }
 
   const res = await ddGet<TrialSignupResponse>(
-    `/api/v1/self/trial/signup?agent_id=${agentId}`
+    `/api/v1/self/trial/signup?agent_id=${encodeURIComponent(agentId)}`
   );
+
+  if (!res.ok) {
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: JSON.stringify(
+            {
+              status: "error",
+              http_status: res.status,
+              detail:
+                (res.data as unknown as Record<string, unknown>)?.detail ||
+                (res.data as unknown as Record<string, unknown>)?.error ||
+                "Status check failed",
+              response: res.data,
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
 
   return {
     content: [

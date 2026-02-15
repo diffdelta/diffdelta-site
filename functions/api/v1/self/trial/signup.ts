@@ -29,6 +29,10 @@ interface TrialQueue {
   entries: TrialEntry[];
 }
 
+// ── Trial limits ──
+
+const MAX_TRIAL_AGENTS = 10;
+
 // ── Wallet validation ──
 
 const WALLET_RE = /^0x[0-9a-fA-F]{40}$/;
@@ -75,7 +79,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return jsonResponse(
       {
         error: "not_bootstrapped",
-        detail: "You must bootstrap your capsule before signing up for the trial. Call POST /api/v1/self/bootstrap and then PUT /self/{agent_id}/capsule.json first.",
+        detail: "You must bootstrap and write your first capsule before signing up. Use self_bootstrap then self_write (MCP), or POST /api/v1/self/bootstrap then PUT /self/{agent_id}/capsule.json (HTTP).",
         bootstrap_url: "/api/v1/self/bootstrap",
       },
       400
@@ -114,37 +118,90 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     });
   }
 
+  // Enforce agent cap (existing agents don't count against the limit when re-calling)
+  if (queue.entries.length >= MAX_TRIAL_AGENTS) {
+    return jsonResponse(
+      {
+        error: "trial_full",
+        detail: `The trial is full (${MAX_TRIAL_AGENTS} agents max). Follow m/diffdelta for future trials.`,
+        max_agents: MAX_TRIAL_AGENTS,
+      },
+      403
+    );
+  }
+
   // Find an unpaired bot to match with
   const unpaired = queue.entries.find(
     (e) => e.partner_id === null && e.agent_id !== agentIdHex
   );
 
   if (unpaired) {
-    // Pair them!
-    unpaired.partner_id = agentIdHex;
-    unpaired.paired_at = now;
+    // Pair them — re-read queue to mitigate race condition where two
+    // concurrent requests both find the same unpaired bot.
+    const freshQueue = await loadQueue(env);
+    const freshUnpaired = freshQueue.entries.find(
+      (e) => e.agent_id === unpaired.agent_id
+    );
 
-    const newEntry: TrialEntry = {
-      agent_id: agentIdHex,
-      wallet_address: walletAddress,
-      signed_up_at: now,
-      partner_id: unpaired.agent_id,
-      paired_at: now,
-    };
-    queue.entries.push(newEntry);
-    await saveQueue(env, queue);
+    // If the bot got paired between our first read and now, fall through to queue
+    if (freshUnpaired && freshUnpaired.partner_id === null) {
+      freshUnpaired.partner_id = agentIdHex;
+      freshUnpaired.paired_at = now;
 
+      const newEntry: TrialEntry = {
+        agent_id: agentIdHex,
+        wallet_address: walletAddress,
+        signed_up_at: now,
+        partner_id: freshUnpaired.agent_id,
+        paired_at: now,
+      };
+      freshQueue.entries.push(newEntry);
+      await saveQueue(env, freshQueue);
+
+      return jsonResponse({
+        status: "paired",
+        agent_id: agentIdHex,
+        partner_id: freshUnpaired.agent_id,
+        paired_at: now,
+        wallet_address: walletAddress,
+        hint: "You have been paired! Grant your partner READ_CAPSULE access and verify their capsule at GET /self/" + freshUnpaired.agent_id + "/verify.json",
+      });
+    }
+    // Fall through: partner was taken, queue this bot instead
+  }
+
+  // No partner available (or partner was taken in race) — queue this bot
+  // Re-read to avoid overwriting a concurrent write
+  const latestQueue = await loadQueue(env);
+
+  // Double-check we haven't been added by a concurrent request
+  if (latestQueue.entries.some((e) => e.agent_id === agentIdHex)) {
+    const me = latestQueue.entries.find((e) => e.agent_id === agentIdHex)!;
     return jsonResponse({
-      status: "paired",
+      status: me.partner_id ? "paired" : "queued",
       agent_id: agentIdHex,
-      partner_id: unpaired.agent_id,
-      paired_at: now,
-      wallet_address: walletAddress,
-      hint: "You have been paired! Grant your partner READ_CAPSULE access and verify their capsule at GET /self/" + unpaired.agent_id + "/verify.json",
+      partner_id: me.partner_id,
+      paired_at: me.paired_at,
+      signed_up_at: me.signed_up_at,
+      wallet_address: me.wallet_address,
+      hint: me.partner_id
+        ? "You are paired! Grant your partner READ_CAPSULE access."
+        : "Waiting for another bot to sign up.",
     });
   }
 
-  // No partner available — queue this bot
+  // Still safe to add
+  if (latestQueue.entries.length >= MAX_TRIAL_AGENTS) {
+    return jsonResponse(
+      {
+        error: "trial_full",
+        detail: `The trial is full (${MAX_TRIAL_AGENTS} agents max). Follow m/diffdelta for future trials.`,
+        max_agents: MAX_TRIAL_AGENTS,
+      },
+      403
+    );
+  }
+
   const newEntry: TrialEntry = {
     agent_id: agentIdHex,
     wallet_address: walletAddress,
@@ -152,8 +209,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     partner_id: null,
     paired_at: null,
   };
-  queue.entries.push(newEntry);
-  await saveQueue(env, queue);
+  latestQueue.entries.push(newEntry);
+  await saveQueue(env, latestQueue);
 
   return jsonResponse({
     status: "queued",
