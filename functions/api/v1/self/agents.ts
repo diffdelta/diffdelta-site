@@ -52,6 +52,21 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     });
   }
 
+  // Load trial signup queue for wallet + pairing data
+  interface TrialEntry {
+    agent_id: string;
+    wallet_address: string | null;
+    signed_up_at: string;
+    partner_id: string | null;
+    paired_at: string | null;
+  }
+  interface TrialQueue { entries: TrialEntry[] }
+  let trialQueue: TrialQueue = { entries: [] };
+  try {
+    const raw = await env.SELF.get("self:trial:queue");
+    if (raw) trialQueue = JSON.parse(raw) as TrialQueue;
+  } catch { /* ignore */ }
+
   // Enrich each agent with meta + trial progress (parallel fetches)
   const enriched = await Promise.all(
     registry.agents.map(async (entry) => {
@@ -115,6 +130,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         ? receipts.some((r) => r.id === "trial-feedback")
         : false;
 
+      // Trial signup data (wallet, pairing)
+      const trialEntry = trialQueue.entries.find((t) => t.agent_id === entry.agent_id);
+
       return {
         agent_id: entry.agent_id,
         registered_at: entry.registered_at,
@@ -140,6 +158,14 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
           has_feedback: hasFeedback,
           trial_complete: allDone && hasTokenSavings && hasFeedback && hasCollaboration,
         },
+        signup: trialEntry
+          ? {
+              wallet_address: trialEntry.wallet_address,
+              partner_id: trialEntry.partner_id,
+              paired_at: trialEntry.paired_at,
+              signed_up_at: trialEntry.signed_up_at,
+            }
+          : null,
       };
     })
   );
