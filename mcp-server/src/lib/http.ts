@@ -62,12 +62,19 @@ export async function ddGet<T = unknown>(
  */
 export async function ddPost<T = unknown>(
   path: string,
-  body: unknown
+  body: unknown,
+  opts?: { agentId?: string }
 ): Promise<HttpResponse<T>> {
   const url = `${getBaseUrl()}${path}`;
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (opts?.agentId) {
+    headers["X-Self-Agent-Id"] = opts.agentId;
+  }
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(body),
   });
   const data = (await res.json().catch(() => ({}))) as T;

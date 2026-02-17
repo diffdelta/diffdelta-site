@@ -25,14 +25,18 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   // Only /api/ and /stripe/ need auth, rate limiting, or signature checks.
   const isSelf = path.startsWith("/self/");
   const isSelfRead = isSelf && (request.method === "GET" || request.method === "HEAD");
+  const isFeeds = path.startsWith("/feeds/");
+  const isFeedsRead = isFeeds && (request.method === "GET" || request.method === "HEAD");
 
-  // Cost control: /self GET/HEAD can be extremely high volume. We intentionally
-  // skip KV-based rate limiting/auth for reads and rely on cache + ETag + (in prod)
-  // edge/WAF rate limits. Writes still go through middleware.
+  // Cost control: /self and /feeds GET/HEAD can be extremely high volume.
+  // We intentionally skip KV-based rate limiting/auth for reads and rely on
+  // cache + ETag + (in prod) edge/WAF rate limits.
+  // Writes still go through middleware.
   const needsMiddleware =
     path.startsWith("/api/") ||
     path.startsWith("/stripe/") ||
-    (isSelf && !isSelfRead);
+    (isSelf && !isSelfRead) ||
+    (isFeeds && !isFeedsRead);
 
   if (!needsMiddleware) {
     return next();
@@ -91,7 +95,8 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       path.startsWith("/api/v1/key/claim") ||
       path.startsWith("/api/v1/self/") ||  // Self Capsule public bootstrap/upgrade endpoints (their own validation)
       path.startsWith("/api/v1/auth/") ||  // Magic link auth endpoints (own validation)
-      path.startsWith("/api/v1/admin/");   // Admin endpoints use their own auth
+      path.startsWith("/api/v1/admin/") || // Admin endpoints use their own auth
+      path.startsWith("/api/v1/feeds/");   // Agent feed endpoints use Self Capsule identity auth
 
     if (!isPublicEndpoint && !auth.authenticated) {
       return errorResponse(

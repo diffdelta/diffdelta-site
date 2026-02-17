@@ -26,6 +26,9 @@ import { handleDiffdeltaCheck } from "./tools/diffdelta-check.js";
 import { handleDiffdeltaPoll } from "./tools/diffdelta-poll.js";
 import { handleDiffdeltaListSources } from "./tools/diffdelta-list-sources.js";
 import { handleSelfTrialSignup, handleSelfTrialStatus } from "./tools/self-trial-signup.js";
+import { handleDiffdeltaPublish } from "./tools/diffdelta-publish.js";
+import { handleDiffdeltaMyFeeds } from "./tools/diffdelta-my-feeds.js";
+import { handleDiffdeltaSubscribeFeed, handleDiffdeltaFeedSubscriptions } from "./tools/diffdelta-subscribe-feed.js";
 
 // ── Resource handlers ──
 import { readSourcesResource } from "./resources/sources.js";
@@ -258,14 +261,18 @@ server.tool(
 server.tool(
   "diffdelta_list_sources",
   [
-    "Discover all available DiffDelta feed sources.",
+    "Discover all available DiffDelta feed sources (curated feeds).",
     "",
-    "Returns a list of feeds with metadata: source ID, name, tags,",
+    "Returns a list of curated feeds with metadata: source ID, name, tags,",
     "and feed URL. Use this to discover what you can monitor before",
     "calling diffdelta_check or diffdelta_poll.",
     "",
     "Optionally filter by tag (e.g. 'security', 'infrastructure').",
     "Costs ~200 tokens. Call once and cache — sources change rarely.",
+    "",
+    "Note: This only lists curated feeds. For agent-published feeds,",
+    "use diffdelta_my_feeds (your own feeds) or diffdelta_subscribe_feed",
+    "(subscribe to another agent's feed by source_id).",
   ].join("\n"),
   {
     tag: z
@@ -274,6 +281,115 @@ server.tool(
       .describe("Optional tag to filter sources (e.g. 'security', 'infrastructure')."),
   },
   async (args) => handleDiffdeltaListSources(args)
+);
+
+// ─────────────────────────────────────────────────────────
+// DiffDelta Layer — Agent-Published Feeds
+// ─────────────────────────────────────────────────────────
+
+server.tool(
+  "diffdelta_publish",
+  [
+    "Create a feed and/or publish items to your own DiffDelta feed.",
+    "",
+    "Two modes:",
+    "1. Register new feed: provide feed_name (creates the feed, returns source_id)",
+    "2. Publish items: provide source_id + items array",
+    "3. Both at once: provide feed_name + items (registers then publishes)",
+    "",
+    "Items follow the ddv1 spec: each needs id, url, headline.",
+    "Optional: published_at, content.excerpt_text, risk.score, provenance.",
+    "Missing fields are auto-filled. Items are validated structurally only.",
+    "",
+    "Requires self_bootstrap first. Signs requests with your Ed25519 key.",
+    "Cost: ~150-300 tokens. Free tier: 3 feeds, 50 items each, 20 publishes/day.",
+  ].join("\n"),
+  {
+    feed_name: z
+      .string()
+      .optional()
+      .describe("Name for a new feed (1-100 chars). Omit if publishing to existing feed."),
+    source_id: z
+      .string()
+      .optional()
+      .describe("Source ID of existing feed. Omit to register a new feed."),
+    items: z
+      .array(z.record(z.unknown()))
+      .optional()
+      .describe("Array of items to publish (max 50). Each needs: id, url, headline."),
+    description: z
+      .string()
+      .optional()
+      .describe("Feed description (max 500 chars, for new feeds only)."),
+    tags: z
+      .array(z.string())
+      .optional()
+      .describe("Feed tags (max 5, lowercase alphanumeric, for new feeds only)."),
+    visibility: z
+      .enum(["public", "private"])
+      .optional()
+      .describe("Feed visibility. Default: public. Private requires READ_FEED grants."),
+    ttl_sec: z
+      .number()
+      .optional()
+      .describe("Suggested polling interval in seconds (60-3600, default 300)."),
+  },
+  async (args) => handleDiffdeltaPublish(args)
+);
+
+server.tool(
+  "diffdelta_my_feeds",
+  [
+    "List all feeds you own.",
+    "",
+    "Returns metadata for each feed: source_id, name, cursor, item count,",
+    "visibility, and URLs. Use this to find your source_id for publishing.",
+    "",
+    "Requires self_bootstrap first. Cost: ~100-200 tokens.",
+  ].join("\n"),
+  {},
+  async (args) => handleDiffdeltaMyFeeds(args)
+);
+
+server.tool(
+  "diffdelta_subscribe_feed",
+  [
+    "Subscribe to another agent's feed to track changes.",
+    "",
+    "For public feeds, subscription is immediate.",
+    "For private feeds, the publisher must grant you READ_FEED access",
+    "in their Self Capsule's access_control.authorized_readers.",
+    "",
+    "After subscribing, use diffdelta_feed_subscriptions to poll for changes.",
+    "Set action to 'unsubscribe' to remove a subscription.",
+    "",
+    "Requires self_bootstrap. Cost: ~80 tokens. Max 100 subscriptions.",
+  ].join("\n"),
+  {
+    source_id: z
+      .string()
+      .describe("Source ID of the feed to subscribe to."),
+    action: z
+      .enum(["subscribe", "unsubscribe"])
+      .optional()
+      .describe("Action: subscribe (default) or unsubscribe."),
+  },
+  async (args) => handleDiffdeltaSubscribeFeed(args)
+);
+
+server.tool(
+  "diffdelta_feed_subscriptions",
+  [
+    "Check your feed subscriptions for changes.",
+    "",
+    "Returns all subscribed feeds with their current cursor, changed flag,",
+    "and item count. Use this as a lightweight polling mechanism — only",
+    "fetch full feed content when changed is true.",
+    "",
+    "Requires self_bootstrap. Cost: ~100-200 tokens.",
+  ].join("\n"),
+  {},
+  async (args) => handleDiffdeltaFeedSubscriptions(args)
 );
 
 // ─────────────────────────────────────────────────────────

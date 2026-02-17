@@ -14,6 +14,7 @@ export interface Env {
   RATE_LIMITS: KVNamespace;   // Rate limit counters (ephemeral, TTL-based)
   SESSIONS: KVNamespace;      // Stripe sessions, magic link tokens, auth sessions
   SELF: KVNamespace;          // Self Capsule state (capsules, cursors, seq, quotas)
+  FEEDS: KVNamespace;         // Agent-published feeds (metadata, items, heads, subscriptions)
 
   // ── Secrets (set in Cloudflare Pages > Settings > Environment variables) ──
   STRIPE_SECRET_KEY: string;
@@ -89,6 +90,87 @@ export interface MoltbookAgentCache {
   verified_at: string;           // ISO 8601 — when we last verified with Moltbook
   linked_key_hash?: string;      // If this Moltbook agent is linked to a DiffDelta Pro account
 }
+
+// ─────────────────────────────────────────────────────────
+// Agent-published feeds — managed publishing infrastructure
+// Why: agents publish their own changefeeds using the ddv1 protocol.
+// DiffDelta validates, hosts, and serves them identically to curated feeds.
+// ─────────────────────────────────────────────────────────
+
+/** Stored in FEEDS KV under `feed:meta:{source_id}` */
+export interface AgentFeedMeta {
+  source_id: string;              // e.g. "agent_ab12cd_my_security_feed"
+  owner_agent_id: string;         // SHA-256 agent_id from Self Capsule
+  name: string;                   // Display name (max 100 chars)
+  description: string;            // Max 500 chars
+  tags: string[];                 // Max 5 tags, pattern: ^[a-z0-9_\-]{2,32}$
+  created_at: string;             // ISO 8601
+  updated_at: string;             // ISO 8601
+  item_count: number;             // Current items in feed
+  cursor: string | null;          // Current cursor (sha256:<hex>)
+  prev_cursor: string | null;     // Previous cursor
+  ttl_sec: number;                // Suggested polling interval (60-3600)
+  visibility: "public" | "private"; // Access control level
+  enabled: boolean;
+}
+
+/** Stored in FEEDS KV under `feed:registry:{agent_id}` */
+export interface AgentFeedRegistry {
+  feeds: string[];                // Array of source_ids owned by this agent
+}
+
+/** Stored in FEEDS KV under `feed:subs:{agent_id}` */
+export interface AgentFeedSubscriptions {
+  subscriptions: string[];        // Array of source_ids this agent subscribes to
+}
+
+/** A single item in an agent-published feed (subset of deltaItem) */
+export interface AgentFeedItem {
+  id: string;                     // Unique within this feed (1-200 chars)
+  url: string;                    // URI
+  headline: string;               // 1-2000 chars
+  published_at: string;           // ISO 8601
+  updated_at: string;             // ISO 8601
+  content: {
+    lang?: string;                // ISO 639-1 (default: "und")
+    excerpt_text?: string;        // Max 500 chars
+  };
+  risk?: {
+    score: number;                // 0-1 (publisher-provided, DiffDelta does not compute)
+    reasons?: string[];           // Max 10, pattern: ^[a-z0-9_\-]{2,64}$
+  };
+  provenance: {
+    fetched_at: string;           // ISO 8601
+    evidence_urls: string[];      // 1-20 URIs
+    content_hash: string;         // sha256:<64-char-hex>
+  };
+  source: string;                 // Source ID (auto-filled to feed source_id)
+}
+
+/** Feed publish limits */
+export interface AgentFeedLimits {
+  max_feeds_per_agent: number;
+  max_items_per_feed: number;
+  max_item_bytes: number;
+  max_publishes_per_day: number;
+  retention_days: number;
+}
+
+export const FREE_FEED_LIMITS: AgentFeedLimits = {
+  max_feeds_per_agent: 3,
+  max_items_per_feed: 50,
+  max_item_bytes: 4096,
+  max_publishes_per_day: 20,
+  retention_days: 7,
+};
+
+export const PRO_FEED_LIMITS: AgentFeedLimits = {
+  max_feeds_per_agent: 20,
+  max_items_per_feed: 500,
+  max_item_bytes: 16384,
+  max_publishes_per_day: 200,
+  retention_days: 90,
+};
 
 /** Webhook registration (Phase 2 — type reserved now) */
 export interface WebhookRegistration {
