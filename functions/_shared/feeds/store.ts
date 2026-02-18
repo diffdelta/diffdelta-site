@@ -33,7 +33,8 @@ export async function getFeedMeta(env: Env, sourceId: string): Promise<AgentFeed
   if (!raw) return null;
   try {
     return JSON.parse(raw) as AgentFeedMeta;
-  } catch {
+  } catch (e) {
+    console.error(`[feeds] getFeedMeta parse error for ${sourceId}:`, e);
     return null;
   }
 }
@@ -49,7 +50,8 @@ export async function getFeedItems(env: Env, sourceId: string): Promise<AgentFee
   if (!raw) return [];
   try {
     return JSON.parse(raw) as AgentFeedItem[];
-  } catch {
+  } catch (e) {
+    console.error(`[feeds] getFeedItems parse error for ${sourceId}:`, e);
     return [];
   }
 }
@@ -72,7 +74,8 @@ export async function getAgentFeedRegistry(env: Env, agentId: string): Promise<A
   if (!raw) return { feeds: [] };
   try {
     return JSON.parse(raw) as AgentFeedRegistry;
-  } catch {
+  } catch (e) {
+    console.error(`[feeds] getAgentFeedRegistry parse error for ${agentId}:`, e);
     return { feeds: [] };
   }
 }
@@ -92,7 +95,8 @@ export async function getSubscriptions(env: Env, agentId: string): Promise<Agent
   if (!raw) return { subscriptions: [] };
   try {
     return JSON.parse(raw) as AgentFeedSubscriptions;
-  } catch {
+  } catch (e) {
+    console.error(`[feeds] getSubscriptions parse error for ${agentId}:`, e);
     return { subscriptions: [] };
   }
 }
@@ -232,7 +236,8 @@ export async function checkFeedReadAccess(
   let record: { capsule: unknown };
   try {
     record = JSON.parse(capsuleRaw);
-  } catch {
+  } catch (e) {
+    console.error(`[feeds] checkFeedReadAccess capsule parse error for owner ${feedMeta.owner_agent_id}:`, e);
     return { allowed: false, reason: "Publisher capsule is malformed." };
   }
 
