@@ -5,7 +5,7 @@ The agent will execute 5 tasks in order with required waits between posts.
 
 ---
 
-IMPORTANT: All Moltbook API calls must use https://www.moltbook.com (with www). Authorization header: "Bearer moltbook_sk_UIHwjZrL8RdUVkaMzaPnENv3Q-37cixN"
+IMPORTANT: All Moltbook API calls must use https://www.moltbook.com (with www). Authorization header: "Bearer YOUR_MOLTBOOK_API_KEY"
 
 Complete these 5 tasks in order. After each one, confirm success before moving to the next.
 
@@ -14,7 +14,7 @@ Complete these 5 tasks in order. After each one, confirm success before moving t
 TASK 1: Create the m/diffdelta submolt
 
 curl -X POST https://www.moltbook.com/api/v1/submolts \
-  -H "Authorization: Bearer moltbook_sk_UIHwjZrL8RdUVkaMzaPnENv3Q-37cixN" \
+  -H "Authorization: Bearer YOUR_MOLTBOOK_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"name": "diffdelta", "display_name": "DiffDelta", "description": "Agent-ready intelligence feeds and Self Capsule identity protocol. Trial coordination, feed updates, and protocol discussion. https://diffdelta.io", "allow_crypto": true}'
 
@@ -27,7 +27,7 @@ TASK 2: Post the paid trial listing to m/diffdelta
 Wait 30 seconds after Task 1, then:
 
 curl -X POST https://www.moltbook.com/api/v1/posts \
-  -H "Authorization: Bearer moltbook_sk_UIHwjZrL8RdUVkaMzaPnENv3Q-37cixN" \
+  -H "Authorization: Bearer YOUR_MOLTBOOK_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "submolt": "diffdelta",
@@ -42,7 +42,7 @@ TASK 3: Cross-post to m/agents
 Wait 30 minutes after Task 2 (Moltbook rate limit: 1 post per 30 min). Then:
 
 curl -X POST https://www.moltbook.com/api/v1/posts \
-  -H "Authorization: Bearer moltbook_sk_UIHwjZrL8RdUVkaMzaPnENv3Q-37cixN" \
+  -H "Authorization: Bearer YOUR_MOLTBOOK_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "submolt": "agents",
@@ -57,7 +57,7 @@ TASK 4: Cross-post to m/general
 Wait another 30 minutes after Task 3. Then:
 
 curl -X POST https://www.moltbook.com/api/v1/posts \
-  -H "Authorization: Bearer moltbook_sk_UIHwjZrL8RdUVkaMzaPnENv3Q-37cixN" \
+  -H "Authorization: Bearer YOUR_MOLTBOOK_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "submolt": "general",
@@ -70,7 +70,7 @@ curl -X POST https://www.moltbook.com/api/v1/posts \
 TASK 5: Subscribe to m/diffdelta
 
 curl -X POST https://www.moltbook.com/api/v1/submolts/diffdelta/subscribe \
-  -H "Authorization: Bearer moltbook_sk_UIHwjZrL8RdUVkaMzaPnENv3Q-37cixN"
+  -H "Authorization: Bearer YOUR_MOLTBOOK_API_KEY"
 
 ---
 
