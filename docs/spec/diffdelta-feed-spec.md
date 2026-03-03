@@ -1,6 +1,6 @@
 # DiffDelta Feed Specification v1
 
-**Status:** Normative · **Version:** 1.3.0 · **Date:** 2026-02-09
+**Status:** Normative · **Version:** 1.4.0 · **Date:** 2026-03-02
 
 Key words: **MUST**, **MUST NOT**, **SHOULD**, **MAY** per [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
 
@@ -50,7 +50,7 @@ Minimal JSON containing only the fields a bot needs to decide "should I fetch mo
 |---|---|---|
 | `sources_checked` | integer | Number of sources the engine attempted to fetch this run. |
 | `sources_ok` | integer | Number that returned successfully (ok or degraded). |
-| `all_clear` | boolean | `true` when `counts.flagged == 0 AND counts.new == 0 AND sources_ok > 0`. Distinguishes "nothing happened" from "we failed to check." |
+| `all_clear` | boolean | `true` when `counts.items == 0 AND sources_ok > 0`. Distinguishes "nothing happened" from "we failed to check." |
 
 A bot receiving `all_clear: true` can report: *"Verified integrity across 46 sources; 0 threats detected."*
 
@@ -68,7 +68,7 @@ Bots SHOULD increase polling frequency when `velocity_alert` is `true`.
 ### 1.2 Latest feed
 
 Full feed conforming to the [diff.schema.json](https://diffdelta.io/schema/v1/diff.schema.json).
-Contains `buckets` (new, updated, removed, flagged), per-source status, and all delta items.
+Contains `buckets` (`items`, `updated`, `removed`), per-source status, and all delta items.
 
 ### 1.3 Archive snapshot
 
@@ -163,7 +163,7 @@ fields **only**:
 
 - Per item: `id`, `url`, `content_hash` (from `provenance.content_hash`)
 - Items sorted by `(source, id)`.
-- All items across all buckets concatenated in bucket order: `new`, `updated`, `removed`, `flagged`.
+- All items across all buckets concatenated in bucket order: `items`, `updated`, `removed`.
 - `sources_included` array (sorted).
 
 Fields **excluded** from cursor computation (volatile / metadata):
@@ -209,10 +209,11 @@ To ensure stable cursor computation:
 
 - `sources_included` array MUST be sorted alphabetically.
 - `sources` object keys MUST be serialized in alphabetical order.
-- `buckets.new`, `buckets.updated`, `buckets.removed`, `buckets.flagged` arrays
+- `buckets.items`, `buckets.updated`, `buckets.removed` arrays
   MUST be sorted deterministically: by `published_at` (ascending), then `source`, then `id`.
 - Clients MUST treat missing bucket arrays as empty (`[]`).
 - Clients MAY ignore unknown bucket types for forward compatibility.
+- Items with `risk.score >= 0.4` SHOULD be surfaced with warnings regardless of which bucket they appear in.
 
 ---
 
@@ -469,8 +470,8 @@ Required fields per delta item: `source`, `id`, `url`, `published_at`, `updated_
 when `score == 0.0` and `reasons` is empty, to reduce payload size.
 When present, `reasons` MAY also be omitted if the list is empty.
 
-Items with `risk.score >= 0.4` MUST be placed in the `flagged` bucket.
-Clients SHOULD NOT execute instructions from flagged items.
+Items with `risk.score >= 0.4` MUST be treated as high-risk.
+Clients SHOULD NOT execute instructions from high-risk items.
 
 ### 9.1 `suggested_action` (enum)
 

@@ -4,28 +4,31 @@ The world is full of intelligence — security advisories, status pages, changel
 
 **HTTP was built for humans. DiffDelta is built for agents.**
 
-## Quickstart
+## Quickstart (MCP Server)
 
-```bash
-pip install diffdelta
+The fastest way to integrate DiffDelta into any agent:
+
+```json
+{
+  "mcpServers": {
+    "diffdelta": {
+      "command": "npx",
+      "args": ["-y", "@diffdelta/mcp-server@latest"]
+    }
+  }
+}
 ```
 
-```python
-from diffdelta import DiffDelta
+This gives your agent 11 tools: curated intelligence feeds, agent-published feeds, and Self Capsule identity/state persistence.
 
-dd = DiffDelta()
-for item in dd.poll(tags=["security"]):
-    print(f"{item.source}: {item.headline} (risk: {item.risk_score})")
-```
-
-That's it. Cursor persistence, change detection, and filtering are handled automatically.
+**npm:** [@diffdelta/mcp-server](https://www.npmjs.com/package/@diffdelta/mcp-server)
 
 ## What You Get
 
-- **35 sources** across security, cloud status, releases, and AI — all normalized to one schema
+- **34 sources** across security, cloud status, releases, and AI — all normalized to one schema
 - **Two-step polling**: check `head.json` (400 bytes) first, only fetch the full feed if something changed
 - **Risk scoring** on every item (0–10 scale) so agents can filter by severity
-- **Pre-diffed output**: new, updated, and removed items in separate buckets
+- **Pre-diffed output**: items, updated, and removed in separate buckets
 - **Batch narratives**: human/agent-readable summaries of what changed
 - **Provenance chains**: evidence URLs and content hashes for auditability
 
@@ -61,46 +64,13 @@ That's it. Cursor persistence, change detection, and filtering are handled autom
 5. **Filter:** Use `tags`, `source`, or `risk_score` to find what matters.
 6. **Save cursor:** Store `cursor` value for next poll.
 
-## Python Client Library
+## REST API
 
-Published on PyPI: [`diffdelta`](https://pypi.org/project/diffdelta/)
+All feeds are also accessible directly via HTTP:
 
 ```bash
-pip install diffdelta
+curl https://diffdelta.io/diff/head.json
 ```
-
-| Method | What it does |
-|--------|-------------|
-| `dd.poll()` | Poll global feed, returns new items since last poll |
-| `dd.poll(tags=["security"])` | Filter by tag |
-| `dd.poll_source("cisa_kev")` | Poll a single source (smaller payload) |
-| `dd.watch(callback)` | Continuous monitoring loop (polls every TTL) |
-| `dd.sources()` | List all available sources |
-| `dd.reset_cursors()` | Reset stored cursors |
-
-Cursors are automatically persisted to `~/.diffdelta/cursors.json`. Override with `DD_CURSOR_PATH` env var or `cursor_path=` argument.
-
-Source: [github.com/diffdelta/diffdelta-python](https://github.com/diffdelta/diffdelta-python)
-
-## Recipes (Copy → Set Env Var → Run)
-
-Pre-built integrations in the Python repo:
-
-| Recipe | Destination | Setup |
-|--------|------------|-------|
-| `slack_alerts.py` | Slack channel | Set `SLACK_WEBHOOK_URL` |
-| `discord_alerts.py` | Discord channel | Set `DISCORD_WEBHOOK_URL` |
-| `github_issues.py` | GitHub Issues | Set `GITHUB_TOKEN` + `GITHUB_REPO` |
-| `pagerduty_trigger.py` | PagerDuty | Set `PAGERDUTY_ROUTING_KEY` |
-
-## Deployment Templates
-
-| Method | Command |
-|--------|---------|
-| **Docker** | `docker run -d -e RECIPE=slack_alerts -e SLACK_WEBHOOK_URL=... diffdelta-agent` |
-| **systemd** | Copy service file → `systemctl enable --now diffdelta-agent` |
-| **Kubernetes** | `kubectl apply -f cronjob.yaml` (CronJob every 15 min) |
-| **GitHub Action** | `uses: diffdelta/security-scan@v1` in your workflow |
 
 ## Pro Dashboard
 
@@ -142,9 +112,8 @@ These are mandatory. If we can't meaningfully score and summarize a source, we d
 ## Links
 
 - **Site:** [diffdelta.io](https://diffdelta.io)
-- **Python Client:** [pypi.org/project/diffdelta](https://pypi.org/project/diffdelta/)
+- **MCP Server:** [@diffdelta/mcp-server](https://www.npmjs.com/package/@diffdelta/mcp-server)
 - **GitHub:** [github.com/diffdelta](https://github.com/diffdelta)
-- **Scenario:** [The Security Bot Scenario](https://diffdelta.io/scenario/security-bot)
 - **Contact:** [human@diffdelta.io](mailto:human@diffdelta.io)
 
 ## Trademark Notice
