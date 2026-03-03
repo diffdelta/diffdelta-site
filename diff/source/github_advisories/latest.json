@@ -1,19 +1,661 @@
 {
   "schema_version": "1.2.0",
-  "generated_at": "2026-03-03T22:00:44Z",
+  "generated_at": "2026-03-03T23:01:13Z",
   "source_id": "github_advisories",
-  "hash": "sha256:241a9761952e45159c15b7ed0c0a75a63028f98bcf87a111f17970d966c5ac0e",
-  "prev_hash": "sha256:4ab7ebe95b632bc71169d3d235f7f9181189020d02659f51edfa727427c3f02f",
-  "cursor": "sha256:dba7a8f3c15561f95bf2b413be6fc0f43a694e2104480c28e58ee1319518cf97",
-  "prev_cursor": "sha256:57784c1be4d16701c171edad5d0774421440f4015cfd2b88d434f0621e33ed08",
+  "hash": "sha256:924f1d2ae6562a656f65a3132553657609052ca0495238f04f4b7248777cc1bd",
+  "prev_hash": "sha256:241a9761952e45159c15b7ed0c0a75a63028f98bcf87a111f17970d966c5ac0e",
+  "cursor": "sha256:0fa20e2ab93fb8251dc586c60f6e158159e66fda1ea07d2f86f49e43aa1923e5",
+  "prev_cursor": "sha256:dba7a8f3c15561f95bf2b413be6fc0f43a694e2104480c28e58ee1319518cf97",
   "changed": true,
   "ttl_sec": 3600,
   "sources_included": [
     "github_advisories"
   ],
-  "batch_narrative": "github_advisories: 100 advisories (10 critical, 28 high, 59 medium, 3 low).",
+  "batch_narrative": "github_advisories: 100 advisories (5 critical, 30 high, 59 medium, 6 low).",
   "buckets": {
     "items": [
+      {
+        "source": "github_advisories",
+        "id": "GHSA-659f-22xc-98f2",
+        "url": "https://github.com/advisories/GHSA-659f-22xc-98f2",
+        "published_at": "2026-03-03T23:00:53Z",
+        "updated_at": "2026-03-03T23:00:53Z",
+        "headline": "OpenClaw hook transform path containment missed symlink-resolved escapes",
+        "content": {
+          "excerpt_text": "## Vulnerability Webhook transform modules were validated with lexical path checks only. A symlink under the allowed hooks transform tree could resolve outside the intended directory and be dynamically imported. ## Affected Packages / Versions - Package: `openclaw` (npm) - Affected versions: `<= 2026.2.21-2` - Patched version (planned next release): `2026.2.22` ## Impact When an attacker can cause a transform module path to reference a symlinked entry that resolves outside the trusted...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-659f-22xc-98f2"
+          ],
+          "content_hash": "sha256:6dee54d6c8fb5dddefa31b25483efe6abe0743f4d7148f5f061638aaac2c9c0b"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-94"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-659f-22xc-98f2"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "GHSA-4gc7-qcvf-38wg",
+        "url": "https://github.com/advisories/GHSA-4gc7-qcvf-38wg",
+        "published_at": "2026-03-03T22:59:59Z",
+        "updated_at": "2026-03-03T23:00:01Z",
+        "headline": "In OpenClaw, manually adding sort to tools.exec.safeBins could bypass allowlist approval via --compress-program",
+        "content": {
+          "excerpt_text": "### Summary This issue applies to a **non-default configuration** only. If `sort` is manually added to `tools.exec.safeBins`, OpenClaw could treat `sort --compress-program= ` as valid safe-bin usage. In `security=allowlist` + `ask=on-miss`, this could satisfy allowlist checks and skip operator approval, while GNU `sort` may invoke an external program via `--compress-program`. ### Affected Packages / Versions - Ecosystem: npm - Package: `openclaw` - Affected: `<= 2026.2.21-2` - Patched...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-4gc7-qcvf-38wg"
+          ],
+          "content_hash": "sha256:52b57f2112d6843f54c17682e0f3f7aafd6219d276c15b59aa8664979d0f51bf"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-78",
+              "CWE-184"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-4gc7-qcvf-38wg"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "GHSA-25pw-4h6w-qwvm",
+        "url": "https://github.com/advisories/GHSA-25pw-4h6w-qwvm",
+        "published_at": "2026-03-03T22:54:46Z",
+        "updated_at": "2026-03-03T22:54:48Z",
+        "headline": "OpenClaw has a BlueBubbles group allowlist mismatch via DM pairing-store fallback",
+        "content": {
+          "excerpt_text": "### Summary In `openclaw@2026.2.25`, BlueBubbles group authorization could incorrectly treat DM pairing-store identities as group allowlist identities when `dmPolicy=pairing` and `groupPolicy=allowlist`. A sender that was only DM-paired (not explicitly present in `groupAllowFrom`) could pass group sender checks for message and reaction ingress. Per OpenClaw's `SECURITY.md` trust model, this is a constrained authorization-consistency issue, not a multi-tenant boundary bypass or host-privilege...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-25pw-4h6w-qwvm"
+          ],
+          "content_hash": "sha256:a52694987b069ff69ee520917349a1cc1db573486c8a1ee1e7e9c0807f717bdd"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-863"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-25pw-4h6w-qwvm"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "GHSA-gcj7-r3hg-m7w6",
+        "url": "https://github.com/advisories/GHSA-gcj7-r3hg-m7w6",
+        "published_at": "2026-03-03T22:25:37Z",
+        "updated_at": "2026-03-03T22:25:38Z",
+        "headline": "OpenClaw's voice-call Twilio replay dedupe now bound to authenticated webhook identity",
+        "content": {
+          "excerpt_text": "### Summary The voice-call Twilio webhook path accepted replay/dedupe identity from unsigned request metadata (`i-twilio-idempotency-token`), enabling replayed signed requests to bypass replay detection and manager dedupe by mutating only that header. ### Affected Packages / Versions - Package: `openclaw` (npm) - Affected versions: `<= 2026.2.25` (latest published npm version at triage time) - Fixed on `main`: commit `1aadf26f9acc399affabd859937a09468a9c5cb4` - Planned patched npm version:...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-gcj7-r3hg-m7w6"
+          ],
+          "content_hash": "sha256:91b98ff4f527d1c8dccee2c578005c03883fd189dba60db6c280902b5705237f"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "github_advisory",
+            "cvss": 3.7,
+            "cwes": [
+              "CWE-294",
+              "CWE-345"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-gcj7-r3hg-m7w6"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "GHSA-w7j5-j98m-w679",
+        "url": "https://github.com/advisories/GHSA-w7j5-j98m-w679",
+        "published_at": "2026-03-03T22:25:13Z",
+        "updated_at": "2026-03-03T22:25:14Z",
+        "headline": "OpenClaw has multiple E2E/test Dockerfiles that run all processes as root",
+        "content": {
+          "excerpt_text": "Three Dockerfiles in scripts/docker/ and scripts/e2e/ lack a USER directive, meaning all processes run as uid 0 (root). If any process is compromised, the attacker has root inside the container, making container breakout significantly easier. **Partial fix (2026-02-08):** Commit 28e1a65e added USER sandbox to Dockerfile.sandbox and Dockerfile.sandbox-browser. The E2E/test Dockerfiles listed below remain unpatched. **Affected components:** - scripts/e2e/Dockerfile -...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-w7j5-j98m-w679"
+          ],
+          "content_hash": "sha256:cd6933609b987c029b86331b088ccd73f56f0181a675e107d8d6b30194ead604"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-250"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-w7j5-j98m-w679"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "GHSA-796m-2973-wc5q",
+        "url": "https://github.com/advisories/GHSA-796m-2973-wc5q",
+        "published_at": "2026-03-03T22:23:45Z",
+        "updated_at": "2026-03-03T22:23:47Z",
+        "headline": "OpenClaw has exec allowlist/safeBins policy-runtime mismatch via env -S wrapper interpretation",
+        "content": {
+          "excerpt_text": "### Summary `tools.exec` allowlist/safe-bins evaluation could diverge from runtime execution for wrapper commands using GNU `env -S/--split-string` semantics. This allowed policy checks to treat a command as a benign safe-bin invocation while runtime executed a different payload. ### Affected Packages / Versions - Package: `openclaw` (npm) - Vulnerable versions: `<= 2026.2.22-2` (latest currently published npm version) - Patched version (released): `2026.2.23` ### Impact An attacker able to...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-796m-2973-wc5q"
+          ],
+          "content_hash": "sha256:7c8bbd3645a444cae0b4070b7de704d6be49889f907c24d949d2c0c058d47ec1"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-436"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-796m-2973-wc5q"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "GHSA-7qf6-h84j-8fq4",
+        "url": "https://github.com/advisories/GHSA-7qf6-h84j-8fq4",
+        "published_at": "2026-03-03T22:21:59Z",
+        "updated_at": "2026-03-03T22:21:59Z",
+        "headline": "OpenClaw: Microsoft Teams media fetch paths bypass shared SSRF guard model",
+        "content": {
+          "excerpt_text": "## Impact Microsoft Teams media handling used mixed fetch paths for Graph metadata/content and attachment auth-retry flows. Some paths bypassed the shared SSRF guard model and created inconsistent host/DNS enforcement across redirect/fetch hops. ## Affected Packages / Versions - Package: `openclaw` (npm) - Latest published vulnerable version: `2026.2.25` - Affected range: `<= 2026.2.25` - Planned patched version for next release: `2026.2.26` ## Technical Details The Microsoft Teams...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-7qf6-h84j-8fq4"
+          ],
+          "content_hash": "sha256:6df1fec8d2dca180d631761caddf21b58f3486211a1c93612bea2f491f2bb9fd"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-367",
+              "CWE-918"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-7qf6-h84j-8fq4"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "GHSA-jmmg-jqc7-5qf4",
+        "url": "https://github.com/advisories/GHSA-jmmg-jqc7-5qf4",
+        "published_at": "2026-03-03T22:18:09Z",
+        "updated_at": "2026-03-03T22:18:10Z",
+        "headline": "OpenClaw's browser-origin WebSocket auth hardening gap could enable loopback password brute-force chains",
+        "content": {
+          "excerpt_text": "This issue is a browser-origin WebSocket auth chain on local loopback deployments using password auth. It is serious, but conditional: an attacker must get the user to open a malicious page and then successfully guess the gateway password. ## Context and Preconditions OpenClaw’s web/gateway surface is designed for local use and trusted-operator workflows. In affected versions, a browser-origin client could combine three behaviors: - Origin checks not enforced for some non-Control-UI...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-jmmg-jqc7-5qf4"
+          ],
+          "content_hash": "sha256:4c24af37fd0d443c2e8109c24f79322197ae26ab4df8b5a101c1b655fca8dceb"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-287",
+              "CWE-307",
+              "CWE-346"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-jmmg-jqc7-5qf4"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "GHSA-2rgf-hm63-5qph",
+        "url": "https://github.com/advisories/GHSA-2rgf-hm63-5qph",
+        "published_at": "2026-03-03T22:17:12Z",
+        "updated_at": "2026-03-03T22:17:14Z",
+        "headline": "OpenClaw improperly parses X-Forwarded-For behind trusted proxies allows client IP spoofing in security decisions",
+        "content": {
+          "excerpt_text": "### Summary OpenClaw used left-most `X-Forwarded-For` values when requests came from configured trusted proxies. In proxy chains that append/preserve header values, this could let attacker-controlled header content influence security decisions tied to client IP. ### Affected Packages / Versions - Package: `openclaw` (npm) - Affected: `<= 2026.2.19-2` - Patched: `2026.2.21` (planned next release) ### Impact Possible client-IP spoofing in security-sensitive paths (for example auth rate-limit...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-2rgf-hm63-5qph"
+          ],
+          "content_hash": "sha256:d2551f1d4a03ad0c75b8930947da7fbd55352efaa2c0a664dcf10e8c8a15dc1a"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-345",
+              "CWE-807"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-2rgf-hm63-5qph"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "GHSA-7ff8-xjh3-mgh6",
+        "url": "https://github.com/advisories/GHSA-7ff8-xjh3-mgh6",
+        "published_at": "2026-03-03T22:13:53Z",
+        "updated_at": "2026-03-03T22:13:54Z",
+        "headline": "OpenClaw's non-default autoAllowSkills setting could bypass on-miss exec prompt",
+        "content": {
+          "excerpt_text": "### Summary In `openclaw` versions up to and including `2026.2.22-2`, a non-default exec-approval configuration could allow a skill-name collision to bypass an `ask=on-miss` prompt. When `autoAllowSkills=true`, a path-scoped executable such as `./skill-bin` could resolve to basename `skill-bin`, satisfy the `skills` allowlist segment, and run without prompting for approval. ### Affected Packages / Versions - Package: `npm openclaw` - Affected versions: `<= 2026.2.22-2` - Patched versions:...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-7ff8-xjh3-mgh6"
+          ],
+          "content_hash": "sha256:281614fa4b13a07f2b8af3df5dda6161758e82c9a0c87b0c68f11e41a8e6c035"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-266",
+              "CWE-863"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-7ff8-xjh3-mgh6"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "GHSA-xgf2-vxv2-rrmg",
+        "url": "https://github.com/advisories/GHSA-xgf2-vxv2-rrmg",
+        "published_at": "2026-03-03T22:12:51Z",
+        "updated_at": "2026-03-03T22:12:53Z",
+        "headline": "OpenClaw's shell startup env injection bypasses system.run allowlist intent (RCE class)",
+        "content": {
+          "excerpt_text": "### Summary `system.run` environment sanitization allowed shell-startup env overrides (`HOME`, `ZDOTDIR`) that can execute attacker-controlled startup files before allowlist-evaluated command bodies. ### Affected Packages / Versions - Package: `openclaw` (npm) - Affected: `<= 2026.2.21-2` (latest published vulnerable version) - Planned patched version: `>= 2026.2.22` ### Technical Details In affected versions: - Env sanitization blocked many dangerous keys, but not startup-sensitive override...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-xgf2-vxv2-rrmg"
+          ],
+          "content_hash": "sha256:b827d1639a077bc069904ca989a2035f325903ae5658205870fb1a8e9d8e58d7"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-15",
+              "CWE-78"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-xgf2-vxv2-rrmg"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "GHSA-62f6-mrcj-v8h5",
+        "url": "https://github.com/advisories/GHSA-62f6-mrcj-v8h5",
+        "published_at": "2026-03-03T22:12:20Z",
+        "updated_at": "2026-03-03T22:12:22Z",
+        "headline": "OpenClaw's runtime /debug override path accepted prototype-reserved keys",
+        "content": {
+          "excerpt_text": "### Summary OpenClaw accepted prototype-reserved keys in runtime `/debug set` override object values (`__proto__`, `constructor`, `prototype`). ### Impact `/debug` is disabled by default, and exploitation requires an already authorized `/debug set` caller. No unauthenticated vector was identified. This issue affects runtime in-memory overrides only (non-persistent and cleared on restart/reset). Given the required prior authorization boundary, this is treated as defense-in-depth hardening for...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-62f6-mrcj-v8h5"
+          ],
+          "content_hash": "sha256:fd9e97ebd209a0f9a62977209ed0abad6c0ad3330344dbd2eb82b577caeadcf3"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-1321"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-62f6-mrcj-v8h5"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "GHSA-27cr-4p5m-74rj",
+        "url": "https://github.com/advisories/GHSA-27cr-4p5m-74rj",
+        "published_at": "2026-03-03T22:11:54Z",
+        "updated_at": "2026-03-03T22:11:56Z",
+        "headline": "OpenClaw has a workspace-only sandbox guard mismatch for @-prefixed absolute paths",
+        "content": {
+          "excerpt_text": "A workspace-only file-system guard mismatch allowed `@`-prefixed absolute paths to bypass boundary validation in some tool path checks. ### Impact When `tools.fs.workspaceOnly=true`, certain `@`-prefixed absolute paths (for example `@/etc/passwd`) could be validated before canonicalization while runtime path handling normalized the prefix differently. In affected code paths this could permit reads outside the intended workspace boundary. Per `SECURITY.md`, OpenClaw is primarily a...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-27cr-4p5m-74rj"
+          ],
+          "content_hash": "sha256:57ff362d43654e4614c9a8f37535aabe1c02258fc759fc2b7483fb84bc139ead"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-22",
+              "CWE-180"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-27cr-4p5m-74rj"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "GHSA-w9cg-v44m-4qv8",
+        "url": "https://github.com/advisories/GHSA-w9cg-v44m-4qv8",
+        "published_at": "2026-03-03T22:09:52Z",
+        "updated_at": "2026-03-03T22:09:53Z",
+        "headline": "OpenClaw affected by BASH_ENV / ENV startup-file injection into spawned shell commands",
+        "content": {
+          "excerpt_text": "### Summary `BASH_ENV` / `ENV` startup-file injection could lead to unintended pre-command shell execution when attacker-controlled environment values were admitted and then inherited by host command execution paths. ### Affected Packages / Versions - Package: `openclaw` (npm) - Affected: `<= 2026.2.19-2` - Fixed on `main`: `2cdbadee1f8fcaa93302d7debbfc529e19868ea4` - Planned patched release version: `2026.2.21` ### Details The fix hardens environment handling across all relevant execution...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-w9cg-v44m-4qv8"
+          ],
+          "content_hash": "sha256:c23b130739e695413d0bc07e931adbb69766845b1806b2f680f4f27785c1d0c3"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-15",
+              "CWE-78"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-w9cg-v44m-4qv8"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "GHSA-r294-2894-92j3",
+        "url": "https://github.com/advisories/GHSA-r294-2894-92j3",
+        "published_at": "2026-03-03T22:09:26Z",
+        "updated_at": "2026-03-03T22:09:28Z",
+        "headline": "OpenClaw has stored XSS in exported session HTML viewer via markdown/raw-HTML rendering",
+        "content": {
+          "excerpt_text": "## Summary The exported session HTML viewer allowed stored XSS when untrusted session content included raw HTML markdown tokens or unescaped metadata fields. ## Impact Opening a crafted exported HTML session could execute attacker-controlled JavaScript in the viewer context. This can expose session content in the page and enable phishing or UI spoofing in the trusted export view. ## Affected Packages / Versions - Package: `openclaw` (npm) - Affected versions: `<= 2026.2.22-2` - Patched...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-r294-2894-92j3"
+          ],
+          "content_hash": "sha256:84af28072f4fd1924d52f312183a33e7366e44fb2fe4c8217976af5e242bb65a"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-79"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-r294-2894-92j3"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "GHSA-xmv6-r34m-62p4",
+        "url": "https://github.com/advisories/GHSA-xmv6-r34m-62p4",
+        "published_at": "2026-03-03T22:08:54Z",
+        "updated_at": "2026-03-03T22:08:55Z",
+        "headline": "OpenClaw: Sandbox media fallback tmp symlink alias bypass allows host file reads outside sandboxRoot",
+        "content": {
+          "excerpt_text": "### Summary A sandbox path validation bypass in `openclaw` allows host file reads outside `sandboxRoot` via the media path fallback tmp flow when the fallback tmp root is a symlink alias. ### Affected Packages / Versions - Package: `npm openclaw` - Affected versions: `<= 2026.2.24` - Latest published npm version at triage time (February 26, 2026): `2026.2.24` - Patched version : `2026.2.25` ### Details When `/tmp/openclaw` is unavailable or unsafe, `resolvePreferredOpenClawTmpDir()` in...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-xmv6-r34m-62p4"
+          ],
+          "content_hash": "sha256:879e532c03f8b9337fe5a8d4863b39c5c393453ddb1453564019f20119fbdad1"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-22",
+              "CWE-59"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-xmv6-r34m-62p4"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "GHSA-g75x-8qqm-2vxp",
+        "url": "https://github.com/advisories/GHSA-g75x-8qqm-2vxp",
+        "published_at": "2026-03-03T22:08:26Z",
+        "updated_at": "2026-03-03T22:08:28Z",
+        "headline": "OpenClaw's `tools.exec.safeBins` PATH-hijack allowed trojan binaries to bypass allowlist checks",
+        "content": {
+          "excerpt_text": "## Summary `tools.exec.safeBins` allowlist checks could be bypassed by PATH-hijacked binaries, allowing execution of attacker-controlled trojan binaries under an allowlisted executable name. ## Affected Packages / Versions - Package: `openclaw` (npm) - Latest published version at triage time: `2026.2.17` - Affected range: `>= 2026.1.21 < 2026.2.18` - Patched version: `2026.2.19` ## Impact In allowlist mode, `safeBins` validation previously accepted a resolved executable path based on...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-03T23:01:13Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-g75x-8qqm-2vxp"
+          ],
+          "content_hash": "sha256:6c2d69efb9547d33481fd3e8eaf3a3f2f15fd2d2c45f97cdccc7dc867f5fc748"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-426",
+              "CWE-863"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-g75x-8qqm-2vxp"
+            }
+          }
+        }
+      },
       {
         "source": "github_advisories",
         "id": "GHSA-vffc-f7r7-rx2w",
@@ -26,7 +668,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-vffc-f7r7-rx2w"
           ],
@@ -63,7 +705,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-vvgp-4c28-m3jm"
           ],
@@ -100,7 +742,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-v3j7-34xh-6g3w"
           ],
@@ -139,7 +781,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-pj5x-38rw-6fph"
           ],
@@ -176,7 +818,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-4cqv-h74h-93j4"
           ],
@@ -214,7 +856,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3cvx-236h-m9fj"
           ],
@@ -252,7 +894,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-h97f-6pqj-q452"
           ],
@@ -289,7 +931,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3x3x-h76w-hp98"
           ],
@@ -326,7 +968,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-pfv7-rr5m-qmv6"
           ],
@@ -363,7 +1005,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3c6h-g97w-fg78"
           ],
@@ -402,7 +1044,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-j4xf-96qf-rx69"
           ],
@@ -440,7 +1082,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9p38-94jf-hgjj"
           ],
@@ -478,7 +1120,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5h2c-8v84-qpvr"
           ],
@@ -517,7 +1159,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-ff98-w8hj-qrxf"
           ],
@@ -554,7 +1196,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-553v-f69r-656j"
           ],
@@ -591,7 +1233,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-45cg-2683-gfmq"
           ],
@@ -629,7 +1271,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mqr9-vqhq-3jxw"
           ],
@@ -666,7 +1308,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-h9xm-j4qg-fvpg"
           ],
@@ -705,7 +1347,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-j26j-7qc4-3mrf"
           ],
@@ -754,7 +1396,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-2hm8-rqrm-xfjq"
           ],
@@ -806,7 +1448,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-p4wh-cr8m-gm6c"
           ],
@@ -844,7 +1486,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5mx2-2mgw-x8rm"
           ],
@@ -881,7 +1523,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-2mc2-g238-722j"
           ],
@@ -919,7 +1561,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5gj7-jf77-q2q2"
           ],
@@ -957,7 +1599,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-77hf-7fqf-f227"
           ],
@@ -996,7 +1638,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wpg9-4g4v-f9rc"
           ],
@@ -1035,7 +1677,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-474h-prjg-mmw3"
           ],
@@ -1073,7 +1715,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-v865-p3gq-hw6m"
           ],
@@ -1110,7 +1752,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-354r-7mfh-7rh2"
           ],
@@ -1147,7 +1789,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-r54r-wmmq-mh84"
           ],
@@ -1185,7 +1827,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3pxq-f3cp-jmxp"
           ],
@@ -1224,7 +1866,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8mvx-p2r9-r375"
           ],
@@ -1263,7 +1905,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-h3rm-6x7g-882f"
           ],
@@ -1301,7 +1943,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-2858-xg23-26fp"
           ],
@@ -1339,7 +1981,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-x4vp-4235-65hg"
           ],
@@ -1376,7 +2018,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-cfvj-7rx7-fc7c"
           ],
@@ -1413,7 +2055,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-jqwg-75qf-vmf9"
           ],
@@ -1451,7 +2093,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qc86-q28f-ggww"
           ],
@@ -1489,7 +2131,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-jxm3-pmm2-9gf6"
           ],
@@ -1527,7 +2169,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5fvc-7894-ghp4"
           ],
@@ -1578,7 +2220,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-2xfc-g69j-x2mp"
           ],
@@ -1617,7 +2259,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-v47q-jxvr-p68x"
           ],
@@ -1655,7 +2297,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wwp2-x4rj-j8rm"
           ],
@@ -1692,7 +2334,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-rcph-x7mj-54mm"
           ],
@@ -1729,7 +2371,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-45rp-9p97-h852"
           ],
@@ -1766,7 +2408,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8vm4-g489-v3w7"
           ],
@@ -1803,7 +2445,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-4mgv-366x-qxvx"
           ],
@@ -1841,7 +2483,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-7x43-mpfg-r9wj"
           ],
@@ -1879,7 +2521,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-94rc-cqvm-m4pw"
           ],
@@ -1919,7 +2561,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hfpc-8r3f-gw53"
           ],
@@ -1957,7 +2599,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-65p9-r9h6-22vj"
           ],
@@ -1996,7 +2638,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-vw5v-4f2q-w9xf"
           ],
@@ -2034,7 +2676,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5whh-4q9j-7v28"
           ],
@@ -2072,7 +2714,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-g38g-8gr9-h9xp"
           ],
@@ -2111,7 +2753,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-vvpj-8cmc-gx39"
           ],
@@ -2150,7 +2792,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-7wx9-6375-f5wh"
           ],
@@ -2189,7 +2831,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9j26-99jh-v26q"
           ],
@@ -2227,7 +2869,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-cgc2-rcrh-qr5x"
           ],
@@ -2265,7 +2907,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-x9cf-3w63-rpq9"
           ],
@@ -2302,7 +2944,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-56pc-6hvp-4gv4"
           ],
@@ -2339,7 +2981,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9868-vxmx-w862"
           ],
@@ -2377,7 +3019,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8fmp-37rc-p5g7"
           ],
@@ -2414,7 +3056,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-f8mp-vj46-cq8v"
           ],
@@ -2453,7 +3095,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qhrr-grqp-6x2g"
           ],
@@ -2490,7 +3132,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-rm2p-j3r7-4x4j"
           ],
@@ -2527,7 +3169,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-6rcp-vxwf-3mfp"
           ],
@@ -2565,7 +3207,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mwcg-wfq3-4gjc"
           ],
@@ -2603,7 +3245,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-25gx-x37c-7pph"
           ],
@@ -2641,7 +3283,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-jv6r-27ww-4gw4"
           ],
@@ -2679,7 +3321,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-ccg8-46r6-9qgj"
           ],
@@ -2717,7 +3359,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-vqx8-9xxw-f2m7"
           ],
@@ -2755,7 +3397,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3xfw-4pmr-4xc5"
           ],
@@ -2792,7 +3434,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-h656-5vcf-cm23"
           ],
@@ -2832,7 +3474,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9f72-qcpw-2hxc"
           ],
@@ -2870,7 +3512,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-vmqr-rc7x-3446"
           ],
@@ -2909,7 +3551,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mwxv-35wr-4vvj"
           ],
@@ -2946,7 +3588,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hff7-ccv5-52f8"
           ],
@@ -2983,7 +3625,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-vj3g-5px3-gr46"
           ],
@@ -3020,7 +3662,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-2ww6-868g-2c56"
           ],
@@ -3057,7 +3699,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-33hm-cq8r-wc49"
           ],
@@ -3095,7 +3737,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-43x4-g22p-3hrq"
           ],
@@ -3143,7 +3785,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-w76h-8m22-hpgh"
           ],
@@ -3180,7 +3822,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
+          "fetched_at": "2026-03-03T23:01:13Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-7xhj-55q9-pc3m"
           ],
@@ -3205,705 +3847,6 @@
             }
           }
         }
-      },
-      {
-        "source": "github_advisories",
-        "id": "GHSA-7fcc-cw49-xm78",
-        "url": "https://github.com/advisories/GHSA-7fcc-cw49-xm78",
-        "published_at": "2026-03-03T18:09:26Z",
-        "updated_at": "2026-03-03T18:09:28Z",
-        "headline": "OpenClaw has command injection via Windows shell fallback in Lobster tool execution",
-        "content": {
-          "excerpt_text": "## Summary The Lobster extension tool execution path used a Windows shell fallback (`shell: true`) after spawn failures (`EINVAL`/`ENOENT`). In that fallback path, shell metacharacters in command arguments can be interpreted by the shell, enabling command injection. ## Affected Packages / Versions - Package: `openclaw` (npm) - Affected versions: `<= 2026.2.17` - Latest confirmed affected published version: `2026.2.17` - Patched version: `2026.2.19` ## Technical Details In affected releases...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-7fcc-cw49-xm78"
-          ],
-          "content_hash": "sha256:9901f2929042725105aa9949384fcd22f6c5f0d57da73a9b43a6d011244bc8e4"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-78"
-            ],
-            "packages": [
-              "npm:openclaw"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-7fcc-cw49-xm78"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "GHSA-qj22-xqjr-v83v",
-        "url": "https://github.com/advisories/GHSA-qj22-xqjr-v83v",
-        "published_at": "2026-03-03T18:09:08Z",
-        "updated_at": "2026-03-03T18:09:08Z",
-        "headline": "OpenClaw's Telegram message_reaction authorization bypass allows unauthorized system-event injection",
-        "content": {
-          "excerpt_text": "A missing sender-authorization check in Telegram `message_reaction` handling allowed unauthorized users to trigger reaction-derived system events. ## Affected Packages / Versions - Package: `openclaw` (npm) - Introduced: `2026.2.17` - Affected: `>= 2026.2.17` and `<= 2026.2.24` - Latest published at patch time: `2026.2.24` - Patched in release: `2026.2.25` ## Impact When reaction notifications are enabled, unauthorized Telegram senders could inject reaction system events despite configured...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-qj22-xqjr-v83v"
-          ],
-          "content_hash": "sha256:c417f1cfd5697eab27fdceb1a824b7f6f2bad8e5665c17dc02e3aac6d633df5e"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-863"
-            ],
-            "packages": [
-              "npm:openclaw"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-qj22-xqjr-v83v"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "GHSA-48wf-g7cp-gr3m",
-        "url": "https://github.com/advisories/GHSA-48wf-g7cp-gr3m",
-        "published_at": "2026-03-03T18:00:06Z",
-        "updated_at": "2026-03-03T18:00:07Z",
-        "headline": "OpenClaw has allowlist exec-guard bypass via env -S",
-        "content": {
-          "excerpt_text": "### Summary In `allowlist` mode, `system.run` guardrails could be bypassed through `env -S`, causing policy-analysis/runtime-execution mismatch for shell wrapper payloads. ### Severity Rationale (Medium) This issue is rated **medium** because it is a guardrail/policy bypass in OpenClaw's trusted-operator model, not an authentication boundary break. - Authenticated Gateway callers are trusted operators by design. - `exec` approvals/allowlists are operator safety controls. - The bug still...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-48wf-g7cp-gr3m"
-          ],
-          "content_hash": "sha256:816d19a14b91183fabad985aac2f9bc918d3359f3bfdba2f59d24c060e2f1845"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-184",
-              "CWE-193"
-            ],
-            "packages": [
-              "npm:openclaw"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-48wf-g7cp-gr3m"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-28223",
-        "url": "https://github.com/advisories/GHSA-p4v8-rw59-93cq",
-        "published_at": "2026-03-03T17:59:30Z",
-        "updated_at": "2026-03-03T17:59:32Z",
-        "headline": "Wagtail Vulnerable to Cross-site Scripting in simple_translation admin interface",
-        "content": {
-          "excerpt_text": "### Impact A stored Cross-site Scripting (XSS) vulnerability exists on confirmation messages within the `wagtail.contrib.simple_translation` module. A user with access to the Wagtail admin area may create a page with a specially-crafted title which, when another user performs the \"Translate\" action, causes arbitrary JavaScript code to run. This could lead to performing actions with that user's credentials. The vulnerability is not exploitable by an ordinary site visitor without access to the...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-p4v8-rw59-93cq"
-          ],
-          "content_hash": "sha256:b4b7ee9b80c42ef3b85165a4476fc6a130a92bca10b6c67d2814cdbba46e45d0"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cvss": 6.1,
-            "cwes": [
-              "CWE-79"
-            ],
-            "packages": [
-              "pip:wagtail",
-              "pip:wagtail",
-              "pip:wagtail",
-              "pip:wagtail"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-p4v8-rw59-93cq"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-28222",
-        "url": "https://github.com/advisories/GHSA-p5cm-246w-84jm",
-        "published_at": "2026-03-03T17:57:18Z",
-        "updated_at": "2026-03-03T17:57:22Z",
-        "headline": "Wagtail Vulnerable to Cross-site Scripting in TableBlock class attributes",
-        "content": {
-          "excerpt_text": "### Impact A stored Cross-site Scripting (XSS) vulnerability exists on rendering `TableBlock` blocks within a StreamField. A user with access to create or edit pages containing `TableBlock` StreamField blocks is able to set specially-crafted `class` attributes on the block which run arbitrary JavaScript code when the page is viewed. When viewed by a user with higher privileges, this could lead to performing actions with that user's credentials. The vulnerability is not exploitable by an...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-p5cm-246w-84jm"
-          ],
-          "content_hash": "sha256:cfaed3a6de7823d6522141f23fcd552bd44e438b143b857499be74318d320ec0"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cvss": 6.1,
-            "cwes": [
-              "CWE-79"
-            ],
-            "packages": [
-              "pip:wagtail",
-              "pip:wagtail",
-              "pip:wagtail",
-              "pip:wagtail"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-p5cm-246w-84jm"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-27905",
-        "url": "https://github.com/advisories/GHSA-m6w7-qv66-g3mf",
-        "published_at": "2026-03-03T17:46:47Z",
-        "updated_at": "2026-03-03T17:46:50Z",
-        "headline": "BentoML Vulnerable to Arbitrary File Write via Symlink Path Traversal in Tar Extraction",
-        "content": {
-          "excerpt_text": "# Arbitrary File Write via Symlink Path Traversal in Tar Extraction ## Summary The `safe_extract_tarfile()` function validates that each tar member's path is within the destination directory, but for symlink members it only validates the symlink's own path, **not the symlink's target**. An attacker can create a malicious bento/model tar file containing a symlink pointing outside the extraction directory, followed by a regular file that writes through the symlink, achieving arbitrary file...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-m6w7-qv66-g3mf"
-          ],
-          "content_hash": "sha256:a290a3448388f9931fa21d58c9f5d61933b9b462ac377aaa294b3ccec92cdffe"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cvss": 8.1,
-            "cwes": [
-              "CWE-22",
-              "CWE-59"
-            ],
-            "packages": [
-              "pip:bentoml"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-m6w7-qv66-g3mf"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-27601",
-        "url": "https://github.com/advisories/GHSA-qpx9-hpmf-5gmw",
-        "published_at": "2026-03-03T17:46:06Z",
-        "updated_at": "2026-03-03T17:46:07Z",
-        "headline": "Underscore has unlimited recursion in _.flatten and _.isEqual, potential for DoS attack",
-        "content": {
-          "excerpt_text": "### Impact In simple words, some programs that use `_.flatten` or `_.isEqual` could be made to crash. Someone who wants to do harm may be able to do this on purpose. This can only be done if the program has special properties. It only works in Underscore versions up to 1.13.7. A more detailed explanation follows. In affected versions of Underscore, the `_.flatten` and `_.isEqual` functions use recursion without a depth limit. Under very specific conditions, detailed below, an attacker could...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-qpx9-hpmf-5gmw"
-          ],
-          "content_hash": "sha256:1ce00844d73ac76ae72166ac4a1cb3453985c7fd2270ff8480994d9b969c221e"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-674"
-            ],
-            "packages": [
-              "npm:underscore"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-qpx9-hpmf-5gmw"
-            }
-          },
-          "deprecation": {
-            "type": "breaking_change",
-            "confidence": "low",
-            "source": "keyword_scan",
-            "provenance": {
-              "method": "keyword_scan",
-              "authority": "GitHub Security Advisories",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-qpx9-hpmf-5gmw"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-27012",
-        "url": "https://github.com/advisories/GHSA-247v-7cw6-q57v",
-        "published_at": "2026-03-03T17:43:49Z",
-        "updated_at": "2026-03-03T17:43:50Z",
-        "headline": "OpenSTAManager affected by unauthenticated privilege escalation via modules/utenti/actions.php",
-        "content": {
-          "excerpt_text": "### Summary A privilege escalation and authentication bypass vulnerability in OpenSTAManager allows any attacker to arbitrarily change a user's group (`idgruppo`) by directly calling `modules/utenti/actions.php`. This can promote an existing account (e.g. agent) into the Amministratori group as well as demote any user including existing administrators. ### Details `modules/utenti/actions.php` is reachable directly via `http:// :8080/modules/utenti/actions.php` and processes privileged...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-247v-7cw6-q57v"
-          ],
-          "content_hash": "sha256:8e961129465eb115c4c360ff041cd8233d3218b3aa9997876d4d72301a1d02ed"
-        },
-        "signals": {
-          "severity": {
-            "level": "critical",
-            "source": "github_advisory",
-            "cvss": 9.8,
-            "cwes": [
-              "CWE-306"
-            ],
-            "packages": [
-              "composer:devcode-it/openstamanager"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-247v-7cw6-q57v"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-26279",
-        "url": "https://github.com/advisories/GHSA-33mp-8p67-xj7c",
-        "published_at": "2026-03-03T17:40:19Z",
-        "updated_at": "2026-03-03T17:40:19Z",
-        "headline": "Froxlor has Admin-to-Root Privilege Escalation via Input Validation Bypass + OS Command Injection",
-        "content": {
-          "excerpt_text": "## Summary A typo in Froxlor's input validation code (`==` instead of `=`) completely disables email format checking for all settings fields declared as email type. This allows an authenticated admin to store arbitrary strings — including shell metacharacters — in the `panel.adminmail` setting. This value is later concatenated into a shell command executed as **root** by a cron job, where the pipe character `|` is explicitly whitelisted. The result is **full root-level Remote Code...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-33mp-8p67-xj7c"
-          ],
-          "content_hash": "sha256:6e255ac11ffb8cecf8a37264eee6dd981074bdb42ec6d65a0af4449bc05ca516"
-        },
-        "signals": {
-          "severity": {
-            "level": "critical",
-            "source": "github_advisory",
-            "cvss": 9.1,
-            "cwes": [
-              "CWE-78",
-              "CWE-482"
-            ],
-            "packages": [
-              "composer:froxlor/froxlor"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-33mp-8p67-xj7c"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-24415",
-        "url": "https://github.com/advisories/GHSA-jfgp-g7x7-j25j",
-        "published_at": "2026-03-03T17:39:00Z",
-        "updated_at": "2026-03-03T17:39:02Z",
-        "headline": "OpenSTAManager Affected by XSS in modifica_iva.php via righe parameter",
-        "content": {
-          "excerpt_text": "### Summary Multiple Reflected Cross-Site Scripting (XSS) vulnerabilities in OpenSTAManager v2.9.8 allow unauthenticated attackers to execute arbitrary JavaScript code in the context of other users' browsers through crafted URL parameters, potentially leading to session hijacking, credential theft, and unauthorized actions. **Vulnerable Parameter:** `righe` (GET) ### Details OpenSTAManager v2.9.8 contains multiple Reflected XSS vulnerabilities in invoice/order/contract modification modals....",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-jfgp-g7x7-j25j"
-          ],
-          "content_hash": "sha256:9847ae5ec55b60d4b8efc5f55440e9dcc0709b47887cc24bdb45b228871d564e"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-79"
-            ],
-            "packages": [
-              "composer:devcode-it/openstamanager"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-jfgp-g7x7-j25j"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2025-62879",
-        "url": "https://github.com/advisories/GHSA-wj3p-5h3x-c74q",
-        "published_at": "2026-03-03T16:44:18Z",
-        "updated_at": "2026-03-03T16:44:18Z",
-        "headline": "Rancher Backup Operator pod's logs leak S3 tokens",
-        "content": {
-          "excerpt_text": "### Impact A vulnerability has been identified within the Rancher Backup Operator, resulting in the leakage of S3 tokens (both `accessKey` and `secretKey`) into the rancher-backup-operator pod's logs. Specifically, the S3 `accessKey` and `secretKey` are exposed in the pod's logs under the following logging level conditions: | Variable Exposed | Logging Level Condition | ------------------ | ------------------------- | | accessKey | `trace: false` (default), and `debug: false` (default) | |...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-wj3p-5h3x-c74q"
-          ],
-          "content_hash": "sha256:ff08dd8b329ff42c0f03ee0a089ae0e3bdaf447bfa106d947cefe3abcde67407"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cvss": 6.8,
-            "cwes": [
-              "CWE-532"
-            ],
-            "packages": [
-              "go:github.com/rancher/backup-restore-operator",
-              "go:github.com/rancher/backup-restore-operator",
-              "go:github.com/rancher/backup-restore-operator",
-              "go:github.com/rancher/backup-restore-operator"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-wj3p-5h3x-c74q"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2021-25320",
-        "url": "https://github.com/advisories/GHSA-gqf8-rvrh-g7w6",
-        "published_at": "2026-03-03T14:52:15Z",
-        "updated_at": "2026-03-03T14:52:16Z",
-        "headline": "Rancher cloud credentials can be used through proxy API by users without access",
-        "content": {
-          "excerpt_text": "A vulnerability was discovered in Rancher 2.2.0 through the aforementioned patched versions, where cloud credentials weren't being properly validated through the Rancher API. Specifically through a proxy designed to communicate with cloud providers. Any Rancher user that was logged-in and aware of a cloud-credential ID that was valid for a given cloud provider, could call that cloud provider's API through the proxy API, and the cloud-credential would be attached. The exploit is limited to...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-gqf8-rvrh-g7w6"
-          ],
-          "content_hash": "sha256:e728e686d2a2a70577d03f7c3227533887e61680cea9a39f02c129f18b86ea63"
-        },
-        "signals": {
-          "severity": {
-            "level": "critical",
-            "source": "github_advisory",
-            "cvss": 10.0,
-            "cwes": [
-              "CWE-284"
-            ],
-            "packages": [
-              "go:github.com/rancher/rancher",
-              "go:github.com/rancher/rancher"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-gqf8-rvrh-g7w6"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "GHSA-hwm2-4ph6-w6m5",
-        "url": "https://github.com/advisories/GHSA-hwm2-4ph6-w6m5",
-        "published_at": "2026-03-03T14:51:36Z",
-        "updated_at": "2026-03-03T14:51:36Z",
-        "headline": "Rancher's restricted PodSecurityPolicy does not prevent containers from running as a privileged user",
-        "content": {
-          "excerpt_text": "### Impact The `restricted` pod security policy (PSP), provided in Rancher versions from 2.0 up to and including 2.6.3, has a deviation from the [upstream](https://github.com/kubernetes/website/blob/6d22e08903d7dd44b049c4689fa882ae07f67de9/content/en/examples/policy/restricted-psp.yaml) `restricted` policy provided in Kubernetes, in which Rancher's PSP has `runAsUser` set to `runAsAny`, while upstream has `runAsUser` set to `MustRunAsNonRoot`. This allows containers to run as any user,...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-hwm2-4ph6-w6m5"
-          ],
-          "content_hash": "sha256:5f4ed667577a9cca0f7e5cbdef317864e7e7373ae2b122074b4256bdbb9f04c9"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-862"
-            ],
-            "packages": [
-              "go:github.com/rancher/rancher"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-hwm2-4ph6-w6m5"
-            }
-          },
-          "deprecation": {
-            "type": "removal",
-            "affects": [
-              "since"
-            ],
-            "confidence": "high",
-            "source": "keyword_scan",
-            "provenance": {
-              "method": "keyword_scan",
-              "authority": "GitHub Security Advisories",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-hwm2-4ph6-w6m5"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2022-21951",
-        "url": "https://github.com/advisories/GHSA-vrph-m5jj-c46c",
-        "published_at": "2026-03-03T14:50:33Z",
-        "updated_at": "2026-03-03T14:50:36Z",
-        "headline": "Rancher's weave CNI password is not configured when a cluster is created from an RKE template",
-        "content": {
-          "excerpt_text": "### Impact This vulnerability only affects customers using [Weave](https://rancher.com/docs/rancher/v2.6/en/faq/networking/cni-providers/#weave) CNI (Container Network Interface) when configured through [RKE templates](https://rancher.com/docs/rancher/v2.6/en/admin-settings/rke-templates/). A flaw was discovered in Rancher versions from 2.5.0 up to and including 2.5.13 and from 2.6.0 up to and including 2.6.4, where a UI (user interface) issue with RKE templates does not include a value for...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-vrph-m5jj-c46c"
-          ],
-          "content_hash": "sha256:17c3a4a9870678b6b766efee3dec98665222806fbe58dbfb29a4084ac30e2ed5"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cvss": 6.8,
-            "cwes": [
-              "CWE-311",
-              "CWE-319"
-            ],
-            "packages": [
-              "go:github.com/rancher/rancher",
-              "go:github.com/rancher/rancher"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-vrph-m5jj-c46c"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2022-31247",
-        "url": "https://github.com/advisories/GHSA-6x34-89p7-95wg",
-        "published_at": "2026-03-03T14:50:12Z",
-        "updated_at": "2026-03-03T14:50:16Z",
-        "headline": "Rancher has downstream cluster privilege escalation through cluster and project role template binding (CRTB/PRTB)",
-        "content": {
-          "excerpt_text": "### Impact An issue was discovered in Rancher versions up to and including 2.5.15 and 2.6.6 where a flaw with authorization logic allows privilege escalation through cluster role template binding (CRTB) and project role template binding (PRTB). This issue does not affect the local cluster, it affects only downstream clusters. The vulnerability can be exploited by any user who has permissions to create/edit cluster role template bindings or project role template bindings (such as...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-6x34-89p7-95wg"
-          ],
-          "content_hash": "sha256:efa46a4f6feead8162178845468d3b72d8872658ee5d6b3739672860c8d1fc3a"
-        },
-        "signals": {
-          "severity": {
-            "level": "critical",
-            "source": "github_advisory",
-            "cvss": 9.1,
-            "cwes": [
-              "CWE-285",
-              "CWE-863"
-            ],
-            "packages": [
-              "go:github.com/rancher/rancher",
-              "go:github.com/rancher/rancher"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-6x34-89p7-95wg"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2021-36783",
-        "url": "https://github.com/advisories/GHSA-8w87-58w6-hfv8",
-        "published_at": "2026-03-03T14:49:34Z",
-        "updated_at": "2026-03-03T14:49:36Z",
-        "headline": "Rancher doesn't properly sanitize credentials in cluster template answers",
-        "content": {
-          "excerpt_text": "### Impact It was discovered that in Rancher versions up to and including 2.5.12 and 2.6.3 there is a failure to properly sanitize credentials in cluster template answers. This failure can lead to plaintext storage and exposure of credentials, passwords and API tokens. The exposed credentials are visible in Rancher to authenticated `Cluster Owners`, `Cluster Members`, `Project Owners` and `Project Members` on the endpoints `/v1/management.cattle.io.clusters`, `/v3/clusters` and...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-8w87-58w6-hfv8"
-          ],
-          "content_hash": "sha256:cb25341bace8c88746141b88c7a434327cd9fb1250c9dbde0ab75235908484b0"
-        },
-        "signals": {
-          "severity": {
-            "level": "critical",
-            "source": "github_advisory",
-            "cvss": 10.0,
-            "cwes": [
-              "CWE-200",
-              "CWE-312",
-              "CWE-522"
-            ],
-            "packages": [
-              "go:github.com/rancher/rancher",
-              "go:github.com/rancher/rancher"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-8w87-58w6-hfv8"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2023-22648",
-        "url": "https://github.com/advisories/GHSA-vf6j-6739-78m8",
-        "published_at": "2026-03-03T14:48:41Z",
-        "updated_at": "2026-03-03T14:48:42Z",
-        "headline": "Rancher's Azure AD permission changes are not reflected on active sessions",
-        "content": {
-          "excerpt_text": "A bug has been identified in which permission changes in Azure AD are not reflected to users while they are logged in the Rancher UI. This would cause the users to retain their previous permissions in Rancher, even if they change groups on Azure AD, for example, to a lower privileged group, or are removed from a group, thus retaining their access to Rancher instead of losing it. ### Impact This issue only affects Rancher instances with Azure AD integration enabled, regardless of the...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-03T22:00:44Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-vf6j-6739-78m8"
-          ],
-          "content_hash": "sha256:467eed49aff16fd5e2b842c91c4c035a74ac9c11a62f0a1750ed2d2831c84d83"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cvss": 8.0,
-            "cwes": [
-              "CWE-269",
-              "CWE-271",
-              "CWE-384"
-            ],
-            "packages": [
-              "go:github.com/rancher/rancher",
-              "go:github.com/rancher/rancher"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-vf6j-6739-78m8"
-            }
-          },
-          "deprecation": {
-            "type": "removal",
-            "confidence": "low",
-            "source": "keyword_scan",
-            "provenance": {
-              "method": "keyword_scan",
-              "authority": "GitHub Security Advisories",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-vf6j-6739-78m8"
-            }
-          }
-        }
       }
     ],
     "updated": [],
@@ -3915,7 +3858,7 @@
     "removed": 0
   },
   "integrity_reset": false,
-  "archive_url": "/archive/github_advisories/2026/03/03/20260303T220044Z_241a9761952e4515.json",
+  "archive_url": "/archive/github_advisories/2026/03/03/20260303T230113Z_924f1d2ae6562a65.json",
   "prev_archive_url": "/archive/github_advisories/2026/02/10/20260210T142802Z_0d53e07ce074c901.json",
   "sources_url": "/diff/sources.json"
 }
