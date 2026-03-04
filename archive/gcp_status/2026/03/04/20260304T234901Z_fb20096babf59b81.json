@@ -1,0 +1,112 @@
+{
+  "schema_version": "1.2.0",
+  "generated_at": "2026-03-04T23:49:01Z",
+  "source_id": "gcp_status",
+  "hash": "sha256:fb20096babf59b81fe4f7cbd28f92ea81e1c049109baef2e704bc25c3507ed1d",
+  "prev_hash": "sha256:05c8cf6af8e6c5cdd0aeac53a0bdf5721456ce3a8011e6036414afab891f16a3",
+  "cursor": "sha256:a75b9a0fbcfabb86c0b81d46eb9630b18be4d4754b5791a315044de9ceb1b5e9",
+  "prev_cursor": "sha256:1f8d3b3cb32e984d812586056889c02b89c3626218d1bc064b94b406ac923417",
+  "changed": true,
+  "ttl_sec": 300,
+  "sources_included": [
+    "gcp_status"
+  ],
+  "batch_narrative": "gcp_status: 2 updates (1 resolved).",
+  "buckets": {
+    "items": [
+      {
+        "source": "gcp_status",
+        "id": "tag:status.cloud.google.com,2026:feed:41E5S3mkTGDfkZuJZH5k.Mpx9jbJDhNmRUszWrrji",
+        "url": "https://status.cloud.google.com/incidents/41E5S3mkTGDfkZuJZH5k",
+        "published_at": "2026-03-04T23:49:01Z",
+        "updated_at": "2026-03-04T23:23:18Z",
+        "headline": "RESOLVED: Vertex AI Gemini API customers experienced increased error rates when accessing the global endpoint",
+        "content": {
+          "excerpt_text": "Incident began at 2026-02-27 04:36 and ended at 2026-02-27 06:45 (all times are US/Pacific ). Preliminary Incident Report We apologize for the inconvenience this service disruption may have caused. We would like to provide some information about this incident below. Please note, this information is based on our best knowledge at the time of posting and is subject to change as our investigation continues. A final Incident Report with preventative actions will be posted once our investigation...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-04T23:49:01Z",
+          "evidence_urls": [
+            "https://status.cloud.google.com/incidents/41E5S3mkTGDfkZuJZH5k"
+          ],
+          "content_hash": "sha256:c632b6debd21da05e8dc33ea94a60d102058db0b15b7b3b031b35145ca8b37af"
+        },
+        "signals": {
+          "incident": {
+            "status": "resolved",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "GCP Service Health",
+              "authority_url": "https://status.cloud.google.com/",
+              "evidence_url": "https://status.cloud.google.com/incidents/41E5S3mkTGDfkZuJZH5k"
+            }
+          }
+        },
+        "source_payload": {
+          "html": "<p> Incident began at <strong>2026-02-27 04:36</strong> and ended at <strong>2026-02-27 06:45</strong> <span>(all times are <strong>US/Pacific</strong>).</span></p><div class=\"cBIRi14aVDP__status-update-text\"><h1>Preliminary Incident Report</h1>\n<p>We apologize for the inconvenience this service disruption may have caused. We would like to provide some information about this incident below. Please note, this information is based on our best knowledge at the time of posting and is subject to change as our investigation continues. A final Incident Report with preventative actions will be posted once our investigation is complete. If you have experienced impact outside of what is listed below, please reach out to Google Cloud Support using <a href=\"https://cloud.google.com/support\">https://cloud.google.com/support</a>.</p>\n<h2>Date/Time of the Issue (All time US/Pacific)</h2>\n<p>Incident Start: 27 February 2026 04:37</p>\n<p>Incident End: 27 February 2026 06:35</p>\n<p>Duration: 1 hour, 58 minutes</p>\n<h2>Summary</h2>\n<p>On Friday, 27 February 2026 at 04:37 US/Pacific, customers using Vertex AI Gemini API models (including Gemini 2.0, 2.5, and 3.0 previews) experienced increased error rates. Impacted services included Google Cloud Support, Agent Assist, the Vertex Gemini API and Dialogflow CX in US regions and the global endpoint for a duration of 1 hour and 58 minutes.</p>\n<p>This is not the level of quality and reliability we strive to offer you, and we are taking immediate steps to improve the platform’s performance and availability.</p>\n<h2>Preliminary Root Cause</h2>\n<p>This incident was caused by a configuration change to a safety filtering service that supports all Gemini models. This configuration change enabled a code path that interacted poorly with specific requests, leading to service disruption for the safety filtering service. This in turn led to customers seeing overload (429 and 503) errors for their queries.</p>\n<p>Google engineers have begun a full root cause analysis and will provide additional information once it is available.</p>\n<h2>Remediation</h2>\n<p>Google engineers were alerted to the service disruption via automated alert on Friday, 27 February 2026 04:54 US/Pacific and immediately started an investigation.</p>\n<p>Engineers identified the faulty configuration change for a safety filtering service and initiated a rollback to restore the previous stable configuration. Additionally, engineers added more capacity to the service. Full service restoration was confirmed by 06:35 US/Pacific as the rollback propagated and servers became healthy.</p>\n<h2>Description of Impact</h2>\n<p>On Friday, 27 February 2026 between 04:37 and 06:35 US/Pacific, customers accessing Vertex Gemini APIs may have experienced the following:</p>\n<ul>\n<li>Affected Models: All Gemini versions were affected, including gemini-2.5-flash, gemini-2.5-flash-lite, gemini-2.5-pro, gemini-3.0-flash-preview, gemini-3.0-pro-preview, gemini-2.0-flash, gemini-2.0-flash-lite.</li>\n<li>Error Experience:\n<ul>\n<li>PayGo Customers: Experienced primarily 429 Resource Exhausted errors.</li>\n<li>Provisioned Throughput (PT) Customers: Received 503 Service Unavailable errors.</li>\n<li>For PT customers, most errors stopped at 06:00. For PayGo customers, most errors stopped at 06:20.</li>\n</ul>\n</li>\n<li>Geographic Scope: Global endpoint, us-central1, us-east4, and other US regions were impacted.</li>\n</ul>\n</div><hr /><p>Affected products: Agent Assist, Dialogflow CX, Google Cloud Support, Vertex Gemini API</p><p>Affected locations: Global, Montréal (northamerica-northeast1), São Paulo (southamerica-east1), Iowa (us-central1), South Carolina (us-east1), Northern Virginia (us-east4), Columbus (us-east5), Oregon (us-west1)</p>",
+          "link": "https://status.cloud.google.com/incidents/41E5S3mkTGDfkZuJZH5k",
+          "published": "",
+          "updated": "2026-03-04T23:23:18+00:00",
+          "updated_parsed": [
+            2026,
+            3,
+            4,
+            23,
+            23,
+            18,
+            2,
+            63,
+            0
+          ],
+          "guid": "tag:status.cloud.google.com,2026:feed:41E5S3mkTGDfkZuJZH5k.Mpx9jbJDhNmRUszWrrji"
+        }
+      },
+      {
+        "source": "gcp_status",
+        "id": "tag:status.cloud.google.com,2026:feed:41E5S3mkTGDfkZuJZH5k.1ZZawUdGD7QvNYtf2o1A",
+        "url": "https://status.cloud.google.com/incidents/41E5S3mkTGDfkZuJZH5k",
+        "published_at": "2026-03-04T23:49:01Z",
+        "updated_at": "2026-03-04T23:23:18Z",
+        "headline": "UPDATE: Vertex AI Gemini API customers experienced increased error rates when accessing the global endpoint",
+        "content": {
+          "excerpt_text": "Incident began at 2026-02-27 04:36 and ended at 2026-02-27 06:45 (all times are US/Pacific ). Description Between Friday, 2026-02-27, 04:36 and 06:45 PST, customers experienced increased error rates when accessing the Vertex Gemini API Global endpoint. The issue impacted API requests to multiple Gemini models. The incident also caused downstream impact to Dialogflow CX, Agent Assist, Google Cloud Support AI agent, and Customer Experience Agent Studio, which rely on Gemini APIs. Preliminary...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-04T23:49:01Z",
+          "evidence_urls": [
+            "https://status.cloud.google.com/incidents/41E5S3mkTGDfkZuJZH5k"
+          ],
+          "content_hash": "sha256:40bed35b2a4b9da7270ab9363e52f4e8e5b2db70ec4b74868a57a32886d45517"
+        },
+        "source_payload": {
+          "html": "<p> Incident began at <strong>2026-02-27 04:36</strong> and ended at <strong>2026-02-27 06:45</strong> <span>(all times are <strong>US/Pacific</strong>).</span></p><div class=\"cBIRi14aVDP__status-update-text\"><p><strong>Description</strong>\n<br />\nBetween Friday, 2026-02-27, 04:36 and 06:45 PST, customers experienced increased error rates when accessing the Vertex Gemini API Global endpoint. The issue impacted API requests to multiple Gemini models.</p>\n<p>The incident also caused downstream impact to Dialogflow CX, Agent Assist, Google Cloud Support AI agent, and Customer Experience Agent Studio, which rely on Gemini APIs.</p>\n<p>Preliminary analysis indicates the issue was triggered by a recent configuration change. Service was fully restored after the configuration change was rolled back.</p>\n<p>We thank you for your patience while we worked on resolving the issue.</p>\n<p><strong>Symptom</strong>\n<br />\nCustomers experienced increased error rates when sending API requests to impacted multiple Gemini models through the global endpoint.</p>\n</div><hr /><p>Affected products: Agent Assist, Dialogflow CX, Google Cloud Support, Vertex Gemini API</p><p>Affected locations: Global, Montréal (northamerica-northeast1), São Paulo (southamerica-east1), Iowa (us-central1), South Carolina (us-east1), Northern Virginia (us-east4), Columbus (us-east5), Oregon (us-west1)</p>",
+          "link": "https://status.cloud.google.com/incidents/41E5S3mkTGDfkZuJZH5k",
+          "published": "",
+          "updated": "2026-03-04T23:23:18+00:00",
+          "updated_parsed": [
+            2026,
+            3,
+            4,
+            23,
+            23,
+            18,
+            2,
+            63,
+            0
+          ],
+          "guid": "tag:status.cloud.google.com,2026:feed:41E5S3mkTGDfkZuJZH5k.1ZZawUdGD7QvNYtf2o1A"
+        }
+      }
+    ],
+    "updated": [],
+    "removed": []
+  },
+  "counts": {
+    "items": 2,
+    "updated": 0,
+    "removed": 0
+  },
+  "integrity_reset": false
+}
