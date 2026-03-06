@@ -1,10 +1,10 @@
 {
   "schema_version": "1.2.0",
-  "generated_at": "2026-03-06T23:16:58Z",
-  "hash": "sha256:d77ac8956196dafcb34d69f2359a8dcfdca3d8d1360cec56d354857a15fdea1c",
-  "prev_hash": "sha256:570a6fca72cb1352a5ab174ac7194ad99efc83b38da900e6cd01ccdd367d17dd",
-  "cursor": "sha256:3f19c03a9c63559ab8b800f6db5cc6efc9cdd6bf3113dc9d787b54d4ad2b459a",
-  "prev_cursor": "sha256:3018bd29897a6e997dc50e116059651d7410e9bb010cbede9ce4d2aae5819676",
+  "generated_at": "2026-03-06T23:47:07Z",
+  "hash": "sha256:ddf2a82588833308f766584053dfd8cf18fff1ae213cb28a4ba69ac862bb13d1",
+  "prev_hash": "sha256:d77ac8956196dafcb34d69f2359a8dcfdca3d8d1360cec56d354857a15fdea1c",
+  "cursor": "sha256:c75c0822997367f4b65f7e1de46a3131e2cddea4eedab5eb6dc79aefdbf7dad0",
+  "prev_cursor": "sha256:3f19c03a9c63559ab8b800f6db5cc6efc9cdd6bf3113dc9d787b54d4ad2b459a",
   "changed": true,
   "ttl_sec": 900,
   "sources_included": [
@@ -47,14 +47,181 @@
     "vscode_releases",
     "wikipedia_recent_changes"
   ],
-  "batch_narrative": "100 items. 9 deprecations. 100 advisories (15 critical, 49 high).",
+  "batch_narrative": "120 items. 9 deprecations. 20 releases. 100 advisories (14 critical, 47 high).",
   "counts": {
-    "items": 100,
+    "items": 120,
     "updated": 0,
     "removed": 0
   },
   "buckets": {
     "items": [
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30852",
+        "url": "https://github.com/advisories/GHSA-m2w3-8f23-hxxf",
+        "published_at": "2026-03-06T23:40:19Z",
+        "updated_at": "2026-03-06T23:40:21Z",
+        "headline": "Caddy's vars_regexp double-expands user input, leaking env vars and files",
+        "content": {
+          "excerpt_text": "### Summary The `vars_regexp` matcher in `vars.go:337` double-expands user-controlled input through the Caddy replacer. When `vars_regexp` matches against a placeholder like `{http.request.header.X-Input}`, the header value gets resolved once (expected), then passed through `repl.ReplaceAll()` again (the bug). This means an attacker can put `{env.DATABASE_URL}` or `{file./etc/passwd}` in a request header and the server will evaluate it, leaking environment variables, file contents, and...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:46:06Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-m2w3-8f23-hxxf"
+          ],
+          "content_hash": "sha256:02fc352a2d891f52cfb7740fc2d8b1d01c47ac037863c16fcace962d9e07954f"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-74",
+              "CWE-200"
+            ],
+            "packages": [
+              "go:github.com/caddyserver/caddy/v2/modules/caddyhttp"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-m2w3-8f23-hxxf"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30851",
+        "url": "https://github.com/advisories/GHSA-7r4p-vjf4-gxv4",
+        "published_at": "2026-03-06T23:38:44Z",
+        "updated_at": "2026-03-06T23:38:45Z",
+        "headline": "Caddy forward_auth copy_headers Does Not Strip Client-Supplied Headers, Allowing Identity Injection and Privilege Escalation",
+        "content": {
+          "excerpt_text": "## Summary Caddy's `forward_auth` directive with `copy_headers` generates conditional header-set operations that only fire when the upstream auth service includes the named header in its response. No delete or remove operation is generated for the original client-supplied request header with the same name. When an auth service returns `200 OK` without one of the configured `copy_headers` headers, the client-supplied header passes through unchanged to the backend. Any requester holding a...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:46:06Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-7r4p-vjf4-gxv4"
+          ],
+          "content_hash": "sha256:94cb3227f4991b9ad746d6568442a23878668d9a0c77bca452ae0da67d77fabd"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cvss": 8.1,
+            "cwes": [
+              "CWE-287",
+              "CWE-345"
+            ],
+            "packages": [
+              "go:github.com/caddyserver/caddy/v2/modules/caddyhttp/reverseproxy"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-7r4p-vjf4-gxv4"
+            }
+          },
+          "deprecation": {
+            "type": "removal",
+            "affects": [
+              "operation",
+              "incidental"
+            ],
+            "confidence": "medium",
+            "source": "keyword_scan",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "GitHub Security Advisories",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-7r4p-vjf4-gxv4"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30838",
+        "url": "https://github.com/advisories/GHSA-4v6x-c7xx-hw9f",
+        "published_at": "2026-03-06T23:27:03Z",
+        "updated_at": "2026-03-06T23:27:04Z",
+        "headline": "CommonMark has DisallowedRawHtml extension bypass via whitespace in HTML tag names",
+        "content": {
+          "excerpt_text": "### Impact The `DisallowedRawHtml` extension can be bypassed by inserting a newline, tab, or other ASCII whitespace character between a disallowed HTML tag name and the closing `>`. For example, ` ` would pass through unfiltered and be rendered as a valid HTML tag by browsers. This is a cross-site scripting (XSS) vector for any application that relies on this extension to sanitize untrusted user input. All applications using the `DisallowedRawHtml` extension to process untrusted markdown are...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:46:06Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-4v6x-c7xx-hw9f"
+          ],
+          "content_hash": "sha256:e8bd619beb826d959a4a27adbb73e4ecad357d9d228f00916c58d5cb84fc4e17"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-79"
+            ],
+            "packages": [
+              "composer:league/commonmark"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-4v6x-c7xx-hw9f"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30835",
+        "url": "https://github.com/advisories/GHSA-9cp7-3q5w-j92g",
+        "published_at": "2026-03-06T23:25:13Z",
+        "updated_at": "2026-03-06T23:25:14Z",
+        "headline": "parse-server: Malformed `$regex` query leaks database error details in API response",
+        "content": {
+          "excerpt_text": "### Impact A malformed $regex query parameter (e.g. `[abc)` causes the database to return a structured error object that is passed unsanitized through the API response. This leaks database internals such as error messages, error codes, code names, cluster timestamps, and topology details. The vulnerability is exploitable by any client that can send query requests, depending on the deployment's permission configuration. ### Patches The fix sanitizes database error objects so that only a...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:46:06Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-9cp7-3q5w-j92g"
+          ],
+          "content_hash": "sha256:f0a81078207ac6a3baa7ed6c43d0dc1c8dfa8d8105f72317066f6991e66ea0d7"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-209"
+            ],
+            "packages": [
+              "npm:parse-server",
+              "npm:parse-server"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-9cp7-3q5w-j92g"
+            }
+          }
+        }
+      },
       {
         "source": "github_advisories",
         "id": "CVE-2026-30824",
@@ -67,7 +234,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5f53-522j-j454"
           ],
@@ -104,7 +271,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-cwc3-p92j-g7qm"
           ],
@@ -143,7 +310,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mq4r-h2gh-qv7x"
           ],
@@ -181,7 +348,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3fvx-xrxq-8jvv"
           ],
@@ -219,7 +386,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hcm4-6hpj-vghm"
           ],
@@ -257,7 +424,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-h75p-j8xm-m278"
           ],
@@ -295,7 +462,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-j8g8-j7fc-43v6"
           ],
@@ -332,7 +499,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wvhq-wp8g-c7vq"
           ],
@@ -366,7 +533,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-m4h2-mjfm-mp55"
           ],
@@ -403,7 +570,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-79wj-8rqv-jvp5"
           ],
@@ -441,7 +608,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xfh7-phr7-gr2x"
           ],
@@ -479,7 +646,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9r75-g2cr-3h76"
           ],
@@ -518,7 +685,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-rw8p-c6hf-q3pg"
           ],
@@ -556,7 +723,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5mq8-78gm-pjmq"
           ],
@@ -593,7 +760,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-46wh-pxpv-q5gq"
           ],
@@ -633,7 +800,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-c9v3-4pv7-87pr"
           ],
@@ -671,7 +838,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-g8r9-g2v8-jv6f"
           ],
@@ -708,7 +875,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5r2p-pjr8-7fh7"
           ],
@@ -745,7 +912,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-jc5m-wrp2-qq38"
           ],
@@ -782,7 +949,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-x2g5-fvc2-gqvp"
           ],
@@ -821,7 +988,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-g7hc-96xr-gvvx"
           ],
@@ -858,7 +1025,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-595m-wc8g-6qgc"
           ],
@@ -896,7 +1063,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-87x4-j8vh-p5qf"
           ],
@@ -935,7 +1102,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-fpx8-73gf-7x73"
           ],
@@ -973,7 +1140,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-73hc-m4hx-79pj"
           ],
@@ -1011,7 +1178,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wjpw-4j6x-6rwh"
           ],
@@ -1064,7 +1231,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mjqr-5c55-g77h"
           ],
@@ -1102,7 +1269,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qw8v-34ww-6q9p"
           ],
@@ -1141,7 +1308,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9fv2-c7v6-p45w"
           ],
@@ -1179,7 +1346,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-m297-3jv9-m927"
           ],
@@ -1217,7 +1384,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8cr3-vpxx-92cx"
           ],
@@ -1255,7 +1422,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-v2xr-wvrv-p969"
           ],
@@ -1295,7 +1462,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-573f-x89g-hqp9"
           ],
@@ -1333,7 +1500,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xxh7-fcf3-rj7f"
           ],
@@ -1373,7 +1540,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-jf73-858c-54pg"
           ],
@@ -1412,7 +1579,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mh23-rw7f-v5pq"
           ],
@@ -1457,7 +1624,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-7rhv-h82h-vpjh"
           ],
@@ -1495,7 +1662,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-f93w-pcj3-rggc"
           ],
@@ -1532,7 +1699,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hj7x-879w-vrp7"
           ],
@@ -1569,7 +1736,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xq2h-p299-vjwv"
           ],
@@ -1606,7 +1773,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-fwhj-785h-43hh"
           ],
@@ -1645,7 +1812,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-p443-p7w5-2f7f"
           ],
@@ -1684,7 +1851,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-gq2m-77hf-vwgh"
           ],
@@ -1723,7 +1890,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-g962-2j28-3cg9"
           ],
@@ -1762,7 +1929,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-x57h-xx53-v53w"
           ],
@@ -1800,7 +1967,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hcff-qv74-7hr4"
           ],
@@ -1838,7 +2005,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-q658-hfpg-35qc"
           ],
@@ -1876,7 +2043,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-g48c-2wqr-h844"
           ],
@@ -1914,7 +2081,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-vgjm-2cpf-4g7c"
           ],
@@ -1952,7 +2119,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-x9p5-w45c-7ffc"
           ],
@@ -1990,7 +2157,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-vgvf-m4fw-938j"
           ],
@@ -2027,7 +2194,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-v9vm-r24h-6rqm"
           ],
@@ -2064,7 +2231,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xrcr-gmf5-2r8j"
           ],
@@ -2102,7 +2269,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-cj4v-437j-jq4c"
           ],
@@ -2140,7 +2307,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-m2hx-wjxc-9fp4"
           ],
@@ -2178,7 +2345,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3c22-5j5m-4jq7"
           ],
@@ -2216,7 +2383,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-c36c-7pc2-f2ph"
           ],
@@ -2255,7 +2422,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-g9w5-qffc-6762"
           ],
@@ -2294,7 +2461,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-7rgv-gqhr-fxg3"
           ],
@@ -2342,7 +2509,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-v66j-6wwf-jc57"
           ],
@@ -2380,7 +2547,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qrfh-cc86-vc8c"
           ],
@@ -2418,7 +2585,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5wmx-573v-2qwq"
           ],
@@ -2455,7 +2622,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-2jpr-83rg-v67j"
           ],
@@ -2493,7 +2660,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xxpw-32hf-q8v9"
           ],
@@ -2548,7 +2715,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-v2x6-wwfw-r2rq"
           ],
@@ -2586,7 +2753,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-w75w-9qv4-j5xj"
           ],
@@ -2624,7 +2791,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-c7mq-gh6q-6q7c"
           ],
@@ -2662,7 +2829,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qffp-2rhf-9h96"
           ],
@@ -2700,7 +2867,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xhw7-jhmp-j62j"
           ],
@@ -2745,7 +2912,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9m84-wc28-w895"
           ],
@@ -2783,7 +2950,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5wp8-q9mx-8jx8"
           ],
@@ -2821,7 +2988,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hhjv-jq77-cmvx"
           ],
@@ -2859,7 +3026,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-vc89-5g3r-cmhh"
           ],
@@ -2897,7 +3064,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-6px9-j4qr-xfjw"
           ],
@@ -2935,7 +3102,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-2m8c-2374-465f"
           ],
@@ -2969,7 +3136,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-262p-vjx5-45xh"
           ],
@@ -3006,7 +3173,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-f9v3-j2m7-4hpg"
           ],
@@ -3043,7 +3210,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-pm7g-w2cf-q238"
           ],
@@ -3083,7 +3250,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5528-5vmv-3xc2"
           ],
@@ -3120,7 +3287,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hx52-cv84-jr5v"
           ],
@@ -3171,7 +3338,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8qp7-fhr9-fw53"
           ],
@@ -3209,7 +3376,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-95v5-prp4-5gv5"
           ],
@@ -3247,7 +3414,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-389r-rccm-h3h5"
           ],
@@ -3285,7 +3452,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-928r-fm4v-mvrw"
           ],
@@ -3324,7 +3491,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-p436-gjf2-799p"
           ],
@@ -3377,7 +3544,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xpqw-6gx7-v673"
           ],
@@ -3417,7 +3584,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-6rx5-m2rc-hmf7"
           ],
@@ -3456,7 +3623,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-25rw-g6ff-fmg8"
           ],
@@ -3495,7 +3662,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-pr34-2v5x-6qjq"
           ],
@@ -3534,7 +3701,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-79pf-vx4x-7jmm"
           ],
@@ -3573,7 +3740,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-rhr9-hgcm-x289"
           ],
@@ -3610,7 +3777,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-6865-qjcf-286f"
           ],
@@ -3648,7 +3815,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5hwf-rc88-82xm"
           ],
@@ -3685,7 +3852,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wccx-j62j-r448"
           ],
@@ -3722,7 +3889,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-25g8-2mcf-fcx9"
           ],
@@ -3759,7 +3926,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:46:06Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wf6x-7x77-mvgw"
           ],
@@ -3787,122 +3954,125 @@
         }
       },
       {
-        "source": "github_advisories",
-        "id": "CVE-2026-29062",
-        "url": "https://github.com/advisories/GHSA-6v53-7c9g-w56r",
-        "published_at": "2026-03-04T21:23:45Z",
-        "updated_at": "2026-03-06T21:58:01Z",
-        "headline": "jackson-core has Nesting Depth Constraint Bypass in `UTF8DataInputJsonParser` potentially allowing Resource Exhaustion",
+        "source": "nextjs_releases",
+        "id": "294138094",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.84",
+        "published_at": "2026-03-06T23:33:18Z",
+        "updated_at": "2026-03-06T23:33:18Z",
+        "headline": "v16.2.0-canary.84",
         "content": {
-          "excerpt_text": "### Summary The `UTF8DataInputJsonParser`, which is used when parsing from a `java.io.DataInput` source, bypasses the `maxNestingDepth` constraint (default: 500) defined in `StreamReadConstraints`. A similar issue was found in `ReaderBasedJsonParser`. This allows a user to supply a JSON document with excessive nesting, which can cause a `StackOverflowError` when the structure is processed, leading to a Denial of Service (DoS). The related fix for com.fasterxml.jackson.core:jackson-core,...",
+          "excerpt_text": "### Core Changes - Bump Node heap limit for lint-no-typescript to avoid OOM in CI: #90996 - Upgrade React from `3bc2d414-20260304` to `46103596-20260305`: #90989 - fix: trigger MPA navigation for server action redirects with build ID mismatch: #89946 ### Misc Changes - Update Rspack development test manifest: #90969 - Turbopack: Make `ReadVcFuture::strongly_consistent` private: #90843 - Update adapters documentation: #90986 ### Credits Huge thanks to @vercel-release-bot, @bgw, @gaojude,...",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:47:03Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-6v53-7c9g-w56r"
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.84"
           ],
-          "content_hash": "sha256:615506d9c12fc1419f5d82cee8d09fbd0e434fc685fcdf56591819337b4401da"
+          "content_hash": "sha256:9a1feb444221c1d2843aa25a7485639f6f01630dc253dcc33b9c79cafb59df1a"
         },
         "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-770"
-            ],
-            "packages": [
-              "maven:tools.jackson.core:jackson-core"
-            ],
+          "release": {
+            "version": "v16.2.0-canary.84",
+            "prerelease": true,
             "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-6v53-7c9g-w56r"
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.84"
             }
           }
         }
       },
       {
-        "source": "github_advisories",
-        "id": "CVE-2026-29054",
-        "url": "https://github.com/advisories/GHSA-92mv-8f8w-wq52",
-        "published_at": "2026-03-04T21:19:08Z",
-        "updated_at": "2026-03-05T22:37:27Z",
-        "headline": "traefik CVE-2024-45410 fix bypass: lowercase `Connection` tokens can delete traefik-managed forwarded identity headers (for example, `X-Real-Ip`)",
+        "source": "nextjs_releases",
+        "id": "294038210",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.83",
+        "published_at": "2026-03-06T18:00:21Z",
+        "updated_at": "2026-03-06T18:00:21Z",
+        "headline": "v16.2.0-canary.83",
         "content": {
-          "excerpt_text": "## Impact There is a potential vulnerability in Traefik managing the `Connection` header with `X-Forwarded` headers. When Traefik processes HTTP/1.1 requests, the protection put in place to prevent the removal of Traefik-managed `X-Forwarded` headers (such as `X-Real-Ip`, `X-Forwarded-Host`, `X-Forwarded-Port`, etc.) via the `Connection` header does not handle case sensitivity correctly. The `Connection` tokens are compared case-sensitively against the protected header names, but the actual...",
+          "excerpt_text": "### Core Changes - Rewrite instant validation to use depth-based URL boundary discovery: #90905 - Add `experimental.cachedNavigations` feature flag: #90928 - preserve allowQuery for partial fallback shells: #90887 - Cache runtime data for partially static pages on initial load (resume): #90888 - re-introduce partial fallback -> route upgrading: #89063 - fix: Don't fall through to catch-all when static child subtree doesn't match: #90957 ### Misc Changes - Turbopack: CompileTimeDefineValue...",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:47:03Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-92mv-8f8w-wq52"
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.83"
           ],
-          "content_hash": "sha256:dbd98ea0a8ee6c89b5912f16a12f322923f6302c0bb79bda45f5ec8fc02118d5"
+          "content_hash": "sha256:852d7881eeb3985309eba46993ea9912ea8bde0c428316a9aa5f862d2254950c"
         },
         "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cvss": 7.5,
-            "cwes": [
-              "CWE-178"
-            ],
-            "packages": [
-              "go:github.com/traefik/traefik/v2",
-              "go:github.com/traefik/traefik/v3"
-            ],
+          "release": {
+            "version": "v16.2.0-canary.83",
+            "prerelease": true,
             "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-92mv-8f8w-wq52"
-            }
-          },
-          "deprecation": {
-            "type": "removal",
-            "confidence": "medium",
-            "source": "keyword_scan",
-            "provenance": {
-              "method": "keyword_scan",
-              "authority": "GitHub Security Advisories",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-92mv-8f8w-wq52"
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.83"
             }
           }
         }
       },
       {
-        "source": "github_advisories",
-        "id": "GHSA-wf45-3gpw-vrqv",
-        "url": "https://github.com/advisories/GHSA-wf45-3gpw-vrqv",
-        "published_at": "2026-03-04T21:07:39Z",
-        "updated_at": "2026-03-04T21:07:41Z",
-        "headline": "`time_calibrators` was removed from crates.io due to malicious code",
+        "source": "nextjs_releases",
+        "id": "293808885",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.82",
+        "published_at": "2026-03-06T06:32:44Z",
+        "updated_at": "2026-03-06T06:32:44Z",
+        "headline": "v16.2.0-canary.82",
         "content": {
-          "excerpt_text": "The `time_calibrators` crate attempted to exfiltrate `.env` files to a server that was in turn impersonating the legitimate `timeapi.io` service. The malicious crate had 1 version published on 2026-03-03 approximately 3 hours before removal and had no evidence of actual downloads. There were no crates depending on this crate on crates.io. Rust security response working group thanks cybergeek for finding and reporting this, and thanks to Emily Albini for co-ordinating with the crates.io team.",
+          "excerpt_text": "### Misc Changes - Set DontFork and Unmergeable on all mmap sites in turbo-persistence: #90941 ### Credits Huge thanks to @sokra for helping!",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:47:03Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-wf45-3gpw-vrqv"
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.82"
           ],
-          "content_hash": "sha256:4e6857298ee91221720eb4e36649445c3a27657c2c3cfee712b439e17bd974c1"
+          "content_hash": "sha256:164324f7bb0b141c8fc9b12acbb539444415244faf86f3129dc237bef740c3b1"
         },
         "signals": {
-          "severity": {
-            "level": "critical",
-            "source": "github_advisory",
-            "packages": [
-              "rust:time_calibrators"
-            ],
+          "release": {
+            "version": "v16.2.0-canary.82",
+            "prerelease": true,
             "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-wf45-3gpw-vrqv"
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.82"
+            }
+          }
+        }
+      },
+      {
+        "source": "nextjs_releases",
+        "id": "293728548",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.81",
+        "published_at": "2026-03-05T23:46:31Z",
+        "updated_at": "2026-03-05T23:46:31Z",
+        "headline": "v16.2.0-canary.81",
+        "content": {
+          "excerpt_text": "### Core Changes - Add trace spans for turbopack persistence in .next/trace: #90397 - Upgrade React from `4cc5b7a9-20260303` to `3bc2d414-20260304`: #90876 - Fix prefetch inlining build failure with dynamic routes: #90899 - Update `@vercel/og` and `satori` vendors: #90933 - Batch require cache deletion to avoid quadratic scanning: #90625 - Revert legacy PPR removal: #90948 ### Misc Changes - Cleanup non-generic assertions in our deploy test suite: #90894 - Turbopack: Tree shaking fixes and...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:47:03Z",
+          "evidence_urls": [
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.81"
+          ],
+          "content_hash": "sha256:d964f829ae4612f66781ecb6a5682068a64da47060833d0859db807b7fa9f74f"
+        },
+        "signals": {
+          "release": {
+            "version": "v16.2.0-canary.81",
+            "prerelease": true,
+            "provenance": {
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.81"
             }
           },
           "deprecation": {
@@ -3911,46 +4081,505 @@
             "source": "keyword_scan",
             "provenance": {
               "method": "keyword_scan",
-              "authority": "GitHub Security Advisories",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-wf45-3gpw-vrqv"
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.81"
             }
           }
         }
       },
       {
-        "source": "github_advisories",
-        "id": "CVE-2026-29042",
-        "url": "https://github.com/advisories/GHSA-95fj-3w7g-4r27",
-        "published_at": "2026-03-04T21:05:51Z",
-        "updated_at": "2026-03-06T21:57:20Z",
-        "headline": "Nuclio Shell Runtime Command Injection Leading to Privilege Escalation",
+        "source": "nextjs_releases",
+        "id": "293204294",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.80",
+        "published_at": "2026-03-04T23:35:09Z",
+        "updated_at": "2026-03-04T23:35:09Z",
+        "headline": "v16.2.0-canary.80",
         "content": {
-          "excerpt_text": "## Summary This vulnerability exists in Nuclio's Shell Runtime component, allowing attackers with function invocation permissions to inject malicious commands via HTTP request headers, execute arbitrary code with root privileges in function containers, steal ServiceAccount Tokens with cluster-admin level permissions, and ultimately achieve complete control over the entire Kubernetes cluster. Recommended CWE classification: CWE-78 (OS Command Injection). Nuclio Shell Runtime processes the...",
+          "excerpt_text": "### Core Changes - Address review feedback: extract modules, clean up imports: #90813 ### Credits Huge thanks to @sokra for helping!",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-06T23:15:58Z",
+          "fetched_at": "2026-03-06T23:47:03Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-95fj-3w7g-4r27"
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.80"
           ],
-          "content_hash": "sha256:053fbbe1a27ccd4ec2c0315ca0c01ae5af66ac26b86b3d21f63ff1ab4a812863"
+          "content_hash": "sha256:57e59ece0eb2b5e5405db524e43c69377bdab384270bb447fc6940d21a151ed6"
         },
         "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-75"
-            ],
-            "packages": [
-              "go:github.com/nuclio/nuclio"
-            ],
+          "release": {
+            "version": "v16.2.0-canary.80",
+            "prerelease": true,
             "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-95fj-3w7g-4r27"
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.80"
+            }
+          }
+        }
+      },
+      {
+        "source": "nextjs_releases",
+        "id": "293177314",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.79",
+        "published_at": "2026-03-04T21:48:54Z",
+        "updated_at": "2026-03-04T21:48:54Z",
+        "headline": "v16.2.0-canary.79",
+        "content": {
+          "excerpt_text": "### Core Changes - partial fallbacks: add adapter flag: #90395 ### Misc Changes - [ci]: continue-on-error for more gh auth status checks: #90890 ### Credits Huge thanks to @ztanner for helping!",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:47:03Z",
+          "evidence_urls": [
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.79"
+          ],
+          "content_hash": "sha256:1a4cd7f55f0ba8c656450b10a626b1ed958006fad5872005da9f5d1985d282cf"
+        },
+        "signals": {
+          "release": {
+            "version": "v16.2.0-canary.79",
+            "prerelease": true,
+            "provenance": {
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.79"
+            }
+          }
+        }
+      },
+      {
+        "source": "nextjs_releases",
+        "id": "293132483",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.78",
+        "published_at": "2026-03-04T19:33:33Z",
+        "updated_at": "2026-03-04T19:33:33Z",
+        "headline": "v16.2.0-canary.78",
+        "content": {
+          "excerpt_text": "### Core Changes - Replace PPR config helpers with cacheComponents checks: #90704 - Cached Navigations: Cache visited fully static pages in the segment cache: #90306 - Remove `isRoutePPREnabled` from render options and delete dead PPR branch: #90713 - Use page extensions in next-swc transforms applying to pages: #90650 - Cached Navigations: Cache static stage of partially static initial HTML: #90539 - Remove `PrerenderStorePPR` type and all `prerender-ppr` switch cases: #90721 - Clean up...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:47:03Z",
+          "evidence_urls": [
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.78"
+          ],
+          "content_hash": "sha256:9f134b67e0b8b18e2d06b20ef0fda4667b9eee70a2e03adca843c83c61715314"
+        },
+        "signals": {
+          "release": {
+            "version": "v16.2.0-canary.78",
+            "prerelease": true,
+            "provenance": {
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.78"
+            }
+          }
+        }
+      },
+      {
+        "source": "nextjs_releases",
+        "id": "292976718",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.77",
+        "published_at": "2026-03-04T13:25:38Z",
+        "updated_at": "2026-03-04T13:25:38Z",
+        "headline": "v16.2.0-canary.77",
+        "content": {
+          "excerpt_text": "### Core Changes - Update default error pages: #90469 ### Misc Changes - [turbopack] add a new hasher implementation to eliminate allocations: #89059 - update proxy docs to use NextProxy type: #90647 - Show labeled steps for `instant()` test helper in the Playwright UI: #90664 ### Credits Huge thanks to @lukesandberg, @clicktodev, @mitul-s, and @unstubbable for helping!",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:47:03Z",
+          "evidence_urls": [
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.77"
+          ],
+          "content_hash": "sha256:aa5cfa67958ed66044fb3225279be9ca1751b86cc60403fe913c58275ab8580f"
+        },
+        "signals": {
+          "release": {
+            "version": "v16.2.0-canary.77",
+            "prerelease": true,
+            "provenance": {
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.77"
+            }
+          }
+        }
+      },
+      {
+        "source": "nextjs_releases",
+        "id": "292761649",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.75",
+        "published_at": "2026-03-03T23:33:03Z",
+        "updated_at": "2026-03-03T23:33:03Z",
+        "headline": "v16.2.0-canary.75",
+        "content": {
+          "excerpt_text": "### Misc Changes - Update Rspack development test manifest: #90805 - Avoid using TaskTypes as keys in storage instead use hashes: #88904 - Remove leaf segment force-refetch check: #90836 ### Credits Huge thanks to @vercel-release-bot, @lukesandberg, and @acdlite for helping!",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:47:03Z",
+          "evidence_urls": [
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.75"
+          ],
+          "content_hash": "sha256:b1658086edb4e35d9d0958352837766eacad8c7682cb9c4fbfc060ec7bbd7742"
+        },
+        "signals": {
+          "release": {
+            "version": "v16.2.0-canary.75",
+            "prerelease": true,
+            "provenance": {
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.75"
+            }
+          }
+        }
+      },
+      {
+        "source": "nextjs_releases",
+        "id": "292685251",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.74",
+        "published_at": "2026-03-03T19:28:44Z",
+        "updated_at": "2026-03-03T19:28:44Z",
+        "headline": "v16.2.0-canary.74",
+        "content": {
+          "excerpt_text": "### Core Changes - Refactor extractExportedConstValue to return { value } | null instead of throwing: #90510 - Reimplement code frame rendering in native code: #85592 - [devtools] Bundle for same target as Next.js browser runtime: #90762 - Upgrade React from `98ce535f-20260226` to `4cc5b7a9-20260303`: #90827 - Add `transitionTypes` prop to `next/link`: #90701 - [otel] fix missing http.route attribute: #90832 ### Misc Changes - turbo-persistence: add CRC32 block checksums: #90754 - Remove...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:47:03Z",
+          "evidence_urls": [
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.74"
+          ],
+          "content_hash": "sha256:e517e1d0f978f8a157591b73c4dd30af9f61e1e221c5ba154844e4799b54eca4"
+        },
+        "signals": {
+          "release": {
+            "version": "v16.2.0-canary.74",
+            "prerelease": true,
+            "provenance": {
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.74"
+            }
+          }
+        }
+      },
+      {
+        "source": "nextjs_releases",
+        "id": "292464331",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.73",
+        "published_at": "2026-03-03T10:40:00Z",
+        "updated_at": "2026-03-03T10:40:00Z",
+        "headline": "v16.2.0-canary.73",
+        "content": {
+          "excerpt_text": "### Core Changes - Stub adapterPath with experimental.runtimeServerDeploymentId: #90790 - Conditionally load uncommon paths: #90514 ### Misc Changes - Add static error when `unstable_instant` is used without `cacheComponents`: #90793 - enable server action RDC deploy test: #90796 - turbo-persistence: StreamingSstWriter performance and readability improvements: #90692 - pr-status: add reply-thread and resolve-thread subcommands: #90773 - [turbopack] Don't schedule idle snapshots when we are...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:47:03Z",
+          "evidence_urls": [
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.73"
+          ],
+          "content_hash": "sha256:71903b8169862ad6246358559cd86ee74c4ea31b38c42ff26510f700400ed3f5"
+        },
+        "signals": {
+          "release": {
+            "version": "v16.2.0-canary.73",
+            "prerelease": true,
+            "provenance": {
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.73"
+            }
+          }
+        }
+      },
+      {
+        "source": "nextjs_releases",
+        "id": "292310691",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.72",
+        "published_at": "2026-03-02T23:33:03Z",
+        "updated_at": "2026-03-02T23:33:03Z",
+        "headline": "v16.2.0-canary.72",
+        "content": {
+          "excerpt_text": "### Core Changes - docs: error component `unstable_retry()`: #89732 ### Misc Changes - Update Rspack development test manifest: #90751 - Update Rspack production test manifest: #90750 - Turbopack: improve cell order lint rule for TraitRef::cell: #90756 - Add determinism test for static shell with asset preload headers: #89826 ### Credits Huge thanks to @devjiwonchoi, @vercel-release-bot, and @mischnic for helping!",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:47:03Z",
+          "evidence_urls": [
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.72"
+          ],
+          "content_hash": "sha256:d7578242da8060b988a7db53f5d69781a9d3857725d76fe6d6dc17d5f9f85c23"
+        },
+        "signals": {
+          "release": {
+            "version": "v16.2.0-canary.72",
+            "prerelease": true,
+            "provenance": {
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.72"
+            }
+          }
+        }
+      },
+      {
+        "source": "nextjs_releases",
+        "id": "292151022",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.71",
+        "published_at": "2026-03-02T16:38:54Z",
+        "updated_at": "2026-03-02T16:38:54Z",
+        "headline": "v16.2.0-canary.71",
+        "content": {
+          "excerpt_text": "### Core Changes - fix(turbopack): use posix.join for client URL manifest paths on Windows: #90700 - Turbopack: improve cell order lint rule for ReadRef::cell: #88500 - Change names of logged times: #90688 - [devtools] Bump React Compiler version to latest experimental: #90763 - Skip writeToBfCache without window: #90771 ### Example Changes - with-docker: add new config file formats: #90731 ### Misc Changes - Fix ENOBUFS errors in pr-status.js when fetching large CI logs: #90654 - docs:...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:47:03Z",
+          "evidence_urls": [
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.71"
+          ],
+          "content_hash": "sha256:833cbb97f90f2ef388fa739376120e22bc4d6121f91bb78208162be94205ecaf"
+        },
+        "signals": {
+          "release": {
+            "version": "v16.2.0-canary.71",
+            "prerelease": true,
+            "provenance": {
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.71"
+            }
+          }
+        }
+      },
+      {
+        "source": "nextjs_releases",
+        "id": "291862494",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.70",
+        "published_at": "2026-03-01T23:32:47Z",
+        "updated_at": "2026-03-01T23:32:47Z",
+        "headline": "v16.2.0-canary.70",
+        "content": {
+          "excerpt_text": "### Core Changes - [devtools] Stop blocking overlay on error details copy: #90698 - feat: provide nextVersion to modifyConfig adapter hook: #90735 - experimental.prefetchInlining: bundle segment prefetches into a single response: #90555 - instant(): fix cookie handling for fresh page loads: #90613 ### Misc Changes - Use commit-based tarball URL in PR stats comment: #90709 - [ci] Use commit instead of PR number for preview builds in deploy tests: #90722 ### Credits Huge thanks to @eps1lon,...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:47:03Z",
+          "evidence_urls": [
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.70"
+          ],
+          "content_hash": "sha256:f5d4642038f7ee72f3689b4ebdd37d75e680c4c66bb24e5d8890ec4d73c76b62"
+        },
+        "signals": {
+          "release": {
+            "version": "v16.2.0-canary.70",
+            "prerelease": true,
+            "provenance": {
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.70"
+            }
+          }
+        }
+      },
+      {
+        "source": "nextjs_releases",
+        "id": "291691907",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.69",
+        "published_at": "2026-02-28T22:46:50Z",
+        "updated_at": "2026-02-28T22:46:50Z",
+        "headline": "v16.2.0-canary.69",
+        "content": {
+          "excerpt_text": "### Core Changes - Turbopack: Allow turbopack-node backend to be swapped at runtime using an experimental config option: #90671 - Turbopack: Revert default loader runtime backend to child processes: #90675 ### Misc Changes - turbo-persistence: streaming SST writer for reduced memory usage: #90617 - Add custom cleanup script support for deploy tests: #90696 ### Credits Huge thanks to @lukesandberg, @bgw, and @ijjk for helping!",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:47:03Z",
+          "evidence_urls": [
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.69"
+          ],
+          "content_hash": "sha256:d146c5f9e1c53e1378514902808249d64a3f2ef6d09a54866be69850db2d11bb"
+        },
+        "signals": {
+          "release": {
+            "version": "v16.2.0-canary.69",
+            "prerelease": true,
+            "provenance": {
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.69"
+            }
+          }
+        }
+      },
+      {
+        "source": "nextjs_releases",
+        "id": "291563352",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.68",
+        "published_at": "2026-02-28T01:27:49Z",
+        "updated_at": "2026-02-28T01:27:49Z",
+        "headline": "v16.2.0-canary.68",
+        "content": {
+          "excerpt_text": "### Core Changes - Turbopack: restrict server HMR to app pages: #90663 ### Misc Changes - Centralize test timings to fix shard divergence in CI: #90672 - tests: Fix immutableAssetToken extraction: #90668 ### Credits Huge thanks to @ijjk, @mischnic, and @wbinnssmith for helping!",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:47:03Z",
+          "evidence_urls": [
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.68"
+          ],
+          "content_hash": "sha256:2422e9fddabffcc5d6611ca12e35ece727780078d6f80f7520f07ff8fda9f2d7"
+        },
+        "signals": {
+          "release": {
+            "version": "v16.2.0-canary.68",
+            "prerelease": true,
+            "provenance": {
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.68"
+            }
+          }
+        }
+      },
+      {
+        "source": "nextjs_releases",
+        "id": "291547905",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.67",
+        "published_at": "2026-02-27T23:32:54Z",
+        "updated_at": "2026-02-27T23:32:54Z",
+        "headline": "v16.2.0-canary.67",
+        "content": {
+          "excerpt_text": "### Misc Changes - Ensure we only run main test mode with custom deploy script: #90665 ### Credits Huge thanks to @ijjk for helping!",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:47:03Z",
+          "evidence_urls": [
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.67"
+          ],
+          "content_hash": "sha256:25bb903f25c5163072aadf59279aad2b1f110db11d28cbf77b07b5a0d57a37a1"
+        },
+        "signals": {
+          "release": {
+            "version": "v16.2.0-canary.67",
+            "prerelease": true,
+            "provenance": {
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.67"
+            }
+          }
+        }
+      },
+      {
+        "source": "nextjs_releases",
+        "id": "291472815",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.66",
+        "published_at": "2026-02-27T18:52:00Z",
+        "updated_at": "2026-02-27T18:52:00Z",
+        "headline": "v16.2.0-canary.66",
+        "content": {
+          "excerpt_text": "### Core Changes - refactor(turbopack-node): support execution by napi and worker_threads: #86266 - [instant] Allow providing user feedback for blocking route errors: #90498 - Allow Node.js' experimental inspector flags in `next dev` and `next build`: #90603 - tests: Assert dpl query string in all tests for Turbopack: #90592 - [instant] Don't add debug stack to random `unstable_instant` exports: #90273 - Adapter: STATIC_FILE.immutableHash: #90045 - Turbopack:...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:47:03Z",
+          "evidence_urls": [
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.66"
+          ],
+          "content_hash": "sha256:56581d5212097907d9fd1c14f3fa78f45b8cfc540c0f01a24a698e791471a2c0"
+        },
+        "signals": {
+          "release": {
+            "version": "v16.2.0-canary.66",
+            "prerelease": true,
+            "provenance": {
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.66"
+            }
+          }
+        }
+      },
+      {
+        "source": "nextjs_releases",
+        "id": "291177612",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.65",
+        "published_at": "2026-02-27T02:22:01Z",
+        "updated_at": "2026-02-27T02:22:01Z",
+        "headline": "v16.2.0-canary.65",
+        "content": {
+          "excerpt_text": "### Core Changes - Turbopack: Panic if a top-level task attempts an eventually consistent read: #89735 - Fix middleware case with adapters: #90624 ### Misc Changes - Turbopack server HMR: inline source maps for `eval`ed modules: #90561 ### Credits Huge thanks to @bgw, @wbinnssmith, and @ijjk for helping!",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:47:03Z",
+          "evidence_urls": [
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.65"
+          ],
+          "content_hash": "sha256:920ad3a8b3b393d2597865aae60ac9280cc94ac6337245ee7548c362df1af6d7"
+        },
+        "signals": {
+          "release": {
+            "version": "v16.2.0-canary.65",
+            "prerelease": true,
+            "provenance": {
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.65"
+            }
+          }
+        }
+      },
+      {
+        "source": "nextjs_releases",
+        "id": "291149502",
+        "url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.64",
+        "published_at": "2026-02-26T23:35:59Z",
+        "updated_at": "2026-02-26T23:35:59Z",
+        "headline": "v16.2.0-canary.64",
+        "content": {
+          "excerpt_text": "### Core Changes - Fix edge index page _next/data route: #90611 - Turbopack server hmr: Implement `restart` event: #90550 ### Misc Changes - Pre-warm a single NodeJS instance when the next devserver starts: #90174 ### Credits Huge thanks to @ijjk, @andrewimm, and @wbinnssmith for helping!",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-06T23:47:03Z",
+          "evidence_urls": [
+            "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.64"
+          ],
+          "content_hash": "sha256:e1180281ff97008635f15354673a65a16c10296bad0f59df9d31c3d44ef65835"
+        },
+        "signals": {
+          "release": {
+            "version": "v16.2.0-canary.64",
+            "prerelease": true,
+            "provenance": {
+              "method": "github_api",
+              "authority": "Next.js Releases",
+              "authority_url": "https://github.com/vercel/next.js/releases",
+              "evidence_url": "https://github.com/vercel/next.js/releases/tag/v16.2.0-canary.64"
             }
           }
         }
@@ -3960,6 +4589,6 @@
     "removed": []
   },
   "integrity_reset": false,
-  "archive_url": "/archive/_global/2026/03/06/20260306T231658Z_d77ac8956196dafc.json",
+  "archive_url": "/archive/_global/2026/03/06/20260306T234707Z_ddf2a82588833308.json",
   "sources_url": "/diff/sources.json"
 }
