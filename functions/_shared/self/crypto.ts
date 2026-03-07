@@ -1,6 +1,7 @@
 // Self Capsule cryptography helpers (v0: Ed25519-only).
 // Why: signed writes are the integrity boundary; reads are public.
 
+import { createPublicKey, verify as ed25519Verify } from "node:crypto";
 import { canonicalJson } from "./canonical";
 
 export async function sha256Hex(data: Uint8Array): Promise<string> {
@@ -81,29 +82,26 @@ export async function verifyEd25519Envelope(env: SignedCapsuleEnvelope): Promise
   });
   const msgBytes = fromHex(msgHashHex);
 
-  // Attempt WebCrypto Ed25519 verification.
-  // If runtime lacks Ed25519 support, we hard-fail (safe default).
-  // We can later swap this to a small audited library without changing the envelope.
-  let key: CryptoKey;
-  try {
-    key = await crypto.subtle.importKey(
-      "raw",
-      pubKeyBytes,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      { name: "Ed25519" } as any,
-      false,
-      ["verify"]
-    );
-  } catch {
-    throw new Error("Ed25519 not supported in this runtime (importKey failed)");
-  }
+  // Ed25519 SPKI DER: fixed 12-byte prefix for a 32-byte Ed25519 public key.
+  // OID 1.3.101.112 = Ed25519, wrapped in SEQUENCE { SEQUENCE { OID }, BIT STRING }.
+  const ED25519_SPKI_PREFIX = new Uint8Array([
+    0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65,
+    0x70, 0x03, 0x21, 0x00,
+  ]);
+  const spkiDer = new Uint8Array(44);
+  spkiDer.set(ED25519_SPKI_PREFIX, 0);
+  spkiDer.set(pubKeyBytes, 12);
 
   let ok = false;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ok = await crypto.subtle.verify({ name: "Ed25519" } as any, key, sigBytes, msgBytes);
+    const key = createPublicKey({
+      key: Buffer.from(spkiDer),
+      format: "der",
+      type: "spki",
+    });
+    ok = ed25519Verify(null, Buffer.from(msgBytes), key, Buffer.from(sigBytes));
   } catch {
-    throw new Error("Ed25519 not supported in this runtime (verify failed)");
+    throw new Error("Ed25519 verification failed");
   }
 
   if (!ok) throw new Error("Invalid signature");
