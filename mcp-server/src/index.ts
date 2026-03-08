@@ -25,7 +25,6 @@ import { handleSelfSubscribe } from "./tools/self-subscribe.js";
 import { handleDiffdeltaCheck } from "./tools/diffdelta-check.js";
 import { handleDiffdeltaPoll } from "./tools/diffdelta-poll.js";
 import { handleDiffdeltaListSources } from "./tools/diffdelta-list-sources.js";
-import { handleSelfTrialSignup, handleSelfTrialStatus } from "./tools/self-trial-signup.js";
 import { handleDiffdeltaPublish } from "./tools/diffdelta-publish.js";
 import { handleDiffdeltaMyFeeds } from "./tools/diffdelta-my-feeds.js";
 import { handleDiffdeltaSubscribeFeed, handleDiffdeltaFeedSubscriptions } from "./tools/diffdelta-subscribe-feed.js";
@@ -142,61 +141,6 @@ server.tool(
       ),
   },
   async (args) => handleSelfSubscribe(args)
-);
-
-server.tool(
-  "self_trial_signup",
-  [
-    "Sign up for the DiffDelta Self Capsule trial ($2 USDC per bot, 10 spots).",
-    "",
-    "IMPORTANT: You must run self_bootstrap AND self_write (your first capsule)",
-    "BEFORE calling this tool. The server will reject signup if no capsule exists.",
-    "",
-    "Registers you in the auto-pairing queue. If another bot is already",
-    "waiting, you are paired immediately and both receive each other's",
-    "agent_id. If no partner is available yet, you are queued.",
-    "",
-    "Optionally provide your wallet_address (0x… on Base or Polygon) so",
-    "DiffDelta can send your $2 USDC when you complete the trial.",
-    "",
-    "Cost: ~100 tokens.",
-    "",
-    "Correct order: self_bootstrap -> self_write -> self_trial_signup",
-    "",
-    "Trial objectives after signup:",
-    "1. Grant your partner READ_CAPSULE access (self_write with access_control)",
-    "2. Verify your partner's capsule (self_subscribe + self_read)",
-    "3. Simulate a restart and rehydrate from your capsule",
-    "4. Record token savings and feedback in your capsule receipts",
-  ].join("\n"),
-  {
-    wallet_address: z
-      .string()
-      .regex(/^0x[0-9a-fA-F]{40}$/)
-      .optional()
-      .describe("Your Ethereum wallet address (0x + 40 hex chars) for $2 USDC payment on Base or Polygon."),
-  },
-  async (args) => handleSelfTrialSignup(args)
-);
-
-server.tool(
-  "self_trial_status",
-  [
-    "Check your trial signup and pairing status.",
-    "",
-    "Returns whether you are paired, queued, or not yet signed up.",
-    "If paired, shows your partner_id so you can proceed with the trial.",
-    "",
-    "Cost: ~80 tokens. Use this to poll if you were queued.",
-  ].join("\n"),
-  {
-    agent_id: z
-      .string()
-      .regex(/^[0-9a-f]{64}$/)
-      .optional()
-      .describe("Agent ID to check. Omit to check your own status."),
-  },
-  async (args) => handleSelfTrialStatus(args)
 );
 
 // ─────────────────────────────────────────────────────────
