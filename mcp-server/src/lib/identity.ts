@@ -96,3 +96,40 @@ export function currentSeq(): number {
 export function getIdentityPath(): string {
   return IDENTITY_FILE;
 }
+
+// ── Local capsule cache ──
+// Persists the latest known capsule to disk so rehydration can
+// compare local vs server state and pick the fresher one.
+
+const CAPSULE_FILE = path.join(DIFFDELTA_DIR, "capsule.json");
+
+interface CachedCapsule {
+  capsule: Record<string, unknown>;
+  seq: number;
+  cursor: string | null;
+  saved_at: string;
+}
+
+export function saveLocalCapsule(
+  capsule: Record<string, unknown>,
+  seq: number,
+  cursor: string | null
+): void {
+  const data: CachedCapsule = {
+    capsule,
+    seq,
+    cursor,
+    saved_at: new Date().toISOString(),
+  };
+  fs.mkdirSync(DIFFDELTA_DIR, { recursive: true });
+  fs.writeFileSync(CAPSULE_FILE, JSON.stringify(data, null, 2), "utf-8");
+}
+
+export function loadLocalCapsule(): CachedCapsule | null {
+  try {
+    if (!fs.existsSync(CAPSULE_FILE)) return null;
+    return JSON.parse(fs.readFileSync(CAPSULE_FILE, "utf-8")) as CachedCapsule;
+  } catch {
+    return null;
+  }
+}

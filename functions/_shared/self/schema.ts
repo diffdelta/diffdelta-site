@@ -159,7 +159,7 @@ export function validateCapsule(capsule: unknown, limits: CapsuleLimits): Valida
           reasons.push("objective_item");
           continue;
         }
-        const allowed = new Set(["id", "status", "priority", "title", "checkpoint"]);
+        const allowed = new Set(["id", "status", "priority", "title", "checkpoint", "updated_at", "tags"]);
         for (const k of Object.keys(o)) if (!allowed.has(k)) reasons.push("unknown_field");
         if (typeof o.id !== "string" || !ID_RE.test(o.id)) reasons.push("objective_id");
         if (typeof o.status !== "string" || !OBJECTIVE_STATUSES_V0.has(o.status)) reasons.push("objective_status");
@@ -167,6 +167,16 @@ export function validateCapsule(capsule: unknown, limits: CapsuleLimits): Valida
         if (typeof o.title !== "string" || o.title.length < 1 || o.title.length > 120) reasons.push("objective_title");
         if (o.checkpoint !== undefined && (typeof o.checkpoint !== "string" || o.checkpoint.length > 200)) {
           reasons.push("objective_checkpoint");
+        }
+        if (o.updated_at !== undefined && (typeof o.updated_at !== "string" || !ISO_DATE_RE.test(o.updated_at))) {
+          reasons.push("objective_updated_at");
+        }
+        if (o.tags !== undefined) {
+          if (!Array.isArray(o.tags) || o.tags.length > 10) {
+            reasons.push("objective_tags");
+          } else {
+            for (const t of o.tags) if (typeof t !== "string" || t.length > 32) reasons.push("objective_tags");
+          }
         }
       }
     }
@@ -208,11 +218,20 @@ export function validateCapsule(capsule: unknown, limits: CapsuleLimits): Valida
               reasons.push("receipt_item");
               continue;
             }
-            const allowedR = new Set(["name", "content_hash", "evidence_url"]);
+            const allowedR = new Set(["name", "content_hash", "evidence_url", "rationale", "updated_at", "tags"]);
             for (const k of Object.keys(r)) if (!allowedR.has(k)) reasons.push("unknown_field");
             if (typeof r.name !== "string" || r.name.length < 1 || r.name.length > 32) reasons.push("receipt_name");
             if (typeof r.content_hash !== "string" || !/^sha256:[0-9a-f]{64}$/.test(r.content_hash)) reasons.push("receipt_hash");
             if (r.evidence_url !== undefined && (typeof r.evidence_url !== "string" || r.evidence_url.length > 200)) reasons.push("receipt_url");
+            if (r.rationale !== undefined && (typeof r.rationale !== "string" || r.rationale.length > 200)) reasons.push("receipt_rationale");
+            if (r.updated_at !== undefined && (typeof r.updated_at !== "string" || !ISO_DATE_RE.test(r.updated_at))) reasons.push("receipt_updated_at");
+            if (r.tags !== undefined) {
+              if (!Array.isArray(r.tags) || r.tags.length > 10) {
+                reasons.push("receipt_tags");
+              } else {
+                for (const t of r.tags) if (typeof t !== "string" || t.length > 32) reasons.push("receipt_tags");
+              }
+            }
           }
         }
       }

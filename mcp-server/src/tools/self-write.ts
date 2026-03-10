@@ -13,7 +13,7 @@
  */
 
 import { z } from "zod";
-import { loadIdentity, incrementSeq } from "../lib/identity.js";
+import { loadIdentity, incrementSeq, saveLocalCapsule } from "../lib/identity.js";
 import { signCapsule } from "../lib/crypto.js";
 import { ddPut } from "../lib/http.js";
 
@@ -132,6 +132,10 @@ export async function handleSelfWrite(
   }
 
   const data = res.data as WriteResponse;
+
+  // Cache locally for rehydration priority resolution
+  saveLocalCapsule(capsule, seq, data.cursor || null);
+
   return {
     content: [
       {

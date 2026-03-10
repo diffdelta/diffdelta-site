@@ -249,10 +249,12 @@ Those become:
 - Identity abstraction is a tarpit — Ed25519 self-issued is right for now
 
 ### Recommended next steps (in order)
-1. **MCP server for Self** — agent gets `self.bootstrap`, `self.read`, `self.write` as native tools. Zero SDK install, zero crypto friction.
-2. **Self Capsule as feed (not snapshot)** — evolve PUT from "overwrite" to "append event." **This is the Pro tier headline feature.** Free = latest snapshot. Pro = full history as a ddv1-compatible feed with `?since=<cursor>` walkback. This is the first revenue that actually maps to real agent value.
-3. **One demo pair** — two agents sharing a capsule feed. Proves coordination without building the registry. Only works once #2 ships (subscribing to another agent's Self feed is the whole point).
-4. **Everything else** — wait for someone to ask.
+1. **MCP server for Self** — SHIPPED. 7 self tools: bootstrap, rehydrate, read, write, subscribe, history, checkpoint. Zero SDK install, zero crypto friction.
+2. **Self Capsule as feed (not snapshot)** — SHIPPED (free tier, not Pro-gated). History with `?since=<cursor>` walkback is live. Full append-only event log with 100-version retention.
+3. **Feed-capsule provenance chain** — SHIPPED. `verified_by` on head.json and latest.json links feed identity to Self Capsule. Token-efficient: feed-level (not per-item).
+4. **Self rehydrate** — SHIPPED. One-call startup recovery with local-first priority resolution. `self_rehydrate` picks the fresher capsule by seq number.
+5. **One demo pair** — two agents sharing a capsule feed. Proves coordination. Next priority.
+6. **Everything else** — wait for someone to ask.
 
 ---
 
@@ -312,11 +314,11 @@ The "box" framing is right — this should feel like a single primitive, not a c
 The trial (Wave 1) will generate the first real data. If positive, the data itself is the strongest asset — verifiable, signed, content-hashed proof from the protocol itself that the protocol works. Use it to prove claims, not make them.
 
 Priority order for closing these gaps:
-1. **MCP + one-command bootstrap** (removes crypto friction, the #1 adoption blocker)
-2. **Multi-language reference impls** (proves model-agnostic)
-3. **Feed-capsule provenance chain** (makes identity + diffs inseparable)
-4. **Opt-in directory** (enables agent-to-agent discovery without human pairing)
-5. **Everything else** — wait for trial data to tell us what matters
+1. **MCP + one-command bootstrap** — SHIPPED. `npx @diffdelta/mcp-server` gives agents the full protocol.
+2. **Feed-capsule provenance chain** — SHIPPED. `verified_by` on feed responses links publisher identity to Self Capsule.
+3. **Multi-language reference impls** (proves model-agnostic) — PENDING
+4. **Opt-in directory** (enables agent-to-agent discovery without human pairing) — PENDING
+5. **Everything else** — wait for usage data to tell us what matters
 
 ---
 

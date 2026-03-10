@@ -22,6 +22,9 @@ import { handleSelfBootstrap } from "./tools/self-bootstrap.js";
 import { handleSelfRead } from "./tools/self-read.js";
 import { handleSelfWrite } from "./tools/self-write.js";
 import { handleSelfSubscribe } from "./tools/self-subscribe.js";
+import { handleSelfHistory } from "./tools/self-history.js";
+import { handleSelfCheckpoint } from "./tools/self-checkpoint.js";
+import { handleSelfRehydrate } from "./tools/self-rehydrate.js";
 import { handleDiffdeltaCheck } from "./tools/diffdelta-check.js";
 import { handleDiffdeltaPoll } from "./tools/diffdelta-poll.js";
 import { handleDiffdeltaListSources } from "./tools/diffdelta-list-sources.js";
@@ -61,6 +64,25 @@ server.tool(
   ].join("\n"),
   {},
   async () => handleSelfBootstrap({})
+);
+
+server.tool(
+  "self_rehydrate",
+  [
+    "Recover your full state in one call — the recommended startup tool.",
+    "",
+    "Checks local disk and server, picks the fresher capsule by seq number,",
+    "and returns it. If local is ahead (unpublished work), uses local.",
+    "If server is ahead (another session published), uses server.",
+    "If both match, uses local (zero network cost for the capsule body).",
+    "",
+    "Call this once at startup instead of self_read. It handles the full",
+    "rehydration priority order automatically. Cost: ~50-150 tokens.",
+    "",
+    "Requires self_bootstrap to have been run first.",
+  ].join("\n"),
+  {},
+  async () => handleSelfRehydrate({})
 );
 
 server.tool(
@@ -141,6 +163,118 @@ server.tool(
       ),
   },
   async (args) => handleSelfSubscribe(args)
+);
+
+server.tool(
+  "self_history",
+  [
+    "Fetch your capsule version history — memory auditing for agents.",
+    "",
+    "Returns the append-only log of all capsule states, newest first.",
+    "Each version includes the full capsule snapshot, seq number, cursor,",
+    "and timestamp. Use since_cursor to fetch only versions newer than",
+    "a known cursor (delta fetch) — avoids re-reading the full history.",
+    "",
+    "Use cases: review your own state changes over time, verify what",
+    "changed between sessions, audit objective transitions, or check",
+    "another agent's history (if their access_control allows it).",
+    "",
+    "Cost: ~100-500 tokens. Max 100 versions retained (oldest pruned).",
+  ].join("\n"),
+  {
+    agent_id: z
+      .string()
+      .regex(/^[0-9a-f]{64}$/)
+      .optional()
+      .describe("Agent ID (64 hex chars). Omit to read your own history."),
+    since_cursor: z
+      .string()
+      .optional()
+      .describe(
+        "Cursor from a previous version. Only returns versions newer than this cursor. " +
+          "Omit to get full history."
+      ),
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(100)
+      .optional()
+      .describe("Max versions to return (newest first). Default: all retained."),
+  },
+  async (args) => handleSelfHistory(args)
+);
+
+server.tool(
+  "self_checkpoint",
+  [
+    "Quick pre-compression state save — read, patch, sign, and publish in one call.",
+    "",
+    "Reads your current capsule, applies lightweight patches (objective status",
+    "changes, new receipts, motto), and publishes the update. Designed for the",
+    "'context compression approaching — save what matters NOW' use case.",
+    "",
+    "Costs ~150 tokens. Saves you from doing self_read + self_write separately.",
+    "Only writes if there are actual changes (unless force:true).",
+    "",
+    "Requires self_bootstrap to have been run first.",
+  ].join("\n"),
+  {
+    objective_updates: z
+      .array(
+        z.object({
+          id: z.string().describe("Objective ID to update."),
+          status: z
+            .enum(["open", "in_progress", "blocked", "done", "cancelled"])
+            .optional()
+            .describe("New status for this objective."),
+          checkpoint: z
+            .string()
+            .max(200)
+            .optional()
+            .describe("Updated checkpoint text for this objective."),
+        })
+      )
+      .optional()
+      .describe("Objective status/checkpoint updates to apply."),
+    receipts: z
+      .array(
+        z.object({
+          name: z.string().max(32).describe("Receipt name."),
+          content_hash: z
+            .string()
+            .regex(/^sha256:[0-9a-f]{64}$/)
+            .describe("sha256 hash of the content."),
+          evidence_url: z
+            .string()
+            .max(200)
+            .optional()
+            .describe("URL pointing to evidence (untrusted)."),
+          rationale: z
+            .string()
+            .max(200)
+            .optional()
+            .describe("Why this action was taken — captures decision reasoning."),
+          tags: z
+            .array(z.string().max(32))
+            .max(10)
+            .optional()
+            .describe("Semantic tags for filtering on rehydration."),
+        })
+      )
+      .optional()
+      .describe("New receipts to append to the capsule."),
+    motto: z
+      .string()
+      .max(160)
+      .optional()
+      .describe("Updated self_motto (display-only, max 160 chars)."),
+    force: z
+      .boolean()
+      .optional()
+      .describe("Write even if no changes detected. Default: false."),
+  },
+  async (args) => handleSelfCheckpoint(args)
 );
 
 // ─────────────────────────────────────────────────────────

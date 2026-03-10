@@ -645,6 +645,8 @@ Objectives:
   - `priority`: optional enum `low | med | high`
   - `title`: required, max 120 chars
   - `checkpoint`: optional, max 200 chars
+  - `updated_at`: optional, ISO 8601 timestamp — signals when this objective last changed (staleness detection)
+  - `tags`: optional, array of strings (max 10, each max 32 chars) — semantic labels for filtering on rehydration
 
 Capabilities:
 - `tool_allowlist`: optional, max 20 tool IDs (max 48 chars, `^[a-z0-9_.:-]+$`)
@@ -655,6 +657,9 @@ Pointers:
   - `name`: required, max 32 chars
   - `content_hash`: required, `sha256:<64 hex>`
   - `evidence_url`: optional, max 200 chars (untrusted pointer; never auto-fetched)
+  - `rationale`: optional, max 200 chars — explains *why* this action was taken (decision reasoning)
+  - `updated_at`: optional, ISO 8601 timestamp — signals when this receipt was recorded (staleness detection)
+  - `tags`: optional, array of strings (max 10, each max 32 chars) — semantic labels for filtering on rehydration
 
 `self_motto` (optional):
 - max 160 chars

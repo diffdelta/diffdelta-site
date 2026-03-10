@@ -41,6 +41,10 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     generated_at: meta.updated_at,
     ttl_sec: meta.ttl_sec,
     sources_included: [sourceId],
+    verified_by: {
+      agent_id: meta.owner_agent_id,
+      capsule_url: `/self/${meta.owner_agent_id}/capsule.json`,
+    },
     source_meta: {
       [sourceId]: {
         name: meta.name,

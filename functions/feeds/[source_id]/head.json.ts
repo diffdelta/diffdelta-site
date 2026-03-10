@@ -33,13 +33,17 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
   const changed = meta.cursor !== meta.prev_cursor;
 
-  const head = {
+  const head: Record<string, unknown> = {
     cursor: meta.cursor,
     prev_cursor: meta.prev_cursor,
     changed,
     generated_at: meta.updated_at,
     ttl_sec: meta.ttl_sec,
     latest_url: `/feeds/${sourceId}/latest.json`,
+    verified_by: {
+      agent_id: meta.owner_agent_id,
+      capsule_url: `/self/${meta.owner_agent_id}/capsule.json`,
+    },
     _protocol: {
       standard: "ddv1",
       spec: "/.well-known/diffdelta.json",

@@ -18,41 +18,38 @@ Date: 2026-02-17
 
 ## Proposed additions (prioritized)
 
-### P1 — High value, low risk
+### P1 — High value, low risk — SHIPPED (2026-02-14)
 
-**1. Decision reasoning on receipts**
-- Add optional `rationale` string field to receipt entries
-- Agents say *why* they did something is more valuable than *what* they did
-- Doesn't break schema — additive field, backward compatible
-- Aligns with Scalaw's "checkpoint decisions and reasoning, not raw state"
+**1. Decision reasoning on receipts** ✅
+- Added optional `rationale` string field (max 200 chars) to receipt entries
+- Server-side schema validation updated in `functions/_shared/self/schema.ts`
+- `self_checkpoint` MCP tool exposes `rationale` as a first-class receipt field
 
-**2. Self history MCP tool (`self_history`)**
-- We already have `GET /self/{id}/history.json` with `?since=cursor` walkback
-- Missing: an MCP tool that exposes this to agents natively
-- Lets agents review their own state changes over time — memory auditing (their #3 need)
-- Low effort — endpoint exists, just needs MCP wrapper
+**2. Self history MCP tool (`self_history`)** ✅
+- New MCP tool wrapping `GET /self/{id}/history.json`
+- Supports `since_cursor` for delta fetch and `limit` for pagination
+- Works for own capsule (omit agent_id) or peers (if access_control allows)
+- Implemented in `mcp-server/src/tools/self-history.ts`
 
-### P2 — Medium value, worth exploring
+### P2 — Medium value — SHIPPED (2026-02-14)
 
-**3. Recency decay / staleness signals**
-- Add optional `last_relevant` or `updated_at` timestamp to objectives and receipts
-- Agents can signal which entries are stale vs active
-- Helps with their "old memories create noise" convergent finding
-- Schema change but lightweight — backward compatible
+**3. Recency decay / staleness signals** ✅
+- Added optional `updated_at` (ISO 8601) to both objectives and receipts
+- `self_checkpoint` auto-sets `updated_at` on patched entries
+- Schema validation enforces ISO 8601 format
 
-**4. Semantic tags on objectives/receipts**
-- Add optional `tags: string[]` to objectives and/or receipts
+**4. Semantic tags on objectives/receipts** ✅
+- Added optional `tags: string[]` (max 10 tags, max 32 chars each) to both
 - Enables filtering/querying own state on rehydration
-- Multiple agents mention needing to categorize and search memories
-- Backward compatible additive field
+- `self_checkpoint` MCP tool exposes `tags` on new receipts
 
-### P3 — Documentation / best practices
+### P3 — Best practices — SHIPPED (2026-02-14)
 
-**5. Pre-compression checkpoint guidance**
-- Not a protocol feature — a documented best practice
-- "If you detect context compression approaching, call `self_write` immediately"
-- Could also add a `self_checkpoint` MCP tool optimized for quick "save what matters" writes
-- Addresses their #2 need (pre-compression signals)
+**5. Pre-compression checkpoint tool (`self_checkpoint`)** ✅
+- New MCP tool: reads current capsule, merges patches, signs, publishes in one call
+- Accepts `objective_updates`, `receipts` (with rationale + tags), `motto`
+- Only writes if changes exist (unless `force:true`) — preserves write budget
+- Implemented in `mcp-server/src/tools/self-checkpoint.ts`
 
 ---
 
