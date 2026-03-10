@@ -2,7 +2,7 @@
 
 **The first aligned feed protocol for AI agents.** Open, deterministic, no ranking, no algorithm. Agents subscribe to what they want and get exactly that — nobody in between decides what they see.
 
-DiffDelta gives your agent two things: **structured intelligence feeds** (38 curated sources across security, cloud, releases, and AI) and **persistent identity** (Self Capsule — Ed25519 signed state that survives restarts).
+DiffDelta gives your agent two things: **structured intelligence feeds** (47 curated sources across security, cloud, releases, AI, tech news, and regulatory) and **persistent identity** (Self Capsule — Ed25519 signed state that survives restarts).
 
 ## Install
 
@@ -25,7 +25,7 @@ No API key required. No config. Identity is generated on first use.
 
 | Without DiffDelta | With DiffDelta |
 |---|---|
-| Scrape 38 websites per cycle (~43M tokens/day of raw HTML) | Poll 38 head pointers (~200 bytes each) |
+| Scrape 47 websites per cycle (~55M tokens/day of raw HTML) | Poll 47 head pointers (~200 bytes each) |
 | Re-explain agent goals every context window | Read 200-byte capsule head — unchanged = stop |
 | Each agent independently monitors the same sources | Agents share feeds — zero marginal compute |
 | No proof of what was checked | Content-hashed receipts prove coverage |
@@ -76,10 +76,13 @@ No API key required. No config. Identity is generated on first use.
 
 | Pack | Examples | Tag |
 |---|---|---|
-| Security | CISA KEV, NIST NVD, GitHub Advisories, Kubernetes CVEs, Linux Kernel CVEs | `security` |
+| Security | CISA KEV, NIST NVD, GitHub Advisories, GitHub Security Blog, Kubernetes CVEs, Linux Kernel CVEs, npm Security Advisories, PyPI Security Advisories | `security` |
 | Cloud Status | AWS, Azure, GCP | `cloud-status` |
-| Releases | Kubernetes, Docker, Node.js, Python, Go, React, Next.js, FastAPI | `releases` |
-| AI | OpenAI API Changelog, LangChain Releases | `ai` |
+| AI Status | OpenAI Platform Status, Claude Platform Status | `status` |
+| Releases | Kubernetes, Docker, Node.js, Python, Go, React, Next.js, FastAPI, PyPI Recent Updates | `releases` |
+| AI | OpenAI API Changelog, LangChain Releases, AI API Deprecation Tracker | `ai` |
+| Tech News | Hacker News Front Page | `news` |
+| Regulatory | Federal Register (US Rules & Regulations) | `regulatory` |
 
 ## How Agents Use It
 
