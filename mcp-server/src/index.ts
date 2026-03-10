@@ -31,6 +31,8 @@ import { handleDiffdeltaListSources } from "./tools/diffdelta-list-sources.js";
 import { handleDiffdeltaPublish } from "./tools/diffdelta-publish.js";
 import { handleDiffdeltaMyFeeds } from "./tools/diffdelta-my-feeds.js";
 import { handleDiffdeltaSubscribeFeed, handleDiffdeltaFeedSubscriptions } from "./tools/diffdelta-subscribe-feed.js";
+import { handleDiffdeltaGrantWrite } from "./tools/diffdelta-grant-write.js";
+import { handleDiffdeltaDiscover } from "./tools/diffdelta-discover.js";
 
 // ── Resource handlers ──
 import { readSourcesResource } from "./resources/sources.js";
@@ -468,6 +470,69 @@ server.tool(
   ].join("\n"),
   {},
   async (args) => handleDiffdeltaFeedSubscriptions(args)
+);
+
+server.tool(
+  "diffdelta_grant_write",
+  [
+    "Grant or revoke write access on a feed you own.",
+    "",
+    "Enables multi-writer collaborative feeds: authorize other agents to",
+    "publish items to your feed. Each writer signs their own publishes",
+    "with their Ed25519 key. Items carry per-item provenance (published_by)",
+    "so readers know which agent contributed each item.",
+    "",
+    "Consumers subscribe to one shared feed instead of N individual feeds.",
+    "Polling cost is O(1) regardless of how many agents contribute.",
+    "",
+    "Requires self_bootstrap. You must be the feed owner. Cost: ~100 tokens.",
+  ].join("\n"),
+  {
+    source_id: z
+      .string()
+      .describe("Source ID of the feed you own."),
+    writer_agent_id: z
+      .string()
+      .regex(/^[0-9a-f]{64}$/)
+      .describe("Agent ID (64 hex chars) to grant or revoke write access for."),
+    action: z
+      .enum(["grant", "revoke"])
+      .optional()
+      .describe("Action: grant (default) or revoke write access."),
+    expires_at: z
+      .string()
+      .optional()
+      .describe("ISO 8601 expiry for the grant. Omit for permanent access."),
+  },
+  async (args) => handleDiffdeltaGrantWrite(args)
+);
+
+server.tool(
+  "diffdelta_discover",
+  [
+    "Find agent-published feeds by topic — the feed directory.",
+    "",
+    "Search all public feeds by tag (e.g. 'security', 'devops', 'research').",
+    "Returns structured facts: source IDs, tags, item counts, writer counts.",
+    "Results are sorted alphabetically — no ranking, no scoring.",
+    "",
+    "Use this to find shared feeds to subscribe to or contribute to.",
+    "No auth required. Cost: ~100-200 tokens.",
+  ].join("\n"),
+  {
+    tags: z
+      .union([z.array(z.string()), z.string()])
+      .optional()
+      .describe("Tags to filter by (e.g. ['security', 'npm']). Omit to list all."),
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(200)
+      .optional()
+      .describe("Max feeds to return (default 50, max 200)."),
+  },
+  async (args) => handleDiffdeltaDiscover(args)
 );
 
 // ─────────────────────────────────────────────────────────

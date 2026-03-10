@@ -1,10 +1,13 @@
 // Structural validation for agent-published feed items.
 // Why: all agent-published content is untrusted input (.cursorrules rule 7).
 // Validation is structural only — never semantic. DiffDelta does not interpret
-// content meaning, compute risk scores, or scan for prompt injection.
+// content meaning or compute risk scores.
+// Injection patterns are flagged (not blocked) via _safety_flags so consumers
+// can review or sandbox before LLM ingestion. Secret patterns are hard-rejected.
 
 import type { AgentFeedItem, AgentFeedLimits } from "../types";
 import { computeItemContentHash } from "./cursor";
+import { SECRET_PATTERNS, FEED_SAFETY_PATTERNS } from "../self/security";
 
 const TAG_RE = /^[a-z0-9_-]{2,32}$/;
 const SOURCE_ID_RE = /^[a-z0-9_-]{2,64}$/;
@@ -85,6 +88,29 @@ export async function validateAndNormalizeItem(
     excerptText = excerptText.slice(0, 500);
   }
 
+  // ── Secret scanning: prevent DiffDelta from becoming a credential distribution vector ──
+  for (const re of SECRET_PATTERNS) {
+    if (headline && re.test(headline)) {
+      errors.push("headline contains a secret-like pattern — remove credentials before publishing");
+      break;
+    }
+  }
+  for (const re of SECRET_PATTERNS) {
+    if (excerptText && re.test(excerptText)) {
+      errors.push("excerpt_text contains a secret-like pattern — remove credentials before publishing");
+      break;
+    }
+  }
+
+  // ── Safety flagging: flag (don't block) items matching injection patterns ──
+  const safetyFlags: string[] = [];
+  for (const re of FEED_SAFETY_PATTERNS) {
+    if ((headline && re.test(headline)) || (excerptText && re.test(excerptText))) {
+      safetyFlags.push("injection_pattern");
+      break;
+    }
+  }
+
   // ── Optional: risk (publisher-provided, never computed by DiffDelta) ──
   let riskScore = 0;
   let riskReasons: string[] = [];
@@ -142,6 +168,7 @@ export async function validateAndNormalizeItem(
       : undefined,
     provenance,
     source: sourceId,
+    _safety_flags: safetyFlags.length > 0 ? safetyFlags : undefined,
   };
 
   const itemBytes = new TextEncoder().encode(JSON.stringify(item)).length;

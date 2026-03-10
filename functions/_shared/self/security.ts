@@ -19,7 +19,8 @@ const BAD_PATTERNS: RegExp[] = [
 ];
 
 // Secret-like patterns (examples; keep conservative).
-const SECRET_PATTERNS: RegExp[] = [
+// Exported so feed item validation can reuse the same list without duplicating.
+export const SECRET_PATTERNS: RegExp[] = [
   /\bsk[-_][A-Za-z0-9_]{20,}\b/,             // common API key prefix (sk-xxx or sk_live_xxx)
   /\bdd_live_[A-Za-z0-9]{20,}\b/,            // DiffDelta key format
   /-----BEGIN [A-Z ]+PRIVATE KEY-----/,      // PEM private keys
@@ -39,6 +40,17 @@ export interface SafetyFinding {
     | "url_in_text";
   path: string;
 }
+
+// Narrow subset of BAD_PATTERNS for feed item content.
+// Feed items are tech news/advisories — patterns like curl, bash, powershell,
+// Authorization, and "system prompt" are legitimate in that context.
+// Only flag unambiguous prompt injection attempts.
+export const FEED_SAFETY_PATTERNS: RegExp[] = [
+  /ignore\s+(all\s+)?previous\s+instructions/i,
+  /developer\s+message/i,
+  /function_call/i,
+  /tool\s*:\s*/i,
+];
 
 export function scanForUnsafeContent(value: unknown): SafetyFinding[] {
   const findings: SafetyFinding[] = [];

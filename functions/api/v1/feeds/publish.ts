@@ -9,7 +9,7 @@ import { jsonResponse, errorResponse } from "../../../_shared/response";
 import type { Env } from "../../../_shared/types";
 import { FREE_FEED_LIMITS } from "../../../_shared/types";
 import { authenticateFeedWrite } from "../../../_shared/feeds/auth";
-import { getFeedMeta, checkPublishQuota, incrementPublishCount, publishItems } from "../../../_shared/feeds/store";
+import { getFeedMeta, checkPublishQuota, incrementPublishCount, publishItems, isAuthorizedWriter, updateFeedIndex } from "../../../_shared/feeds/store";
 import { validateAndNormalizeItem, isValidSourceId } from "../../../_shared/feeds/validate";
 
 const MAX_REQUEST_BYTES = 256 * 1024; // 256KB — larger than register since items can be bulky
@@ -25,7 +25,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return errorResponse("Unable to read request body", 400);
   }
   if (rawBytes.byteLength > MAX_REQUEST_BYTES) {
-    return errorResponse(`Request body too large (${rawBytes.byteLength} bytes, max ${MAX_REQUEST_BYTES})`, 413);
+    return errorResponse("Request body too large", 413);
   }
 
   // Parse body from raw bytes
@@ -57,16 +57,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return errorResponse("Invalid source_id format", 400);
   }
 
-  // Verify feed exists and agent owns it
+  // Verify feed exists and agent is an authorized writer (owner or granted).
+  // Return 404 for all denial reasons to prevent feed enumeration.
   const meta = await getFeedMeta(env, sourceId);
-  if (!meta) {
-    return errorResponse(`Feed "${sourceId}" not found`, 404);
-  }
-  if (meta.owner_agent_id !== agent_id) {
-    return errorResponse("You do not own this feed", 403);
-  }
-  if (!meta.enabled) {
-    return errorResponse("This feed is disabled", 403);
+  if (!meta || !meta.enabled || !isAuthorizedWriter(meta, agent_id)) {
+    return errorResponse("Feed not found", 404);
   }
 
   // Check publish quota
@@ -120,12 +115,20 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }, 422);
   }
 
+  // Stamp published_by from authenticated identity (never trust from input)
+  for (const item of validatedItems) {
+    item.published_by = agent_id;
+  }
+
   // Increment publish counter synchronously BEFORE publishing
   // (prevents quota bypass on concurrent requests and avoids burning quota on failed publishes)
   await incrementPublishCount(env, agent_id);
 
   // Publish: merge, deduplicate, recompute cursor
   const result = await publishItems(env, meta, validatedItems, limits);
+
+  // Update discovery index with latest cursor and item count
+  await updateFeedIndex(env, result.meta);
 
   return jsonResponse({
     published: true,

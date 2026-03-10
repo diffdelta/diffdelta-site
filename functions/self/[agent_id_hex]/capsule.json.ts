@@ -8,6 +8,7 @@ import { jsonResponse, errorResponse } from "../../_shared/response";
 import type { Env } from "../../_shared/types";
 import { parseAgentIdHex, verifyEd25519Envelope } from "../../_shared/self/crypto";
 import { scanForUnsafeContent } from "../../_shared/self/security";
+import { extractAgentId } from "../../_shared/feeds/auth";
 import { validateCapsule, LIMITS } from "../../_shared/self/schema";
 import {
   computeCursorForCapsule,
@@ -42,10 +43,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     return errorResponse("Capsule not found", 404);
   }
 
-  // Access control: if capsule is private, verify requester is authorized.
-  // Normalize to lowercase hex so case-insensitive agent IDs match correctly.
-  const rawRequester = request.headers.get("X-Self-Agent-Id");
-  const requesterAgentId = rawRequester ? rawRequester.trim().toLowerCase() : null;
+  const requesterAgentId = await extractAgentId(request, env);
   const access = checkCapsuleAccess(stored.capsule, agentIdHex, requesterAgentId, "capsule.json");
   if (!access.allowed) {
     return jsonResponse(
@@ -155,11 +153,13 @@ export const onRequestPut: PagesFunction<Env> = async (context) => {
   if (findings.length > 0) {
     // Track rejection metadata (fire-and-forget)
     context.waitUntil(upsertAgentMeta(env, agentIdHex, "safety_reject"));
+    // Return only finding codes (not internal paths) to avoid information leakage
+    const codes = [...new Set(findings.map((f) => f.code))];
     return jsonResponse(
       {
         accepted: false,
         reason_codes: ["unsafe_content"],
-        findings,
+        finding_codes: codes,
         next_write_at: dayResetAtIsoUTC(),
       },
       422

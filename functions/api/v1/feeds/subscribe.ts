@@ -17,7 +17,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
 
   // Authenticate via X-Self-Agent-Id
-  const agentId = extractAgentId(request);
+  const agentId = await extractAgentId(request, env);
   if (!agentId) {
     return errorResponse("Include X-Self-Agent-Id header with your agent_id", 401);
   }
@@ -30,7 +30,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return errorResponse("Unable to read request body", 400);
   }
   if (rawBytes.byteLength > MAX_REQUEST_BYTES) {
-    return errorResponse(`Request body too large (${rawBytes.byteLength} bytes, max ${MAX_REQUEST_BYTES})`, 413);
+    return errorResponse("Request body too large", 413);
   }
 
   let body: Record<string, unknown>;
@@ -52,10 +52,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   const action = typeof body.action === "string" ? body.action : "subscribe";
 
-  // Verify feed exists
+  // Verify feed exists (return 404 for all denial reasons to prevent enumeration)
   const meta = await getFeedMeta(env, sourceId);
   if (!meta) {
-    return errorResponse(`Feed "${sourceId}" not found`, 404);
+    return errorResponse("Feed not found", 404);
   }
 
   if (action === "unsubscribe") {
@@ -69,11 +69,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   // For subscribe: check read access (public feeds always OK, private need grant)
   const access = await checkFeedReadAccess(env, meta, agentId);
   if (!access.allowed) {
-    return jsonResponse({
-      subscribed: false,
-      reason: "access_denied",
-      detail: access.reason,
-    }, 403);
+    return errorResponse("Feed not found", 404);
   }
 
   // Check subscription limit (max 100 subscriptions per agent)

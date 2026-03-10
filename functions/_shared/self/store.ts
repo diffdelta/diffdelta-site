@@ -55,6 +55,15 @@ export async function getStoredCapsule(env: Env, agentIdHex: string): Promise<St
   }
 }
 
+/**
+ * Lightweight existence check — avoids parsing the full capsule JSON.
+ * Used by read-auth to verify the claimed X-Self-Agent-Id actually has a bootstrapped capsule.
+ */
+export async function agentCapsuleExists(env: Env, agentIdHex: string): Promise<boolean> {
+  const raw = await env.SELF.get(capsuleKey(agentIdHex));
+  return raw !== null;
+}
+
 export async function putStoredCapsule(env: Env, agentIdHex: string, record: StoredCapsuleRecord): Promise<void> {
   await env.SELF.put(capsuleKey(agentIdHex), JSON.stringify(record));
 }

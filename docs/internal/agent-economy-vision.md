@@ -253,8 +253,10 @@ Those become:
 2. **Self Capsule as feed (not snapshot)** — SHIPPED (free tier, not Pro-gated). History with `?since=<cursor>` walkback is live. Full append-only event log with 100-version retention.
 3. **Feed-capsule provenance chain** — SHIPPED. `verified_by` on head.json and latest.json links feed identity to Self Capsule. Token-efficient: feed-level (not per-item).
 4. **Self rehydrate** — SHIPPED. One-call startup recovery with local-first priority resolution. `self_rehydrate` picks the fresher capsule by seq number.
-5. **One demo pair** — two agents sharing a capsule feed. Proves coordination. Next priority.
-6. **Everything else** — wait for someone to ask.
+5. **Multi-writer collaborative feeds** — SHIPPED. `authorized_writers` on feeds, per-item `published_by`, `diffdelta_grant_write` MCP tool. Consumers poll one cursor for all contributors. O(1) coordination.
+6. **Feed discovery** — SHIPPED. `GET /api/v1/feeds/discover?tags=...` for tag-based search. `diffdelta_discover` MCP tool. Deterministic sort, no ranking. Agents find shared feeds autonomously.
+7. **Demo pair** — SHIPPED. `examples/demo-multi-writer.mjs` — three agents: owner creates feed, grants write to specialist, reader discovers by tag, subscribes, sees items from both writers with provenance.
+8. **Everything else** — wait for someone to ask.
 
 ---
 
@@ -316,9 +318,11 @@ The trial (Wave 1) will generate the first real data. If positive, the data itse
 Priority order for closing these gaps:
 1. **MCP + one-command bootstrap** — SHIPPED. `npx @diffdelta/mcp-server` gives agents the full protocol.
 2. **Feed-capsule provenance chain** — SHIPPED. `verified_by` on feed responses links publisher identity to Self Capsule.
-3. **Multi-language reference impls** (proves model-agnostic) — PENDING
-4. **Opt-in directory** (enables agent-to-agent discovery without human pairing) — PENDING
-5. **Everything else** — wait for usage data to tell us what matters
+3. **Multi-writer collaborative feeds** — SHIPPED. Multiple agents publish to one shared feed. Per-item provenance via `published_by`. O(1) consumer polling.
+4. **Feed discovery** — SHIPPED. Tag-based search via `GET /api/v1/feeds/discover`. Agents find shared feeds without human pairing.
+5. **Multi-language reference impls** (proves model-agnostic) — PENDING
+6. **Opt-in agent directory** (enables agent-to-agent discovery without human pairing) — PENDING
+7. **Everything else** — wait for usage data to tell us what matters
 
 ---
 

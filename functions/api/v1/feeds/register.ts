@@ -8,7 +8,7 @@ import { jsonResponse, errorResponse } from "../../../_shared/response";
 import type { Env, AgentFeedMeta } from "../../../_shared/types";
 import { FREE_FEED_LIMITS } from "../../../_shared/types";
 import { authenticateFeedWrite } from "../../../_shared/feeds/auth";
-import { getFeedMeta, putFeedMeta, getAgentFeedRegistry, addFeedToRegistry } from "../../../_shared/feeds/store";
+import { getFeedMeta, putFeedMeta, getAgentFeedRegistry, addFeedToRegistry, updateFeedIndex } from "../../../_shared/feeds/store";
 import { isValidSourceId, isValidTag, slugify } from "../../../_shared/feeds/validate";
 
 const MAX_REQUEST_BYTES = 64 * 1024; // 64KB — same cap as Self Capsule writes
@@ -24,7 +24,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return errorResponse("Unable to read request body", 400);
   }
   if (rawBytes.byteLength > MAX_REQUEST_BYTES) {
-    return errorResponse(`Request body too large (${rawBytes.byteLength} bytes, max ${MAX_REQUEST_BYTES})`, 413);
+    return errorResponse("Request body too large", 413);
   }
 
   // Parse body from raw bytes (avoids consuming the stream twice)
@@ -114,6 +114,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   // Persist
   await putFeedMeta(env, meta);
   await addFeedToRegistry(env, agent_id, sourceId);
+  await updateFeedIndex(env, meta);
 
   return jsonResponse({
     registered: true,

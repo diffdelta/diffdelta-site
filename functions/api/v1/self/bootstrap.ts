@@ -12,11 +12,24 @@ interface Body {
   public_key?: string; // v0: 32-byte hex
 }
 
+const MAX_REQUEST_BYTES = 4 * 1024;
+
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request } = context;
+
+  let rawBytes: ArrayBuffer;
+  try {
+    rawBytes = await request.arrayBuffer();
+  } catch {
+    return errorResponse("Unable to read request body", 400);
+  }
+  if (rawBytes.byteLength > MAX_REQUEST_BYTES) {
+    return errorResponse("Request body too large", 413);
+  }
+
   let body: Body;
   try {
-    body = await request.json();
+    body = JSON.parse(new TextDecoder().decode(rawBytes));
   } catch {
     return errorResponse("Invalid JSON body", 400);
   }

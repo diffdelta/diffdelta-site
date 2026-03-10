@@ -20,10 +20,19 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return errorResponse("Service not configured", 503);
   }
 
-  // ── Parse + validate ──
+  // ── Parse + validate (with size cap) ──
+  let rawBytes: ArrayBuffer;
+  try {
+    rawBytes = await request.arrayBuffer();
+  } catch {
+    return errorResponse("Unable to read request body", 400);
+  }
+  if (rawBytes.byteLength > 8192) {
+    return errorResponse("Request body too large", 413);
+  }
   let body: SourceRequest;
   try {
-    body = await request.json();
+    body = JSON.parse(new TextDecoder().decode(rawBytes));
   } catch {
     return errorResponse("Invalid JSON body", 400);
   }

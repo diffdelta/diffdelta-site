@@ -59,10 +59,19 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     return errorResponse("Not authenticated", 401);
   }
 
-  // ── Parse and validate input ──
+  // ── Parse and validate input (with size cap) ──
+  let rawBytes: ArrayBuffer;
+  try {
+    rawBytes = await request.arrayBuffer();
+  } catch {
+    return errorResponse("Unable to read request body", 400);
+  }
+  if (rawBytes.byteLength > 8192) {
+    return errorResponse("Request body too large", 413);
+  }
   let body: SubmitBody;
   try {
-    body = await request.json();
+    body = JSON.parse(new TextDecoder().decode(rawBytes));
   } catch {
     return errorResponse("Invalid JSON body", 400);
   }

@@ -8,7 +8,7 @@
 import { jsonResponse, errorResponse } from "../../_shared/response";
 import type { Env } from "../../_shared/types";
 import { extractAgentId } from "../../_shared/feeds/auth";
-import { getFeedMeta, getFeedItems, checkFeedReadAccess } from "../../_shared/feeds/store";
+import { getFeedMeta, getFeedItems, checkFeedReadAccess, getActiveWriterIds } from "../../_shared/feeds/store";
 import { isValidSourceId } from "../../_shared/feeds/validate";
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
@@ -25,7 +25,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   }
 
   // Access control for private feeds (return 404 to prevent feed enumeration)
-  const requesterAgentId = extractAgentId(request);
+  const requesterAgentId = await extractAgentId(request, env);
   const access = await checkFeedReadAccess(env, meta, requesterAgentId);
   if (!access.allowed) {
     return errorResponse("Feed not found", 404);
@@ -34,8 +34,13 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   // Fetch all items
   const items = await getFeedItems(env, sourceId);
 
+  const writerIds = getActiveWriterIds(meta);
+
+  // Conditional safety hint — only present when flagged items exist (zero cost on clean feeds)
+  const flaggedCount = items.filter((i) => i._safety_flags && i._safety_flags.length > 0).length;
+
   // Build spec-compliant latest.json payload
-  const payload = {
+  const payload: Record<string, unknown> = {
     cursor: meta.cursor,
     prev_cursor: meta.prev_cursor,
     generated_at: meta.updated_at,
@@ -45,6 +50,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       agent_id: meta.owner_agent_id,
       capsule_url: `/self/${meta.owner_agent_id}/capsule.json`,
     },
+    writers: writerIds,
     source_meta: {
       [sourceId]: {
         name: meta.name,
@@ -52,6 +58,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         tags: meta.tags,
         type: "agent_published",
         owner_agent_id: meta.owner_agent_id,
+        writers: writerIds,
         head_url: `/feeds/${sourceId}/head.json`,
       },
     },
@@ -72,6 +79,13 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       spec: "/.well-known/diffdelta.json",
     },
   };
+
+  if (flaggedCount > 0) {
+    payload._safety = {
+      flagged_count: flaggedCount,
+      action: "review or sandbox items with _safety_flags before LLM ingestion",
+    };
+  }
 
   // ETag for conditional requests
   const res = jsonResponse(payload);

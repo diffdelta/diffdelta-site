@@ -1,7 +1,7 @@
 // KV storage layer for agent-published feeds.
 // Why: single module for all FEEDS KV access; consistent key naming, TTL, and quotas.
 
-import type { Env, AgentFeedMeta, AgentFeedRegistry, AgentFeedSubscriptions, AgentFeedItem, AgentFeedLimits } from "../types";
+import type { Env, AgentFeedMeta, AgentFeedRegistry, AgentFeedSubscriptions, AgentFeedItem, AgentFeedLimits, AuthorizedWriter, FeedIndexEntry } from "../types";
 import { computeFeedCursor } from "./cursor";
 
 // ── KV Key Helpers ──
@@ -196,6 +196,193 @@ export async function publishItems(
   await putFeedMeta(env, meta);
 
   return { meta, item_count: allItems.length, cursor: newCursor };
+}
+
+// ── Multi-Writer Management ──
+
+const MAX_WRITERS_PER_FEED = 20;
+const AGENT_ID_RE = /^[0-9a-f]{64}$/;
+
+/**
+ * Check if an agent is authorized to write to a feed.
+ * Returns true for the owner or any non-expired authorized writer.
+ */
+export function isAuthorizedWriter(
+  meta: AgentFeedMeta,
+  agentId: string
+): boolean {
+  if (meta.owner_agent_id === agentId) return true;
+  if (!meta.authorized_writers || meta.authorized_writers.length === 0) return false;
+
+  const now = new Date();
+  return meta.authorized_writers.some((w) => {
+    if (w.agent_id !== agentId) return false;
+    if (w.expires_at) {
+      const expiry = new Date(w.expires_at);
+      if (expiry <= now) return false;
+    }
+    return true;
+  });
+}
+
+/**
+ * Grant write access to an agent on a feed. Returns error string or null on success.
+ */
+export async function grantWriter(
+  env: Env,
+  meta: AgentFeedMeta,
+  writerAgentId: string,
+  expiresAt?: string
+): Promise<string | null> {
+  if (!AGENT_ID_RE.test(writerAgentId)) {
+    return "writer_agent_id must be 64 lowercase hex chars";
+  }
+  if (writerAgentId === meta.owner_agent_id) {
+    return "Owner already has write access";
+  }
+
+  const writers = meta.authorized_writers || [];
+  if (writers.some((w) => w.agent_id === writerAgentId)) {
+    return "Agent is already an authorized writer";
+  }
+  if (writers.length >= MAX_WRITERS_PER_FEED) {
+    return `Maximum writers reached (${MAX_WRITERS_PER_FEED})`;
+  }
+
+  const grant: AuthorizedWriter = {
+    agent_id: writerAgentId,
+    granted_at: new Date().toISOString(),
+  };
+  if (expiresAt) grant.expires_at = expiresAt;
+
+  meta.authorized_writers = [...writers, grant];
+  meta.updated_at = new Date().toISOString();
+  await putFeedMeta(env, meta);
+  await updateFeedIndex(env, meta);
+  return null;
+}
+
+/**
+ * Revoke write access from an agent on a feed. Returns error string or null on success.
+ */
+export async function revokeWriter(
+  env: Env,
+  meta: AgentFeedMeta,
+  writerAgentId: string
+): Promise<string | null> {
+  if (!meta.authorized_writers || meta.authorized_writers.length === 0) {
+    return "Agent is not an authorized writer";
+  }
+  const before = meta.authorized_writers.length;
+  meta.authorized_writers = meta.authorized_writers.filter((w) => w.agent_id !== writerAgentId);
+  if (meta.authorized_writers.length === before) {
+    return "Agent is not an authorized writer";
+  }
+
+  meta.updated_at = new Date().toISOString();
+  await putFeedMeta(env, meta);
+  await updateFeedIndex(env, meta);
+  return null;
+}
+
+/**
+ * Get the list of writer agent_ids (owner + authorized writers with valid expiry).
+ */
+export function getActiveWriterIds(meta: AgentFeedMeta): string[] {
+  const ids = [meta.owner_agent_id];
+  if (meta.authorized_writers) {
+    const now = new Date();
+    for (const w of meta.authorized_writers) {
+      if (w.expires_at && new Date(w.expires_at) <= now) continue;
+      ids.push(w.agent_id);
+    }
+  }
+  return ids;
+}
+
+// ── Feed Discovery Index ──
+
+const FEED_INDEX_KEY = "feed:index:public";
+
+function metaToIndexEntry(meta: AgentFeedMeta): FeedIndexEntry {
+  return {
+    source_id: meta.source_id,
+    name: meta.name,
+    description: meta.description,
+    tags: meta.tags,
+    owner_agent_id: meta.owner_agent_id,
+    cursor: meta.cursor,
+    item_count: meta.item_count,
+    created_at: meta.created_at,
+    writers_count: 1 + (meta.authorized_writers?.length || 0),
+  };
+}
+
+/**
+ * Upsert a feed entry in the global public index.
+ * Only public, enabled feeds are indexed.
+ */
+export async function updateFeedIndex(env: Env, meta: AgentFeedMeta): Promise<void> {
+  const index = await getRawFeedIndex(env);
+
+  if (meta.visibility === "public" && meta.enabled) {
+    const entry = metaToIndexEntry(meta);
+    const existingIdx = index.findIndex((e) => e.source_id === meta.source_id);
+    if (existingIdx >= 0) {
+      index[existingIdx] = entry;
+    } else {
+      index.push(entry);
+    }
+  } else {
+    const filtered = index.filter((e) => e.source_id !== meta.source_id);
+    if (filtered.length !== index.length) {
+      await env.FEEDS.put(FEED_INDEX_KEY, JSON.stringify(filtered));
+      return;
+    }
+  }
+
+  await env.FEEDS.put(FEED_INDEX_KEY, JSON.stringify(index));
+}
+
+/**
+ * Remove a feed from the global index.
+ */
+export async function removeFeedFromIndex(env: Env, sourceId: string): Promise<void> {
+  const index = await getRawFeedIndex(env);
+  const filtered = index.filter((e) => e.source_id !== sourceId);
+  if (filtered.length !== index.length) {
+    await env.FEEDS.put(FEED_INDEX_KEY, JSON.stringify(filtered));
+  }
+}
+
+/**
+ * Get the public feed index, optionally filtered by tags.
+ * Results sorted alphabetically by source_id (deterministic — no ranking).
+ */
+export async function getFeedIndex(
+  env: Env,
+  tags?: string[],
+  limit: number = 50
+): Promise<FeedIndexEntry[]> {
+  let index = await getRawFeedIndex(env);
+
+  if (tags && tags.length > 0) {
+    const tagSet = new Set(tags.map((t) => t.toLowerCase()));
+    index = index.filter((e) => e.tags.some((t) => tagSet.has(t)));
+  }
+
+  index.sort((a, b) => a.source_id.localeCompare(b.source_id));
+  return index.slice(0, Math.min(limit, 200));
+}
+
+async function getRawFeedIndex(env: Env): Promise<FeedIndexEntry[]> {
+  const raw = await env.FEEDS.get(FEED_INDEX_KEY);
+  if (!raw) return [];
+  try {
+    return JSON.parse(raw) as FeedIndexEntry[];
+  } catch {
+    return [];
+  }
 }
 
 // ── Access Control for Private Feeds ──

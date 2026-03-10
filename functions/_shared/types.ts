@@ -97,6 +97,13 @@ export interface MoltbookAgentCache {
 // DiffDelta validates, hosts, and serves them identically to curated feeds.
 // ─────────────────────────────────────────────────────────
 
+/** Write-access grant for multi-writer feeds */
+export interface AuthorizedWriter {
+  agent_id: string;               // 64-hex agent ID
+  granted_at: string;             // ISO 8601
+  expires_at?: string;            // ISO 8601 (optional, enforced server-side)
+}
+
 /** Stored in FEEDS KV under `feed:meta:{source_id}` */
 export interface AgentFeedMeta {
   source_id: string;              // e.g. "agent_ab12cd_my_security_feed"
@@ -112,6 +119,7 @@ export interface AgentFeedMeta {
   ttl_sec: number;                // Suggested polling interval (60-3600)
   visibility: "public" | "private"; // Access control level
   enabled: boolean;
+  authorized_writers?: AuthorizedWriter[]; // Max 20 — agents granted write access
 }
 
 /** Stored in FEEDS KV under `feed:registry:{agent_id}` */
@@ -145,6 +153,21 @@ export interface AgentFeedItem {
     content_hash: string;         // sha256:<64-char-hex>
   };
   source: string;                 // Source ID (auto-filled to feed source_id)
+  published_by?: string;          // agent_id of the writer (server-set, never trusted from input)
+  _safety_flags?: string[];       // Server-stamped injection pattern flags (never trusted from input)
+}
+
+/** Entry in the public feed discovery index */
+export interface FeedIndexEntry {
+  source_id: string;
+  name: string;
+  description: string;
+  tags: string[];
+  owner_agent_id: string;
+  cursor: string | null;
+  item_count: number;
+  created_at: string;
+  writers_count: number;
 }
 
 /** Feed publish limits */

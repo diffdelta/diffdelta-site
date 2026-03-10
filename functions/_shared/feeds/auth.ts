@@ -4,7 +4,7 @@
 
 import type { Env } from "../types";
 import { parseAgentIdHex, verifyEd25519Envelope } from "../self/crypto";
-import { getStoredCapsule } from "../self/store";
+import { getStoredCapsule, agentCapsuleExists } from "../self/store";
 import { errorResponse } from "../response";
 
 /**
@@ -63,9 +63,8 @@ export async function authenticateFeedWrite(
       signature,
       capsule: actionPayload,
     });
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : "signature_error";
-    return errorResponse(`Signature verification failed: ${msg}`, 401);
+  } catch {
+    return errorResponse("Signature verification failed", 401);
   }
 
   return { agent_id: agentIdHex };
@@ -73,13 +72,16 @@ export async function authenticateFeedWrite(
 
 /**
  * Authenticate a feed read request using X-Self-Agent-Id header.
- * The agent must have a bootstrapped Self Capsule.
+ * Verifies the claimed agent_id has a bootstrapped Self Capsule in KV —
+ * this prevents trivial spoofing where an attacker guesses a valid-format
+ * agent_id without having actually bootstrapped one.
  * Returns the agent_id or null (for unauthenticated reads).
  */
-export function extractAgentId(request: Request): string | null {
+export async function extractAgentId(request: Request, env: Env): Promise<string | null> {
   const raw = request.headers.get("X-Self-Agent-Id");
   if (!raw) return null;
   const hex = raw.trim().toLowerCase();
   if (!/^[0-9a-f]{64}$/.test(hex)) return null;
+  if (!await agentCapsuleExists(env, hex)) return null;
   return hex;
 }

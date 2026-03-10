@@ -14,7 +14,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
 
   // Authenticate via X-Self-Agent-Id
-  const agentId = extractAgentId(request);
+  const agentId = await extractAgentId(request, env);
   if (!agentId) {
     return errorResponse("Include X-Self-Agent-Id header with your agent_id", 401);
   }

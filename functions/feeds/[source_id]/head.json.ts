@@ -8,7 +8,7 @@
 import { jsonResponse, errorResponse } from "../../_shared/response";
 import type { Env } from "../../_shared/types";
 import { extractAgentId } from "../../_shared/feeds/auth";
-import { getFeedMeta, checkFeedReadAccess } from "../../_shared/feeds/store";
+import { getFeedMeta, checkFeedReadAccess, getActiveWriterIds } from "../../_shared/feeds/store";
 import { isValidSourceId } from "../../_shared/feeds/validate";
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
@@ -25,13 +25,15 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   }
 
   // Access control for private feeds (return 404 to prevent feed enumeration)
-  const requesterAgentId = extractAgentId(request);
+  const requesterAgentId = await extractAgentId(request, env);
   const access = await checkFeedReadAccess(env, meta, requesterAgentId);
   if (!access.allowed) {
     return errorResponse("Feed not found", 404);
   }
 
   const changed = meta.cursor !== meta.prev_cursor;
+
+  const writerIds = getActiveWriterIds(meta);
 
   const head: Record<string, unknown> = {
     cursor: meta.cursor,
@@ -44,6 +46,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       agent_id: meta.owner_agent_id,
       capsule_url: `/self/${meta.owner_agent_id}/capsule.json`,
     },
+    writers: writerIds,
     _protocol: {
       standard: "ddv1",
       spec: "/.well-known/diffdelta.json",

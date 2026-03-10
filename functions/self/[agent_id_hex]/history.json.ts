@@ -11,6 +11,7 @@
 import { jsonResponse, errorResponse } from "../../_shared/response";
 import type { Env } from "../../_shared/types";
 import { parseAgentIdHex } from "../../_shared/self/crypto";
+import { extractAgentId } from "../../_shared/feeds/auth";
 import { getHistory, getHistorySince, getStoredCapsule, checkCapsuleAccess } from "../../_shared/self/store";
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
@@ -27,9 +28,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   // private, history is private too (prevents leaking state via history endpoint).
   const stored = await getStoredCapsule(env, agentIdHex);
   if (stored) {
-    // Normalize to lowercase hex so case-insensitive agent IDs match correctly.
-    const rawRequester = request.headers.get("X-Self-Agent-Id");
-    const requesterAgentId = rawRequester ? rawRequester.trim().toLowerCase() : null;
+    const requesterAgentId = await extractAgentId(request, env);
     const access = checkCapsuleAccess(stored.capsule, agentIdHex, requesterAgentId, "history.json");
     if (!access.allowed) {
       return jsonResponse(
