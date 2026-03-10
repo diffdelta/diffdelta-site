@@ -20,10 +20,14 @@ const BAD_PATTERNS: RegExp[] = [
 
 // Secret-like patterns (examples; keep conservative).
 const SECRET_PATTERNS: RegExp[] = [
-  /\bsk-[A-Za-z0-9]{20,}\b/,                 // common API key prefix
+  /\bsk[-_][A-Za-z0-9_]{20,}\b/,             // common API key prefix (sk-xxx or sk_live_xxx)
   /\bdd_live_[A-Za-z0-9]{20,}\b/,            // DiffDelta key format
   /-----BEGIN [A-Z ]+PRIVATE KEY-----/,      // PEM private keys
   /\bAKIA[0-9A-Z]{16}\b/,                    // AWS access key id
+  /\bmoltbook_sk_[A-Za-z0-9_]{20,}\b/,       // Moltbook API key
+  /\bghp_[A-Za-z0-9]{36,}\b/,               // GitHub personal access token
+  /\bglpat-[A-Za-z0-9_-]{20,}\b/,           // GitLab personal access token
+  /\bxoxb-[0-9]{10,}-[A-Za-z0-9]+/,         // Slack bot token
 ];
 
 export interface SafetyFinding {
