@@ -579,15 +579,26 @@ server.resource(
 );
 
 // ─────────────────────────────────────────────────────────
-// Start — stdio transport
+// Smithery sandbox — allows registry to scan tools without credentials
 // ─────────────────────────────────────────────────────────
 
-async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
+export function createSandboxServer() {
+  return server;
 }
 
-main().catch((err) => {
-  console.error("MCP server failed to start:", err);
-  process.exit(1);
-});
+// ─────────────────────────────────────────────────────────
+// Start — stdio transport (only when run directly)
+// ─────────────────────────────────────────────────────────
+
+const isDirectRun =
+  typeof process !== "undefined" &&
+  process.argv[1] &&
+  (process.argv[1].endsWith("/index.js") || process.argv[1].endsWith("/index.cjs"));
+
+if (isDirectRun) {
+  const transport = new StdioServerTransport();
+  server.connect(transport).catch((err) => {
+    console.error("MCP server failed to start:", err);
+    process.exit(1);
+  });
+}
