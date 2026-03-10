@@ -1,7 +1,8 @@
 // Self Capsule cryptography helpers (v0: Ed25519-only).
 // Why: signed writes are the integrity boundary; reads are public.
+// Uses Web Crypto API only — no node:crypto, so it runs on Cloudflare
+// Workers/Pages Functions without nodejs_compat.
 
-import { createPublicKey, verify as ed25519Verify } from "node:crypto";
 import { canonicalJson } from "./canonical";
 
 export async function sha256Hex(data: Uint8Array): Promise<string> {
@@ -48,33 +49,27 @@ export interface SignedCapsuleEnvelope {
 }
 
 export async function verifyEd25519Envelope(env: SignedCapsuleEnvelope): Promise<void> {
-  // v0: Ed25519-only
   if (env.signature_alg && env.signature_alg !== "ed25519") {
     throw new Error("Unsupported signature_alg (v0: ed25519 only)");
   }
 
-  // Guard: required envelope fields must be present and be strings.
   if (typeof env.public_key !== "string") throw new Error("Missing public_key");
   if (typeof env.signature !== "string") throw new Error("Missing signature");
   if (env.capsule === undefined || env.capsule === null) throw new Error("Missing capsule");
 
   const agentIdHex = parseAgentIdHex(env.agent_id);
 
-  // public_key: require 32-byte hex for v0
   const pubHex = env.public_key.trim().toLowerCase();
   if (!/^[0-9a-f]{64}$/.test(pubHex)) throw new Error("Invalid public_key (expected 32-byte hex)");
   const pubKeyBytes = fromHex(pubHex);
 
-  // Verify binding: agent_id == sha256(public_key_bytes)
   const derived = await sha256Hex(pubKeyBytes);
   if (derived !== agentIdHex) throw new Error("agent_id does not match public_key");
 
-  // Signature: 64-byte hex
   const sigHex = env.signature.trim().toLowerCase();
   if (!/^[0-9a-f]{128}$/.test(sigHex)) throw new Error("Invalid signature (expected 64-byte hex)");
   const sigBytes = fromHex(sigHex);
 
-  // Message to sign: sha256(canonical_json({agent_id, seq, capsule}))
   const msgHashHex = await sha256HexOfJson({
     agent_id: agentIdHex,
     seq: env.seq,
@@ -82,8 +77,8 @@ export async function verifyEd25519Envelope(env: SignedCapsuleEnvelope): Promise
   });
   const msgBytes = fromHex(msgHashHex);
 
-  // Ed25519 SPKI DER: fixed 12-byte prefix for a 32-byte Ed25519 public key.
-  // OID 1.3.101.112 = Ed25519, wrapped in SEQUENCE { SEQUENCE { OID }, BIT STRING }.
+  // Import the raw 32-byte Ed25519 public key via Web Crypto API.
+  // Wrap in SPKI DER: 12-byte fixed prefix + 32-byte raw key.
   const ED25519_SPKI_PREFIX = new Uint8Array([
     0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65,
     0x70, 0x03, 0x21, 0x00,
@@ -94,16 +89,17 @@ export async function verifyEd25519Envelope(env: SignedCapsuleEnvelope): Promise
 
   let ok = false;
   try {
-    const key = createPublicKey({
-      key: Buffer.from(spkiDer),
-      format: "der",
-      type: "spki",
-    });
-    ok = ed25519Verify(null, Buffer.from(msgBytes), key, Buffer.from(sigBytes));
+    const key = await crypto.subtle.importKey(
+      "spki",
+      spkiDer,
+      { name: "Ed25519" },
+      false,
+      ["verify"]
+    );
+    ok = await crypto.subtle.verify("Ed25519", key, sigBytes, msgBytes);
   } catch {
     throw new Error("Ed25519 verification failed");
   }
 
   if (!ok) throw new Error("Invalid signature");
 }
-
