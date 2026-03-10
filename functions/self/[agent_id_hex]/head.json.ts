@@ -7,7 +7,7 @@
 import { jsonResponse, errorResponse } from "../../_shared/response";
 import type { Env } from "../../_shared/types";
 import { parseAgentIdHex } from "../../_shared/self/crypto";
-import { getStoredCapsule, getWritesUsed24h, dayResetAtIsoUTC, checkCapsuleAccess } from "../../_shared/self/store";
+import { getStoredCapsule, getWritesUsed24h, dayResetAtIsoUTC } from "../../_shared/self/store";
 
 // v0: single generous tier — all agents get 50 writes/day.
 const WRITE_LIMIT_24H = 50;
@@ -26,17 +26,8 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     return errorResponse("Capsule not found", 404);
   }
 
-  // Access control: if capsule is private, verify requester has READ_HEAD scope.
-  // Normalize to lowercase hex so case-insensitive agent IDs match correctly.
-  const rawRequester = request.headers.get("X-Self-Agent-Id");
-  const requesterAgentId = rawRequester ? rawRequester.trim().toLowerCase() : null;
-  const access = checkCapsuleAccess(stored.capsule, agentIdHex, requesterAgentId, "head.json");
-  if (!access.allowed) {
-    return jsonResponse(
-      { error: "access_denied", detail: access.reason, agent_id: agentIdHex },
-      403
-    );
-  }
+  // head.json is ALWAYS public per spec — no access control check.
+  // It contains only cursor, metadata, and write quota — no capsule content.
 
   const used = await getWritesUsed24h(env, agentIdHex);
   const remaining = Math.max(0, WRITE_LIMIT_24H - used);
