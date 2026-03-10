@@ -362,7 +362,8 @@ export async function removeFeedFromIndex(env: Env, sourceId: string): Promise<v
 export async function getFeedIndex(
   env: Env,
   tags?: string[],
-  limit: number = 50
+  limit: number = 50,
+  query?: string
 ): Promise<FeedIndexEntry[]> {
   let index = await getRawFeedIndex(env);
 
@@ -371,7 +372,23 @@ export async function getFeedIndex(
     index = index.filter((e) => e.tags.some((t) => tagSet.has(t)));
   }
 
-  index.sort((a, b) => a.source_id.localeCompare(b.source_id));
+  if (query) {
+    const tokens = query.toLowerCase().split(/\s+/).filter((t) => t.length >= 2);
+    if (tokens.length > 0) {
+      const scored = index.map((e) => {
+        const haystack = `${e.name} ${e.description} ${e.tags.join(" ")}`.toLowerCase();
+        const hits = tokens.filter((t) => haystack.includes(t)).length;
+        return { entry: e, score: hits };
+      });
+      index = scored
+        .filter((s) => s.score > 0)
+        .sort((a, b) => b.score - a.score || a.entry.source_id.localeCompare(b.entry.source_id))
+        .map((s) => s.entry);
+    }
+  } else {
+    index.sort((a, b) => a.source_id.localeCompare(b.source_id));
+  }
+
   return index.slice(0, Math.min(limit, 200));
 }
 

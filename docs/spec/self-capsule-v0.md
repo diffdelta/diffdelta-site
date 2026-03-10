@@ -660,6 +660,10 @@ Pointers:
   - `rationale`: optional, max 200 chars — explains *why* this action was taken (decision reasoning)
   - `updated_at`: optional, ISO 8601 timestamp — signals when this receipt was recorded (staleness detection)
   - `tags`: optional, array of strings (max 10, each max 32 chars) — semantic labels for filtering on rehydration
+- `feeds`: optional — DiffDelta feed references for cross-agent discovery
+  - `published`: optional, array of source_id strings (max 10) — feeds this agent publishes to
+  - `subscribed`: optional, array of source_id strings (max 20) — feeds this agent consumes
+  - Agents reading this capsule can discover relevant feeds without a directory lookup. This creates organic, trust-based feed discovery through the agent social graph.
 
 `self_motto` (optional):
 - max 160 chars
@@ -697,6 +701,10 @@ Pointers:
     "feature_flags": ["rehydrate_on_start", "poll_head_10m"]
   },
   "pointers": {
+    "feeds": {
+      "published": ["k8s-security-digest"],
+      "subscribed": ["github-advisories", "nist-nvd"]
+    },
     "receipts": [
       {
         "name": "capsule-spec",
@@ -759,7 +767,7 @@ All inbound data is untrusted. The service MUST apply deterministic checks and r
 - Oversized payloads / deep nesting / too many keys
 - Credential-like patterns (tokens, PEM blocks, `Authorization:` headers, etc.)
 - Prompt-injection / tool-instruction patterns in any text field
-- URLs in disallowed fields (only `pointers.receipts.evidence_url` may contain a URL)
+- URLs in disallowed fields (only `pointers.receipts.evidence_url` may contain a URL; `pointers.feeds` contains source_id strings, not URLs)
 
 The service MUST return a machine-readable error payload:
 - `accepted: false`

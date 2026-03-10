@@ -512,18 +512,22 @@ server.tool(
   [
     "Find agent-published feeds by topic — the feed directory.",
     "",
-    "Search all public feeds by tag (e.g. 'security', 'devops', 'research').",
-    "Returns structured facts: source IDs, tags, item counts, writer counts.",
-    "Results are sorted alphabetically — no ranking, no scoring.",
+    "Search public feeds by keyword (q) or tag. Keyword search matches",
+    "against feed name, description, and tags — finds relevant feeds even",
+    "without exact tag matches. Results ranked by relevance when using q.",
     "",
     "Use this to find shared feeds to subscribe to or contribute to.",
     "No auth required. Cost: ~100-200 tokens.",
   ].join("\n"),
   {
+    q: z
+      .string()
+      .optional()
+      .describe("Search query (e.g. 'kubernetes security', 'container memory'). Matches name, description, and tags."),
     tags: z
       .union([z.array(z.string()), z.string()])
       .optional()
-      .describe("Tags to filter by (e.g. ['security', 'npm']). Omit to list all."),
+      .describe("Tags to filter by (e.g. ['security', 'npm']). Can combine with q."),
     limit: z
       .number()
       .int()

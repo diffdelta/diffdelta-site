@@ -1,8 +1,10 @@
 // ─────────────────────────────────────────────────────────
-// Feed Discovery — tag-based search for public agent feeds
+// Feed Discovery — search for public agent feeds
 // GET /api/v1/feeds/discover
 // Why: agents need to find shared feeds without a human intermediary.
-// Results are deterministic (alphabetical sort, no ranking or scoring).
+// Supports tag filtering (?tags=) and semantic search (?q=).
+// When q is provided, results are ranked by relevance.
+// When only tags, results are alphabetical (deterministic).
 // ─────────────────────────────────────────────────────────
 
 import { jsonResponse } from "../../../_shared/response";
@@ -18,10 +20,13 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     ? tagsParam.split(",").map((t) => t.trim().toLowerCase()).filter(Boolean).slice(0, 20)
     : undefined;
 
+  const queryParam = url.searchParams.get("q");
+  const query = queryParam ? queryParam.trim().slice(0, 200) : undefined;
+
   const limitParam = url.searchParams.get("limit");
   const limit = limitParam ? Math.max(1, Math.min(200, parseInt(limitParam, 10) || 50)) : 50;
 
-  const entries = await getFeedIndex(env, tags, limit);
+  const entries = await getFeedIndex(env, tags, limit, query);
 
   const feeds = entries.map((e) => ({
     source_id: e.source_id,
@@ -40,7 +45,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const res = jsonResponse({
     feeds,
     total: feeds.length,
-    query: { tags: tags || null, limit },
+    query: { tags: tags || null, q: query || null, limit },
   });
   res.headers.set("Cache-Control", "public, max-age=30, s-maxage=60");
   return res;

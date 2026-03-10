@@ -44,9 +44,11 @@ export async function handleDiffdeltaDiscover(
       ? [args.tags]
       : [];
   const limit = typeof args.limit === "number" ? args.limit : 50;
+  const query = typeof args.q === "string" ? args.q.trim() : "";
 
   const params = new URLSearchParams();
   if (tags.length > 0) params.set("tags", tags.join(","));
+  if (query) params.set("q", query);
   if (limit !== 50) params.set("limit", String(limit));
   const qs = params.toString();
   const path = `/api/v1/feeds/discover${qs ? `?${qs}` : ""}`;
@@ -71,11 +73,14 @@ export async function handleDiffdeltaDiscover(
 
   const feeds = res.data.feeds || [];
   if (feeds.length === 0) {
+    const parts: string[] = [];
+    if (query) parts.push(`query "${query}"`);
+    if (tags.length > 0) parts.push(`tags: ${tags.join(", ")}`);
     return textResult({
       feeds: [],
       total: 0,
-      detail: tags.length > 0
-        ? `No public feeds found with tags: ${tags.join(", ")}`
+      detail: parts.length > 0
+        ? `No public feeds found matching ${parts.join(" and ")}.`
         : "No public feeds found.",
     });
   }
