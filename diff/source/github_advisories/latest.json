@@ -1,19 +1,1248 @@
 {
   "schema_version": "1.2.0",
-  "generated_at": "2026-03-10T23:46:21Z",
+  "generated_at": "2026-03-11T00:23:38Z",
   "source_id": "github_advisories",
-  "hash": "sha256:061510a6950646312d8b8b5ee10e80b89f36e53a322103ec32d47b1445aab0cc",
-  "prev_hash": "sha256:2fdb803e46aaab6140eb7000e3128180b8b2a6fa5223bf753e616aaa9b6b1d00",
-  "cursor": "sha256:a5068b851d50a0b7b733932fad1a933897a253a1ba7ffb053777ba75264ae0bb",
-  "prev_cursor": "sha256:758094a2c50cb577af05bd80bf7547f168b5c22da81bbe5b82c379f70aec7785",
+  "hash": "sha256:72ff8508664ef4f2560227bbc68e6eb8ebbea49031fe9ff1b546c00b5e67016b",
+  "prev_hash": "sha256:061510a6950646312d8b8b5ee10e80b89f36e53a322103ec32d47b1445aab0cc",
+  "cursor": "sha256:fe867a78aca18adeef3851a0169181a743c7e8e4680e789ddc6cc18a861ab866",
+  "prev_cursor": "sha256:a5068b851d50a0b7b733932fad1a933897a253a1ba7ffb053777ba75264ae0bb",
   "changed": true,
   "ttl_sec": 3600,
   "sources_included": [
     "github_advisories"
   ],
-  "batch_narrative": "github_advisories: 100 advisories (16 critical, 39 high, 40 medium, 5 low).",
+  "batch_narrative": "github_advisories: 100 advisories (12 critical, 41 high, 44 medium, 3 low).",
   "buckets": {
     "items": [
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31828",
+        "url": "https://github.com/advisories/GHSA-7m6r-fhh7-r47c",
+        "published_at": "2026-03-11T00:23:21Z",
+        "updated_at": "2026-03-11T00:23:24Z",
+        "headline": "Parse Server vulnerable to LDAP injection via unsanitized user input in DN and group filter construction",
+        "content": {
+          "excerpt_text": "### Impact The LDAP authentication adapter is vulnerable to LDAP injection. User-supplied input (`authData.id`) is interpolated directly into LDAP Distinguished Names (DN) and group search filters without escaping special characters. This allows an attacker with valid LDAP credentials to manipulate the bind DN structure and to bypass group membership checks. This enables privilege escalation from any authenticated LDAP user to a member of any restricted group. The vulnerability affects Parse...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-7m6r-fhh7-r47c"
+          ],
+          "content_hash": "sha256:8c79b1b98c4848b4109ae5cd393f52811a116665b55c9e487729d60b814dda8b"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-90"
+            ],
+            "packages": [
+              "npm:parse-server",
+              "npm:parse-server"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-7m6r-fhh7-r47c"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31800",
+        "url": "https://github.com/advisories/GHSA-7xg7-rqf6-pw6c",
+        "published_at": "2026-03-11T00:23:01Z",
+        "updated_at": "2026-03-11T00:23:04Z",
+        "headline": "Parse Server: Classes `_GraphQLConfig` and `_Audience` master key bypass via generic class routes",
+        "content": {
+          "excerpt_text": "### Impact The `_GraphQLConfig` and `_Audience` internal classes can be read, modified, and deleted via the generic `/classes/_GraphQLConfig` and `/classes/_Audience` REST API routes without master key authentication. This bypasses the master key enforcement that exists on the dedicated `/graphql-config` and `/push_audiences` endpoints. An attacker can read, modify and delete GraphQL configuration and push audience data. ### Patches The fix adds the affected internal classes to the...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-7xg7-rqf6-pw6c"
+          ],
+          "content_hash": "sha256:f1512aeaae60b9f60ced558276fa2df4ad0d76104f569e1c5a24fc82b3bdf770"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-862"
+            ],
+            "packages": [
+              "npm:parse-server",
+              "npm:parse-server"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-7xg7-rqf6-pw6c"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30973",
+        "url": "https://github.com/advisories/GHSA-rfx7-4xw3-gh4m",
+        "published_at": "2026-03-11T00:22:38Z",
+        "updated_at": "2026-03-11T00:22:39Z",
+        "headline": "@appium/support has a Zip Slip arbitrary file write in its ZIP extraction",
+        "content": {
+          "excerpt_text": "## Summary `@appium/support` contains a ZIP extraction implementation (`extractAllTo()` via `ZipExtractor.extract()`) with a path traversal (Zip Slip) check that is non-functional. The check at line 88 of `packages/support/lib/zip.js` creates an `Error` object but never throws it, allowing malicious ZIP entries with `../` path components to write files outside the intended destination directory. This affects all JS-based extractions (the default code path), not only those using the...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-rfx7-4xw3-gh4m"
+          ],
+          "content_hash": "sha256:2f4882e9e4779078beb8757c3a8d61e39529130189c58a34797edc6c1ea3a4c2"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cvss": 6.5,
+            "cwes": [
+              "CWE-22"
+            ],
+            "packages": [
+              "npm:@appium/support"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-rfx7-4xw3-gh4m"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30972",
+        "url": "https://github.com/advisories/GHSA-775h-3xrc-c228",
+        "published_at": "2026-03-11T00:21:51Z",
+        "updated_at": "2026-03-11T00:21:54Z",
+        "headline": "Parse Server has a rate limit bypass via batch request endpoint",
+        "content": {
+          "excerpt_text": "### Impact Parse Server's rate limiting middleware is applied at the Express middleware layer, but the batch request endpoint (`/batch`) processes sub-requests internally by routing them directly through the Promise router, bypassing Express middleware including rate limiting. An attacker can bundle multiple requests targeting a rate-limited endpoint into a single batch request to circumvent the configured rate limit. Any Parse Server deployment that relies on the built-in rate limiting...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-775h-3xrc-c228"
+          ],
+          "content_hash": "sha256:d453043ae5e4acc78500f0763a69ae2721fe42aae8e03c2995836bea27d8f9e0"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-799"
+            ],
+            "packages": [
+              "npm:parse-server",
+              "npm:parse-server"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-775h-3xrc-c228"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30967",
+        "url": "https://github.com/advisories/GHSA-fr88-w35c-r596",
+        "published_at": "2026-03-11T00:21:37Z",
+        "updated_at": "2026-03-11T00:21:39Z",
+        "headline": "Parse Server OAuth2 authentication adapter account takeover via identity spoofing",
+        "content": {
+          "excerpt_text": "### Impact The OAuth2 authentication adapter, when configured without the `useridField` option, only verifies that a token is active via the provider's token introspection endpoint, but does not verify that the token belongs to the user identified by `authData.id`. An attacker with any valid OAuth2 token from the same provider can authenticate as any other user. This affects any Parse Server deployment that uses the generic OAuth2 authentication adapter (configured with `oauth2: true`)...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-fr88-w35c-r596"
+          ],
+          "content_hash": "sha256:0a599aee6bdd54a70c9481ff1a07234b349ee8441dac595bc6d53f9fb76c58ab"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-287"
+            ],
+            "packages": [
+              "npm:parse-server",
+              "npm:parse-server"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-fr88-w35c-r596"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30966",
+        "url": "https://github.com/advisories/GHSA-5f92-jrq3-28rc",
+        "published_at": "2026-03-11T00:21:07Z",
+        "updated_at": "2026-03-11T00:21:09Z",
+        "headline": "Parse Server has role escalation and CLP bypass via direct `_Join` table write",
+        "content": {
+          "excerpt_text": "### Impact Parse Server's internal tables, which store Relation field mappings such as role memberships, can be directly accessed via the REST API or GraphQL API by any client using only the application key. No master key is required. An attacker can create, read, update, or delete records in any internal relationship table. Exploiting this allows the attacker to inject themselves into any Parse Role, gaining all permissions associated with that role, including full read, write, and delete...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-5f92-jrq3-28rc"
+          ],
+          "content_hash": "sha256:9f11fa1ce4953f6384a84827c4afb04bc8f725b2c447647eb6b743ef284516b0"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "github_advisory",
+            "cvss": 10.0,
+            "cwes": [
+              "CWE-284"
+            ],
+            "packages": [
+              "npm:parse-server",
+              "npm:parse-server"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-5f92-jrq3-28rc"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30965",
+        "url": "https://github.com/advisories/GHSA-6r2j-cxgf-495f",
+        "published_at": "2026-03-11T00:20:38Z",
+        "updated_at": "2026-03-11T00:20:39Z",
+        "headline": "Parse Server vulnerable to session token exfiltration via `redirectClassNameForKey` query parameter",
+        "content": {
+          "excerpt_text": "### Impact A vulnerability in Parse Server's query handling allows an authenticated or unauthenticated attacker to exfiltrate session tokens of other users by exploiting the `redirectClassNameForKey` query parameter. Exfiltrated session tokens can be used to take over user accounts. The vulnerability requires the attacker to be able to create or update an object with a new relation field, which depends on the Class-Level Permissions of at least one class. ### Patches The fix applies the same...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-6r2j-cxgf-495f"
+          ],
+          "content_hash": "sha256:28fb2c63747b3e09e33b61b60937411f68e41038377493e8a8323c9778b7153c"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-863"
+            ],
+            "packages": [
+              "npm:parse-server",
+              "npm:parse-server"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-6r2j-cxgf-495f"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30962",
+        "url": "https://github.com/advisories/GHSA-72hp-qff8-4pvv",
+        "published_at": "2026-03-11T00:19:57Z",
+        "updated_at": "2026-03-11T00:19:58Z",
+        "headline": "Parse Server has a protected fields bypass via logical query operators",
+        "content": {
+          "excerpt_text": "### Impact The validation for protected fields only checks top-level query keys. By wrapping a query constraint on a protected field inside a logical operator, the check is bypassed entirely. This allows any authenticated user to query on protected fields to extract field values. All Parse Server deployments have default protected fields and are vulnerable. ### Patches The fix adds recursive validation of sub-queries with logical operators, consistent with the existing recursive validation...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-72hp-qff8-4pvv"
+          ],
+          "content_hash": "sha256:f4efddd8d30720fd7ded0e09a0a9e98ef508a0168d7925c32d43d53e8c3b5ad3"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-284"
+            ],
+            "packages": [
+              "npm:parse-server",
+              "npm:parse-server"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-72hp-qff8-4pvv"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30951",
+        "url": "https://github.com/advisories/GHSA-6457-6jrx-69cr",
+        "published_at": "2026-03-11T00:18:48Z",
+        "updated_at": "2026-03-11T00:18:49Z",
+        "headline": "Sequelize v6 Vulnerable to SQL Injection via JSON Column Cast Type",
+        "content": {
+          "excerpt_text": "### Summary SQL injection via unescaped cast type in JSON/JSONB `where` clause processing. The `_traverseJSON()` function splits JSON path keys on `::` to extract a cast type, which is interpolated raw into `CAST(... AS )` SQL. An attacker who controls JSON object keys can inject arbitrary SQL and exfiltrate data from any table. Affected: v6.x through 6.37.7. v7 (`@sequelize/core`) is not affected. ### Details In `src/dialects/abstract/query-generator.js`, `_traverseJSON()` extracts a cast...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-6457-6jrx-69cr"
+          ],
+          "content_hash": "sha256:2a6e7393705098b48bd39772eef1960c2108d9cff57e3c3e20291297989e96f3"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cvss": 7.5,
+            "cwes": [
+              "CWE-89"
+            ],
+            "packages": [
+              "npm:sequelize"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-6457-6jrx-69cr"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30949",
+        "url": "https://github.com/advisories/GHSA-48mh-j4p5-7j9v",
+        "published_at": "2026-03-11T00:17:53Z",
+        "updated_at": "2026-03-11T00:17:53Z",
+        "headline": "Parse Server missing audience validation in Keycloak authentication adapter",
+        "content": {
+          "excerpt_text": "### Impact The Keycloak authentication adapter does not validate the `azp` (authorized party) claim of Keycloak access tokens against the configured `client-id`. A valid access token issued by the same Keycloak realm for a *different* client application can be used to authenticate as any user on the Parse Server that uses the Keycloak adapter. This enables cross-application account takeover in multi-client Keycloak realms. All Parse Server deployments that use the Keycloak authentication...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-48mh-j4p5-7j9v"
+          ],
+          "content_hash": "sha256:de02655657bf58dea5c59d08332c525462b96d78c7f2f42c90f050712a50d348"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-287"
+            ],
+            "packages": [
+              "npm:parse-server",
+              "npm:parse-server"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-48mh-j4p5-7j9v"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30948",
+        "url": "https://github.com/advisories/GHSA-hcj7-6gxh-24ww",
+        "published_at": "2026-03-11T00:17:35Z",
+        "updated_at": "2026-03-11T00:17:38Z",
+        "headline": "Parse Server vulnerable to stored cross-site scripting (XSS) via SVG file upload",
+        "content": {
+          "excerpt_text": "### Impact A stored cross-site scripting (XSS) vulnerability allows any authenticated user to upload an SVG file containing JavaScript. The file is served inline with `Content-Type: image/svg+xml` and without protective headers, causing the browser to execute embedded scripts in the Parse Server origin. This can be exploited to steal session tokens from `localStorage` and achieve account takeover. The default `fileExtensions` option blocks HTML file extensions but does not block SVG, which...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-hcj7-6gxh-24ww"
+          ],
+          "content_hash": "sha256:a623d3fa4428b04777dba92fbabf6a1318e0c81ed70861e105bf799edf74b1f0"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-79"
+            ],
+            "packages": [
+              "npm:parse-server",
+              "npm:parse-server"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-hcj7-6gxh-24ww"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30947",
+        "url": "https://github.com/advisories/GHSA-7ch5-98q2-7289",
+        "published_at": "2026-03-11T00:17:16Z",
+        "updated_at": "2026-03-11T00:17:18Z",
+        "headline": "Parse Server has a bypass of class-level permissions in LiveQuery",
+        "content": {
+          "excerpt_text": "### Impact Class-level permissions (CLP) are not enforced for LiveQuery subscriptions. An unauthenticated or unauthorized client can subscribe to any LiveQuery-enabled class and receive real-time events for all objects, regardless of CLP restrictions. All Parse Server deployments that use LiveQuery with class-level permissions are affected. Data intended to be restricted by CLP is leaked to unauthorized subscribers in real time. ### Patches The fix enforces CLP before creating the...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-7ch5-98q2-7289"
+          ],
+          "content_hash": "sha256:50316a44e483008a58bc32e0e61b0d204748a0ba7d83304e7b26469accbad8af"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-863"
+            ],
+            "packages": [
+              "npm:parse-server",
+              "npm:parse-server"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-7ch5-98q2-7289"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30946",
+        "url": "https://github.com/advisories/GHSA-cmj3-wx7h-ffvg",
+        "published_at": "2026-03-11T00:16:48Z",
+        "updated_at": "2026-03-11T00:16:49Z",
+        "headline": "Parse Server affected by denial-of-service via unbounded query complexity in REST and GraphQL API",
+        "content": {
+          "excerpt_text": "### Impact An unauthenticated attacker can exhaust Parse Server resources (CPU, memory, database connections) through crafted queries that exploit the lack of complexity limits in the REST and GraphQL APIs. All Parse Server deployments using the REST or GraphQL API are affected. ### Patches The vulnerability is fixed by introducing configurable request complexity limits via the `requestComplexity` server option with the following keys: - `subqueryDepth`: Maximum nesting depth for `$inQuery`,...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-cmj3-wx7h-ffvg"
+          ],
+          "content_hash": "sha256:f672a47bd8e2ce3373e40c7c7caa475c8cfe40c806d7d81fc0881809757c2f76"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-770"
+            ],
+            "packages": [
+              "npm:parse-server",
+              "npm:parse-server"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-cmj3-wx7h-ffvg"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30945",
+        "url": "https://github.com/advisories/GHSA-8rgj-vrfr-6hqr",
+        "published_at": "2026-03-11T00:16:41Z",
+        "updated_at": "2026-03-11T00:16:43Z",
+        "headline": "StudioCMS: IDOR — Arbitrary API Token Revocation Leading to Denial of Service",
+        "content": {
+          "excerpt_text": "## Summary The DELETE /studiocms_api/dashboard/api-tokens endpoint allows any authenticated user with editor privileges or above to revoke API tokens belonging to any other user, including admin and owner accounts. The handler accepts tokenID and userID directly from the request payload without verifying token ownership, caller identity, or role hierarchy. This enables targeted denial of service against critical integrations and automations. ## Details #### Vulnerable Code The following is...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-8rgj-vrfr-6hqr"
+          ],
+          "content_hash": "sha256:c277f9589f9d7a785cbca725fee311059c8b3d0084c026166ed0fbf563c04e60"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cvss": 7.1,
+            "cwes": [
+              "CWE-639"
+            ],
+            "packages": [
+              "npm:studiocms"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-8rgj-vrfr-6hqr"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-30941",
+        "url": "https://github.com/advisories/GHSA-vgjh-hmwf-c588",
+        "published_at": "2026-03-11T00:16:26Z",
+        "updated_at": "2026-03-11T00:16:28Z",
+        "headline": "Parse Server has a NoSQL injection via token type in password reset and email verification endpoints",
+        "content": {
+          "excerpt_text": "### Impact A NoSQL injection vulnerability allows an unauthenticated attacker to inject MongoDB query operators via the `token` field in the password reset and email verification resend endpoints. The `token` value is passed to database queries without type validation and can be used to extract password reset and email verification tokens. Any Parse Server deployment using MongoDB with email verification or password reset enabled is affected. When `emailVerifyTokenReuseIfValid` is...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-vgjh-hmwf-c588"
+          ],
+          "content_hash": "sha256:c254a5e1e65cb434e457192afcc475aba866df6b5b908b4ed72a984b00587ee3"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-943"
+            ],
+            "packages": [
+              "npm:parse-server",
+              "npm:parse-server"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-vgjh-hmwf-c588"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31826",
+        "url": "https://github.com/advisories/GHSA-hqmh-ppp3-xvm7",
+        "published_at": "2026-03-11T00:14:02Z",
+        "updated_at": "2026-03-11T00:14:03Z",
+        "headline": "pypdf: manipulated stream length values can exhaust RAM",
+        "content": {
+          "excerpt_text": "### Impact An attacker who uses this vulnerability can craft a PDF which leads to large memory usage. This requires parsing a content stream with a rather large `/Length` value, regardless of the actual data length inside the stream. ### Patches This has been fixed in [pypdf==6.8.0](https://github.com/py-pdf/pypdf/releases/tag/6.8.0). ### Workarounds If you cannot upgrade yet, consider applying the changes from PR [#3675](https://github.com/py-pdf/pypdf/pull/3675). As far as we are aware,...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-hqmh-ppp3-xvm7"
+          ],
+          "content_hash": "sha256:f0724d450990d61404f19966809b53f5097857315df6265a1eb71220f8662a09"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-770"
+            ],
+            "packages": [
+              "pip:pypdf"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-hqmh-ppp3-xvm7"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31825",
+        "url": "https://github.com/advisories/GHSA-xcwx-r2gw-w93m",
+        "published_at": "2026-03-11T00:13:41Z",
+        "updated_at": "2026-03-11T00:13:43Z",
+        "headline": "Sylius has a DQL Injection via API Order Filters",
+        "content": {
+          "excerpt_text": "### Impact Sylius API filters `ProductPriceOrderFilter` and `TranslationOrderNameAndLocaleFilter` pass user-supplied order direction values directly to Doctrine's `orderBy()` without validation. An attacker can inject arbitrary DQL: ``` GET /api/v2/shop/products?order[price]=ASC,%20variant.code%20DESC ``` ### Patches The issue is fixed in versions: 1.9.12, 1.10.16, 1.11.17, 1.12.23, 1.13.15, 1.14.18, 2.0.16, 2.1.12, 2.2.3 and above. ### Workarounds An `EventSubscriber` that sanitizes `order`...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-xcwx-r2gw-w93m"
+          ],
+          "content_hash": "sha256:0926f8671f092024ded0a675b2172e85ae80a66e69a5bee33ff125a6e21098a3"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cvss": 5.3,
+            "cwes": [
+              "CWE-89",
+              "CWE-943"
+            ],
+            "packages": [
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-xcwx-r2gw-w93m"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31824",
+        "url": "https://github.com/advisories/GHSA-7mp4-25j8-hp5q",
+        "published_at": "2026-03-11T00:13:29Z",
+        "updated_at": "2026-03-11T00:13:33Z",
+        "headline": "Sylius has a Promotion Usage Limit Bypass via Race Condition",
+        "content": {
+          "excerpt_text": "### Impact A Time-of-Check To Time-of-Use (TOCTOU) race condition was discovered in the promotion usage limit enforcement. The same class of vulnerability affects three independent limits: 1. **Promotion usage limit** - the global `used` counter on `Promotion` entities 2. **Coupon usage limit** - the global `used` counter on `PromotionCoupon` entities 3. **Coupon per-customer usage limit** - the per-customer redemption count on `PromotionCoupon` entities In all three cases, the eligibility...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-7mp4-25j8-hp5q"
+          ],
+          "content_hash": "sha256:a05309f0e69b612e5065266ba6f35533f0da990c1661bea516576bfffc0830b3"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cvss": 8.2,
+            "cwes": [
+              "CWE-362",
+              "CWE-367"
+            ],
+            "packages": [
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-7mp4-25j8-hp5q"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31823",
+        "url": "https://github.com/advisories/GHSA-mx4q-xxc9-pf5q",
+        "published_at": "2026-03-11T00:13:20Z",
+        "updated_at": "2026-03-11T00:13:23Z",
+        "headline": "Sylius Vulnerable to Authenticated Stored XSS",
+        "content": {
+          "excerpt_text": "### Impact An authenticated stored cross-site scripting (XSS) vulnerability exists in multiple places across the shop frontend and admin panel due to unsanitized entity names being rendered as raw HTML. **Shop breadcrumbs** (`shared/breadcrumbs.html.twig`): The `breadcrumbs` macro uses the Twig `|raw` filter on label values. Since taxon names, product names, and ancestor names flow directly into these labels, a malicious taxon name like ` ` is rendered and executed as JavaScript on the...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-mx4q-xxc9-pf5q"
+          ],
+          "content_hash": "sha256:64bcf042846a87d98689fa44d54f9c397e1bf91ccc9856024088a527b4c759e4"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cvss": 4.8,
+            "cwes": [
+              "CWE-79"
+            ],
+            "packages": [
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-mx4q-xxc9-pf5q"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31822",
+        "url": "https://github.com/advisories/GHSA-vgh8-c6fp-7gcg",
+        "published_at": "2026-03-11T00:13:02Z",
+        "updated_at": "2026-03-11T00:13:03Z",
+        "headline": "Sylius has a XSS vulnerability in checkout login form",
+        "content": {
+          "excerpt_text": "### Impact A cross-site scripting (XSS) vulnerability exists in the shop checkout login form handled by the ApiLoginController Stimulus controller. When a login attempt fails, AuthenticationFailureHandler returns a JSON response whose message field is rendered into the DOM using innerHTML, allowing any HTML or JavaScript in that value to be parsed and executed by the browser. The message value originates from `AuthenticationException::getMessageKey()` passed through Symfony's translator...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-vgh8-c6fp-7gcg"
+          ],
+          "content_hash": "sha256:ae94c21279a463b5e5e7941bf2ef6b41d177b489aef5d5dcf0c2dc6e6b258d15"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-79"
+            ],
+            "packages": [
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-vgh8-c6fp-7gcg"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31821",
+        "url": "https://github.com/advisories/GHSA-wjmg-4cq5-m8hg",
+        "published_at": "2026-03-11T00:12:54Z",
+        "updated_at": "2026-03-11T00:12:58Z",
+        "headline": "Sylius is Missing Authorization in API v2 Add Item Endpoint",
+        "content": {
+          "excerpt_text": "### Impact The `POST /api/v2/shop/orders/{tokenValue}/items` endpoint does not verify cart ownership. An unauthenticated attacker can add items to other registered customers' carts by knowing the cart `tokenValue`. ``` POST /api/v2/shop/orders/{tokenValue}/items ``` Other mutation endpoints (PUT, PATCH, DELETE) are **not affected**. API Platform loads the Order entity through the state provider for these operations, which triggers `VisitorBasedExtension` and returns 404 for unauthorized...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-wjmg-4cq5-m8hg"
+          ],
+          "content_hash": "sha256:3ab5ba73a77b1246fa340828d0a5447c9290f301b970587c4df0eacea7d6eb7a"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-862"
+            ],
+            "packages": [
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-wjmg-4cq5-m8hg"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31820",
+        "url": "https://github.com/advisories/GHSA-2xc6-348p-c2x6",
+        "published_at": "2026-03-11T00:12:47Z",
+        "updated_at": "2026-03-11T00:12:48Z",
+        "headline": "Sylius affected by IDOR in Cart and Checkout LiveComponents",
+        "content": {
+          "excerpt_text": "### Impact An authenticated Insecure Direct Object Reference (IDOR) vulnerability exists in multiple shop LiveComponents due to unvalidated resource IDs accepted via `#[LiveArg]` parameters. Unlike props, which are protected by LiveComponent's `@checksum`, `args` are fully user-controlled - any action that accepts a resource ID via `#[LiveArg]` and loads it with `->find()` without ownership validation is vulnerable. Checkout address **FormComponent** (`addressFieldUpdated` action): Accepts...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-2xc6-348p-c2x6"
+          ],
+          "content_hash": "sha256:3d6d0b8a7b01c9c8bdeba0e1d71ecd16762cfab811d2703a95761d0bb86b5c28"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-639"
+            ],
+            "packages": [
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-2xc6-348p-c2x6"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31819",
+        "url": "https://github.com/advisories/GHSA-9ffx-f77r-756w",
+        "published_at": "2026-03-11T00:12:29Z",
+        "updated_at": "2026-03-11T00:12:33Z",
+        "headline": "Sylius has an Open Redirect via Referer Header",
+        "content": {
+          "excerpt_text": "### Impact `CurrencySwitchController::switchAction()`, `ImpersonateUserController::impersonateAction()` and `StorageBasedLocaleSwitcher::handle()` use the HTTP Referer header directly when redirecting. The attack requires the victim to click a legitimate application link placed on an attacker-controlled page. The browser automatically sends the attacker's site as the Referer, and the application redirects back to it. This can be used for phishing or credential theft, as the redirect...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-9ffx-f77r-756w"
+          ],
+          "content_hash": "sha256:85d0651d24f04da08874319eb4e3cea1cdbac2aa2658d12081dd93ebe5a3432e"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-601"
+            ],
+            "packages": [
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius",
+              "composer:sylius/sylius"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-9ffx-f77r-756w"
+            }
+          },
+          "deprecation": {
+            "type": "deprecated",
+            "confidence": "low",
+            "source": "keyword_scan",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "GitHub Security Advisories",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-9ffx-f77r-756w"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-28807",
+        "url": "https://github.com/advisories/GHSA-h7cj-j2vv-qw8r",
+        "published_at": "2026-03-11T00:11:39Z",
+        "updated_at": "2026-03-11T00:11:42Z",
+        "headline": "Wisp Vulnerable to Path Traversal",
+        "content": {
+          "excerpt_text": "### Summary `wisp.serve_static` is vulnerable to arbitrary file read via percent-encoded path traversal (`%2e%2e`). The directory traversal sanitization runs before percent-decoding, allowing encoded `..` sequences to bypass the filter. An unauthenticated attacker can read any file readable by the application process in a single HTTP request. ### Details In `src/wisp.gleam`, `serve_static` processes the request path in this order: ```gleam let path = path |>...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-h7cj-j2vv-qw8r"
+          ],
+          "content_hash": "sha256:2d707e6e01a13bb80b38eca17e35a176b39738c688d1524eb22d84fdac9dc395"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-22"
+            ],
+            "packages": [
+              "erlang:wisp"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-h7cj-j2vv-qw8r"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31815",
+        "url": "https://github.com/advisories/GHSA-ffv6-jj46-x367",
+        "published_at": "2026-03-11T00:11:08Z",
+        "updated_at": "2026-03-11T00:11:12Z",
+        "headline": "django-unicorn affected by component state manipulation via unvalidated attribute access",
+        "content": {
+          "excerpt_text": "## Summary Component state manipulation is possible in `django-unicorn` due to missing access control checks during property updates and method calls. An attacker can bypass the intended `_is_public` protection to modify internal attributes such as `template_name` or trigger protected methods. ## Vulnerability Details: Component Access Control Bypass Security analysis identified that the framework fails to enforce visibility boundaries defined by `_is_public` within the action parsers....",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-ffv6-jj46-x367"
+          ],
+          "content_hash": "sha256:9d810f31876a31fc87956ef1a569984aca8abe91f02c90e866f2aae612a36ee4"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cvss": 5.3,
+            "cwes": [
+              "CWE-284",
+              "CWE-915"
+            ],
+            "packages": [
+              "pip:django-unicorn"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-ffv6-jj46-x367"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31817",
+        "url": "https://github.com/advisories/GHSA-364q-w7vh-vhpc",
+        "published_at": "2026-03-11T00:09:41Z",
+        "updated_at": "2026-03-11T00:09:42Z",
+        "headline": "OliveTin's unsafe parsing of UniqueTrackingId can be used to write files",
+        "content": {
+          "excerpt_text": "When the `saveLogs` feature is enabled, OliveTin persists execution log entries to disk. The filename used for these log files is constructed in part from the user-supplied `UniqueTrackingId` field in the `StartAction` API request. This value is not validated or sanitized before being used in a file path, allowing an attacker to use directory traversal sequences (e.g., `../../../`) to write files to arbitrary locations on the filesystem. ### Affected Code **Entry point —...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-364q-w7vh-vhpc"
+          ],
+          "content_hash": "sha256:84260e081180eef73c3050b900dec8e14f0512c48baa8de211647f2a31b97802"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cvss": 8.5,
+            "cwes": [
+              "CWE-22"
+            ],
+            "packages": [
+              "go:github.com/OliveTin/OliveTin"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-364q-w7vh-vhpc"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31812",
+        "url": "https://github.com/advisories/GHSA-6xvm-j4wr-6v98",
+        "published_at": "2026-03-11T00:09:19Z",
+        "updated_at": "2026-03-11T00:09:21Z",
+        "headline": "Quinn affected by unauthenticated remote DoS via panic in QUIC transport parameter parsing",
+        "content": {
+          "excerpt_text": "### Summary A remote, unauthenticated attacker can trigger a denial of service in applications using vulnerable `quinn` versions by sending a crafted QUIC Initial packet containing malformed `quic_transport_parameters`. `In quinn-proto` parsing logic, attacker-controlled varints are decoded with `unwrap()`, so truncated encodings cause `Err(UnexpectedEnd)` and `panic`. This is reachable over the network with a single packet and no prior trust or authentication. ### Details The issue is...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-6xvm-j4wr-6v98"
+          ],
+          "content_hash": "sha256:bd2a644d02949402b6db7d9a7942c1eba983afa26d2353d2d9bdff4cb80d73bf"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-248"
+            ],
+            "packages": [
+              "rust:quinn-proto"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-6xvm-j4wr-6v98"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31809",
+        "url": "https://github.com/advisories/GHSA-pmc9-f5qr-2pcr",
+        "published_at": "2026-03-10T23:57:56Z",
+        "updated_at": "2026-03-10T23:57:58Z",
+        "headline": "SiYuan has a SVG Sanitizer Bypass via Whitespace in `javascript:` URI — Unauthenticated XSS",
+        "content": {
+          "excerpt_text": "# SVG Sanitizer Bypass via Whitespace in `javascript:` URI — Unauthenticated XSS ## Summary SiYuan's SVG sanitizer (`SanitizeSVG`) checks `href` attributes for the `javascript:` prefix using `strings.HasPrefix()`. However, inserting ASCII tab (` `), newline (` `), or carriage return (` `) characters inside the `javascript:` string bypasses this prefix check. Browsers strip these characters per the WHATWG URL specification before parsing the URL scheme, so the JavaScript still executes....",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-pmc9-f5qr-2pcr"
+          ],
+          "content_hash": "sha256:a3bd22b5b8905bf176c95b1e744f5e25828159a53efb28aacdede7d1bb67768e"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-79"
+            ],
+            "packages": [
+              "go:github.com/siyuan-note/siyuan/kernel"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-pmc9-f5qr-2pcr"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31861",
+        "url": "https://github.com/advisories/GHSA-7fv4-fmmc-86g2",
+        "published_at": "2026-03-10T23:57:23Z",
+        "updated_at": "2026-03-10T23:57:26Z",
+        "headline": "@siteboon/claude-code-ui is Vulnerable to Shell Command Injection in Git Routes",
+        "content": {
+          "excerpt_text": "# Shell Command Injection in User Git Config Endpoint | Field | Value | |-------|-------| | **Severity** | High | | **CVSS 3.1** | 8.8 (High) — when chained with VULN-01 | | **CWE** | CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection') | | **Attack Vector** | Network | | **Authentication** | JWT required (bypassable via VULN-01) | | **Affected Files** | `server/routes/user.js` (lines 58-59) | ## Description The `/api/user/git-config` endpoint...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-7fv4-fmmc-86g2"
+          ],
+          "content_hash": "sha256:647724b249f70df5242adfe9e4d4c108bd0b8ac400e030d4ff104ac671746c2b"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-94"
+            ],
+            "packages": [
+              "npm:@siteboon/claude-code-ui"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-7fv4-fmmc-86g2"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31808",
+        "url": "https://github.com/advisories/GHSA-5v7r-6r5c-r473",
+        "published_at": "2026-03-10T23:57:09Z",
+        "updated_at": "2026-03-10T23:57:11Z",
+        "headline": "file-type affected by infinite loop in ASF parser on malformed input with zero-size sub-header",
+        "content": {
+          "excerpt_text": "### Impact A denial of service vulnerability exists in the ASF (WMV/WMA) file type detection parser. When parsing a crafted input where an ASF sub-header has a `size` field of zero, the parser enters an infinite loop. The `payload` value becomes negative (-24), causing `tokenizer.ignore(payload)` to move the read position backwards, so the same sub-header is read repeatedly forever. Any application that uses `file-type` to detect the type of untrusted/attacker-controlled input is affected....",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-5v7r-6r5c-r473"
+          ],
+          "content_hash": "sha256:6e0c4831b864ba76e7790662ddea64e6ee5f8da5ea583ce4941699a9ffc7fe94"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cvss": 5.3,
+            "cwes": [
+              "CWE-835"
+            ],
+            "packages": [
+              "npm:file-type"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-5v7r-6r5c-r473"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-31807",
+        "url": "https://github.com/advisories/GHSA-5hc8-qmg8-pw27",
+        "published_at": "2026-03-10T23:49:23Z",
+        "updated_at": "2026-03-10T23:49:23Z",
+        "headline": "SiYuan has a SVG Sanitizer Bypass via `<animate>` Element — Unauthenticated XSS",
+        "content": {
+          "excerpt_text": "# SVG Sanitizer Bypass via ` ` Element — Unauthenticated XSS ## Summary SiYuan's SVG sanitizer (`SanitizeSVG`) blocks dangerous elements (`",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-11T00:23:38Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-5hc8-qmg8-pw27"
+          ],
+          "content_hash": "sha256:bf92f5d970967e9c04fcb57c81cffb97c7051713509e3b8c18731e0cb7d8025a"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cwes": [
+              "CWE-79"
+            ],
+            "packages": [
+              "go:github.com/siyuan-note/siyuan/kernel"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-5hc8-qmg8-pw27"
+            }
+          },
+          "deprecation": {
+            "type": "removal",
+            "affects": [
+              "entirely"
+            ],
+            "confidence": "low",
+            "source": "keyword_scan",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "GitHub Security Advisories",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-5hc8-qmg8-pw27"
+            }
+          }
+        }
+      },
       {
         "source": "github_advisories",
         "id": "CVE-2026-31802",
@@ -26,7 +1255,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9ppj-qmqm-q256"
           ],
@@ -63,7 +1292,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-85jx-fm8m-x8c6"
           ],
@@ -102,7 +1331,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-56jp-jfqg-f8f4"
           ],
@@ -149,7 +1378,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qmw5-2p58-xvrc"
           ],
@@ -196,7 +1425,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-f45g-68q3-5w8x"
           ],
@@ -234,7 +1463,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-p9xr-7p9p-gpqx"
           ],
@@ -271,7 +1500,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wg9x-qfgw-pxhj"
           ],
@@ -308,7 +1537,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mrmj-x24c-wwcv"
           ],
@@ -355,7 +1584,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-493f-jh8w-qhx3"
           ],
@@ -402,7 +1631,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xjgw-4wvw-rgm4"
           ],
@@ -441,7 +1670,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-7r34-79r5-rcc9"
           ],
@@ -479,7 +1708,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-r275-fr43-pm7q"
           ],
@@ -518,7 +1747,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-c23c-rp3m-vpg3"
           ],
@@ -557,7 +1786,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-84xm-r438-86px"
           ],
@@ -598,7 +1827,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-56cj-wgg3-x943"
           ],
@@ -639,7 +1868,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-ghc4-35x6-crw5"
           ],
@@ -681,7 +1910,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qpr4-jrj4-6f27"
           ],
@@ -719,7 +1948,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-vff3-pqq8-4cpq"
           ],
@@ -757,7 +1986,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mj32-r678-7mvp"
           ],
@@ -795,7 +2024,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wj89-2385-gpx3"
           ],
@@ -832,7 +2061,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-cfpv-rmpf-f624"
           ],
@@ -869,7 +2098,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-pmgj-gmm4-jh6j"
           ],
@@ -906,7 +2135,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mqxf-2998-c6cp"
           ],
@@ -944,7 +2173,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-j3x5-mghf-xvfw"
           ],
@@ -982,7 +2211,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-vg3j-hpm9-8v5v"
           ],
@@ -1021,7 +2250,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-667w-mmh7-mrr4"
           ],
@@ -1060,7 +2289,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3cw6-2j68-868p"
           ],
@@ -1101,7 +2330,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-m6hv-x64c-27mm"
           ],
@@ -1139,7 +2368,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-f7pm-6hr8-7ggm"
           ],
@@ -1179,7 +2408,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9c4h-pwmf-m6fj"
           ],
@@ -1220,7 +2449,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xv8g-fj9h-6gmv"
           ],
@@ -1257,7 +2486,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-cw6x-mw64-q6pv"
           ],
@@ -1297,7 +2526,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-jw8q-gjvg-8w4q"
           ],
@@ -1335,7 +2564,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-r5v6-2599-9g3m"
           ],
@@ -1374,7 +2603,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wmfp-5q7x-987x"
           ],
@@ -1411,7 +2640,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-27vg-33gh-4hwg"
           ],
@@ -1448,7 +2677,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5j86-7r7m-p8h6"
           ],
@@ -1486,7 +2715,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-q342-9w2p-57fp"
           ],
@@ -1524,7 +2753,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mf3j-86qx-cq5j"
           ],
@@ -1562,7 +2791,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3c4m-j3g4-hh25"
           ],
@@ -1600,7 +2829,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-v359-jj2v-j536"
           ],
@@ -1638,7 +2867,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-93fx-5qgc-wr38"
           ],
@@ -1676,7 +2905,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9q36-67vc-rrwg"
           ],
@@ -1715,7 +2944,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9q2p-vc84-2rwm"
           ],
@@ -1754,7 +2983,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hfpr-jhpq-x4rm"
           ],
@@ -1792,7 +3021,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-r6qf-8968-wj9q"
           ],
@@ -1831,7 +3060,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-6mgf-v5j7-45cr"
           ],
@@ -1871,7 +3100,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-pjvx-rx66-r3fg"
           ],
@@ -1921,7 +3150,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3h2q-j2v4-6w5r"
           ],
@@ -1960,7 +3189,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-j425-whc4-4jgc"
           ],
@@ -1999,7 +3228,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-6rmx-gvvg-vh6j"
           ],
@@ -2038,7 +3267,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-rchv-x836-w7xp"
           ],
@@ -2076,7 +3305,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-x46r-mf5g-xpr6"
           ],
@@ -2113,7 +3342,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-gh4x-f7cq-wwx6"
           ],
@@ -2150,7 +3379,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-r633-fcgp-m532"
           ],
@@ -2188,7 +3417,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-525j-95gf-766f"
           ],
@@ -2242,7 +3471,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-7pfv-hr63-h7cw"
           ],
@@ -2279,7 +3508,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-f9cq-v43p-v523"
           ],
@@ -2318,7 +3547,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-x6fw-778m-wr9v"
           ],
@@ -2367,7 +3596,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-q5q9-2rhp-33qw"
           ],
@@ -2404,7 +3633,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hwx8-q9cg-mqmc"
           ],
@@ -2442,7 +3671,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hm3f-q6rw-m6wh"
           ],
@@ -2480,7 +3709,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-656w-6f6c-m9r6"
           ],
@@ -2520,7 +3749,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-6r7f-3fwq-hq74"
           ],
@@ -2575,7 +3804,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-4hgg-c4rr-6h7f"
           ],
@@ -2612,7 +3841,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-ch3w-9456-38v3"
           ],
@@ -2649,7 +3878,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hmqr-wjmj-376c"
           ],
@@ -2686,7 +3915,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qh6q-598w-w6m2"
           ],
@@ -2724,7 +3953,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
+          "fetched_at": "2026-03-11T00:23:38Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9h33-g3ww-mqff"
           ],
@@ -2749,1209 +3978,6 @@
             }
           }
         }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-25041",
-        "url": "https://github.com/advisories/GHSA-726g-59wr-cj4c",
-        "published_at": "2026-03-09T16:56:26Z",
-        "updated_at": "2026-03-10T18:39:13Z",
-        "headline": "@budibase/server: Command Injection in PostgreSQL Dump Command",
-        "content": {
-          "excerpt_text": "**Location**: `packages/server/src/integrations/postgres.ts:529-531` #### Description The PostgreSQL integration constructs shell commands using user-controlled configuration values (database name, host, password, etc.) without proper sanitization. The password and other connection parameters are directly interpolated into a shell command. #### Code Reference ```529:531:packages/server/src/integrations/postgres.ts const dumpCommand = `PGPASSWORD=\"${ this.config.password }\" pg_dump...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-726g-59wr-cj4c"
-          ],
-          "content_hash": "sha256:d9be5039e9e28cb7668e616dac523527c1b8193cc3b07902a8eb47f197d5bb66"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-77",
-              "CWE-78"
-            ],
-            "packages": [
-              "npm:@budibase/server"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-726g-59wr-cj4c"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2025-69219",
-        "url": "https://github.com/advisories/GHSA-9r5j-7r2x-rv4g",
-        "published_at": "2026-03-09T12:31:38Z",
-        "updated_at": "2026-03-10T01:21:25Z",
-        "headline": "Apache Airflow Providers Http has Unsafe Pickle Deserializatio leading to RCE via HttpOperator",
-        "content": {
-          "excerpt_text": "A user with access to the DB could craft a database entry that would result in executing code on Triggerer - which gives anyone who have access to DB the same permissions as Dag Author. Since direct DB access is not usual and recommended for Airflow, the likelihood of it making any damage is low. Users should upgrade to version 6.0.0 of the provider to avoid even that risk.",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-9r5j-7r2x-rv4g"
-          ],
-          "content_hash": "sha256:48db9593156de9c77ca75b76e3c86f725b9af30743e0f2289306cdf30eea378f"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cvss": 8.8,
-            "cwes": [
-              "CWE-913"
-            ],
-            "packages": [
-              "pip:apache-airflow-providers-http"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-9r5j-7r2x-rv4g"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-25604",
-        "url": "https://github.com/advisories/GHSA-rv5f-ccpm-xjj4",
-        "published_at": "2026-03-09T12:31:38Z",
-        "updated_at": "2026-03-10T01:22:22Z",
-        "headline": "Apache Airflow AWS Auth Manager has Host Header Injection Leading to SAML Authentication Bypass",
-        "content": {
-          "excerpt_text": "In AWS Auth manager, the origin of the SAML authentication has been used as provided by the client and not verified against the actual instance URL. This allowed to gain access to different instances with potentially different access controls by reusing SAML response from other instances. You should upgrade to 9.22.0 version of provider if you use AWS Auth Manager.",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-rv5f-ccpm-xjj4"
-          ],
-          "content_hash": "sha256:4332cef35f5efa74e528661bd2f35c9f71c1df6cd041de7ff61070f9f39407bd"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cvss": 5.4,
-            "cwes": [
-              "CWE-346"
-            ],
-            "packages": [
-              "pip:apache-airflow-providers-amazon"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-rv5f-ccpm-xjj4"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-24281",
-        "url": "https://github.com/advisories/GHSA-7xrh-hqfc-g7qr",
-        "published_at": "2026-03-07T09:30:15Z",
-        "updated_at": "2026-03-10T19:32:54Z",
-        "headline": "Apache ZooKeeper: Reverse-DNS fallback enables hostname verification bypass in ZooKeeper ZKTrustManager",
-        "content": {
-          "excerpt_text": "Hostname verification in Apache ZooKeeper ZKTrustManager falls back to reverse DNS (PTR) when IP SAN validation fails, allowing attackers who control or spoof PTR records to impersonate ZooKeeper servers or clients with a valid certificate for the PTR name. It's important to note that attacker must present a certificate which is trusted by ZKTrustManager which makes the attack vector harder to exploit. Users are recommended to upgrade to version 3.8.6 or 3.9.5, which fixes this issue by...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-7xrh-hqfc-g7qr"
-          ],
-          "content_hash": "sha256:f480260a833771e40d27a2b3b2270b1a62096d73bcfcc66b91eb0746716bfeff"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cvss": 7.4,
-            "cwes": [
-              "CWE-295",
-              "CWE-297"
-            ],
-            "packages": [
-              "maven:org.apache.zookeeper:zookeeper",
-              "maven:org.apache.zookeeper:zookeeper"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-7xrh-hqfc-g7qr"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-24308",
-        "url": "https://github.com/advisories/GHSA-crhr-qqj8-rpxc",
-        "published_at": "2026-03-07T09:30:15Z",
-        "updated_at": "2026-03-09T18:19:16Z",
-        "headline": "Apache ZooKeeper has improper handling of configuration values",
-        "content": {
-          "excerpt_text": "Improper handling of configuration values in ZKConfig in Apache ZooKeeper 3.8.5 and 3.9.4 on all platforms allows an attacker to expose sensitive information stored in client configuration in the client's logfile. Configuration values are exposed at INFO level logging rendering potential production systems affected by the issue. Users are recommended to upgrade to version 3.8.6 or 3.9.5 which fixes this issue.",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-crhr-qqj8-rpxc"
-          ],
-          "content_hash": "sha256:a101c3fb0822a8e4073bd2a9cac809d8bef0afc0f56740a6e17799b51246911a"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-532"
-            ],
-            "packages": [
-              "maven:org.apache.zookeeper:zookeeper",
-              "maven:org.apache.zookeeper:zookeeper"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-crhr-qqj8-rpxc"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2025-14675",
-        "url": "https://github.com/advisories/GHSA-m4q3-832v-44j6",
-        "published_at": "2026-03-07T09:30:14Z",
-        "updated_at": "2026-03-10T19:34:20Z",
-        "headline": "Meta Box Plugin for WordPress: Authenticated (Contributor+) Arbitrary File Deletion via ajax_delete_file",
-        "content": {
-          "excerpt_text": "The Meta Box plugin for WordPress is vulnerable to arbitrary file deletion due to insufficient file path validation in the 'ajax_delete_file' function in all versions up to, and including, 5.11.1. This makes it possible for authenticated attackers, with Contributor-level access and above, to delete arbitrary files on the server, which can easily lead to remote code execution when the right file is deleted (such as wp-config.php).",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-m4q3-832v-44j6"
-          ],
-          "content_hash": "sha256:f850248c81c5045ef9dcacedaf4fb16db79d855c98ccd3fe4cf8c2da3046b47f"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cvss": 7.2,
-            "cwes": [
-              "CWE-22"
-            ],
-            "packages": [
-              "composer:wpmetabox/meta-box"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-m4q3-832v-44j6"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "GHSA-pm4j-7r4q-ccg8",
-        "url": "https://github.com/advisories/GHSA-pm4j-7r4q-ccg8",
-        "published_at": "2026-03-07T02:39:44Z",
-        "updated_at": "2026-03-07T02:39:45Z",
-        "headline": "Soroban: Muxed address<->ScVal conversions may break after a conversion failure",
-        "content": {
-          "excerpt_text": "### Summary Soroban host ensures that `MuxedAddress` objects can't be used as storage keys in order to proactively prevent the contract logic bugs. However, due to a bug in Soroban host implementation, a failure in `Val`->`ScVal` conversion during the storage key computation will have the flag indicating that storage conversion is happening stuck in the `true` state until the next storage access. While the flag is stuck in `true` state, any `MuxedAddress` object conversions to `ScVal` will...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-pm4j-7r4q-ccg8"
-          ],
-          "content_hash": "sha256:ff07b667a7b6d6a5028856514700599b00601e7ca61cd622c12cbb946596a8d0"
-        },
-        "signals": {
-          "severity": {
-            "level": "low",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-681"
-            ],
-            "packages": [
-              "rust:soroban-env-host"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-pm4j-7r4q-ccg8"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30921",
-        "url": "https://github.com/advisories/GHSA-4j36-39gm-8vq8",
-        "published_at": "2026-03-07T02:39:04Z",
-        "updated_at": "2026-03-10T18:44:25Z",
-        "headline": "OneUptime: Synthetic Monitor RCE via exposed Playwright browser object",
-        "content": {
-          "excerpt_text": "Summary OneUptime Synthetic Monitors allow low-privileged project users to submit custom Playwright code that is executed on the `oneuptime-probe` service. In the current implementation, this untrusted code is run inside Node's `vm` and is given live host Playwright objects such as `browser` and `page`. This creates a distinct server-side RCE primitive: the attacker does not need the classic `this.constructor.constructor(...)` sandbox escape. Instead, the attacker can directly use the...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-4j36-39gm-8vq8"
-          ],
-          "content_hash": "sha256:edd326c993011755deeef7b5f0620c296a06cc7550c52dd9dafe5dbcbd8279ed"
-        },
-        "signals": {
-          "severity": {
-            "level": "critical",
-            "source": "github_advisory",
-            "cvss": 10.0,
-            "cwes": [
-              "CWE-749"
-            ],
-            "packages": [
-              "npm:@oneuptime/common"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-4j36-39gm-8vq8"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "GHSA-qr2g-p6q7-w82m",
-        "url": "https://github.com/advisories/GHSA-qr2g-p6q7-w82m",
-        "published_at": "2026-03-07T02:37:47Z",
-        "updated_at": "2026-03-07T02:37:48Z",
-        "headline": "x402 SDK Security Advisory",
-        "content": {
-          "excerpt_text": "### Impact A security vulnerability exists in outdated versions of the x402 SDK. This vulnerability does not affect users' private keys, smart contracts, or funds. The issue impacts resource servers accepting payments on Solana when the facilitator is running a vulnerable version of the x402 SDK. ### Who Should Take Action Facilitators that process payments on Solana must upgrade the x402 SDK to the patched versions listed below. Clients are not required to upgrade. Resource servers are not...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-qr2g-p6q7-w82m"
-          ],
-          "content_hash": "sha256:350ca48df24cf2d3844ecfbfd68f4812d1ff266f40843df4996c17f290574384"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "packages": [
-              "npm:@x402/svm",
-              "pip:x402",
-              "go:github.com/coinbase/x402/go"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-qr2g-p6q7-w82m"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-31900",
-        "url": "https://github.com/advisories/GHSA-v53h-f6m7-xcgm",
-        "published_at": "2026-03-07T02:32:27Z",
-        "updated_at": "2026-03-10T18:40:39Z",
-        "headline": "Black's vulnerable version parsing leads to RCE in GitHub Action",
-        "content": {
-          "excerpt_text": "### Impact Black provides a [GitHub action](https://black.readthedocs.io/en/stable/integrations/github_actions.html) for formatting code. This action supports an option, `use_pyproject: true`, for reading the version of Black to use from the repository `pyproject.toml`. A malicious pull request could edit pyproject.toml to use a direct URL reference to a malicious repository. This could lead to arbitrary code execution in the context of the GitHub Action. Attackers could then gain access to...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-v53h-f6m7-xcgm"
-          ],
-          "content_hash": "sha256:61a4ee00a37c963537852251b909738e4b201a7d80d64515e1504f9d383b46a5"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-20"
-            ],
-            "packages": [
-              "actions:psf/black"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-v53h-f6m7-xcgm"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30916",
-        "url": "https://github.com/advisories/GHSA-6f6w-6j58-rq76",
-        "published_at": "2026-03-07T02:31:58Z",
-        "updated_at": "2026-03-10T18:44:10Z",
-        "headline": "Shescape has possible misidentification of shell due to link chains",
-        "content": {
-          "excerpt_text": "### Impact This impacts users of Shescape that configure their `shell` to point to a file on disk that is a link to a link. The precise result of being affected depends on the actual shell used and incorrect shell identified by Shescape. In particular, an attacker may be able to bypass escaping for the shell being used. This can result, for example, in exposure of sensitive information, consider the following proof of concept (targeting Shescape v2): ```javascript import fs from \"node:fs\";...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-6f6w-6j58-rq76"
-          ],
-          "content_hash": "sha256:180631bcabb46c822ae97ae880b9fed68b357a188b0dcad3b87f8bc7dacb9f06"
-        },
-        "signals": {
-          "severity": {
-            "level": "low",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-200"
-            ],
-            "packages": [
-              "npm:shescape"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-6f6w-6j58-rq76"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "GHSA-c8m8-3jcr-6rj5",
-        "url": "https://github.com/advisories/GHSA-c8m8-3jcr-6rj5",
-        "published_at": "2026-03-07T02:31:18Z",
-        "updated_at": "2026-03-07T03:16:21Z",
-        "headline": "FUXA has a hardcoded fallback JWT signing secret",
-        "content": {
-          "excerpt_text": "FUXA used a static fallback JWT signing secret (`frangoteam751`) when no `secretCode` was configured. If authentication was enabled without explicitly setting a custom secret, an attacker who knew the default value could forge valid JWT tokens and bypass authentication. This issue has been addressed in version 1.3.0 by removing the static fallback and generating a secure random secret when no `secretCode` is provided.",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-c8m8-3jcr-6rj5"
-          ],
-          "content_hash": "sha256:e27a33a61b4eb479e3c9052be62b6888c36f9009e5dd2811b67e4c102ffe1fb0"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cvss": 8.1,
-            "cwes": [
-              "CWE-321"
-            ],
-            "packages": [
-              "npm:@frangoteam/fuxa"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-c8m8-3jcr-6rj5"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30887",
-        "url": "https://github.com/advisories/GHSA-h343-gg57-2q67",
-        "published_at": "2026-03-07T02:30:09Z",
-        "updated_at": "2026-03-10T18:44:05Z",
-        "headline": "OneUpTime's Unsandboxed Code Execution in Probe Allows Any Project Member to Achieve RCE",
-        "content": {
-          "excerpt_text": "### Summary OneUptime allows project members to run custom Playwright/JavaScript code via Synthetic Monitors to test websites. However, the system executes this untrusted user code inside the insecure Node.js `vm` module. By leveraging a standard prototype-chain escape (`this.constructor.constructor`), an attacker can bypass the sandbox, gain access to the underlying Node.js `process` object, and execute arbitrary system commands (RCE) on the `oneuptime-probe` container. Furthermore, because...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-h343-gg57-2q67"
-          ],
-          "content_hash": "sha256:b3071da2fd03904affbac6f186366b2b21e4ac207c8557cc78557a8f2928a68f"
-        },
-        "signals": {
-          "severity": {
-            "level": "critical",
-            "source": "github_advisory",
-            "cvss": 10.0,
-            "cwes": [
-              "CWE-94"
-            ],
-            "packages": [
-              "npm:@oneuptime/common"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-h343-gg57-2q67"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30885",
-        "url": "https://github.com/advisories/GHSA-6w2r-cfpc-23r5",
-        "published_at": "2026-03-07T02:25:48Z",
-        "updated_at": "2026-03-10T18:44:00Z",
-        "headline": "AVideo has Unauthenticated IDOR - Playlist Information Disclosure",
-        "content": {
-          "excerpt_text": "**Product:** AVideo (https://github.com/WWBN/AVideo) **Version:** Latest (tested March 2026) **Type:** Insecure Direct Object Reference (IDOR) **Auth Required:** No **User Interaction:** None ## Summary The `/objects/playlistsFromUser.json.php` endpoint returns all playlists for any user without requiring authentication or authorization. An unauthenticated attacker can enumerate user IDs and retrieve playlist information including playlist names, video IDs, and playlist status for any user...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-6w2r-cfpc-23r5"
-          ],
-          "content_hash": "sha256:1242da378d78534f37b228164d51dc2a9a11e5a179d48fb5a0cf4143e7bd77b8"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-306",
-              "CWE-862"
-            ],
-            "packages": [
-              "composer:wwbn/avideo"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-6w2r-cfpc-23r5"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30870",
-        "url": "https://github.com/advisories/GHSA-q6wc-xx4m-92fj",
-        "published_at": "2026-03-07T02:23:24Z",
-        "updated_at": "2026-03-10T18:43:25Z",
-        "headline": "PowerSync: Some sync filters ignored on 1.20.0 using `config.edition: 3`",
-        "content": {
-          "excerpt_text": "### Impact In version **1.20.0**, when using new sync streams with `config.edition: 3`, certain subquery filters were ignored when determining which data to sync to users. Depending on the sync stream configuration, this could result in authenticated users syncing data that should have been restricted. Only queries that gate synchronization using subqueries without partitioning the result set are affected. Not affected: * Sync rules (bucket_definitions) * Sync streams using `config.edition:...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-q6wc-xx4m-92fj"
-          ],
-          "content_hash": "sha256:07c7377b995b3ebbb77a17a92925dead2c0f88bca13dd164fa85f88165a86599"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cvss": 6.5,
-            "cwes": [
-              "CWE-285"
-            ],
-            "packages": [
-              "npm:@powersync/service-core",
-              "npm:@powersync/service-sync-rules"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-q6wc-xx4m-92fj"
-            }
-          },
-          "deprecation": {
-            "type": "removal",
-            "confidence": "low",
-            "source": "keyword_scan",
-            "provenance": {
-              "method": "keyword_scan",
-              "authority": "GitHub Security Advisories",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-q6wc-xx4m-92fj"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30869",
-        "url": "https://github.com/advisories/GHSA-2h2p-mvfx-868w",
-        "published_at": "2026-03-07T02:19:45Z",
-        "updated_at": "2026-03-10T18:43:20Z",
-        "headline": "SiYuan Vulnerable to Path Traversal in /export Endpoint Allows Arbitrary File Read and Secret Leakage",
-        "content": {
-          "excerpt_text": "### Summary A path traversal vulnerability in the `/export` endpoint allows an attacker to read arbitrary files from the server filesystem. By exploiting double‑encoded traversal sequences, an attacker can access sensitive files such as `conf/conf.json`, which contains secrets including the API token, cookie signing key, and workspace access authentication code. Leaking these secrets may enable administrative access to the SiYuan kernel API, and in certain deployment scenarios could...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-2h2p-mvfx-868w"
-          ],
-          "content_hash": "sha256:e671434d9f361653c70f8819f0748744cff0479c83c92346e7faef0bd263f268"
-        },
-        "signals": {
-          "severity": {
-            "level": "critical",
-            "source": "github_advisory",
-            "cvss": 9.3,
-            "cwes": [
-              "CWE-22",
-              "CWE-200",
-              "CWE-285"
-            ],
-            "packages": [
-              "go:github.com/siyuan-note/siyuan/kernel"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-2h2p-mvfx-868w"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "GHSA-g9rg-8vq5-mpwm",
-        "url": "https://github.com/advisories/GHSA-g9rg-8vq5-mpwm",
-        "published_at": "2026-03-07T02:12:26Z",
-        "updated_at": "2026-03-07T02:12:28Z",
-        "headline": "mcp-memory-service's Wildcard CORS with Credentials Enables Cross-Origin Memory Theft",
-        "content": {
-          "excerpt_text": "### Summary When the HTTP server is enabled (`MCP_HTTP_ENABLED=true`), the application configures FastAPI's CORSMiddleware with `allow_origins=['*']`, `allow_credentials=True`, `allow_methods=[\"*\"]`, and `allow_headers=[\"*\"]`. The wildcard `Access-Control-Allow-Origin: *` header permits any website to read API responses cross-origin. When combined with anonymous access (`MCP_ALLOW_ANONYMOUS_ACCESS=true`) - the simplest way to get the HTTP dashboard working without OAuth - no credentials are...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-g9rg-8vq5-mpwm"
-          ],
-          "content_hash": "sha256:b1dbe88920a5192ee005d4143d5c86d8e498c2c7fa0d66bbe83f25a026c725fe"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cvss": 8.1,
-            "cwes": [
-              "CWE-942"
-            ],
-            "packages": [
-              "pip:mcp-memory-service"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-g9rg-8vq5-mpwm"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "GHSA-5q8v-j673-m5v4",
-        "url": "https://github.com/advisories/GHSA-5q8v-j673-m5v4",
-        "published_at": "2026-03-07T02:10:45Z",
-        "updated_at": "2026-03-07T02:10:45Z",
-        "headline": "Firefly III user API endpoints expose all users' information to any authenticated user (IDOR)",
-        "content": {
-          "excerpt_text": "### Summary The User management API endpoints (`GET /api/v1/users` and `GET /api/v1/users/{id}`) are accessible to any authenticated user without admin/owner role verification, exposing all users' email addresses, roles, and account status. ### Affected Endpoints 1. **GET /api/v1/users** (UserController::index, line 94) — Lists ALL users with full details. No role check. 2. **GET /api/v1/users/{id}** (UserController::show, line 126) — Shows any user's details by ID. No role check. ###...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-5q8v-j673-m5v4"
-          ],
-          "content_hash": "sha256:8b4d3cc14ca2d46a9f98778df2de1aa6f66f3dc12b5ea8d3ff8c5ad9d8b4c01b"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-863"
-            ],
-            "packages": [
-              "composer:grumpydictator/firefly-iii"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-5q8v-j673-m5v4"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30861",
-        "url": "https://github.com/advisories/GHSA-r55h-3rwj-hcmg",
-        "published_at": "2026-03-07T01:59:01Z",
-        "updated_at": "2026-03-09T13:14:29Z",
-        "headline": "WeKnora has Remote Code Execution (RCE) via Command Injection in MCP Stdio Configuration Validation",
-        "content": {
-          "excerpt_text": "### Summary A critical unauthenticated remote code execution (RCE) vulnerability exists in the MCP stdio configuration validation introduced in version 2.0.5. The application allows unrestricted user registration, meaning any attacker can create an account and exploit the command injection flaw. Despite implementing a whitelist for allowed commands (`npx`, `uvx`) and blacklists for dangerous arguments and environment variables, the validation can be bypassed using the `-p` flag with `npx...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-r55h-3rwj-hcmg"
-          ],
-          "content_hash": "sha256:65de279bf2252507175b63c02e0cd07329a9b024bce72eb73cfff58fae5b9394"
-        },
-        "signals": {
-          "severity": {
-            "level": "critical",
-            "source": "github_advisory",
-            "cvss": 10.0,
-            "cwes": [
-              "CWE-78"
-            ],
-            "packages": [
-              "go:github.com/Tencent/WeKnora"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-r55h-3rwj-hcmg"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30860",
-        "url": "https://github.com/advisories/GHSA-8w32-6mrw-q5wv",
-        "published_at": "2026-03-06T23:59:20Z",
-        "updated_at": "2026-03-09T13:15:09Z",
-        "headline": "WeKnora Vulnerable to Remote Code Execution via SQL Injection Bypass in AI Database Query Tool",
-        "content": {
-          "excerpt_text": "## Summary A critical Remote Code Execution (RCE) vulnerability exists in the application's database query functionality. The validation system fails to recursively inspect child nodes within PostgreSQL array expressions and row expressions, allowing attackers to bypass SQL injection protections. By smuggling dangerous PostgreSQL functions inside these expressions and chaining them with large object operations and library loading capabilities, an unauthenticated attacker can achieve...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-8w32-6mrw-q5wv"
-          ],
-          "content_hash": "sha256:b94d30009a7315595851eefdfe583179cb0a26a1e3ee1e817aeeab3245022444"
-        },
-        "signals": {
-          "severity": {
-            "level": "critical",
-            "source": "github_advisory",
-            "cvss": 10.0,
-            "cwes": [
-              "CWE-89"
-            ],
-            "packages": [
-              "go:github.com/Tencent/WeKnora"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-8w32-6mrw-q5wv"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30859",
-        "url": "https://github.com/advisories/GHSA-2f4c-vrjq-rcgv",
-        "published_at": "2026-03-06T23:57:20Z",
-        "updated_at": "2026-03-09T13:20:29Z",
-        "headline": "WeKnora has Broken Access Control - Cross-Tenant Data Exposure",
-        "content": {
-          "excerpt_text": "## Summary A broken access control vulnerability in the database query tool allows any authenticated tenant to read sensitive data belonging to other tenants, including API keys, model configurations, and private messages. The application fails to enforce tenant isolation on critical tables (`models`, `messages`, `embeddings`), enabling unauthorized cross-tenant data access with user-level authentication privileges. --- ## Details ### Root Cause The vulnerability exists due to a mismatch...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-2f4c-vrjq-rcgv"
-          ],
-          "content_hash": "sha256:4e936b4255a02f59238cc4f4066b09edfa366d5123afd94eb5eb18a07a872062"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cvss": 7.5,
-            "cwes": [
-              "CWE-284"
-            ],
-            "packages": [
-              "go:github.com/Tencent/WeKnora"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-2f4c-vrjq-rcgv"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30858",
-        "url": "https://github.com/advisories/GHSA-h6gw-8f77-mmmp",
-        "published_at": "2026-03-06T23:56:22Z",
-        "updated_at": "2026-03-09T13:21:08Z",
-        "headline": "WeKnora has DNS Rebinding Vulnerability in web_fetch Tool that Allows SSRF to Internal Resources",
-        "content": {
-          "excerpt_text": "### Summary A DNS rebinding vulnerability in the `web_fetch` tool allows an unauthenticated attacker to bypass URL validation and access internal resources on the server, including private IP addresses (e.g., 127.0.0.1, 192.168.x.x). By crafting a malicious domain that resolves to a public IP during validation and subsequently resolves to a private IP during execution, an attacker can access sensitive local services and potentially exfiltrate data. ### Details The vulnerability exists...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-h6gw-8f77-mmmp"
-          ],
-          "content_hash": "sha256:ff19335e6ca7a40c7557d4e195814e40eade07d317e44c8f40eb45ce304e1a05"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cvss": 7.5,
-            "cwes": [
-              "CWE-918"
-            ],
-            "packages": [
-              "go:github.com/Tencent/WeKnora"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-h6gw-8f77-mmmp"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30857",
-        "url": "https://github.com/advisories/GHSA-8rf9-c59g-f82f",
-        "published_at": "2026-03-06T23:55:47Z",
-        "updated_at": "2026-03-09T13:21:48Z",
-        "headline": "WeKnora has Unauthorized Cross‑Tenant Knowledge Base Cloning",
-        "content": {
-          "excerpt_text": "### Summary A cross-tenant authorization bypass in the knowledge base copy endpoint allows any authenticated user to clone (duplicate) another tenant’s knowledge base into their own tenant by knowing/guessing the source knowledge base ID. This enables bulk data exfiltration (document/FAQ content) across tenants, making the impact critical. ### Details The `POST /api/v1/knowledge-bases/copy` endpoint enqueues an asynchronous KB clone task using the caller-supplied `source_id` without...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-8rf9-c59g-f82f"
-          ],
-          "content_hash": "sha256:33fd536eebe5b2b4ce01dadc08098b98e32e02500091049c6aac597d33e24924"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cvss": 5.9,
-            "cwes": [
-              "CWE-639"
-            ],
-            "packages": [
-              "go:github.com/Tencent/WeKnora"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-8rf9-c59g-f82f"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30856",
-        "url": "https://github.com/advisories/GHSA-67q9-58vj-32qx",
-        "published_at": "2026-03-06T23:54:44Z",
-        "updated_at": "2026-03-09T13:21:55Z",
-        "headline": "WeKnora Vulnerable to Tool Execution Hijacking via Ambigous Naming Convention In MCP client and Indirect Prompt Injection",
-        "content": {
-          "excerpt_text": "### Summary A vulnerability involving tool name collision and indirect prompt injection allows a malicious remote MCP server to hijack tool execution. By exploiting an ambiguous naming convention in the MCP client (`mcp_{service}_{tool}`), an attacker can register a malicious tool that overwrites a legitimate one (e.g., `tavily_extract`). This enables the attacker to redirect LLM execution flow, exfiltrate system prompts, context, and potentially execute other tools with the user's...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-67q9-58vj-32qx"
-          ],
-          "content_hash": "sha256:1d3d1009ef14c28c0a6f7ca572b3b4422183753f8968471fdf56c75dc67d3a38"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cvss": 5.4,
-            "cwes": [
-              "CWE-706"
-            ],
-            "packages": [
-              "go:github.com/Tencent/WeKnora"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-67q9-58vj-32qx"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30855",
-        "url": "https://github.com/advisories/GHSA-ccj6-79j6-cq5q",
-        "published_at": "2026-03-06T23:53:53Z",
-        "updated_at": "2026-03-09T13:21:39Z",
-        "headline": "WeKnora Vulnerable to Broken Access Control in Tenant Management",
-        "content": {
-          "excerpt_text": "### Summary An authorization bypass in tenant management endpoints of WeKnora application allows any authenticated user to read, modify, or delete any tenant by ID. Since account registration is open to the public, this vulnerability allows any unauthenticated attacker to register an account and subsequently exploit the system. This enables cross-tenant account takeover and destruction, making the impact critical. ### Details The tenant management handlers do not validate that the caller...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-ccj6-79j6-cq5q"
-          ],
-          "content_hash": "sha256:d7ea3c50b7aafe5832392e69a067e2969108f7629bfe230176b86daf350ac892"
-        },
-        "signals": {
-          "severity": {
-            "level": "critical",
-            "source": "github_advisory",
-            "cvss": 9.8,
-            "cwes": [
-              "CWE-284"
-            ],
-            "packages": [
-              "go:github.com/Tencent/WeKnora"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-ccj6-79j6-cq5q"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30852",
-        "url": "https://github.com/advisories/GHSA-m2w3-8f23-hxxf",
-        "published_at": "2026-03-06T23:40:19Z",
-        "updated_at": "2026-03-09T15:51:04Z",
-        "headline": "Caddy's vars_regexp double-expands user input, leaking env vars and files",
-        "content": {
-          "excerpt_text": "### Summary The `vars_regexp` matcher in `vars.go:337` double-expands user-controlled input through the Caddy replacer. When `vars_regexp` matches against a placeholder like `{http.request.header.X-Input}`, the header value gets resolved once (expected), then passed through `repl.ReplaceAll()` again (the bug). This means an attacker can put `{env.DATABASE_URL}` or `{file./etc/passwd}` in a request header and the server will evaluate it, leaking environment variables, file contents, and...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-m2w3-8f23-hxxf"
-          ],
-          "content_hash": "sha256:02fc352a2d891f52cfb7740fc2d8b1d01c47ac037863c16fcace962d9e07954f"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-74",
-              "CWE-200"
-            ],
-            "packages": [
-              "go:github.com/caddyserver/caddy/v2/modules/caddyhttp"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-m2w3-8f23-hxxf"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30851",
-        "url": "https://github.com/advisories/GHSA-7r4p-vjf4-gxv4",
-        "published_at": "2026-03-06T23:38:44Z",
-        "updated_at": "2026-03-09T15:50:55Z",
-        "headline": "Caddy forward_auth copy_headers Does Not Strip Client-Supplied Headers, Allowing Identity Injection and Privilege Escalation",
-        "content": {
-          "excerpt_text": "## Summary Caddy's `forward_auth` directive with `copy_headers` generates conditional header-set operations that only fire when the upstream auth service includes the named header in its response. No delete or remove operation is generated for the original client-supplied request header with the same name. When an auth service returns `200 OK` without one of the configured `copy_headers` headers, the client-supplied header passes through unchanged to the backend. Any requester holding a...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-7r4p-vjf4-gxv4"
-          ],
-          "content_hash": "sha256:94cb3227f4991b9ad746d6568442a23878668d9a0c77bca452ae0da67d77fabd"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cvss": 8.1,
-            "cwes": [
-              "CWE-287",
-              "CWE-345"
-            ],
-            "packages": [
-              "go:github.com/caddyserver/caddy/v2/modules/caddyhttp/reverseproxy"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-7r4p-vjf4-gxv4"
-            }
-          },
-          "deprecation": {
-            "type": "removal",
-            "affects": [
-              "operation",
-              "incidental"
-            ],
-            "confidence": "medium",
-            "source": "keyword_scan",
-            "provenance": {
-              "method": "keyword_scan",
-              "authority": "GitHub Security Advisories",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-7r4p-vjf4-gxv4"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30838",
-        "url": "https://github.com/advisories/GHSA-4v6x-c7xx-hw9f",
-        "published_at": "2026-03-06T23:27:03Z",
-        "updated_at": "2026-03-09T15:50:47Z",
-        "headline": "CommonMark has DisallowedRawHtml extension bypass via whitespace in HTML tag names",
-        "content": {
-          "excerpt_text": "### Impact The `DisallowedRawHtml` extension can be bypassed by inserting a newline, tab, or other ASCII whitespace character between a disallowed HTML tag name and the closing `>`. For example, ` ` would pass through unfiltered and be rendered as a valid HTML tag by browsers. This is a cross-site scripting (XSS) vector for any application that relies on this extension to sanitize untrusted user input. All applications using the `DisallowedRawHtml` extension to process untrusted markdown are...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-4v6x-c7xx-hw9f"
-          ],
-          "content_hash": "sha256:e8bd619beb826d959a4a27adbb73e4ecad357d9d228f00916c58d5cb84fc4e17"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-79"
-            ],
-            "packages": [
-              "composer:league/commonmark"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-4v6x-c7xx-hw9f"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30835",
-        "url": "https://github.com/advisories/GHSA-9cp7-3q5w-j92g",
-        "published_at": "2026-03-06T23:25:13Z",
-        "updated_at": "2026-03-06T23:25:14Z",
-        "headline": "parse-server: Malformed `$regex` query leaks database error details in API response",
-        "content": {
-          "excerpt_text": "### Impact A malformed $regex query parameter (e.g. `[abc)` causes the database to return a structured error object that is passed unsanitized through the API response. This leaks database internals such as error messages, error codes, code names, cluster timestamps, and topology details. The vulnerability is exploitable by any client that can send query requests, depending on the deployment's permission configuration. ### Patches The fix sanitizes database error objects so that only a...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-9cp7-3q5w-j92g"
-          ],
-          "content_hash": "sha256:f0a81078207ac6a3baa7ed6c43d0dc1c8dfa8d8105f72317066f6991e66ea0d7"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-209"
-            ],
-            "packages": [
-              "npm:parse-server",
-              "npm:parse-server"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-9cp7-3q5w-j92g"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30824",
-        "url": "https://github.com/advisories/GHSA-5f53-522j-j454",
-        "published_at": "2026-03-06T22:21:38Z",
-        "updated_at": "2026-03-09T13:15:56Z",
-        "headline": "Flowise Missing Authentication on NVIDIA NIM Endpoints",
-        "content": {
-          "excerpt_text": "# Missing Authentication on NVIDIA NIM Endpoints ## Summary The NVIDIA NIM router (`/api/v1/nvidia-nim/*`) is whitelisted in the global authentication middleware, allowing unauthenticated access to privileged container management and token generation endpoints. ## Vulnerability Details | Field | Value | |-------|-------| | CWE | CWE-306: Missing Authentication for Critical Function | | Affected File | `packages/server/src/utils/constants.ts` | | Affected Line | Line 20...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-5f53-522j-j454"
-          ],
-          "content_hash": "sha256:d3cb601325493d5773523f9bd99c643c444e511ccd25dbebf0fe960c67d56c87"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-306"
-            ],
-            "packages": [
-              "npm:flowise"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-5f53-522j-j454"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-30823",
-        "url": "https://github.com/advisories/GHSA-cwc3-p92j-g7qm",
-        "published_at": "2026-03-06T22:20:50Z",
-        "updated_at": "2026-03-09T13:15:49Z",
-        "headline": "Flowise has IDOR leading to Account Takeover and Enterprise Feature Bypass via SSO Configuration",
-        "content": {
-          "excerpt_text": "### Summary The Flowise platform has a critical Insecure Direct Object Reference (IDOR) vulnerability combined with a Business Logic Flaw in the PUT /api/v1/loginmethod endpoint. While the endpoint requires authentication, it fails to validate if the authenticated user has ownership or administrative rights over the target organizationId. This allows any low-privileged user (including \"Free\" plan users) to: 1. Overwrite the SSO configuration of any other organization. 2. Enable...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-10T23:46:21Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-cwc3-p92j-g7qm"
-          ],
-          "content_hash": "sha256:4000a2166ea8f65f0216ad303f9961eb6677841999e47d02bcaf622397d46ae3"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cvss": 8.8,
-            "cwes": [
-              "CWE-639",
-              "CWE-862"
-            ],
-            "packages": [
-              "npm:flowise"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-cwc3-p92j-g7qm"
-            }
-          }
-        }
       }
     ],
     "updated": [],
@@ -3963,7 +3989,7 @@
     "removed": 0
   },
   "integrity_reset": false,
-  "archive_url": "/archive/github_advisories/2026/03/10/20260310T234621Z_061510a695064631.json",
+  "archive_url": "/archive/github_advisories/2026/03/11/20260311T002338Z_72ff8508664ef4f2.json",
   "prev_archive_url": "/archive/github_advisories/2026/02/10/20260210T142802Z_0d53e07ce074c901.json",
   "sources_url": "/diff/sources.json"
 }
