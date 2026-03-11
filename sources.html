@@ -124,111 +124,105 @@
     <h1>Source Builder</h1>
     <p class="subtitle">Create custom sources and composite feeds. Paste a URL, preview the schema, pick your fields.</p>
 
-    <!-- Auth -->
-    <div id="auth-gate" class="card">
-      <h3>Authenticate</h3>
-      <p style="color:var(--text2);font-size:.88rem;margin-bottom:12px">Enter your DiffDelta API key to manage sources and feeds.</p>
+    <!-- Step 1: Probe — open to everyone, no auth required -->
+    <div id="probe-step" class="card">
+      <h3>Scan a URL</h3>
+      <p style="color:var(--text2);font-size:.88rem;margin-bottom:12px">Paste an RSS feed or JSON API endpoint. We'll detect the format and show you the fields.</p>
       <div class="input-row">
         <div class="field-group" style="flex:3">
-          <input type="text" id="api-key-input" placeholder="dd_..." autocomplete="off">
+          <input type="url" id="probe-url" placeholder="https://api.example.com/v1/items.json">
         </div>
         <div style="flex:0">
-          <button class="btn btn-primary" onclick="authenticate()" id="auth-btn">Connect</button>
+          <button class="btn btn-primary" onclick="probeUrl()" id="probe-btn">Scan</button>
         </div>
       </div>
-      <div id="auth-error"></div>
+      <div id="probe-result"></div>
     </div>
 
-    <!-- Main content (hidden until auth) -->
-    <div id="main-content" class="hidden">
+    <!-- Step 2: Configure (hidden until probe succeeds) -->
+    <div id="config-step" class="card hidden">
+      <h3>Configure Source</h3>
+
+      <!-- Inline auth prompt — only shown when not yet authenticated -->
+      <div id="inline-auth" class="card" style="background:var(--surface2);border-color:var(--purple);margin-bottom:20px">
+        <p style="color:var(--text2);font-size:.88rem;margin-bottom:10px">Enter your API key to save this source. <a href="/pro.html">Get a key</a></p>
+        <div class="input-row">
+          <div class="field-group" style="flex:3">
+            <input type="text" id="api-key-input" placeholder="dd_..." autocomplete="off">
+          </div>
+          <div style="flex:0">
+            <button class="btn btn-primary" onclick="authenticate()" id="auth-btn">Connect</button>
+          </div>
+        </div>
+        <div id="auth-error"></div>
+      </div>
+
+      <div class="input-row">
+        <div class="field-group">
+          <label>Source Name</label>
+          <input type="text" id="src-name" placeholder="My Security Feed">
+        </div>
+        <div class="field-group">
+          <label>Visibility</label>
+          <div class="toggle" id="src-visibility">
+            <div class="toggle-opt active" data-val="private" onclick="toggleVis(this)">Private</div>
+            <div class="toggle-opt" data-val="public" onclick="toggleVis(this)">Public</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Description (optional)</label>
+        <input type="text" id="src-desc" placeholder="What this source monitors">
+      </div>
+
+      <div class="field-group">
+        <label>Tags (comma-separated, optional)</label>
+        <input type="text" id="src-tags" placeholder="security, ai, news">
+      </div>
+
+      <div class="input-row">
+        <div class="field-group">
+          <label>Max Items</label>
+          <input type="number" id="src-max-items" value="50" min="1" max="200">
+        </div>
+        <div class="field-group">
+          <label>Poll Interval (seconds)</label>
+          <input type="number" id="src-ttl" value="1800" min="900">
+        </div>
+      </div>
+
+      <div id="json-overrides" class="hidden">
+        <div class="input-row">
+          <div class="field-group">
+            <label>Title Field Override</label>
+            <select id="src-title-field"><option value="">Auto-detect</option></select>
+          </div>
+          <div class="field-group">
+            <label>Content Field Override</label>
+            <select id="src-content-field"><option value="">Auto-detect</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>Promote Fields (metadata that survives into the feed)</label>
+        <div id="promote-fields" class="fields-grid"></div>
+      </div>
+
+      <button class="btn btn-primary mt-12" onclick="createSource()" id="create-src-btn">Create Source</button>
+      <div id="create-result" class="mt-12"></div>
+    </div>
+
+    <!-- Tabs for Feed Builder & Dashboard — hidden until auth -->
+    <div id="extra-tabs" class="hidden" style="margin-top:32px">
       <div class="tabs">
-        <button class="tab active" onclick="switchTab('create-source')">New Source</button>
-        <button class="tab" onclick="switchTab('create-feed')">New Feed</button>
+        <button class="tab active" onclick="switchTab('create-feed')">New Feed</button>
         <button class="tab" onclick="switchTab('dashboard')">My Dashboard</button>
       </div>
 
-      <!-- Tab: Create Source -->
-      <div id="tab-create-source" class="tab-content active">
-
-        <!-- Step 1: Probe -->
-        <div id="probe-step" class="card">
-          <h3>Step 1: Scan a URL</h3>
-          <p style="color:var(--text2);font-size:.88rem;margin-bottom:12px">Paste an RSS feed or JSON API endpoint. We'll detect the format and show you the fields.</p>
-          <div class="input-row">
-            <div class="field-group" style="flex:3">
-              <input type="url" id="probe-url" placeholder="https://api.example.com/v1/items.json">
-            </div>
-            <div style="flex:0">
-              <button class="btn btn-primary" onclick="probeUrl()" id="probe-btn">Scan</button>
-            </div>
-          </div>
-          <div id="probe-result"></div>
-        </div>
-
-        <!-- Step 2: Configure (hidden until probe succeeds) -->
-        <div id="config-step" class="card hidden">
-          <h3>Step 2: Configure</h3>
-
-          <div class="input-row">
-            <div class="field-group">
-              <label>Source Name</label>
-              <input type="text" id="src-name" placeholder="My Security Feed">
-            </div>
-            <div class="field-group">
-              <label>Visibility</label>
-              <div class="toggle" id="src-visibility">
-                <div class="toggle-opt active" data-val="private" onclick="toggleVis(this)">Private</div>
-                <div class="toggle-opt" data-val="public" onclick="toggleVis(this)">Public</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="field-group">
-            <label>Description (optional)</label>
-            <input type="text" id="src-desc" placeholder="What this source monitors">
-          </div>
-
-          <div class="field-group">
-            <label>Tags (comma-separated, optional)</label>
-            <input type="text" id="src-tags" placeholder="security, ai, news">
-          </div>
-
-          <div class="input-row">
-            <div class="field-group">
-              <label>Max Items</label>
-              <input type="number" id="src-max-items" value="50" min="1" max="200">
-            </div>
-            <div class="field-group">
-              <label>Poll Interval (seconds)</label>
-              <input type="number" id="src-ttl" value="1800" min="900">
-            </div>
-          </div>
-
-          <div id="json-overrides" class="hidden">
-            <div class="input-row">
-              <div class="field-group">
-                <label>Title Field Override</label>
-                <select id="src-title-field"><option value="">Auto-detect</option></select>
-              </div>
-              <div class="field-group">
-                <label>Content Field Override</label>
-                <select id="src-content-field"><option value="">Auto-detect</option></select>
-              </div>
-            </div>
-          </div>
-
-          <div class="field-group">
-            <label>Promote Fields (metadata that survives into the feed)</label>
-            <div id="promote-fields" class="fields-grid"></div>
-          </div>
-
-          <button class="btn btn-primary mt-12" onclick="createSource()" id="create-src-btn">Create Source</button>
-          <div id="create-result" class="mt-12"></div>
-        </div>
-      </div>
-
       <!-- Tab: Create Feed -->
-      <div id="tab-create-feed" class="tab-content">
+      <div id="tab-create-feed" class="tab-content active">
         <div class="card">
           <h3>Create Composite Feed</h3>
           <p style="color:var(--text2);font-size:.88rem;margin-bottom:16px">Bundle multiple sources into a single pollable endpoint. Mix your custom sources with curated feeds.</p>
@@ -281,24 +275,29 @@
   <script>
     let API_KEY = '';
     let probeData = null;
+    let isAuthenticated = false;
 
-    const headers = () => ({
-      'Content-Type': 'application/json',
-      'X-DiffDelta-Key': API_KEY,
-    });
+    const headers = () => {
+      const h = { 'Content-Type': 'application/json' };
+      if (API_KEY) h['X-DiffDelta-Key'] = API_KEY;
+      return h;
+    };
 
     async function authenticate() {
       const key = document.getElementById('api-key-input').value.trim();
       if (!key) return;
       API_KEY = key;
       document.getElementById('auth-btn').disabled = true;
+      document.getElementById('auth-error').innerHTML = '';
       try {
         const resp = await fetch('/api/v1/sources/custom', { headers: headers() });
         if (!resp.ok) throw new Error((await resp.json()).error || 'Authentication failed');
-        document.getElementById('auth-gate').classList.add('hidden');
-        document.getElementById('main-content').classList.remove('hidden');
+        isAuthenticated = true;
+        document.getElementById('inline-auth').classList.add('hidden');
+        document.getElementById('extra-tabs').classList.remove('hidden');
         loadDashboard();
       } catch (e) {
+        API_KEY = '';
         document.getElementById('auth-error').innerHTML =
           `<div class="msg msg-error">${e.message}</div>`;
       }
@@ -322,7 +321,7 @@
       return document.querySelector(`#${id} .toggle-opt.active`).dataset.val;
     }
 
-    // ── Probe ──
+    // ── Probe (works without auth) ──
     async function probeUrl() {
       const url = document.getElementById('probe-url').value.trim();
       if (!url) return;
@@ -347,10 +346,8 @@
           ${data.json_items_key ? ` (items key: <code>${data.json_items_key}</code>)` : ''}
         </div>`;
 
-        // Show config step
         document.getElementById('config-step').classList.remove('hidden');
 
-        // Populate fields for promote_fields selection
         const container = document.getElementById('promote-fields');
         container.innerHTML = '';
         if (data.fields) {
@@ -364,7 +361,6 @@
           });
         }
 
-        // JSON-specific overrides
         if (data.adapter === 'json' && data.fields) {
           document.getElementById('json-overrides').classList.remove('hidden');
           const titleSel = document.getElementById('src-title-field');
@@ -386,9 +382,16 @@
       btn.textContent = 'Scan';
     }
 
-    // ── Create Source ──
+    // ── Create Source (requires auth) ──
     async function createSource() {
       if (!probeData) return;
+      if (!isAuthenticated) {
+        document.getElementById('inline-auth').style.borderColor = 'var(--yellow)';
+        document.getElementById('api-key-input').focus();
+        document.getElementById('auth-error').innerHTML =
+          '<div class="msg msg-info">Connect your API key first to save this source.</div>';
+        return;
+      }
       const btn = document.getElementById('create-src-btn');
       const result = document.getElementById('create-result');
       btn.disabled = true;
@@ -438,7 +441,7 @@
       btn.disabled = false;
     }
 
-    // ── Create Feed ──
+    // ── Create Feed (requires auth) ──
     async function createFeed() {
       const btn = document.getElementById('create-feed-btn');
       const result = document.getElementById('feed-result');
@@ -475,13 +478,12 @@
 
     // ── Dashboard ──
     async function loadDashboard() {
-      // Load sources
       try {
         const resp = await fetch('/api/v1/sources/custom', { headers: headers() });
         const data = await resp.json();
         const container = document.getElementById('sources-list');
         if (!data.sources || data.sources.length === 0) {
-          container.innerHTML = '<p style="color:var(--text3);font-size:.88rem">No custom sources yet. Create one from the "New Source" tab.</p>';
+          container.innerHTML = '<p style="color:var(--text3);font-size:.88rem">No custom sources yet.</p>';
         } else {
           let html = `<p style="color:var(--text3);font-size:.82rem;margin-bottom:12px">${data.used}/${data.limit} sources used</p>`;
           html += '<table class="source-table"><thead><tr><th>Name</th><th>Status</th><th>Visibility</th><th>ID</th><th></th></tr></thead><tbody>';
@@ -501,13 +503,12 @@
         document.getElementById('sources-list').innerHTML = '<p style="color:var(--red);font-size:.88rem">Failed to load sources.</p>';
       }
 
-      // Load feeds
       try {
         const resp = await fetch('/api/v1/feeds/composite', { headers: headers() });
         const data = await resp.json();
         const container = document.getElementById('feeds-list');
         if (!data.feeds || data.feeds.length === 0) {
-          container.innerHTML = '<p style="color:var(--text3);font-size:.88rem">No composite feeds yet. Create one from the "New Feed" tab.</p>';
+          container.innerHTML = '<p style="color:var(--text3);font-size:.88rem">No composite feeds yet.</p>';
         } else {
           let html = `<p style="color:var(--text3);font-size:.82rem;margin-bottom:12px">${data.used}/${data.limit} feeds used</p>`;
           html += '<table class="source-table"><thead><tr><th>Name</th><th>Sources</th><th>Visibility</th><th>Path</th><th></th></tr></thead><tbody>';

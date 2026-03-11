@@ -103,18 +103,23 @@ function detectRSSFields(text: string): FieldInfo[] {
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
-  const auth = (context.data as Record<string, unknown>).auth as AuthResult;
+  const auth = (context.data as Record<string, unknown>).auth as AuthResult | undefined;
 
-  if (!auth?.authenticated) {
-    return errorResponse("Authentication required", 401);
-  }
-
-  // ── Rate limit: 10 probes/day ──
+  // Probe is open to everyone so users can try before signing up.
+  // Authenticated users get 10 probes/day; anonymous users get 3/day (IP-based).
+  const isAuthed = auth?.authenticated === true;
   const dateKey = new Date().toISOString().slice(0, 10);
-  const rlKey = `probe-rl:${auth.key_hash || "anon"}:${dateKey}`;
+  const identifier = isAuthed
+    ? auth.key_hash || "anon"
+    : request.headers.get("CF-Connecting-IP") || "unknown";
+  const dailyLimit = isAuthed ? 10 : 3;
+  const rlKey = `probe-rl:${identifier}:${dateKey}`;
   const rlCount = parseInt((await env.KEYS.get(rlKey)) || "0", 10);
-  if (rlCount >= 10) {
-    return errorResponse("Probe rate limit reached (10/day). Try again tomorrow.", 429);
+  if (rlCount >= dailyLimit) {
+    const msg = isAuthed
+      ? "Probe rate limit reached (10/day). Try again tomorrow."
+      : "Probe limit reached (3/day). Sign in with an API key for 10 probes/day.";
+    return errorResponse(msg, 429);
   }
 
   // ── Parse request ──
