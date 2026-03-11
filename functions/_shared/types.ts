@@ -35,8 +35,9 @@ export interface KeyData {
   created_at: string;            // ISO 8601
   last_rotated_at: string;       // ISO 8601
   active: boolean;
-  custom_sources_limit: number;  // 2 (pro), -1 (enterprise = unlimited)
+  custom_sources_limit: number;  // 2 (free), 10 (pro), -1 (enterprise = unlimited)
   custom_source_ids: string[];   // IDs of owned custom sources
+  composite_feed_ids?: string[]; // IDs of owned composite feeds
 }
 
 /** Stored in KV under `session:{stripe_session_id}` with 1hr TTL */
@@ -59,12 +60,41 @@ export interface CustomSource {
   id: string;                     // e.g. "cs_a1b2c3d4e5f6"
   owner_key_hash: string;        // SHA-256 of the owning API key
   name: string;                   // User-provided display name
-  url: string;                    // Submitted URL to monitor
-  status: "pending" | "reviewing" | "active" | "rejected";
-  review_notes?: string;          // Admin notes on review decision
+  url: string;                    // Canonical upstream URL
+  status: "active" | "paused";
+  visibility: "private" | "public";
   submitted_at: string;           // ISO 8601
-  reviewed_at?: string;           // ISO 8601
-  feed_source_id?: string;        // Generator source_id once active
+  adapter: "rss" | "json";
+  config: CustomSourceConfig;
+  description?: string;
+  tags?: string[];                // e.g. ["security", "ai"]
+}
+
+/** Engine-compatible config embedded in CustomSource */
+export interface CustomSourceConfig {
+  feed_url?: string;              // RSS adapter
+  api_url?: string;               // JSON adapter
+  json_items_key?: string;
+  json_title_field?: string;
+  json_content_field?: string;
+  url_prefix?: string;
+  promote_fields?: string[];
+  max_items: number;              // Capped: free=50, pro=200
+  ttl_sec: number;                // Floor: 900 (15 min)
+}
+
+/** Stored in KV under `cfeed:{id}` */
+export interface CompositeFeed {
+  id: string;                     // e.g. "cf_x1y2z3"
+  owner_key_hash: string;        // SHA-256 of the owning API key
+  name: string;
+  description?: string;
+  tags?: string[];
+  source_ids: string[];           // Mix of curated IDs and "cs_*" custom IDs
+  visibility: "private" | "public";
+  created_at: string;             // ISO 8601
+  updated_at: string;             // ISO 8601
+  ttl_sec: number;                // Polling interval hint (default: min of source TTLs)
 }
 
 /** Stored in SESSIONS KV under `magic:{token}` with 15min TTL */
