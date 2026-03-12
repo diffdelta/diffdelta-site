@@ -1,19 +1,297 @@
 {
   "schema_version": "1.2.0",
-  "generated_at": "2026-03-12T19:09:08Z",
+  "generated_at": "2026-03-12T20:57:11Z",
   "source_id": "github_advisories",
-  "hash": "sha256:1c2ec4235085cb2fbb6fa0071bf1e946369deaa7bd71ac5320c7fe840b4d33d0",
-  "prev_hash": "sha256:55b24a6da427aa8940e6d62123dde801f03542dae0e833b296d1cfb6b4533d32",
-  "cursor": "sha256:968c92aa2fbccf1fb794405785f1a33f6d7a345ac325018a6a2520f4b583db24",
-  "prev_cursor": "sha256:e8c313d2788138bdda8f71d7c6711d47f8a859001a62301adad4f2c445327fba",
+  "hash": "sha256:d74c199a77a2ee98cc9ea8533bac3d97b81007b2f3c6f50df3721bce8dad3238",
+  "prev_hash": "sha256:1c2ec4235085cb2fbb6fa0071bf1e946369deaa7bd71ac5320c7fe840b4d33d0",
+  "cursor": "sha256:41486e28bb1929914a5f0e7cc3bad41bd2af9756400afb015c87a302af5fd6d2",
+  "prev_cursor": "sha256:968c92aa2fbccf1fb794405785f1a33f6d7a345ac325018a6a2520f4b583db24",
   "changed": true,
   "ttl_sec": 3600,
   "sources_included": [
     "github_advisories"
   ],
-  "batch_narrative": "github_advisories: 100 advisories (8 critical, 32 high, 50 medium, 10 low).",
+  "batch_narrative": "github_advisories: 100 advisories (8 critical, 33 high, 50 medium, 9 low).",
   "buckets": {
     "items": [
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-32320",
+        "url": "https://github.com/advisories/GHSA-j478-p7vq-3347",
+        "published_at": "2026-03-12T20:33:28Z",
+        "updated_at": "2026-03-12T20:33:29Z",
+        "headline": "Ella Core: AMF DoS via malformed PathSwitchRequest with empty NR security capability bitstrings",
+        "content": {
+          "excerpt_text": "## Summary Ella Core panics when processing a PathSwitchRequest containing UE Security Capabilities with zero-length NR encryption or integrity protection algorithm bitstrings, resulting in a denial of service. ## Impact An attacker able to send crafted NGAP messages to Ella Core can crash the process, causing service disruption for all connected subscribers. No authentication is required. ## Fix Added length validation on NR algorithm bitstrings before accessing them in the...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T20:57:11Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-j478-p7vq-3347"
+          ],
+          "content_hash": "sha256:1d6cc0772d5509c2d74c02c530341abf11100910a8dd87a8c8b41f7b6d0d8bed"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cvss": 6.5,
+            "cwes": [
+              "CWE-125"
+            ],
+            "packages": [
+              "go:github.com/ellanetworks/core"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-j478-p7vq-3347"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-32319",
+        "url": "https://github.com/advisories/GHSA-m9pm-w3gv-c68f",
+        "published_at": "2026-03-12T20:33:22Z",
+        "updated_at": "2026-03-12T20:33:22Z",
+        "headline": "Ella Core vulnerable to Unauthenticated AMF DoS via malformed InitialUEMessage with undersized integrity-protected NAS payload",
+        "content": {
+          "excerpt_text": "## Summary Ella Core panics when processing a malformed integrity protected NGAP/NAS message with a length under 7 bytes. ## Impact An attacker able to send crafted NAS messages to Ella Core can crash the process, causing service disruption for all connected subscribers. No authentication is required. ## Fix Added length verification to NAS message handling.",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T20:57:11Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-m9pm-w3gv-c68f"
+          ],
+          "content_hash": "sha256:92c9d0bbf85596a0eb0e1e35f1ba54b9bd995ba853a676de75206100e75942bf"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cvss": 7.5,
+            "cwes": [
+              "CWE-125"
+            ],
+            "packages": [
+              "go:github.com/ellanetworks/core"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-m9pm-w3gv-c68f"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-32302",
+        "url": "https://github.com/advisories/GHSA-5wcw-8jjv-m286",
+        "published_at": "2026-03-12T20:32:59Z",
+        "updated_at": "2026-03-12T20:32:59Z",
+        "headline": "OpenClaw: Untrusted web origins can obtain authenticated operator.admin access in trusted-proxy mode",
+        "content": {
+          "excerpt_text": "## Summary In affected versions of `openclaw`, browser-originated WebSocket connections could bypass origin validation when `gateway.auth.mode` was set to `trusted-proxy` and the request arrived with proxy headers. A page served from an untrusted origin could connect through a trusted reverse proxy, inherit proxy-authenticated identity, and establish a privileged operator session. ## Impact This issue affects deployments that expose the Gateway behind a trusted reverse proxy and rely on...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T20:57:11Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-5wcw-8jjv-m286"
+          ],
+          "content_hash": "sha256:6a34f87ab3092d70948c384f640ba9f7f43e2f5f9ba27bfb4f04d56e250fcde5"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cvss": 8.1,
+            "cwes": [
+              "CWE-346"
+            ],
+            "packages": [
+              "npm:openclaw"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-5wcw-8jjv-m286"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-29066",
+        "url": "https://github.com/advisories/GHSA-m48g-4wr2-j2h6",
+        "published_at": "2026-03-12T20:32:43Z",
+        "updated_at": "2026-03-12T20:32:44Z",
+        "headline": "TinaCMS CLI has Arbitrary File Read via Disabled Vite Filesystem Restriction",
+        "content": {
+          "excerpt_text": "## Summary The TinaCMS CLI dev server configures Vite with `server.fs.strict: false`, which disables Vite's built-in filesystem access restriction. This allows any unauthenticated attacker who can reach the dev server to read arbitrary files on the host system ## Details When running `tinacms dev`, the CLI starts a Vite dev server configured in: `packages/@tinacms/cli/src/next/vite/index.ts` ``` server: { host: configManager.config?.build?.host ?? false, ... fs: { strict: false, // Disables...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T20:57:11Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-m48g-4wr2-j2h6"
+          ],
+          "content_hash": "sha256:53ffa8e53050b5b20d8bc874f2d36783b53353047bfac51a1a33bfb154fa886e"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cvss": 6.2,
+            "cwes": [
+              "CWE-200",
+              "CWE-552"
+            ],
+            "packages": [
+              "npm:@tinacms/cli"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-m48g-4wr2-j2h6"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-28793",
+        "url": "https://github.com/advisories/GHSA-2f24-mg4x-534q",
+        "published_at": "2026-03-12T20:32:26Z",
+        "updated_at": "2026-03-12T20:32:29Z",
+        "headline": "TinaCMS Vulnerable to Path Traversal Leading to Arbitrary File Read, Write and Delete",
+        "content": {
+          "excerpt_text": "## Summary The TinaCMS CLI development server exposes media endpoints that are vulnerable to path traversal, allowing attackers to read and write arbitrary files on the filesystem outside the intended media directory. ## Details When running tinacms dev, the CLI starts a local HTTP server (default port 4001) exposing endpoints such as: - /media/list/* - /media/upload/* - /media/* These endpoints process user-controlled path segments using decodeURI() and path.join() without validating that...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T20:57:11Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-2f24-mg4x-534q"
+          ],
+          "content_hash": "sha256:13fabf00639cd5646785b75168755284e3849efbe721fd0964b97755f6fc58f8"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "github_advisory",
+            "cvss": 8.4,
+            "cwes": [
+              "CWE-22"
+            ],
+            "packages": [
+              "npm:@tinacms/cli"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-2f24-mg4x-534q"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-28792",
+        "url": "https://github.com/advisories/GHSA-8pw3-9m7f-q734",
+        "published_at": "2026-03-12T20:32:09Z",
+        "updated_at": "2026-03-12T20:32:10Z",
+        "headline": "TinaCMS CLI Dev Server Vulnerable to Cross-Origin File Exfiltration via CORS Misconfiguration + Path Traversal in TinaCMS",
+        "content": {
+          "excerpt_text": "## Summary The TinaCMS CLI dev server combines a permissive CORS configuration (Access-Control-Allow-Origin: *) with the path traversal vulnerability (previously reported) to enable a browser-based drive-by attack. A remote attacker can enumerate the filesystem, write arbitrary files, and delete arbitrary files on developer's machines by simply tricking them into visiting a malicious website while tinacms dev is running. ## Details The TinaCMS dev server sets permissive CORS headers that...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T20:57:11Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-8pw3-9m7f-q734"
+          ],
+          "content_hash": "sha256:33a084e633fd0f19c0541a8dd20cf9c97b823b005e0f3f562ff360e68fee3390"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "github_advisory",
+            "cvss": 9.7,
+            "cwes": [
+              "CWE-22",
+              "CWE-942"
+            ],
+            "packages": [
+              "npm:@tinacms/cli"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-8pw3-9m7f-q734"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2023-1289",
+        "url": "https://github.com/advisories/GHSA-j96m-mjp6-99xr",
+        "published_at": "2026-03-12T20:30:45Z",
+        "updated_at": "2026-03-12T20:30:49Z",
+        "headline": "ImageMagick: Specially crafted SVG leads to segmentation fault and generate trash files in \"/tmp\", possible to leverage DoS",
+        "content": {
+          "excerpt_text": "### Summary Specially crafted SVG file make segmentation fault and generate trash files in \"/tmp\", possible to leverage DoS. ### Operating system, version and so on Linux, Debian (Buster) LTS core 5.10 / Parrot OS 5.1 (Electro Ara) ### Tested ImageMagick version 6.9.11-60, 7.1.0-62 ### Details A specially created SVG file that loads by itself and make segmentation fault. Remote attackers can take advantage of this vulnerability to cause a denial of service of the generated SVG file. It seems...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T20:57:11Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-j96m-mjp6-99xr"
+          ],
+          "content_hash": "sha256:63ba18d712a75d61b986410a8ccb424915ccb7af810b5ed1da9a36d36380b07e"
+        },
+        "signals": {
+          "severity": {
+            "level": "medium",
+            "source": "github_advisory",
+            "cvss": 5.5,
+            "cwes": [
+              "CWE-20",
+              "CWE-400"
+            ],
+            "packages": [
+              "nuget:Magick.NET-Q16-AnyCPU",
+              "nuget:Magick.NET-Q16-HDRI-AnyCPU",
+              "nuget:Magick.NET-Q16-HDRI-OpenMP-arm64",
+              "nuget:Magick.NET-Q16-HDRI-arm64",
+              "nuget:Magick.NET-Q16-HDRI-x64",
+              "nuget:Magick.NET-Q16-HDRI-x86",
+              "nuget:Magick.NET-Q16-OpenMP-arm64",
+              "nuget:Magick.NET-Q16-OpenMP-x64",
+              "nuget:Magick.NET-Q16-OpenMP-x86",
+              "nuget:Magick.NET-Q16-arm64"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-j96m-mjp6-99xr"
+            }
+          }
+        }
+      },
       {
         "source": "github_advisories",
         "id": "CVE-2026-32274",
@@ -26,7 +304,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3936-cmfr-pm3m"
           ],
@@ -63,7 +341,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-92gp-jfgx-9qpv"
           ],
@@ -101,7 +379,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5hxf-c7j4-279c"
           ],
@@ -139,7 +417,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-p2m9-wcp5-6qw3"
           ],
@@ -171,14 +449,14 @@
         "id": "CVE-2026-24125",
         "url": "https://github.com/advisories/GHSA-2238-xc5r-v9hj",
         "published_at": "2026-03-12T17:50:28Z",
-        "updated_at": "2026-03-12T17:50:29Z",
+        "updated_at": "2026-03-12T19:13:57Z",
         "headline": "@tinacms/graphql has a Path Traversal issue",
         "content": {
           "excerpt_text": "### Description TinaCMS allows users to create, update, and delete content documents using relative file paths (`relativePath`, `newRelativePath`) via GraphQL mutations. Under certain conditions, these paths are combined with the collection path using `path.join()` without validating that the resolved path remains within the collection root directory. Because `path.join()` does not prevent directory traversal, paths containing `../` sequences can escape the intended directory boundary. ###...",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-2238-xc5r-v9hj"
           ],
@@ -216,7 +494,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5fw2-8jcv-xh87"
           ],
@@ -254,7 +532,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-2cjm-2gwv-m892"
           ],
@@ -292,7 +570,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qmpg-8xg6-ph5q"
           ],
@@ -331,7 +609,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-gg5m-55jj-8m5g"
           ],
@@ -369,7 +647,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3q28-qjrv-qr39"
           ],
@@ -407,7 +685,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xg2q-62g2-cvcm"
           ],
@@ -445,7 +723,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-4cm8-xpfv-jv6f"
           ],
@@ -477,14 +755,14 @@
         "id": "GHSA-mwv9-gp5h-frr4",
         "url": "https://github.com/advisories/GHSA-mwv9-gp5h-frr4",
         "published_at": "2026-03-12T16:38:15Z",
-        "updated_at": "2026-03-12T16:38:15Z",
+        "updated_at": "2026-03-12T19:41:57Z",
         "headline": "Sveltejs devalue's `devalue.parse` and `devalue.unflatten` emit objects with `__proto__` own properties",
         "content": {
           "excerpt_text": "In some circumstances, `devalue.parse` and `devalue.unflatten` could emit objects with `__proto__` own properties. This in and of itself is not a security vulnerability (and is possible with, for example, `JSON.parse` as well), but it can result in prototype injection if _downstream_ code handles it incorrectly: ```ts const result = devalue.parse(/* input creating an object with a __proto__ property */); const target = {}; Object.assign(target, result); // target's prototype is now polluted ```",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mwv9-gp5h-frr4"
           ],
@@ -521,7 +799,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-c442-97qw-j6c6"
           ],
@@ -559,7 +837,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-2m67-cxxq-c3h8"
           ],
@@ -597,7 +875,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-46q5-g3j9-wx5c"
           ],
@@ -636,7 +914,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8wq8-6859-qx77"
           ],
@@ -674,7 +952,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qp4c-xg64-7c6x"
           ],
@@ -711,7 +989,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wqvh-63mv-9w92"
           ],
@@ -750,7 +1028,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-725g-w329-g7qr"
           ],
@@ -784,7 +1062,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-x442-m7cc-hr92"
           ],
@@ -821,7 +1099,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wj56-g96r-673q"
           ],
@@ -859,7 +1137,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9v82-xrm4-mp52"
           ],
@@ -897,7 +1175,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-h7vr-cg25-jf8c"
           ],
@@ -935,7 +1213,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mm78-fgq8-6pgr"
           ],
@@ -973,7 +1251,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-4hjq-9h5c-252j"
           ],
@@ -1011,7 +1289,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5fg6-wrq4-w5gh"
           ],
@@ -1049,7 +1327,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-c7hf-c5p5-5g6h"
           ],
@@ -1087,7 +1365,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-pf93-j98v-25pv"
           ],
@@ -1125,7 +1403,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-fmfg-9g7c-3vq7"
           ],
@@ -1163,7 +1441,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-56cv-c5p2-j2wg"
           ],
@@ -1201,7 +1479,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-rcp6-88mm-9vgf"
           ],
@@ -1239,7 +1517,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-67rw-2x62-mqqm"
           ],
@@ -1276,7 +1554,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8j2w-6fmm-m587"
           ],
@@ -1314,7 +1592,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-v8cg-4474-49v8"
           ],
@@ -1352,7 +1630,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qcc4-p59m-p54m"
           ],
@@ -1391,7 +1669,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mgrq-9f93-wpp5"
           ],
@@ -1430,7 +1708,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-gp3q-wpq4-5c5h"
           ],
@@ -1468,7 +1746,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-g7cr-9h7q-4qxq"
           ],
@@ -1505,7 +1783,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-vhwf-4x96-vqx2"
           ],
@@ -1542,7 +1820,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8g75-q649-6pv6"
           ],
@@ -1581,7 +1859,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xx6g-43w2-9g6g"
           ],
@@ -1633,7 +1911,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-228v-wc5r-j8m7"
           ],
@@ -1671,7 +1949,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-j7mm-f4rv-6q6q"
           ],
@@ -1709,7 +1987,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qjxf-f2mg-c6mc"
           ],
@@ -1739,14 +2017,14 @@
         "id": "CVE-2026-31873",
         "url": "https://github.com/advisories/GHSA-5339-hvwr-7582",
         "published_at": "2026-03-12T14:19:25Z",
-        "updated_at": "2026-03-12T14:19:26Z",
+        "updated_at": "2026-03-12T19:14:32Z",
         "headline": "Unhead Vulnerable to Bypass of URI Scheme Sanitization in makeTagSafe via Case-Sensitivity",
         "content": {
           "excerpt_text": "The `link.href` check in `makeTagSafe` (safe.ts, line 68-71) uses `String.includes()`, which is case-sensitive: ```typescript if (key === 'href') { if (val.includes('javascript:') || val.includes('data:')) { return } next[key] = val } ``` Browsers treat URI schemes case-insensitively. `DATA:text/css,...` is the same as `data:text/css,...` to the browser, but `'DATA:...'.includes('data:')` returns `false`. ### PoC ```javascript useHeadSafe({ link: [{ rel: 'stylesheet', href:...",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5339-hvwr-7582"
           ],
@@ -1776,14 +2054,14 @@
         "id": "CVE-2026-31860",
         "url": "https://github.com/advisories/GHSA-g5xx-pwrp-g3fv",
         "published_at": "2026-03-12T14:19:15Z",
-        "updated_at": "2026-03-12T14:19:16Z",
+        "updated_at": "2026-03-12T19:14:27Z",
         "headline": "Unhead has XSS bypass in `useHeadSafe` via attribute name injection and case-sensitive protocol check",
         "content": {
           "excerpt_text": "## Summary `useHeadSafe()` can be bypassed to inject arbitrary HTML attributes, including event handlers, into SSR-rendered ` ` tags. This is the composable that Nuxt docs recommend for safely handling user-generated content. ## Details **XSS via `data-*` attribute name injection** The `acceptDataAttrs` function (safe.ts, line 16-20) allows any property key starting with `data-` through to the final HTML. It only checks the prefix, not whether the key contains spaces or other characters that...",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-g5xx-pwrp-g3fv"
           ],
@@ -1791,7 +2069,7 @@
         },
         "signals": {
           "severity": {
-            "level": "high",
+            "level": "medium",
             "source": "github_advisory",
             "cwes": [
               "CWE-79"
@@ -1820,7 +2098,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qpg4-j99f-8xcg"
           ],
@@ -1867,7 +2145,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5ggv-92r5-cp4p"
           ],
@@ -1914,7 +2192,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-cqw9-w2m7-r2m2"
           ],
@@ -1961,7 +2239,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-h95r-c8c7-mrwx"
           ],
@@ -2008,7 +2286,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-rqq8-jh93-f4vg"
           ],
@@ -2055,7 +2333,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-cfw5-2vxh-hr84"
           ],
@@ -2092,7 +2370,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hffp-q43q-qq76"
           ],
@@ -2139,7 +2417,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wj8w-pjxf-9g4f"
           ],
@@ -2186,7 +2464,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-7h7q-j33q-hvpf"
           ],
@@ -2233,7 +2511,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xxw5-m53x-j38c"
           ],
@@ -2291,7 +2569,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-fpvf-frm6-625q"
           ],
@@ -2338,7 +2616,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-467j-76j7-5885"
           ],
@@ -2385,7 +2663,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-932h-jw47-73jm"
           ],
@@ -2432,7 +2710,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-r39q-jr8h-gcq2"
           ],
@@ -2479,7 +2757,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-pgpf-m8m4-6cg6"
           ],
@@ -2521,7 +2799,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wrhr-rf8j-r842"
           ],
@@ -2569,7 +2847,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mqfc-82jx-3mr2"
           ],
@@ -2616,7 +2894,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-pmq6-8289-hx3v"
           ],
@@ -2663,7 +2941,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8mpr-6xr2-chhc"
           ],
@@ -2711,7 +2989,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xg29-8ghv-v4xr"
           ],
@@ -2758,7 +3036,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3mwp-xqp2-q6ph"
           ],
@@ -2806,7 +3084,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wgx8-r9vw-2w4h"
           ],
@@ -2844,7 +3122,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xjj9-2w6f-jg55"
           ],
@@ -2882,7 +3160,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-jx93-g359-86wm"
           ],
@@ -2920,7 +3198,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-r8jr-wg88-fq5c"
           ],
@@ -2959,7 +3237,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hvwj-8w5g-28rg"
           ],
@@ -2997,7 +3275,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-rgq9-fqf5-fv58"
           ],
@@ -3035,7 +3313,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-cpfq-66p2-336j"
           ],
@@ -3075,7 +3353,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xj37-qjg2-xwv2"
           ],
@@ -3113,7 +3391,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-f8q5-h5qh-33mh"
           ],
@@ -3161,7 +3439,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-78cv-mqj4-43f7"
           ],
@@ -3192,18 +3470,18 @@
         "id": "CVE-2026-26127",
         "url": "https://github.com/advisories/GHSA-73j8-2gch-69rq",
         "published_at": "2026-03-11T21:11:44Z",
-        "updated_at": "2026-03-11T21:11:46Z",
+        "updated_at": "2026-03-12T20:32:34Z",
         "headline": ".NET Denial of Service Vulnerability",
         "content": {
           "excerpt_text": "# Microsoft Security Advisory CVE-2026-26127 – .NET Denial of Service Vulnerability ## Executive summary Microsoft is releasing this security advisory to provide information about a vulnerability in .NET 9.0 and .NET 10.0. This advisory also provides guidance on what developers can do to update their applications to remove this vulnerability. A denial of service vulnerability exists in .NET and Microsoft.Bcl.Memory due to an out-of-bounds read when decoding malformed Base64Url input. ##...",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-73j8-2gch-69rq"
           ],
-          "content_hash": "sha256:6c6494834f4ece898eb817a58bcdd09ab2a9aa4aa3038dafe0741fe28c0cca2f"
+          "content_hash": "sha256:0d5e5866ee0cc4c3e355505267efdd5a28c331f249354d1310905c9cc3e2065d"
         },
         "signals": {
           "severity": {
@@ -3246,7 +3524,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-4vgm-c2wm-63mw"
           ],
@@ -3293,7 +3571,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9jfh-9xrq-4vwm"
           ],
@@ -3330,7 +3608,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-crjq-wm6x-6qx7"
           ],
@@ -3373,7 +3651,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3wf5-g532-rcrr"
           ],
@@ -3412,7 +3690,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-c4p7-rwrg-pf6p"
           ],
@@ -3453,7 +3731,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-gqc5-xv7m-gcjq"
           ],
@@ -3494,7 +3772,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-7vvp-j573-5584"
           ],
@@ -3534,7 +3812,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8g9r-9wjw-37j4"
           ],
@@ -3572,7 +3850,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-vv3h-7qwr-722v"
           ],
@@ -3611,7 +3889,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-g3hp-vvqf-8vw6"
           ],
@@ -3648,7 +3926,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-fp5j-j7j4-mcxc"
           ],
@@ -3686,7 +3964,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mmf8-487q-p45m"
           ],
@@ -3726,7 +4004,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-rhcg-3h8r-v6vp"
           ],
@@ -3765,7 +4043,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
+          "fetched_at": "2026-03-12T20:57:11Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-vrqc-59mw-qqg7"
           ],
@@ -3791,273 +4069,6 @@
             }
           }
         }
-      },
-      {
-        "source": "github_advisories",
-        "id": "GHSA-54gx-3cgr-7mfm",
-        "url": "https://github.com/advisories/GHSA-54gx-3cgr-7mfm",
-        "published_at": "2026-03-11T14:53:51Z",
-        "updated_at": "2026-03-11T14:53:51Z",
-        "headline": "Cosmos EVM: incorrect state handling during nested EVM execution paths",
-        "content": {
-          "excerpt_text": "**Advisory ID:** ASA-2026-002 **Component:** ICS20 Precompile **Status:** Resolved **Published:** March 2026 **Contact:** [security@cosmoslabs.io](mailto:security@cosmoslabs.io) --- # Security Advisory ASA-2026-002 **Status: Resolved. A patch is available and all known affected chains have either applied mitigations or [upgraded](https://github.com/cosmos/evm/releases/tag/v0.6.0).** | Field | Value | | --- | --- | | **Severity** | Critical | | **Affected Component** | ICS20 Precompile | |...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-54gx-3cgr-7mfm"
-          ],
-          "content_hash": "sha256:aa3d79fe1b312984edf8207b98afedc0524485bade4d9d034d3a8f73f31ccb17"
-        },
-        "signals": {
-          "severity": {
-            "level": "critical",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-670"
-            ],
-            "packages": [
-              "go:github.com/cosmos/evm"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-54gx-3cgr-7mfm"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-29777",
-        "url": "https://github.com/advisories/GHSA-8q2w-wr49-whqj",
-        "published_at": "2026-03-11T14:49:44Z",
-        "updated_at": "2026-03-11T20:43:37Z",
-        "headline": "Traefik: kubernetes gateway rule injection via unescaped backticks in HTTPRoute match values",
-        "content": {
-          "excerpt_text": "## Summary There is a potential vulnerability in Traefik's Kubernetes Gateway provider related to rule injection. A tenant with write access to an HTTPRoute resource can inject backtick-delimited rule tokens into Traefik's router rule language via unsanitized header or query parameter match values. In shared gateway deployments, this can bypass listener hostname constraints and redirect traffic for victim hostnames to attacker-controlled backends. ## Patches -...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-8q2w-wr49-whqj"
-          ],
-          "content_hash": "sha256:19aa968bc44feb912c791adaa466f2368ab3b8b03a25d71a21b71e28d5e366ca"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cwes": [
-              "CWE-74"
-            ],
-            "packages": [
-              "go:github.com/traefik/traefik/v3"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-8q2w-wr49-whqj"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-28229",
-        "url": "https://github.com/advisories/GHSA-56px-hm34-xqj5",
-        "published_at": "2026-03-11T14:49:37Z",
-        "updated_at": "2026-03-11T20:43:32Z",
-        "headline": "Unauthorized access to Argo Workflows Template",
-        "content": {
-          "excerpt_text": "### Summary Workflow templates endpoints allow any client to retrieve WorkflowTemplates (and ClusterWorkflowTemplates). Any request with a `Authorization: Bearer nothing` token can leak sensitive template content, including embedded Secret manifests. ### Details https://github.com/argoproj/argo-workflows/blob/b519c9054e66b2f0a25eec06709717bd1362f72e/server/workflowtemplate/workflow_template_server.go#L60-L78...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-56px-hm34-xqj5"
-          ],
-          "content_hash": "sha256:c0dfbc8b6a693b05d66a6217f30f823dbbbb44dfc48b9bc8ac0a4a00a255f406"
-        },
-        "signals": {
-          "severity": {
-            "level": "high",
-            "source": "github_advisory",
-            "cvss": 7.5,
-            "cwes": [
-              "CWE-200",
-              "CWE-863"
-            ],
-            "packages": [
-              "go:github.com/argoproj/argo-workflows/v3",
-              "go:github.com/argoproj/argo-workflows/v4"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-56px-hm34-xqj5"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-3911",
-        "url": "https://github.com/advisories/GHSA-xh32-c9wx-phrp",
-        "published_at": "2026-03-11T06:31:41Z",
-        "updated_at": "2026-03-12T14:42:37Z",
-        "headline": "Keycloak: Information disclosure of disabled user attributes via administrative endpoint",
-        "content": {
-          "excerpt_text": "A flaw was found in Keycloak. An authenticated user with the view-users role could exploit a vulnerability in the UserResource component. By accessing a specific administrative endpoint, this user could improperly retrieve user attributes that were configured to be hidden. This unauthorized information disclosure could expose sensitive user data.",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-xh32-c9wx-phrp"
-          ],
-          "content_hash": "sha256:8ba7bc67cf234dcba0d62a84426c6ac9c056b3b7fea015e12f67cd352cdf3915"
-        },
-        "signals": {
-          "severity": {
-            "level": "low",
-            "source": "github_advisory",
-            "cvss": 2.7,
-            "cwes": [
-              "CWE-359"
-            ],
-            "packages": [
-              "maven:org.keycloak:keycloak-services"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-xh32-c9wx-phrp"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-31960",
-        "url": "https://github.com/advisories/GHSA-g32c-4pvp-769g",
-        "published_at": "2026-03-11T00:38:08Z",
-        "updated_at": "2026-03-11T21:38:03Z",
-        "headline": "Quill has DoS via unbounded read of HTTP response body during notarization",
-        "content": {
-          "excerpt_text": "### Impact Quill before version `v0.7.1` has unbounded reads of HTTP response bodies during the Apple notarization process. Exploitation requires the ability to modify API responses from Apple's notarization service, which is not possible under standard network conditions due to HTTPS with proper TLS certificate validation; however, environments with TLS-intercepting proxies (common in corporate networks), compromised certificate authorities, or other trust boundary violations are at risk....",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-g32c-4pvp-769g"
-          ],
-          "content_hash": "sha256:8e9df5301b02a1ca380b1b0a34610389ed694bdb25cdd24821b685d6d83f5978"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cvss": 5.3,
-            "cwes": [
-              "CWE-770"
-            ],
-            "packages": [
-              "go:github.com/anchore/quill"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-g32c-4pvp-769g"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-31961",
-        "url": "https://github.com/advisories/GHSA-xj69-m9qq-8m94",
-        "published_at": "2026-03-11T00:38:00Z",
-        "updated_at": "2026-03-11T21:37:56Z",
-        "headline": "Quill has unbounded memory allocation via unvalidated size fields in Mach-O binary parsing",
-        "content": {
-          "excerpt_text": "### Impact Quill before version `v0.7.1` contains an unbounded memory allocation vulnerability when parsing Mach-O binaries. Exploitation requires that Quill processes an attacker-supplied Mach-O binary, which is most likely in environments such as CI/CD pipelines, shared signing services, or any workflow where externally-submitted binaries are accepted for signing. When parsing a Mach-O binary, Quill reads several size and count fields from the `LC_CODE_SIGNATURE` load command and embedded...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-xj69-m9qq-8m94"
-          ],
-          "content_hash": "sha256:ed6c658a41a6b4829fba600f68661353f33fb34b3c48cad4e9cc6d4404a022e8"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cvss": 5.5,
-            "cwes": [
-              "CWE-770"
-            ],
-            "packages": [
-              "go:github.com/anchore/quill"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-xj69-m9qq-8m94"
-            }
-          }
-        }
-      },
-      {
-        "source": "github_advisories",
-        "id": "CVE-2026-31959",
-        "url": "https://github.com/advisories/GHSA-7q3q-5px6-4c5p",
-        "published_at": "2026-03-11T00:37:44Z",
-        "updated_at": "2026-03-11T21:37:51Z",
-        "headline": "Quill vulnerable to SSRF via unvalidated URL from Apple notarization log retrieval",
-        "content": {
-          "excerpt_text": "### Impact Quill before version `v0.7.1` contains a Server-Side Request Forgery (SSRF) vulnerability when attempting to fetch the Apple notarization submission logs. Exploitation requires the ability to modify API responses from Apple's notarization service, which is not possible under standard network conditions due to HTTPS with proper TLS certificate validation; however, environments with TLS-intercepting proxies (common in corporate networks), compromised certificate authorities, or...",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-12T19:09:08Z",
-          "evidence_urls": [
-            "https://github.com/advisories/GHSA-7q3q-5px6-4c5p"
-          ],
-          "content_hash": "sha256:e9e64d6b3655a9a59fd6e10ca2307cb499402044e1708f69baacc43e4bfa613a"
-        },
-        "signals": {
-          "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cvss": 5.3,
-            "cwes": [
-              "CWE-20",
-              "CWE-918"
-            ],
-            "packages": [
-              "go:github.com/anchore/quill"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-7q3q-5px6-4c5p"
-            }
-          }
-        }
       }
     ],
     "updated": [],
@@ -4069,7 +4080,7 @@
     "removed": 0
   },
   "integrity_reset": false,
-  "archive_url": "/archive/github_advisories/2026/03/12/20260312T190908Z_1c2ec4235085cb2f.json",
+  "archive_url": "/archive/github_advisories/2026/03/12/20260312T205711Z_d74c199a77a2ee98.json",
   "prev_archive_url": "/archive/github_advisories/2026/02/10/20260210T142802Z_0d53e07ce074c901.json",
   "sources_url": "/diff/sources.json"
 }
