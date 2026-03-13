@@ -1,10 +1,10 @@
 {
   "schema_version": "1.2.0",
-  "generated_at": "2026-03-13T15:57:02Z",
-  "hash": "sha256:dd438cf7915e8fd7199b13f88fbf7f5fcc6b55a96f40f3698b76e936d043a5d6",
-  "prev_hash": "sha256:63801f4cfb55eeca62e19145281cc084fa07f28a2246a2652a39dc966a8c9218",
-  "cursor": "sha256:d468a44cbaad6d44d80e1a671d93b3b11e26ba2495ab0f09d8c60fe69e3ad842",
-  "prev_cursor": "sha256:0e7ff9de231c01a62b2324bf1952d3f26c97359826f3cb97441a5df7826cd3a8",
+  "generated_at": "2026-03-13T16:26:39Z",
+  "hash": "sha256:f2eada7f168049c84af729e68127286184ffd23546bc0fd008f2b1b86483b15d",
+  "prev_hash": "sha256:dd438cf7915e8fd7199b13f88fbf7f5fcc6b55a96f40f3698b76e936d043a5d6",
+  "cursor": "sha256:682aa346506e0116e5737875cc33b9dd348894c9ff1f701be52b332260890ae7",
+  "prev_cursor": "sha256:d468a44cbaad6d44d80e1a671d93b3b11e26ba2495ab0f09d8c60fe69e3ad842",
   "changed": true,
   "ttl_sec": 900,
   "sources_included": [
@@ -56,14 +56,105 @@
     "vscode_releases",
     "wikipedia_recent_changes"
   ],
-  "batch_narrative": "190 items. 4 deprecations. 40 releases. 102 advisories (11 critical, 33 high).",
+  "batch_narrative": "210 items. 4 deprecations. 40 releases. 109 advisories (17 critical, 34 high).",
   "counts": {
-    "items": 190,
+    "items": 210,
     "updated": 0,
     "removed": 0
   },
   "buckets": {
     "items": [
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-32304",
+        "url": "https://github.com/advisories/GHSA-vh9h-29pq-r5m8",
+        "published_at": "2026-03-13T16:10:29Z",
+        "updated_at": "2026-03-13T16:10:32Z",
+        "headline": "Locutus vulnerable to RCE via unsanitized input in create_function()",
+        "content": {
+          "excerpt_text": "## Summary The `create_function(args, code)` function passes both parameters directly to the `Function` constructor without any sanitization, allowing arbitrary code execution. This is distinct from CVE-2026-29091 (GHSA-fp25-p6mj-qqg6) which was `call_user_func_array` using `eval()` in v2.x. This finding affects `create_function` using `new Function()` in v3.x. ## Root Cause `src/php/funchand/create_function.ts:17`: ```typescript return new Function(...params, code) ``` Zero input validation...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:25:36Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-vh9h-29pq-r5m8"
+          ],
+          "content_hash": "sha256:e15f6e1d1a0783f92914acfe5c7bab9d508a01d9d7ad1fc179fcf03cc0763137"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "github_advisory",
+            "cvss": 9.8,
+            "cwes": [
+              "CWE-94"
+            ],
+            "packages": [
+              "npm:locutus"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-vh9h-29pq-r5m8"
+            }
+          },
+          "deprecation": {
+            "type": "removal",
+            "affects": [
+              "create_function",
+              "API"
+            ],
+            "confidence": "high",
+            "source": "keyword_scan",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "GitHub Security Advisories",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-vh9h-29pq-r5m8"
+            }
+          }
+        }
+      },
+      {
+        "source": "github_advisories",
+        "id": "CVE-2026-32614",
+        "url": "https://github.com/advisories/GHSA-5xxp-2vrj-x855",
+        "published_at": "2026-03-13T16:10:12Z",
+        "updated_at": "2026-03-13T16:10:13Z",
+        "headline": "SM9 Infinity-Point Ciphertext Forgery Vulnerability",
+        "content": {
+          "excerpt_text": "## Overview The current SM9 decryption implementation contains an infinity-point ciphertext forgery vulnerability. The root cause is that, during decryption, the elliptic-curve point C1 in the ciphertext is only deserialized and checked to be on the curve, but the implementation does not explicitly reject the point at infinity. In the current implementation, an attacker can construct C1 as the point at infinity, causing the bilinear pairing result to degenerate into the identity element in...",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:25:36Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-5xxp-2vrj-x855"
+          ],
+          "content_hash": "sha256:bd9c7a10926f5b424f9cb4c8db7fe19fd79bcf282e51a4aa9511643486a3a0d4"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "github_advisory",
+            "cvss": 7.5,
+            "cwes": [
+              "CWE-20"
+            ],
+            "packages": [
+              "go:github.com/emmansun/gmsm"
+            ],
+            "provenance": {
+              "method": "advisory_api",
+              "authority": "GitHub Advisory Database",
+              "authority_url": "https://github.com/advisories",
+              "evidence_url": "https://github.com/advisories/GHSA-5xxp-2vrj-x855"
+            }
+          }
+        }
+      },
       {
         "source": "github_advisories",
         "id": "GHSA-qvr7-g57c-mrc7",
@@ -76,7 +167,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qvr7-g57c-mrc7"
           ],
@@ -114,7 +205,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mj4p-rc52-m843"
           ],
@@ -153,7 +244,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-jf6w-m8jw-jfxc"
           ],
@@ -191,7 +282,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qc36-x95h-7j53"
           ],
@@ -229,7 +320,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8jhh-jcqg-mj5p"
           ],
@@ -268,7 +359,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-rw39-5899-8mxp"
           ],
@@ -307,7 +398,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xf99-j42q-5w5p"
           ],
@@ -345,7 +436,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-4w7m-58cg-cmff"
           ],
@@ -383,7 +474,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-4jpw-hj22-2xmc"
           ],
@@ -421,7 +512,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xw77-45gv-p728"
           ],
@@ -460,7 +551,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xvx8-77m6-gwg6"
           ],
@@ -498,7 +589,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-25h7-pfq9-p65f"
           ],
@@ -536,7 +627,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-g2p6-hh5v-7hfm"
           ],
@@ -573,7 +664,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-4g4c-mfqg-pj8r"
           ],
@@ -610,7 +701,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-m4q3-457p-hh2x"
           ],
@@ -659,7 +750,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9wmw-9wph-2vwp"
           ],
@@ -697,7 +788,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-6r9f-759j-hjgv"
           ],
@@ -735,7 +826,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-j478-p7vq-3347"
           ],
@@ -773,7 +864,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-m9pm-w3gv-c68f"
           ],
@@ -811,7 +902,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5wcw-8jjv-m286"
           ],
@@ -849,7 +940,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-m48g-4wr2-j2h6"
           ],
@@ -888,7 +979,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-2f24-mg4x-534q"
           ],
@@ -926,7 +1017,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8pw3-9m7f-q734"
           ],
@@ -965,7 +1056,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-j96m-mjp6-99xr"
           ],
@@ -1013,7 +1104,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3936-cmfr-pm3m"
           ],
@@ -1050,7 +1141,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-92gp-jfgx-9qpv"
           ],
@@ -1088,7 +1179,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5hxf-c7j4-279c"
           ],
@@ -1126,7 +1217,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-p2m9-wcp5-6qw3"
           ],
@@ -1165,7 +1256,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-2238-xc5r-v9hj"
           ],
@@ -1203,7 +1294,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5fw2-8jcv-xh87"
           ],
@@ -1241,7 +1332,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-2cjm-2gwv-m892"
           ],
@@ -1279,7 +1370,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qmpg-8xg6-ph5q"
           ],
@@ -1318,7 +1409,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-gg5m-55jj-8m5g"
           ],
@@ -1356,7 +1447,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3q28-qjrv-qr39"
           ],
@@ -1394,7 +1485,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xg2q-62g2-cvcm"
           ],
@@ -1432,7 +1523,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-4cm8-xpfv-jv6f"
           ],
@@ -1471,7 +1562,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mwv9-gp5h-frr4"
           ],
@@ -1508,7 +1599,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-c442-97qw-j6c6"
           ],
@@ -1546,7 +1637,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-2m67-cxxq-c3h8"
           ],
@@ -1584,7 +1675,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-46q5-g3j9-wx5c"
           ],
@@ -1623,7 +1714,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8wq8-6859-qx77"
           ],
@@ -1661,7 +1752,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qp4c-xg64-7c6x"
           ],
@@ -1698,7 +1789,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wqvh-63mv-9w92"
           ],
@@ -1737,7 +1828,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-725g-w329-g7qr"
           ],
@@ -1771,7 +1862,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-x442-m7cc-hr92"
           ],
@@ -1808,7 +1899,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wj56-g96r-673q"
           ],
@@ -1846,7 +1937,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9v82-xrm4-mp52"
           ],
@@ -1884,7 +1975,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-h7vr-cg25-jf8c"
           ],
@@ -1922,7 +2013,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mm78-fgq8-6pgr"
           ],
@@ -1960,7 +2051,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-4hjq-9h5c-252j"
           ],
@@ -1998,7 +2089,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5fg6-wrq4-w5gh"
           ],
@@ -2036,7 +2127,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-c7hf-c5p5-5g6h"
           ],
@@ -2074,7 +2165,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-pf93-j98v-25pv"
           ],
@@ -2112,7 +2203,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-fmfg-9g7c-3vq7"
           ],
@@ -2150,7 +2241,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-56cv-c5p2-j2wg"
           ],
@@ -2188,7 +2279,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-rcp6-88mm-9vgf"
           ],
@@ -2226,7 +2317,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-67rw-2x62-mqqm"
           ],
@@ -2263,7 +2354,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8j2w-6fmm-m587"
           ],
@@ -2301,7 +2392,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-v8cg-4474-49v8"
           ],
@@ -2339,7 +2430,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qcc4-p59m-p54m"
           ],
@@ -2378,7 +2469,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mgrq-9f93-wpp5"
           ],
@@ -2417,7 +2508,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-gp3q-wpq4-5c5h"
           ],
@@ -2455,7 +2546,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-g7cr-9h7q-4qxq"
           ],
@@ -2492,7 +2583,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-vhwf-4x96-vqx2"
           ],
@@ -2529,7 +2620,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8g75-q649-6pv6"
           ],
@@ -2568,7 +2659,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xx6g-43w2-9g6g"
           ],
@@ -2620,7 +2711,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-228v-wc5r-j8m7"
           ],
@@ -2658,7 +2749,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-j7mm-f4rv-6q6q"
           ],
@@ -2696,7 +2787,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qjxf-f2mg-c6mc"
           ],
@@ -2733,7 +2824,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5339-hvwr-7582"
           ],
@@ -2770,7 +2861,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-g5xx-pwrp-g3fv"
           ],
@@ -2807,7 +2898,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-qpg4-j99f-8xcg"
           ],
@@ -2854,7 +2945,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5ggv-92r5-cp4p"
           ],
@@ -2901,7 +2992,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-cqw9-w2m7-r2m2"
           ],
@@ -2948,7 +3039,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-h95r-c8c7-mrwx"
           ],
@@ -2995,7 +3086,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-rqq8-jh93-f4vg"
           ],
@@ -3042,7 +3133,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-cfw5-2vxh-hr84"
           ],
@@ -3079,7 +3170,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hffp-q43q-qq76"
           ],
@@ -3126,7 +3217,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wj8w-pjxf-9g4f"
           ],
@@ -3173,7 +3264,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-7h7q-j33q-hvpf"
           ],
@@ -3220,7 +3311,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xxw5-m53x-j38c"
           ],
@@ -3278,7 +3369,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-fpvf-frm6-625q"
           ],
@@ -3325,7 +3416,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-467j-76j7-5885"
           ],
@@ -3372,7 +3463,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-932h-jw47-73jm"
           ],
@@ -3419,7 +3510,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-r39q-jr8h-gcq2"
           ],
@@ -3466,7 +3557,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-pgpf-m8m4-6cg6"
           ],
@@ -3508,7 +3599,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wrhr-rf8j-r842"
           ],
@@ -3556,7 +3647,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-mqfc-82jx-3mr2"
           ],
@@ -3603,7 +3694,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-pmq6-8289-hx3v"
           ],
@@ -3650,7 +3741,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8mpr-6xr2-chhc"
           ],
@@ -3698,7 +3789,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xg29-8ghv-v4xr"
           ],
@@ -3745,7 +3836,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-3mwp-xqp2-q6ph"
           ],
@@ -3793,7 +3884,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-wgx8-r9vw-2w4h"
           ],
@@ -3831,7 +3922,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-xjj9-2w6f-jg55"
           ],
@@ -3869,7 +3960,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-jx93-g359-86wm"
           ],
@@ -3907,7 +3998,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-r8jr-wg88-fq5c"
           ],
@@ -3946,7 +4037,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hvwj-8w5g-28rg"
           ],
@@ -3984,7 +4075,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:25:36Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-rgq9-fqf5-fv58"
           ],
@@ -4011,81 +4102,231 @@
         }
       },
       {
-        "source": "github_advisories",
-        "id": "CVE-2026-2808",
-        "url": "https://github.com/advisories/GHSA-cpfq-66p2-336j",
-        "published_at": "2026-03-12T00:31:17Z",
-        "updated_at": "2026-03-12T17:34:05Z",
-        "headline": "Consul is vulnerable to arbitrary file read when configured with Kubernetes authentication",
+        "source": "npm_security_advisories",
+        "id": "9ec463b6e9c9efee3c7ca36f5d3eeff0",
+        "url": "https://github.com/advisories/GHSA-qvr7-g57c-mrc7",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Unavailable local auth SecretRefs could fall through to remote credentials in local mode",
         "content": {
-          "excerpt_text": "HashiCorp Consul and Consul Enterprise 1.18.20 up to 1.21.10 and 1.22.4 are vulnerable to arbitrary file read when configured with Kubernetes authentication. This vulnerability, CVE-2026-2808, is fixed in Consul 1.18.21, 1.21.11 and 1.22.5.",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-cpfq-66p2-336j"
+            "https://github.com/advisories/GHSA-qvr7-g57c-mrc7"
           ],
-          "content_hash": "sha256:1979e2451b82cb3f9fae0e39759f158a313b6c4fde26f13eb0871017cae90899"
+          "content_hash": "sha256:3394e29ebe0e0733c37abf0bb62954e1a67be640da305311e0294860ee8e222d"
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "c1dada9074f9d56b62dc6323ac1df4bc",
+        "url": "https://github.com/advisories/GHSA-mj4p-rc52-m843",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Sandbox staged writes could escape the verified parent directory before commit",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-mj4p-rc52-m843"
+          ],
+          "content_hash": "sha256:d177837292af2dc5c1e83b84a7a500d6bc25161161c96e2fb5b6ebba1d401781"
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "e276feea3b1aafd7fcca9a7b83d0a13a",
+        "url": "https://github.com/advisories/GHSA-jf6w-m8jw-jfxc",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Write-scoped callers could reach admin-only session reset logic through `agent`",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-jf6w-m8jw-jfxc"
+          ],
+          "content_hash": "sha256:e756c7c4cdb857a030709fdbe2194daa988f55e14cbfb53b3a14d2de67c378b4"
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "aafa758e1863e6043221ca147b785757",
+        "url": "https://github.com/advisories/GHSA-qc36-x95h-7j53",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Unrecognized script runners could bypass `system.run` approval integrity",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-qc36-x95h-7j53"
+          ],
+          "content_hash": "sha256:6cf40755d36489abd8896be9b7419a894283fa6707d45004aa0647371efbd023"
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "908a20f152c50a8cb6e90240682d2eca",
+        "url": "https://github.com/advisories/GHSA-8jhh-jcqg-mj5p",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Channel commands could bypass account-scoped `configWrites` restrictions",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-8jhh-jcqg-mj5p"
+          ],
+          "content_hash": "sha256:ff52a67143b6f7a4f0ca58694533ffd8c9764f7003f6295a2e0541464e1cf2fb"
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "23ebfb88e9b3a84df1b36b5de1031fb5",
+        "url": "https://github.com/advisories/GHSA-rw39-5899-8mxp",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Node-host approvals could show misleading shell payloads instead of the executed argv",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-rw39-5899-8mxp"
+          ],
+          "content_hash": "sha256:307a379b2629a5fb6fa26a0666a98a64727e59c963716467f1a39cdaeae98658"
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "b93bb0b8ce93392dc694425b68c024ae",
+        "url": "https://github.com/advisories/GHSA-xf99-j42q-5w5p",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Unbound interpreter and runtime commands could bypass node-host approval integrity",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-xf99-j42q-5w5p"
+          ],
+          "content_hash": "sha256:958a5d39853fed765aa5ce48389c29b5c9d7e5adeb592532197562aca99c2f9d"
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "a328d1bc189a73db9ca8244eabb6291e",
+        "url": "https://github.com/advisories/GHSA-4w7m-58cg-cmff",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Leaf subagents could steer sibling sessions across sandbox boundaries",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-4w7m-58cg-cmff"
+          ],
+          "content_hash": "sha256:cc505b9c38ec0488ba08be0b9f4fac83a1bf9f3a0ec3cfcc1072886b4ffe26a7"
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "efa32a7ff9752719a9a9c29bf7619e47",
+        "url": "https://github.com/advisories/GHSA-4jpw-hj22-2xmc",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Pairing-scoped device tokens could mint `operator.admin` and reach node RCE",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-4jpw-hj22-2xmc"
+          ],
+          "content_hash": "sha256:751a8059f890f50ee76b20522a1f37dfc62bfbda510aa00a07d7908ffad0537c"
         },
         "signals": {
           "severity": {
-            "level": "medium",
-            "source": "github_advisory",
-            "cvss": 6.8,
-            "cwes": [
-              "CWE-59"
-            ],
-            "packages": [
-              "go:github.com/hashicorp/consul",
-              "go:github.com/hashicorp/consul",
-              "go:github.com/hashicorp/consul"
-            ],
+            "level": "critical",
+            "source": "keyword",
             "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-cpfq-66p2-336j"
+              "method": "keyword_scan",
+              "authority": "npm Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm",
+              "evidence_url": "https://github.com/advisories/GHSA-4jpw-hj22-2xmc"
             }
           }
         }
       },
       {
-        "source": "github_advisories",
-        "id": "CVE-2026-3965",
-        "url": "https://github.com/advisories/GHSA-xj37-qjg2-xwv2",
-        "published_at": "2026-03-12T00:31:17Z",
-        "updated_at": "2026-03-12T17:34:39Z",
-        "headline": "@whyour/qinglong: manipulation of the argument command leads to protection mechanism failure",
+        "source": "npm_security_advisories",
+        "id": "7a647af7bf17f31c9f631eb96a0e5e17",
+        "url": "https://github.com/advisories/GHSA-xw77-45gv-p728",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Plugin subagent routes could bypass gateway authorization with synthetic admin scopes",
         "content": {
-          "excerpt_text": "A security vulnerability has been detected in whyour qinglong up to 2.20.1. Affected is an unknown function of the file back/loaders/express.ts of the component API Interface. The manipulation of the argument command leads to protection mechanism failure. The attack may be initiated remotely. The exploit has been disclosed publicly and may be used. Upgrading to version 2.20.2 is able to address this issue. The identifier of the patch is 6bec52dca158481258315ba0fc2f11206df7b719. It is...",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:55:58Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-xj37-qjg2-xwv2"
+            "https://github.com/advisories/GHSA-xw77-45gv-p728"
           ],
-          "content_hash": "sha256:10e2bd94bcb931d557ad12cb338638835a72134cf5f7349b55179f062fc571ef"
+          "content_hash": "sha256:d44adf9e1a0ebf0fadf1ffbea2bc721004b12c2d7fedb8625dc0501c5552af44"
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "ff3811080ec1c1dca629a9a0868fc20d",
+        "url": "https://github.com/advisories/GHSA-xvx8-77m6-gwg6",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[openclaw] OpenClaw: Sandbox `writeFile` commit could race outside the validated path",
+        "content": {
+          "lang": "en"
         },
-        "signals": {
-          "severity": {
-            "level": "low",
-            "source": "github_advisory",
-            "cvss": 6.3,
-            "cwes": [
-              "CWE-693"
-            ],
-            "packages": [
-              "npm:@whyour/qinglong"
-            ],
-            "provenance": {
-              "method": "advisory_api",
-              "authority": "GitHub Advisory Database",
-              "authority_url": "https://github.com/advisories",
-              "evidence_url": "https://github.com/advisories/GHSA-xj37-qjg2-xwv2"
-            }
-          }
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-xvx8-77m6-gwg6"
+          ],
+          "content_hash": "sha256:ee672dfd685c585698972be9b7c39798c00639c35a650c17384f0998578ce890"
+        }
+      },
+      {
+        "source": "npm_security_advisories",
+        "id": "6917136ffc38555f81692f37fd2e4837",
+        "url": "https://github.com/advisories/GHSA-25h7-pfq9-p65f",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[flatted] flatted vulnerable to unbounded recursion DoS in parse() revive phase",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-25h7-pfq9-p65f"
+          ],
+          "content_hash": "sha256:ddce5563e6f36ce198353964e70f28cde308776c3ea0dc02d3f97a3baf15e17c"
         }
       },
       {
@@ -4099,7 +4340,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-9wmw-9wph-2vwp"
           ],
@@ -4117,7 +4358,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-6r9f-759j-hjgv"
           ],
@@ -4135,7 +4376,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-5wcw-8jjv-m286"
           ],
@@ -4153,7 +4394,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-m48g-4wr2-j2h6"
           ],
@@ -4171,7 +4412,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-2f24-mg4x-534q"
           ],
@@ -4189,7 +4430,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-8pw3-9m7f-q734"
           ],
@@ -4207,7 +4448,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hhfx-wfvq-7g9c"
           ],
@@ -4237,7 +4478,7 @@
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
             "https://github.com/advisories/GHSA-hhfx-wfvq-7g9c"
           ],
@@ -4257,242 +4498,435 @@
         }
       },
       {
-        "source": "npm_security_advisories",
-        "id": "e42060c58e248593fa21799c267452aa",
-        "url": "https://github.com/advisories/GHSA-92gp-jfgx-9qpv",
+        "source": "pypi_security_advisories",
+        "id": "244adeeb756321b13214d7481c8b26ea",
+        "url": "https://github.com/advisories/GHSA-4g4c-mfqg-pj8r",
         "published_at": null,
         "updated_at": null,
-        "headline": "[hyperterse] Hyperterse: Raw exposure of database statements in MCP search tool",
+        "headline": "[magic-wormhole] Magic Wormhole: \"wormhole receive\" allows arbitrary local file overwrite",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-92gp-jfgx-9qpv"
+            "https://github.com/advisories/GHSA-4g4c-mfqg-pj8r"
           ],
-          "content_hash": "sha256:6563fb177b2f6a662c706736918353e1d379b99d0a29c9ba0dbd45ad901ff6eb"
+          "content_hash": "sha256:6391eb9628f9e02d6673aa19e68ccafdedfd109bc58492535b4a9675cbfb4418"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "PyPI Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip",
+              "evidence_url": "https://github.com/advisories/GHSA-4g4c-mfqg-pj8r"
+            }
+          }
         }
       },
       {
-        "source": "npm_security_advisories",
-        "id": "68d0e316b99548fed2c1fb1126425b5c",
-        "url": "https://github.com/advisories/GHSA-5hxf-c7j4-279c",
+        "source": "pypi_security_advisories",
+        "id": "b24ffe82ddb5401e43ea8baa44aac7a4",
+        "url": "https://github.com/advisories/GHSA-hx9q-6w63-j58v",
         "published_at": null,
         "updated_at": null,
-        "headline": "[tinacms] Tina: Path Traversal in Media Upload Handle",
+        "headline": "[orjson] orjson does not limit recursion for deeply nested JSON documents",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-5hxf-c7j4-279c"
+            "https://github.com/advisories/GHSA-hx9q-6w63-j58v"
           ],
-          "content_hash": "sha256:b1aca63a2cd188be082fcdeaaa5f4643c14afccb5c70ad3747a0d87d59d1a272"
+          "content_hash": "sha256:579de74c27a49e8d1b0bbeefef76f4f63fa313dfa5ca7e231e6606abe9f3cf13"
         }
       },
       {
-        "source": "npm_security_advisories",
-        "id": "8128d0f6acab26ba037324a27f741ba3",
-        "url": "https://github.com/advisories/GHSA-2238-xc5r-v9hj",
+        "source": "pypi_security_advisories",
+        "id": "1dd9bac3e249fe179133ac08d3990740",
+        "url": "https://github.com/advisories/GHSA-hhfx-wfvq-7g9c",
         "published_at": null,
         "updated_at": null,
-        "headline": "[@tinacms/graphql] @tinacms/graphql has a Path Traversal issue",
+        "headline": "[msmcp-azure] Azure MCP Server has Server-Side Request Forgery issue that allows authorized attacker to elevate privileges over a network",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-2238-xc5r-v9hj"
+            "https://github.com/advisories/GHSA-hhfx-wfvq-7g9c"
           ],
-          "content_hash": "sha256:aff10a9d06a6feaa77ee432707029c809a991b38f6bb7f6f593adee5b2b78901"
+          "content_hash": "sha256:c7806fecb6a342336f57d451ef2b4fcb191da1ed44326fe02c447e39a7af5d6e"
+        },
+        "signals": {
+          "severity": {
+            "level": "low",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "PyPI Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip",
+              "evidence_url": "https://github.com/advisories/GHSA-hhfx-wfvq-7g9c"
+            }
+          }
         }
       },
       {
-        "source": "npm_security_advisories",
-        "id": "347db962ca722f55ffc29b77927c9d88",
-        "url": "https://github.com/advisories/GHSA-r8jr-wg88-fq5c",
+        "source": "pypi_security_advisories",
+        "id": "fe67a5ed088cf6be0c82391b77c052cc",
+        "url": "https://github.com/advisories/GHSA-3936-cmfr-pm3m",
         "published_at": null,
         "updated_at": null,
-        "headline": "[@keycloak/keycloak-admin-client] Keycloak vulnerable to authorization bypass via the Admin API",
+        "headline": "[black] Black: Arbitrary file writes from unsanitized user input in cache file name",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-r8jr-wg88-fq5c"
+            "https://github.com/advisories/GHSA-3936-cmfr-pm3m"
           ],
-          "content_hash": "sha256:3082e951610397c429198055a965b0ba455dae099659625d9d45e996fc590cd0"
+          "content_hash": "sha256:bef897395305600b54d65ef11910145710200cf79d1184326aa2dbc74fc84df0"
         }
       },
       {
-        "source": "npm_security_advisories",
-        "id": "1f1769bd3546d694f6967368269a6479",
-        "url": "https://github.com/advisories/GHSA-xj37-qjg2-xwv2",
+        "source": "pypi_security_advisories",
+        "id": "f98c64da259a48a254c46bcb50678c23",
+        "url": "https://github.com/advisories/GHSA-p2m9-wcp5-6qw3",
         "published_at": null,
         "updated_at": null,
-        "headline": "[@whyour/qinglong] @whyour/qinglong: manipulation of the argument command leads to protection mechanism failure",
+        "headline": "[multipart] multipart vulnerable to ReDoS in `parse_options_header()`",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-xj37-qjg2-xwv2"
+            "https://github.com/advisories/GHSA-p2m9-wcp5-6qw3"
           ],
-          "content_hash": "sha256:75d8dfd767434391b10f109165532c439a3f0c905065b7e2159f1f096c57930f"
+          "content_hash": "sha256:29d42ea9cfb6651c9c8348ed6387a238e7381546ee7633a1457552ed7ebb4aa9"
         }
       },
       {
-        "source": "npm_security_advisories",
-        "id": "6e5294cc2ab1db82a7dbfd1084bcb72b",
-        "url": "https://github.com/advisories/GHSA-xjj9-2w6f-jg55",
+        "source": "pypi_security_advisories",
+        "id": "f98c64da259a48a254c46bcb50678c23",
+        "url": "https://github.com/advisories/GHSA-p2m9-wcp5-6qw3",
         "published_at": null,
         "updated_at": null,
-        "headline": "[openclaw]  Duplicate Advisory: OpenClaw safeBins file-existence oracle information disclosure",
+        "headline": "[multipart] multipart vulnerable to ReDoS in `parse_options_header()`",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-xjj9-2w6f-jg55"
+            "https://github.com/advisories/GHSA-p2m9-wcp5-6qw3"
           ],
-          "content_hash": "sha256:86985a504b83389564585eeecac840435ad4f37187b424092a0d55de5eb0366d"
+          "content_hash": "sha256:29d42ea9cfb6651c9c8348ed6387a238e7381546ee7633a1457552ed7ebb4aa9"
         }
       },
       {
-        "source": "npm_security_advisories",
-        "id": "0ef7cc3fba5289591a1a0faa041c3d62",
-        "url": "https://github.com/advisories/GHSA-wgx8-r9vw-2w4h",
+        "source": "pypi_security_advisories",
+        "id": "ed0d81763b6e0c7d44a476a2f63bbdcb",
+        "url": "https://github.com/advisories/GHSA-hvwj-8w5g-28rg",
         "published_at": null,
         "updated_at": null,
-        "headline": "[openclaw]  Duplicate Advisory: OpenClaw: Skill env override host env injection via applySkillConfigEnvOverrides (defense-in-depth)",
+        "headline": "[sglang] SGLangs `replay_request_dump.py` contains an insecure pickle.load() without validation and proper deserialization",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-wgx8-r9vw-2w4h"
+            "https://github.com/advisories/GHSA-hvwj-8w5g-28rg"
           ],
-          "content_hash": "sha256:b21f4aafeb5d2cecd8d19cb9059244fdc89db655ed1df249e286ef6cfdfcd11a"
+          "content_hash": "sha256:1d6d4b021227580d2b31f33b775679feb7409cb287f2cec09c3db69a39a8d79f"
         }
       },
       {
-        "source": "npm_security_advisories",
-        "id": "53d58d9d553ff224d7290b6c47db10da",
-        "url": "https://github.com/advisories/GHSA-5fw2-8jcv-xh87",
+        "source": "pypi_security_advisories",
+        "id": "055a488ffc6e6f47ca50fb570f1f4adb",
+        "url": "https://github.com/advisories/GHSA-rgq9-fqf5-fv58",
         "published_at": null,
         "updated_at": null,
-        "headline": "[parse-server] Parse Server: Account takeover via operator injection in authentication data identifier",
+        "headline": "[sglang] SGLang's multimodal generation module is vulnerable to unauthenticated remote code execution through the ZMQ broker",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-5fw2-8jcv-xh87"
+            "https://github.com/advisories/GHSA-rgq9-fqf5-fv58"
           ],
-          "content_hash": "sha256:a4f5495eecc5568d605dabaed65262d83196cab4e995d29bce1cf21d597f4cc1"
+          "content_hash": "sha256:dee468083eb6a5faad0293bd6bff1a217ff75719d05556a1fd5aeca827825c9d"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "PyPI Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip",
+              "evidence_url": "https://github.com/advisories/GHSA-rgq9-fqf5-fv58"
+            }
+          }
         }
       },
       {
-        "source": "npm_security_advisories",
-        "id": "53d58d9d553ff224d7290b6c47db10da",
-        "url": "https://github.com/advisories/GHSA-5fw2-8jcv-xh87",
+        "source": "pypi_security_advisories",
+        "id": "d4bfaab1c27cb5ecc5acf32588e3ede6",
+        "url": "https://github.com/advisories/GHSA-jx93-g359-86wm",
         "published_at": null,
         "updated_at": null,
-        "headline": "[parse-server] Parse Server: Account takeover via operator injection in authentication data identifier",
+        "headline": "[sglang] SGLang's encoder parallel disaggregation system is vulnerable to unauthenticated remote code execution through the disaggregation module",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-5fw2-8jcv-xh87"
+            "https://github.com/advisories/GHSA-jx93-g359-86wm"
           ],
-          "content_hash": "sha256:a4f5495eecc5568d605dabaed65262d83196cab4e995d29bce1cf21d597f4cc1"
+          "content_hash": "sha256:e563dfc18be3ab07c296d146229359178b43b87cd76376c3a6943fae1afdfbd3"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "PyPI Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip",
+              "evidence_url": "https://github.com/advisories/GHSA-jx93-g359-86wm"
+            }
+          }
         }
       },
       {
-        "source": "npm_security_advisories",
-        "id": "1e7a21b5de3d793b659078dc3e9242e9",
-        "url": "https://github.com/advisories/GHSA-2cjm-2gwv-m892",
+        "source": "pypi_security_advisories",
+        "id": "d280a70bda5186849886fde3132a8fc1",
+        "url": "https://github.com/advisories/GHSA-gg5m-55jj-8m5g",
         "published_at": null,
         "updated_at": null,
-        "headline": "[parse-server] Parse Server's OAuth2 adapter shares mutable state across providers via singleton instance",
+        "headline": "[graphiti-core] Graphiti vulnerable to Cypher Injection via unsanitized node_labels in search filters",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-2cjm-2gwv-m892"
+            "https://github.com/advisories/GHSA-gg5m-55jj-8m5g"
           ],
-          "content_hash": "sha256:1d4832fc62305b0b8871b85c0451d72226f148a1d0bc2d92744cc641cbcd3e42"
+          "content_hash": "sha256:045fe73859064906e024b689c9ccc63c647211a3f04fb87100c50432014c00a8"
         }
       },
       {
-        "source": "npm_security_advisories",
-        "id": "1e7a21b5de3d793b659078dc3e9242e9",
-        "url": "https://github.com/advisories/GHSA-2cjm-2gwv-m892",
+        "source": "pypi_security_advisories",
+        "id": "5565e4849a5b41717c1555bad5e41871",
+        "url": "https://github.com/advisories/GHSA-pf93-j98v-25pv",
         "published_at": null,
         "updated_at": null,
-        "headline": "[parse-server] Parse Server's OAuth2 adapter shares mutable state across providers via singleton instance",
+        "headline": "[ha-mcp] ha-mcp has XSS via Unescaped HTML in OAuth Consent Form",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-2cjm-2gwv-m892"
+            "https://github.com/advisories/GHSA-pf93-j98v-25pv"
           ],
-          "content_hash": "sha256:1d4832fc62305b0b8871b85c0451d72226f148a1d0bc2d92744cc641cbcd3e42"
+          "content_hash": "sha256:b21a1eb8f246a24bb2b8054280af44db054b52802ebf96af3ba5da015c77fd1c"
         }
       },
       {
-        "source": "npm_security_advisories",
-        "id": "8d2ff81afd67d0c4818f382aca94c992",
-        "url": "https://github.com/advisories/GHSA-qmpg-8xg6-ph5q",
+        "source": "pypi_security_advisories",
+        "id": "2659b1ed5f259fb5b081a7c5c97a055a",
+        "url": "https://github.com/advisories/GHSA-fmfg-9g7c-3vq7",
         "published_at": null,
         "updated_at": null,
-        "headline": "[trix] Trix has a Stored XSS vulnerability through serialized attributes",
+        "headline": "[ha-mcp] ha-mcp OAuth 2.1 DCR mode enables network reconnaissance via an error oracle",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:56:59Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
-            "https://github.com/advisories/GHSA-qmpg-8xg6-ph5q"
+            "https://github.com/advisories/GHSA-fmfg-9g7c-3vq7"
           ],
-          "content_hash": "sha256:84475d0216bcbe4041b4ccb9debf3553c830bb7f8c8768c694fd0638eda84236"
+          "content_hash": "sha256:c34d24b2bb2e4414d17cf2b6d50f3822189b9ced58e495120fc5a8135010b334"
         }
       },
       {
-        "source": "hn_front_page",
-        "id": "cdfd13f2f2d3db424708a9f7a77527ae",
-        "url": "https://gist.github.com/bretonium/291f4388e2de89a43b25c135b44e41f0",
-        "published_at": "2026-03-12T21:01:10Z",
-        "updated_at": "2026-03-13T15:56:10Z",
-        "headline": "Shall I implement it? No",
+        "source": "pypi_security_advisories",
+        "id": "bea8920197d963af079e2a4e74d60750",
+        "url": "https://github.com/advisories/GHSA-rcp6-88mm-9vgf",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[copyparty] Copyparty has unexpected JavaScript execution via crafted URL to folder with `.prologue.html`",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:37Z",
           "evidence_urls": [
-            "https://gist.github.com/bretonium/291f4388e2de89a43b25c135b44e41f0"
+            "https://github.com/advisories/GHSA-rcp6-88mm-9vgf"
           ],
-          "content_hash": "sha256:4dcf408af87c97d90d8f09226e302b90322a00222e3242935745a49444372ce8"
+          "content_hash": "sha256:8a4aba4b41c57c3c0cdd0807e316ca554cfce4617498288d2f66b22220114674"
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "225a10c9161c226023c928bcd8104498",
+        "url": "https://github.com/advisories/GHSA-67rw-2x62-mqqm",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[copyparty] Copyparty ftp/sftp: Sharing a single file did not fully restrict source-folder access",
+        "content": {
+          "lang": "en"
         },
-        "metadata": {
-          "points": 1446,
-          "num_comments": 521,
-          "author": "breton"
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-67rw-2x62-mqqm"
+          ],
+          "content_hash": "sha256:bafe2a003d68d8ecc912641ce36f58e5ccad25828168aa1305f96db074c0fbc7"
+        },
+        "signals": {
+          "severity": {
+            "level": "critical",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "PyPI Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip",
+              "evidence_url": "https://github.com/advisories/GHSA-67rw-2x62-mqqm"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "f66a607fd047524fba1ceef051191f17",
+        "url": "https://github.com/advisories/GHSA-qjxf-f2mg-c6mc",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[tornado] Tornado is vulnerable to DoS due to too many multipart parts",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-qjxf-f2mg-c6mc"
+          ],
+          "content_hash": "sha256:66fb93ee5762ba09e6242fa6f2c4b50e2b984bee72deb0d2dbf8417dd9a90c60"
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "1eba00618bb0a4f0a9814bb099035a1d",
+        "url": "https://github.com/advisories/GHSA-78cv-mqj4-43f7",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[tornado] Tornado has incomplete validation of cookie attributes",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-78cv-mqj4-43f7"
+          ],
+          "content_hash": "sha256:35a4fbfc2a111e3d8b61615614cee7e8374e76a9d5969f848d926b3d00a755bb"
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "aafc48774e9509d9df32688f1ec36e32",
+        "url": "https://github.com/advisories/GHSA-hqmh-ppp3-xvm7",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[pypdf] pypdf: manipulated stream length values can exhaust RAM",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-hqmh-ppp3-xvm7"
+          ],
+          "content_hash": "sha256:285da9cc35acb2528d9e33079a9bee7cb0421ed1b4a0044acce953b3cad82341"
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "e391c4032201b8107210514a413943b3",
+        "url": "https://github.com/advisories/GHSA-ffv6-jj46-x367",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[django-unicorn] django-unicorn affected by component state manipulation via unvalidated attribute access",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-ffv6-jj46-x367"
+          ],
+          "content_hash": "sha256:842ab0f710457721db10befc2fb221ecdcb9e18b42b109da42b81c27625a3197"
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "c156835decfedaee92dcad4dd9e284f3",
+        "url": "https://github.com/advisories/GHSA-xjgw-4wvw-rgm4",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[mcp-atlassian] MCP Atlassian has an arbitrary file write leading to arbitrary code execution via unconstrained download_path in confluence_download_attachment",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-xjgw-4wvw-rgm4"
+          ],
+          "content_hash": "sha256:f84405fb8915fa68418e3371df88210a9b52b3a74413e4790fdbe1460cfb415d"
+        },
+        "signals": {
+          "severity": {
+            "level": "high",
+            "source": "keyword",
+            "provenance": {
+              "method": "keyword_scan",
+              "authority": "PyPI Security Advisories",
+              "authority_url": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Apip",
+              "evidence_url": "https://github.com/advisories/GHSA-xjgw-4wvw-rgm4"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_security_advisories",
+        "id": "daf98c2089b7afbd125c94dc382dcb85",
+        "url": "https://github.com/advisories/GHSA-7r34-79r5-rcc9",
+        "published_at": null,
+        "updated_at": null,
+        "headline": "[mcp-atlassian] MCP Atlassian has SSRF via unvalidated X-Atlassian-Jira-Url / X-Atlassian-Confluence-Url headers",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:37Z",
+          "evidence_urls": [
+            "https://github.com/advisories/GHSA-7r34-79r5-rcc9"
+          ],
+          "content_hash": "sha256:3c463e779c7928fa2b5af15f5b2375817b71dd842235e26a7df51d345ca69cd2"
         }
       },
       {
@@ -4500,21 +4934,21 @@
         "id": "4d6e5f1543d62ed46c6538dde1c88d0b",
         "url": "https://old.reddit.com/r/linux/comments/1rshc1f/i_traced_2_billion_in_nonprofit_grants_and_45/",
         "published_at": "2026-03-13T10:15:56Z",
-        "updated_at": "2026-03-13T15:56:10Z",
+        "updated_at": "2026-03-13T16:21:41Z",
         "headline": "I traced $2B in grants and 45 states' lobbying behind age‑verification bills",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://old.reddit.com/r/linux/comments/1rshc1f/i_traced_2_billion_in_nonprofit_grants_and_45/"
           ],
           "content_hash": "sha256:a1631bec97fa75b2e4810ae63d63c894aa712d6129166be658d9e925799e1020"
         },
         "metadata": {
-          "points": 749,
-          "num_comments": 303,
+          "points": 791,
+          "num_comments": 325,
           "author": "shaicoleman"
         }
       },
@@ -4523,21 +4957,21 @@
         "id": "30b28adb10826b238e1e882ceaa291b3",
         "url": "https://samhenri.gold/blog/20260312-this-is-not-the-computer-for-you/",
         "published_at": "2026-03-13T01:45:49Z",
-        "updated_at": "2026-03-13T15:56:10Z",
+        "updated_at": "2026-03-13T16:21:41Z",
         "headline": "“This is not the computer for you”",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://samhenri.gold/blog/20260312-this-is-not-the-computer-for-you/"
           ],
           "content_hash": "sha256:eb9e88ca46c57dd73a3313de6b2b6c2bda2a8d66d6ae294510df493ddbd40462"
         },
         "metadata": {
-          "points": 746,
-          "num_comments": 293,
+          "points": 772,
+          "num_comments": 302,
           "author": "MBCook"
         }
       },
@@ -4546,21 +4980,21 @@
         "id": "88b3ec141782db21fd346c8ac100c76d",
         "url": "https://sharif.io/looking-stupid",
         "published_at": "2026-03-09T10:21:58Z",
-        "updated_at": "2026-03-13T15:55:40Z",
+        "updated_at": "2026-03-13T16:21:25Z",
         "headline": "Willingness to look stupid",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://sharif.io/looking-stupid"
           ],
           "content_hash": "sha256:bf4e7c223ab604981337d1b139ff79196eb1e565fffb8fc6c832a348204ba8fa"
         },
         "metadata": {
-          "points": 582,
-          "num_comments": 200,
+          "points": 605,
+          "num_comments": 209,
           "author": "Samin100"
         }
       },
@@ -4569,21 +5003,21 @@
         "id": "f72f668157324a00357edebf38434b76",
         "url": "https://davidoks.blog/p/why-the-atm-didnt-kill-bank-teller",
         "published_at": "2026-03-12T14:48:57Z",
-        "updated_at": "2026-03-13T15:54:40Z",
+        "updated_at": "2026-03-13T16:21:41Z",
         "headline": "ATMs didn’t kill bank teller jobs, but the iPhone did",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://davidoks.blog/p/why-the-atm-didnt-kill-bank-teller"
           ],
           "content_hash": "sha256:27a7424d0fcf9dd21e7c1ea2f6cb549c69620db5f3ba52b07e9c4d9a3d0bed15"
         },
         "metadata": {
-          "points": 483,
-          "num_comments": 497,
+          "points": 486,
+          "num_comments": 503,
           "author": "colinprince"
         }
       },
@@ -4592,45 +5026,22 @@
         "id": "1f3fe710601f9f67b0469e7854b1c243",
         "url": "https://vite.dev/blog/announcing-vite8",
         "published_at": "2026-03-13T04:36:40Z",
-        "updated_at": "2026-03-13T15:56:10Z",
+        "updated_at": "2026-03-13T16:21:41Z",
         "headline": "Vite 8.0 Is Out",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://vite.dev/blog/announcing-vite8"
           ],
           "content_hash": "sha256:d59712e75e9c6e26d7a68bab766736ce9a4e3f0ca2a8a01934efd709ff56cbfa"
         },
         "metadata": {
-          "points": 454,
-          "num_comments": 147,
+          "points": 466,
+          "num_comments": 150,
           "author": "kothariji"
-        }
-      },
-      {
-        "source": "hn_front_page",
-        "id": "3445325834a3841427ee2721c1a1e5e6",
-        "url": "https://www.marketscreener.com/news/us-private-credit-defaults-hit-record-9-2-in-2025-fitch-says-ce7e5fd8df8fff2d",
-        "published_at": "2026-03-12T12:44:45Z",
-        "updated_at": "2026-03-13T15:56:10Z",
-        "headline": "US private credit defaults hit record 9.2% in 2025, Fitch says",
-        "content": {
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://www.marketscreener.com/news/us-private-credit-defaults-hit-record-9-2-in-2025-fitch-says-ce7e5fd8df8fff2d"
-          ],
-          "content_hash": "sha256:010cf3e47e194e61a522fca2d8132fe3521f9cfd7a93edf920d75a70916151db"
-        },
-        "metadata": {
-          "points": 413,
-          "num_comments": 442,
-          "author": "JumpCrisscross"
         }
       },
       {
@@ -4638,20 +5049,20 @@
         "id": "ba0b63c6d8f1f1c58baaa80464605b2c",
         "url": "https://parametricavocado.itch.io/amen-sorting",
         "published_at": "2026-03-12T17:13:56Z",
-        "updated_at": "2026-03-13T15:55:40Z",
+        "updated_at": "2026-03-13T16:21:25Z",
         "headline": "Bubble Sorted Amen Break",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://parametricavocado.itch.io/amen-sorting"
           ],
           "content_hash": "sha256:6e4a702145200d7dd33749507889d6efecec266905c6f6dbc87a16e5d9c9f3e4"
         },
         "metadata": {
-          "points": 368,
+          "points": 371,
           "num_comments": 114,
           "author": "eieio"
         }
@@ -4661,45 +5072,22 @@
         "id": "7829d1888ee28af23f760d3064ee9734",
         "url": "https://med.stanford.edu/news/all-news/2026/03/gut-brain-cognitive-decline.html",
         "published_at": "2026-03-12T16:38:51Z",
-        "updated_at": "2026-03-13T15:55:40Z",
+        "updated_at": "2026-03-13T16:18:55Z",
         "headline": "Enhancing gut-brain communication reversed cognitive decline in aging mice",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://med.stanford.edu/news/all-news/2026/03/gut-brain-cognitive-decline.html"
           ],
           "content_hash": "sha256:0666fe30d8726019efa24537a105a8c3661f4fafc840060d495ea4e830607c9a"
         },
         "metadata": {
-          "points": 355,
-          "num_comments": 169,
+          "points": 358,
+          "num_comments": 171,
           "author": "mustaphah"
-        }
-      },
-      {
-        "source": "hn_front_page",
-        "id": "d9ddd551ffa8fdcd71251dc661744cb7",
-        "url": "https://www.openculture.com/2026/03/the-met-releases-high-definition-3d-scans-of-140-famous-art-objects.html",
-        "published_at": "2026-03-12T15:43:39Z",
-        "updated_at": "2026-03-13T15:53:25Z",
-        "headline": "The Met releases high-def 3D scans of 140 famous art objects",
-        "content": {
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://www.openculture.com/2026/03/the-met-releases-high-definition-3d-scans-of-140-famous-art-objects.html"
-          ],
-          "content_hash": "sha256:d5c41cb7a21be0ccffac22c6ac307516c957a15992097cd9c750c84e184f38fe"
-        },
-        "metadata": {
-          "points": 323,
-          "num_comments": 68,
-          "author": "coloneltcb"
         }
       },
       {
@@ -4707,21 +5095,21 @@
         "id": "f99346b8681556e958e2df4788634eb0",
         "url": "https://tui.studio/",
         "published_at": "2026-03-13T10:32:45Z",
-        "updated_at": "2026-03-13T15:56:10Z",
+        "updated_at": "2026-03-13T16:21:41Z",
         "headline": "TUI Studio – visual terminal UI design tool",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://tui.studio/"
           ],
           "content_hash": "sha256:b710f4035257b8cff53e710b22f775d7be8d433ac563be5edc50da2a4db7dd77"
         },
         "metadata": {
-          "points": 289,
-          "num_comments": 174,
+          "points": 324,
+          "num_comments": 194,
           "author": "mipselaer"
         }
       },
@@ -4730,21 +5118,21 @@
         "id": "6397f5e1449c3d78cf1986a47aaa1e09",
         "url": "https://rachelbythebay.com/w/2022/01/26/swcbbs/",
         "published_at": "2026-03-12T19:41:35Z",
-        "updated_at": "2026-03-13T15:56:10Z",
+        "updated_at": "2026-03-13T16:21:41Z",
         "headline": "An old photo of a large BBS (2022)",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://rachelbythebay.com/w/2022/01/26/swcbbs/"
           ],
           "content_hash": "sha256:f4ab424373b13e30b463a36ea8062cf967095a2ac73b300385e7542b7a3fc8e1"
         },
         "metadata": {
-          "points": 248,
-          "num_comments": 164,
+          "points": 253,
+          "num_comments": 168,
           "author": "xbryanx"
         }
       },
@@ -4753,21 +5141,21 @@
         "id": "489b3049d24579176186c3396a4075e1",
         "url": "https://onecloudplease.com/blog/bucketsquatting-is-finally-dead",
         "published_at": "2026-03-13T08:31:33Z",
-        "updated_at": "2026-03-13T15:56:10Z",
+        "updated_at": "2026-03-13T16:21:41Z",
         "headline": "Bucketsquatting is (finally) dead",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://onecloudplease.com/blog/bucketsquatting-is-finally-dead"
           ],
           "content_hash": "sha256:9272ca0540afa5469f9cb95fd5ac7f84063323dfbfe5901720f6ff4eb8b73509"
         },
         "metadata": {
-          "points": 232,
-          "num_comments": 117,
+          "points": 238,
+          "num_comments": 121,
           "author": "boyter"
         }
       },
@@ -4776,22 +5164,45 @@
         "id": "848db4669bc3293c042ce5aac7ebdfc0",
         "url": "https://www.percepta.ai/blog/can-llms-be-computers",
         "published_at": "2026-03-12T09:17:56Z",
-        "updated_at": "2026-03-13T15:56:10Z",
+        "updated_at": "2026-03-13T16:21:25Z",
         "headline": "Executing programs inside transformers with exponentially faster inference",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://www.percepta.ai/blog/can-llms-be-computers"
           ],
           "content_hash": "sha256:f96c1dc6c85653687e99d319df5fd0b8f6f98dd98e367855464ae933ed6b05cb"
         },
         "metadata": {
-          "points": 213,
-          "num_comments": 71,
+          "points": 222,
+          "num_comments": 79,
           "author": "u1hcw9nx"
+        }
+      },
+      {
+        "source": "hn_front_page",
+        "id": "4e047e07164afdf3410cf5a3049fb3d9",
+        "url": "https://help.instagram.com/491565145294150",
+        "published_at": "2026-03-13T13:03:42Z",
+        "updated_at": "2026-03-13T16:21:41Z",
+        "headline": "E2E encrypted messaging on Instagram will no longer be supported after 8 May",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:38Z",
+          "evidence_urls": [
+            "https://help.instagram.com/491565145294150"
+          ],
+          "content_hash": "sha256:2f9bf62bca61da54d97316d92737aff09e085faade9f40a5574d48e86c9f02d8"
+        },
+        "metadata": {
+          "points": 178,
+          "num_comments": 88,
+          "author": "mindracer"
         }
       },
       {
@@ -4799,21 +5210,21 @@
         "id": "2283b91581b922fbcb44a1bf6f8b21e4",
         "url": "https://ben-mini.com/2024/img-0416",
         "published_at": "2026-03-09T13:07:45Z",
-        "updated_at": "2026-03-13T15:56:10Z",
+        "updated_at": "2026-03-13T16:21:41Z",
         "headline": "IMG_0416 (2024)",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://ben-mini.com/2024/img-0416"
           ],
           "content_hash": "sha256:431e25b2a07f5e9ec077e7699019050af3a0ea3bb6139ccc7be97d422fe4c14d"
         },
         "metadata": {
-          "points": 162,
-          "num_comments": 38,
+          "points": 165,
+          "num_comments": 39,
           "author": "TigerUniversity"
         }
       },
@@ -4822,68 +5233,22 @@
         "id": "ccf08fe1d99b7eb73453a5f327a571d0",
         "url": "https://darkwebinformer.com/full-source-code-of-swedens-e-government-platform-leaked-from-compromised-cgi-sverige-infrastructure/",
         "published_at": "2026-03-13T09:45:30Z",
-        "updated_at": "2026-03-13T15:56:10Z",
+        "updated_at": "2026-03-13T16:20:55Z",
         "headline": "Source code of Swedish e-government services has been leaked",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://darkwebinformer.com/full-source-code-of-swedens-e-government-platform-leaked-from-compromised-cgi-sverige-infrastructure/"
           ],
           "content_hash": "sha256:5461aaea3cdebf0634c39d15beaf11e687151dbe3091c07aff51b980680963bf"
         },
         "metadata": {
-          "points": 156,
-          "num_comments": 138,
+          "points": 158,
+          "num_comments": 142,
           "author": "tavro"
-        }
-      },
-      {
-        "source": "hn_front_page",
-        "id": "4e047e07164afdf3410cf5a3049fb3d9",
-        "url": "https://help.instagram.com/491565145294150",
-        "published_at": "2026-03-13T13:03:42Z",
-        "updated_at": "2026-03-13T15:56:10Z",
-        "headline": "E2E encrypted messaging on Instagram will no longer be supported after 8 May",
-        "content": {
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://help.instagram.com/491565145294150"
-          ],
-          "content_hash": "sha256:2f9bf62bca61da54d97316d92737aff09e085faade9f40a5574d48e86c9f02d8"
-        },
-        "metadata": {
-          "points": 148,
-          "num_comments": 61,
-          "author": "mindracer"
-        }
-      },
-      {
-        "source": "hn_front_page",
-        "id": "2565db86b5f06e6ffd3b371822951cd9",
-        "url": "https://internals-for-interns.com/posts/go-runtime-scheduler/",
-        "published_at": "2026-03-09T14:54:31Z",
-        "updated_at": "2026-03-13T15:55:12Z",
-        "headline": "Understanding the Go Runtime: The Scheduler",
-        "content": {
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://internals-for-interns.com/posts/go-runtime-scheduler/"
-          ],
-          "content_hash": "sha256:5836c93453f4e834034019e1e1f980a79905df3bf5fbafb750d0b37d5954e4b2"
-        },
-        "metadata": {
-          "points": 147,
-          "num_comments": 27,
-          "author": "valyala"
         }
       },
       {
@@ -4891,21 +5256,21 @@
         "id": "83d49408acac25fdb2706db0ace83abb",
         "url": "https://dgroshev.com/blog/okmain/",
         "published_at": "2026-03-09T14:16:53Z",
-        "updated_at": "2026-03-13T15:54:40Z",
+        "updated_at": "2026-03-13T16:21:25Z",
         "headline": "Okmain: How to pick an OK main colour of an image",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://dgroshev.com/blog/okmain/"
           ],
           "content_hash": "sha256:a9a106134e880cd76ec9e952aec161eebf374ebf1950c81b3c7b12231cae3b45"
         },
         "metadata": {
-          "points": 135,
-          "num_comments": 31,
+          "points": 143,
+          "num_comments": 34,
           "author": "dgroshev"
         }
       },
@@ -4914,13 +5279,13 @@
         "id": "d882002e43c83b8e0c63642974a51145",
         "url": "https://ceno.app/en/index.html?",
         "published_at": "2026-03-13T06:30:58Z",
-        "updated_at": "2026-03-13T15:53:55Z",
+        "updated_at": "2026-03-13T16:19:55Z",
         "headline": "Ceno, browse the web without internet access",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://ceno.app/en/index.html?"
           ],
@@ -4928,7 +5293,7 @@
         },
         "metadata": {
           "points": 98,
-          "num_comments": 25,
+          "num_comments": 26,
           "author": "mohsen1"
         }
       },
@@ -4937,21 +5302,21 @@
         "id": "08c89c0a9f73100ffbcfd399e6fd2438",
         "url": "https://nanoclaw.dev/blog/nanoclaw-docker-sandboxes/",
         "published_at": "2026-03-13T13:45:32Z",
-        "updated_at": "2026-03-13T15:56:10Z",
+        "updated_at": "2026-03-13T16:19:55Z",
         "headline": "Run NanoClaw in Docker Sandboxes",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://nanoclaw.dev/blog/nanoclaw-docker-sandboxes/"
           ],
           "content_hash": "sha256:9de59ff2ead5fa35f7b9291bc506fdbedfa7d33957ede45373fd5694154037cd"
         },
         "metadata": {
-          "points": 75,
-          "num_comments": 25,
+          "points": 83,
+          "num_comments": 28,
           "author": "outofdistro"
         }
       },
@@ -4960,21 +5325,21 @@
         "id": "9ba598bd81ab1ac79b22b4c58433c867",
         "url": "https://88mph.fm/",
         "published_at": "2026-03-10T16:18:40Z",
-        "updated_at": "2026-03-13T15:55:40Z",
+        "updated_at": "2026-03-13T16:20:25Z",
         "headline": "Show HN: What was the world listening to? Music charts, 20 countries (1940–2025)",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://88mph.fm/"
           ],
           "content_hash": "sha256:afa43c4dbe4bcdb3c918fe46fe837243f582a15bc668db2b6e64e6491532e261"
         },
         "metadata": {
-          "points": 67,
-          "num_comments": 30,
+          "points": 68,
+          "num_comments": 32,
           "author": "matteocantiello"
         }
       },
@@ -4983,22 +5348,68 @@
         "id": "83441f32ff84a7b7ced282e0153d184f",
         "url": "https://www.getspine.ai/",
         "published_at": "2026-03-13T13:22:40Z",
-        "updated_at": "2026-03-13T15:55:40Z",
+        "updated_at": "2026-03-13T16:21:41Z",
         "headline": "Launch HN: Spine Swarm (YC S23) – AI agents that collaborate on a visual canvas",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://www.getspine.ai/"
           ],
           "content_hash": "sha256:45c1c73d1f99279aba64a87a5eb463fdaaa464e33f519cc90686c085196cdcf0"
         },
         "metadata": {
-          "points": 41,
-          "num_comments": 42,
+          "points": 51,
+          "num_comments": 47,
           "author": "a24venka"
+        }
+      },
+      {
+        "source": "hn_front_page",
+        "id": "f7bd8a84687ef3dc7e32e57edd0cbd5c",
+        "url": "https://www.canirun.ai/",
+        "published_at": "2026-03-13T12:46:10Z",
+        "updated_at": "2026-03-13T16:21:41Z",
+        "headline": "Can I Run AI locally?",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:38Z",
+          "evidence_urls": [
+            "https://www.canirun.ai/"
+          ],
+          "content_hash": "sha256:ff0cf24e0c1e5c5c43aa763ff5a98dd356b544291e5d693960282db521c24ce5"
+        },
+        "metadata": {
+          "points": 43,
+          "num_comments": 7,
+          "author": "ricardbejarano"
+        }
+      },
+      {
+        "source": "hn_front_page",
+        "id": "4c73488d1d5c40c6e1d29bba83586dc5",
+        "url": "https://github.com/upper-up/meta-lobbying-and-other-findings",
+        "published_at": "2026-03-13T15:14:29Z",
+        "updated_at": "2026-03-13T16:21:41Z",
+        "headline": "Meta Platforms: Lobbying, Dark Money, and the App Store Accountability Act",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:38Z",
+          "evidence_urls": [
+            "https://github.com/upper-up/meta-lobbying-and-other-findings"
+          ],
+          "content_hash": "sha256:66382ff1a90592aada65cc28a0072d1d1882b57b75a53c92b0442a75d5b68334"
+        },
+        "metadata": {
+          "points": 40,
+          "num_comments": 2,
+          "author": "SilverElfin"
         }
       },
       {
@@ -5006,20 +5417,20 @@
         "id": "c80cb72bb9ee71811ebc464ce16ca65f",
         "url": "https://www.tomandmaria.com/Tom/Writing/DijkstrasCrisis_LeidenDRAFT.pdf",
         "published_at": "2026-03-09T07:49:49Z",
-        "updated_at": "2026-03-13T15:53:25Z",
+        "updated_at": "2026-03-13T16:19:25Z",
         "headline": "Dijkstra's Crisis: The End of Algol and Beginning of Software Engineering (2010) [pdf]",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://www.tomandmaria.com/Tom/Writing/DijkstrasCrisis_LeidenDRAFT.pdf"
           ],
           "content_hash": "sha256:6882b90fba011b41bfe54b15d7d2f54b1b198491d1025acccaf45dcc2328b0ae"
         },
         "metadata": {
-          "points": 34,
+          "points": 39,
           "num_comments": 4,
           "author": "ipnon"
         }
@@ -5029,13 +5440,13 @@
         "id": "5710e698512167b2db695433158b57a0",
         "url": "https://nubificus.co.uk/blog/gvisor-rpi5/",
         "published_at": "2026-03-13T10:08:54Z",
-        "updated_at": "2026-03-13T15:51:55Z",
+        "updated_at": "2026-03-13T16:13:25Z",
         "headline": "Gvisor on Raspbian",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://nubificus.co.uk/blog/gvisor-rpi5/"
           ],
@@ -5049,48 +5460,48 @@
       },
       {
         "source": "hn_front_page",
-        "id": "eb7c2c7abde6ac84db85c6de33eee513",
-        "url": "https://www.mux.com/blog/22-day-storage-bug",
-        "published_at": "2026-03-09T16:34:29Z",
-        "updated_at": "2026-03-13T15:53:25Z",
-        "headline": "What we learned from a 22-Day storage bug (and how we fixed it)",
-        "content": {
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://www.mux.com/blog/22-day-storage-bug"
-          ],
-          "content_hash": "sha256:84095e2f96c5daf95f5097e49bcfd100f385f043d4d50c2a425cc4623a2119a2"
-        },
-        "metadata": {
-          "points": 23,
-          "num_comments": 2,
-          "author": "mmcclure"
-        }
-      },
-      {
-        "source": "hn_front_page",
         "id": "6ef53635430d524004c68ea9944b6d9e",
         "url": "https://kirkcenter.org/reviews/monster-is-the-machine/",
         "published_at": "2026-03-08T18:09:57Z",
-        "updated_at": "2026-03-13T15:55:12Z",
+        "updated_at": "2026-03-13T16:21:41Z",
         "headline": "Monster Is the Machine",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://kirkcenter.org/reviews/monster-is-the-machine/"
           ],
           "content_hash": "sha256:67d9532aa5366b96521f80fb42f41fc29ad8e87db8d3063a356a07eebda85371"
         },
         "metadata": {
-          "points": 20,
-          "num_comments": 4,
+          "points": 28,
+          "num_comments": 8,
           "author": "freediver"
+        }
+      },
+      {
+        "source": "hn_front_page",
+        "id": "eb7c2c7abde6ac84db85c6de33eee513",
+        "url": "https://www.mux.com/blog/22-day-storage-bug",
+        "published_at": "2026-03-09T16:34:29Z",
+        "updated_at": "2026-03-13T16:21:41Z",
+        "headline": "What we learned from a 22-Day storage bug (and how we fixed it)",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:38Z",
+          "evidence_urls": [
+            "https://www.mux.com/blog/22-day-storage-bug"
+          ],
+          "content_hash": "sha256:84095e2f96c5daf95f5097e49bcfd100f385f043d4d50c2a425cc4623a2119a2"
+        },
+        "metadata": {
+          "points": 26,
+          "num_comments": 3,
+          "author": "mmcclure"
         }
       },
       {
@@ -5098,45 +5509,22 @@
         "id": "493d0ac525b9948d740b779454db2f2d",
         "url": "https://www.macrumors.com/2026/03/13/macbook-neo-runs-windows-11-vm/",
         "published_at": "2026-03-13T14:11:36Z",
-        "updated_at": "2026-03-13T15:55:12Z",
+        "updated_at": "2026-03-13T16:21:25Z",
         "headline": "Parallels Confirms MacBook Neo Can Run Windows in a Virtual Machine",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://www.macrumors.com/2026/03/13/macbook-neo-runs-windows-11-vm/"
           ],
           "content_hash": "sha256:d2900003575e43ddb668edb89e7a853e7e71fa0115e829f99158195656b14e94"
         },
         "metadata": {
-          "points": 17,
-          "num_comments": 14,
+          "points": 24,
+          "num_comments": 22,
           "author": "tosh"
-        }
-      },
-      {
-        "source": "hn_front_page",
-        "id": "c59de1d085c8292738a98175b0185b32",
-        "url": "https://www.4rknova.com//blog/2025/06/22/mrs-fractal",
-        "published_at": "2026-03-09T14:19:50Z",
-        "updated_at": "2026-03-13T15:52:25Z",
-        "headline": "The Mrs Fractal: Mirror, Rotate, Scale",
-        "content": {
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://www.4rknova.com//blog/2025/06/22/mrs-fractal"
-          ],
-          "content_hash": "sha256:f4d14ca2e893b4427c48487db2ce51d954440d3e5baa9e133dbfc5faa4ce1158"
-        },
-        "metadata": {
-          "points": 10,
-          "num_comments": 2,
-          "author": "ibobev"
         }
       },
       {
@@ -5144,682 +5532,260 @@
         "id": "f29ab592f4f1130ee9351fba6cd394a0",
         "url": "https://apnews.com/article/doctor-who-lost-episodes-found-daleks-6849b09faa6eca9377b2a0db45d47ff8",
         "published_at": "2026-03-13T15:04:41Z",
-        "updated_at": "2026-03-13T15:46:55Z",
+        "updated_at": "2026-03-13T16:20:55Z",
         "headline": "Two long-lost episodes of 'Doctor Who' have been found",
         "content": {
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
             "https://apnews.com/article/doctor-who-lost-episodes-found-daleks-6849b09faa6eca9377b2a0db45d47ff8"
           ],
           "content_hash": "sha256:6e27d8a05694ac5ff2f577b064f8fd15960f55f9fab762b7206480c6204c8898"
         },
         "metadata": {
-          "points": 9,
-          "num_comments": 2,
+          "points": 18,
+          "num_comments": 3,
           "author": "cf100clunk"
         }
       },
       {
-        "source": "pypi_recent_updates",
-        "id": "5407a69b095f61e1a07ea022b8fbc01d",
-        "url": "https://pypi.org/project/pandas-plots/1.3.0/",
-        "published_at": "2026-03-13T15:56:44Z",
-        "updated_at": "2026-03-13T15:56:44Z",
-        "headline": "pandas-plots 1.3.0",
+        "source": "hn_front_page",
+        "id": "c59de1d085c8292738a98175b0185b32",
+        "url": "https://www.4rknova.com//blog/2025/06/22/mrs-fractal",
+        "published_at": "2026-03-09T14:19:50Z",
+        "updated_at": "2026-03-13T16:11:55Z",
+        "headline": "The Mrs Fractal: Mirror, Rotate, Scale",
         "content": {
-          "excerpt_text": "A collection of helper for table handling and visualization",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:38Z",
           "evidence_urls": [
-            "https://pypi.org/project/pandas-plots/1.3.0/"
+            "https://www.4rknova.com//blog/2025/06/22/mrs-fractal"
           ],
-          "content_hash": "sha256:8836bf9aaca9db798b4d691be85b237c06eff0e58b1acd3ff21e1d58e8f249aa"
+          "content_hash": "sha256:f4d14ca2e893b4427c48487db2ce51d954440d3e5baa9e133dbfc5faa4ce1158"
+        },
+        "metadata": {
+          "points": 16,
+          "num_comments": 2,
+          "author": "ibobev"
+        }
+      },
+      {
+        "source": "hn_front_page",
+        "id": "5c9f9fb294a81c7878c8f1b1ecd062c3",
+        "url": "https://www.npr.org/2026/03/12/nx-s1-5746128/nasa-artemis-ii-april-launch",
+        "published_at": "2026-03-13T15:29:16Z",
+        "updated_at": "2026-03-13T16:19:55Z",
+        "headline": "NASA targets Artemis II crewed moon mission for April 1 launch",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:38Z",
+          "evidence_urls": [
+            "https://www.npr.org/2026/03/12/nx-s1-5746128/nasa-artemis-ii-april-launch"
+          ],
+          "content_hash": "sha256:ee05f58536bd63de54b2157050a6d98a99b6ea2c20d3199486883c7c00bc77b8"
+        },
+        "metadata": {
+          "points": 15,
+          "num_comments": 3,
+          "author": "Brajeshwar"
+        }
+      },
+      {
+        "source": "hn_front_page",
+        "id": "2b7dc6c7b851da7fc965c89d7b3eef87",
+        "url": "https://www.runcaptain.com/",
+        "published_at": "2026-03-13T15:45:33Z",
+        "updated_at": "2026-03-13T16:20:25Z",
+        "headline": "Launch HN: Captain (YC W26) – Automated RAG for Files",
+        "content": {
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:38Z",
+          "evidence_urls": [
+            "https://www.runcaptain.com/"
+          ],
+          "content_hash": "sha256:448b471ee706ae0865e9700d85f58762e3918cfece472596c6455152980e2f4b"
+        },
+        "metadata": {
+          "points": 11,
+          "num_comments": 0,
+          "author": "CMLewis"
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "bb94d615b724457ca808d849e19bf9a0",
+        "url": "https://pypi.org/project/computer-control-mcp-enhanced/0.4.6/",
+        "published_at": "2026-03-13T16:26:31Z",
+        "updated_at": "2026-03-13T16:26:31Z",
+        "headline": "computer-control-mcp-enhanced 0.4.6",
+        "content": {
+          "excerpt_text": "Enhanced MCP server for computer control: mouse, keyboard, screenshots, OCR, UI automation, region capture, accessibility-aware app launching. Fork of computer-control-mcp with major perception and automation improvements.",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/computer-control-mcp-enhanced/0.4.6/"
+          ],
+          "content_hash": "sha256:04a5bc1f9812fdca4169c3eb54f6c3b2ec00295b1869c6b0a8828c7f9de46f8a"
         },
         "signals": {
           "release": {
-            "version": "1.3.0",
+            "version": "0.4.6",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/pandas-plots/1.3.0/"
+              "evidence_url": "https://pypi.org/project/computer-control-mcp-enhanced/0.4.6/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "cb5906be1b53e6abe3444dd8228b4b0e",
-        "url": "https://pypi.org/project/ocr-indexer-pro/0.1.0/",
-        "published_at": "2026-03-13T15:56:28Z",
-        "updated_at": "2026-03-13T15:56:28Z",
-        "headline": "ocr-indexer-pro 0.1.0",
+        "id": "9ac843bb66f48b9d18b875e8d0951fef",
+        "url": "https://pypi.org/project/pytest-bec-e2e/3.108.3/",
+        "published_at": "2026-03-13T16:26:27Z",
+        "updated_at": "2026-03-13T16:26:27Z",
+        "headline": "pytest-bec-e2e 3.108.3",
         "content": {
-          "excerpt_text": "Herramienta CLI de alto rendimiento para indexación OCR local y búsqueda en servidores Linux.",
+          "excerpt_text": "BEC pytest plugin for end-to-end tests",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/ocr-indexer-pro/0.1.0/"
+            "https://pypi.org/project/pytest-bec-e2e/3.108.3/"
           ],
-          "content_hash": "sha256:83dbf964aaa91b2aecaccaa456f5bb794e6fda92b7584ad1a20d0f3b9f70ee10"
+          "content_hash": "sha256:ed10d37eb482195029a9e2efd8594409f17034f0fd813287a98cf989caaa9517"
         },
         "signals": {
           "release": {
-            "version": "0.1.0",
+            "version": "3.108.3",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/ocr-indexer-pro/0.1.0/"
+              "evidence_url": "https://pypi.org/project/pytest-bec-e2e/3.108.3/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "6875ae7db0509e3e6ab1da098312524e",
-        "url": "https://pypi.org/project/nominal-video/0.1.1/",
-        "published_at": "2026-03-13T15:56:06Z",
-        "updated_at": "2026-03-13T15:56:06Z",
-        "headline": "nominal-video 0.1.1",
+        "id": "96b05179af81548f9c69cab999f8e926",
+        "url": "https://pypi.org/project/bec-server/3.108.3/",
+        "published_at": "2026-03-13T16:26:25Z",
+        "updated_at": "2026-03-13T16:26:25Z",
+        "headline": "bec-server 3.108.3",
         "content": {
-          "excerpt_text": "Stream, proxy, and route video from any source to any sink",
+          "excerpt_text": "BEC server",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/nominal-video/0.1.1/"
+            "https://pypi.org/project/bec-server/3.108.3/"
           ],
-          "content_hash": "sha256:6953494b3e89e84b20c58461e1851eaf346be68787606a68dbe4fffd641bc529"
+          "content_hash": "sha256:ea4b55795b6da2670d51fd88af75216109afdcad07c7d7a706e3d0de8d4d02bb"
         },
         "signals": {
           "release": {
-            "version": "0.1.1",
+            "version": "3.108.3",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/nominal-video/0.1.1/"
+              "evidence_url": "https://pypi.org/project/bec-server/3.108.3/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "5c9cc036bc92953b5baff46b2c04bc02",
-        "url": "https://pypi.org/project/holoviz-utils/0.3.23/",
-        "published_at": "2026-03-13T15:55:45Z",
-        "updated_at": "2026-03-13T15:55:45Z",
-        "headline": "holoviz-utils 0.3.23",
+        "id": "e0fe69e0e46a5c582943e6c7eee3569a",
+        "url": "https://pypi.org/project/bec-lib/3.108.3/",
+        "published_at": "2026-03-13T16:26:23Z",
+        "updated_at": "2026-03-13T16:26:23Z",
+        "headline": "bec-lib 3.108.3",
         "content": {
-          "excerpt_text": "A Python package for HoloViz utilities",
+          "excerpt_text": "BEC library",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/holoviz-utils/0.3.23/"
+            "https://pypi.org/project/bec-lib/3.108.3/"
           ],
-          "content_hash": "sha256:2fad804304be502c13485b0463f12625319ed4b2539c06cb6148671147b8db37"
+          "content_hash": "sha256:06f546c606b83f7f3df2387cb0570ae443563da9e2bb2f08bc8e69bf1e35d54e"
         },
         "signals": {
           "release": {
-            "version": "0.3.23",
+            "version": "3.108.3",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/holoviz-utils/0.3.23/"
+              "evidence_url": "https://pypi.org/project/bec-lib/3.108.3/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "c48995fa81430d788aa6de849ebc6b7c",
-        "url": "https://pypi.org/project/djhud/0.9.12/",
-        "published_at": "2026-03-13T15:55:44Z",
-        "updated_at": "2026-03-13T15:55:44Z",
-        "headline": "djhud 0.9.12",
+        "id": "f31b5450a9a47d6fa82ca6f9f55545b6",
+        "url": "https://pypi.org/project/bec-ipython-client/3.108.3/",
+        "published_at": "2026-03-13T16:26:22Z",
+        "updated_at": "2026-03-13T16:26:22Z",
+        "headline": "bec-ipython-client 3.108.3",
         "content": {
-          "excerpt_text": "Lightweight screen/webcam region capture and virtual camera tool for DJs",
+          "excerpt_text": "BEC IPython client",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/djhud/0.9.12/"
+            "https://pypi.org/project/bec-ipython-client/3.108.3/"
           ],
-          "content_hash": "sha256:37a7e57283ca146a1a123d749679f19944807022a133cedb2d584b9a8a0b2912"
+          "content_hash": "sha256:696667b2efa2662cd2c5f33a96518346db2cbb6f9eb5c9cd0e27fd64b03b1b2a"
         },
         "signals": {
           "release": {
-            "version": "0.9.12",
+            "version": "3.108.3",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/djhud/0.9.12/"
+              "evidence_url": "https://pypi.org/project/bec-ipython-client/3.108.3/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "b55b218aaba1fb2bf04185715ee9a3fc",
-        "url": "https://pypi.org/project/apipod/1.0.2/",
-        "published_at": "2026-03-13T15:55:32Z",
-        "updated_at": "2026-03-13T15:55:32Z",
-        "headline": "APIPod 1.0.2",
+        "id": "a0f562fef4c32a4dd918eba57cdab51c",
+        "url": "https://pypi.org/project/ffun/1.23.0/",
+        "published_at": "2026-03-13T16:26:07Z",
+        "updated_at": "2026-03-13T16:26:07Z",
+        "headline": "ffun 1.23.0",
         "content": {
-          "excerpt_text": "Create web-APIs for long-running tasks",
+          "excerpt_text": "Backend for the Feeds Fun — web-based news reader",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/apipod/1.0.2/"
+            "https://pypi.org/project/ffun/1.23.0/"
           ],
-          "content_hash": "sha256:e5bd9dc94bca5aeb952d5a0320e2705355872d20e083ecbae0e6639c02993134"
-        },
-        "signals": {
-          "release": {
-            "version": "1.0.2",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/apipod/1.0.2/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "72a76d4a1dcec8abe8d80536c80a9dbd",
-        "url": "https://pypi.org/project/copier/9.14.0/",
-        "published_at": "2026-03-13T15:55:29Z",
-        "updated_at": "2026-03-13T15:55:29Z",
-        "headline": "copier 9.14.0",
-        "content": {
-          "excerpt_text": "A library for rendering project templates.",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/copier/9.14.0/"
-          ],
-          "content_hash": "sha256:de5e00c17603bbc07561efda96829b8b671d5467ce83e46031736e192140d270"
-        },
-        "signals": {
-          "release": {
-            "version": "9.14.0",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/copier/9.14.0/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "61fd75c39577ec9b7e0123e2325af8a0",
-        "url": "https://pypi.org/project/vexy-lines-utils/1.0.13/",
-        "published_at": "2026-03-13T15:55:20Z",
-        "updated_at": "2026-03-13T15:55:20Z",
-        "headline": "vexy-lines-utils 1.0.13",
-        "content": {
-          "excerpt_text": "Command-line automation for batch exporting Vexy Lines vector art documents to PDF on macOS",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/vexy-lines-utils/1.0.13/"
-          ],
-          "content_hash": "sha256:0cdaa31ce0016202f8484e09b5031f73535084c03a5ef9c3f5054a892d104650"
-        },
-        "signals": {
-          "release": {
-            "version": "1.0.13",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/vexy-lines-utils/1.0.13/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "5b15abcf49df58f037f833101cb3cf61",
-        "url": "https://pypi.org/project/solace-agent-mesh/1.18.5/",
-        "published_at": "2026-03-13T15:55:19Z",
-        "updated_at": "2026-03-13T15:55:19Z",
-        "headline": "solace-agent-mesh 1.18.5",
-        "content": {
-          "excerpt_text": "Solace Agent Mesh is an open-source framework for building event-driven, multi-agent AI systems where specialized agents collaborate on complex tasks.",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/solace-agent-mesh/1.18.5/"
-          ],
-          "content_hash": "sha256:55f2a47cd580a6eacd7f85ff8ced88294ce55c574eb8c294c8db11ccf6c25f09"
-        },
-        "signals": {
-          "release": {
-            "version": "1.18.5",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/solace-agent-mesh/1.18.5/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "a5916b6b753feb7537140a851e197dc5",
-        "url": "https://pypi.org/project/jcodemunch-mcp/1.3.6/",
-        "published_at": "2026-03-13T15:55:01Z",
-        "updated_at": "2026-03-13T15:55:01Z",
-        "headline": "jcodemunch-mcp 1.3.6",
-        "content": {
-          "excerpt_text": "Token-efficient MCP server for source code exploration via tree-sitter AST parsing",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/jcodemunch-mcp/1.3.6/"
-          ],
-          "content_hash": "sha256:210996bb0888b681f979e916f82264d51c6a74b9e67750db08ef9a235d18cd24"
-        },
-        "signals": {
-          "release": {
-            "version": "1.3.6",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/jcodemunch-mcp/1.3.6/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "540e0e16bd893bdf3519d389528cbb9e",
-        "url": "https://pypi.org/project/markdown-vault-mcp/1.7.0/",
-        "published_at": "2026-03-13T15:55:00Z",
-        "updated_at": "2026-03-13T15:55:00Z",
-        "headline": "markdown-vault-mcp 1.7.0",
-        "content": {
-          "excerpt_text": "Generic markdown vault MCP server with FTS5 + semantic search",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/markdown-vault-mcp/1.7.0/"
-          ],
-          "content_hash": "sha256:7c6bbef29b411e6b04abed38ea13a5afb884db33bb1a3b4dc56b1661d2a564fc"
-        },
-        "signals": {
-          "release": {
-            "version": "1.7.0",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/markdown-vault-mcp/1.7.0/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "acbb741bdbd73f32e3a3d7d4ba884d30",
-        "url": "https://pypi.org/project/lysqlnb/0.4.0/",
-        "published_at": "2026-03-13T15:54:34Z",
-        "updated_at": "2026-03-13T15:54:34Z",
-        "headline": "lysqlnb 0.4.0",
-        "content": {
-          "excerpt_text": "A library for reading and validating Oracle SQL notebooks.",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/lysqlnb/0.4.0/"
-          ],
-          "content_hash": "sha256:5f8b2825d1c93dee77f237382701342c919777016e7aa32795cc5f739879d585"
-        },
-        "signals": {
-          "release": {
-            "version": "0.4.0",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/lysqlnb/0.4.0/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "30d666c1407e950893dfdcf4ff90d133",
-        "url": "https://pypi.org/project/votify/1.7.2/",
-        "published_at": "2026-03-13T15:54:30Z",
-        "updated_at": "2026-03-13T15:54:30Z",
-        "headline": "votify 1.7.2",
-        "content": {
-          "excerpt_text": "A command-line app for downloading songs, podcasts and videos from Spotify.",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/votify/1.7.2/"
-          ],
-          "content_hash": "sha256:45acf0610cf10d7b317906ce12de45e2caeb93437ef85d482b48dfa6d728ba7b"
-        },
-        "signals": {
-          "release": {
-            "version": "1.7.2",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/votify/1.7.2/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "7faf3ec609b277acf93dbb90b40fb29a",
-        "url": "https://pypi.org/project/earlyai-agent/0.3.0/",
-        "published_at": "2026-03-13T15:54:26Z",
-        "updated_at": "2026-03-13T15:54:26Z",
-        "headline": "earlyai-agent 0.3.0",
-        "content": {
-          "excerpt_text": "LLM-powered automatic test generation for Python",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/earlyai-agent/0.3.0/"
-          ],
-          "content_hash": "sha256:2b41ae34546458bf95f96f70d91b5308df63e26e05027a6ec3fb04e6f8348a04"
-        },
-        "signals": {
-          "release": {
-            "version": "0.3.0",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/earlyai-agent/0.3.0/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "d175033a55d7faa8f477a66189da03d3",
-        "url": "https://pypi.org/project/cognigraph/0.15.1/",
-        "published_at": "2026-03-13T15:54:19Z",
-        "updated_at": "2026-03-13T15:54:19Z",
-        "headline": "cognigraph 0.15.1",
-        "content": {
-          "excerpt_text": "DEPRECATED — CogniGraph has been renamed to Graqle. Install 'graqle' instead: pip install graqle",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/cognigraph/0.15.1/"
-          ],
-          "content_hash": "sha256:f069d8f54c065d70ca3c386ca19ada573b0690bc684854c159c4ff21e193c76e"
-        },
-        "signals": {
-          "release": {
-            "version": "0.15.1",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/cognigraph/0.15.1/"
-            }
-          },
-          "deprecation": {
-            "type": "deprecated",
-            "confidence": "low",
-            "source": "keyword_scan",
-            "provenance": {
-              "method": "keyword_scan",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/cognigraph/0.15.1/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "76a7584e76d17c3a60b9c16f942df66f",
-        "url": "https://pypi.org/project/dalexor/1.7.0/",
-        "published_at": "2026-03-13T15:54:16Z",
-        "updated_at": "2026-03-13T15:54:16Z",
-        "headline": "dalexor 1.7.0",
-        "content": {
-          "excerpt_text": "Dalexor MI: Global MCP Brain & Sovereign CLI. Zero-knowledge code intelligence.",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/dalexor/1.7.0/"
-          ],
-          "content_hash": "sha256:0675774fa3854651d9a508fde3eb17a56ca4115c021ba16b08852ddb87c9b7aa"
-        },
-        "signals": {
-          "release": {
-            "version": "1.7.0",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/dalexor/1.7.0/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "b83706e3bc349e075021901cf4f10c1c",
-        "url": "https://pypi.org/project/geocif/0.4.213/",
-        "published_at": "2026-03-13T15:54:11Z",
-        "updated_at": "2026-03-13T15:54:11Z",
-        "headline": "geocif 0.4.213",
-        "content": {
-          "excerpt_text": "Models to visualize and forecast crop conditions and yields",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/geocif/0.4.213/"
-          ],
-          "content_hash": "sha256:4f076ab2e43c5e820641b9f207ffecb376366d8dc850be6840b3f034797148fe"
-        },
-        "signals": {
-          "release": {
-            "version": "0.4.213",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/geocif/0.4.213/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "2a40e9ee28184ed36eed8fd51afbad19",
-        "url": "https://pypi.org/project/fastapi-magic-dto/0.1.1/",
-        "published_at": "2026-03-13T15:53:43Z",
-        "updated_at": "2026-03-13T15:53:43Z",
-        "headline": "fastapi-magic-dto 0.1.1",
-        "content": {
-          "excerpt_text": "Stop duplicating your Pydantic schemas. Map FastAPI request parameters into a single DTO.",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/fastapi-magic-dto/0.1.1/"
-          ],
-          "content_hash": "sha256:1162900b71aa2a64e03838e8cbef2b6e45f4a2d8b44310f40487c25187cd0ba6"
-        },
-        "signals": {
-          "release": {
-            "version": "0.1.1",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/fastapi-magic-dto/0.1.1/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "42c7618dc68339b943417d0a8e9f9b24",
-        "url": "https://pypi.org/project/lightup-ai/1.1.0/",
-        "published_at": "2026-03-13T15:53:27Z",
-        "updated_at": "2026-03-13T15:53:27Z",
-        "headline": "lightup-ai 1.1.0",
-        "content": {
-          "excerpt_text": "AI assistant for Lightup data quality — MCP server + agentic chat client",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/lightup-ai/1.1.0/"
-          ],
-          "content_hash": "sha256:67a71d0eb4c4ca317542730cf7c3a8a5247b34059fb6ee7a64676f2d0a4691e2"
-        },
-        "signals": {
-          "release": {
-            "version": "1.1.0",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/lightup-ai/1.1.0/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "8e8eb9c8a0ac78eaf614b2928b1ada55",
-        "url": "https://pypi.org/project/py-find-1st/1.1.8/",
-        "published_at": "2026-03-13T15:53:18Z",
-        "updated_at": "2026-03-13T15:53:18Z",
-        "headline": "py-find-1st 1.1.8",
-        "content": {
-          "excerpt_text": "Numpy extension module for efficient search of first array index that compares true",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/py-find-1st/1.1.8/"
-          ],
-          "content_hash": "sha256:ed0507721a5b94adbe52f86f4afc7b05cf390a60328251654b75f58014411200"
-        },
-        "signals": {
-          "release": {
-            "version": "1.1.8",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/py-find-1st/1.1.8/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "7a3c8b0521832fff2dc92bb27a95af7a",
-        "url": "https://pypi.org/project/pyforge-deploy/0.1.1/",
-        "published_at": "2026-03-13T15:53:15Z",
-        "updated_at": "2026-03-13T15:53:15Z",
-        "headline": "pyforge-deploy 0.1.1",
-        "content": {
-          "excerpt_text": "Lightweight automation tool designed to streamline the transition from development to distribution.",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/pyforge-deploy/0.1.1/"
-          ],
-          "content_hash": "sha256:4455066ca16e3589390ef8c531d48db75ead31781b9849c83660fc25dfb2db4c"
-        },
-        "signals": {
-          "release": {
-            "version": "0.1.1",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/pyforge-deploy/0.1.1/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "5def33a40ff57aab1cc2ea88ecc7bfc7",
-        "url": "https://pypi.org/project/naas-abi-cli/1.23.0/",
-        "published_at": "2026-03-13T15:52:59Z",
-        "updated_at": "2026-03-13T15:52:59Z",
-        "headline": "naas-abi-cli 1.23.0",
-        "content": {
-          "excerpt_text": "Abi cli allowing you to build your AI system.",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/naas-abi-cli/1.23.0/"
-          ],
-          "content_hash": "sha256:c24212997aef97ef1a2579fe8fd0e20a370c06e98bacaffc179b8f216e5c0a23"
+          "content_hash": "sha256:e9b61bdda4844739cb7f953edd34118758686169ed1b0aa6fd380e0868ae8387"
         },
         "signals": {
           "release": {
@@ -5828,449 +5794,298 @@
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/naas-abi-cli/1.23.0/"
+              "evidence_url": "https://pypi.org/project/ffun/1.23.0/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "ec42caa54231d4c46408039b26c0bea6",
-        "url": "https://pypi.org/project/pyrion/0.2.1/",
-        "published_at": "2026-03-13T15:52:59Z",
-        "updated_at": "2026-03-13T15:52:59Z",
-        "headline": "pyrion 0.2.1",
+        "id": "cd41049a140e765419ce70b78054d974",
+        "url": "https://pypi.org/project/flexprice/2.0.6/",
+        "published_at": "2026-03-13T16:25:52Z",
+        "updated_at": "2026-03-13T16:25:52Z",
+        "headline": "flexprice 2.0.6",
         "content": {
-          "excerpt_text": "A fast and efficient bioinformatics library for genomic data processing",
+          "excerpt_text": "Python Client SDK for the FlexPrice API.",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/pyrion/0.2.1/"
+            "https://pypi.org/project/flexprice/2.0.6/"
           ],
-          "content_hash": "sha256:56f63555c4b738be81443cee6c3f79209b4f2c08cbe91d759decca060e5d1dc3"
+          "content_hash": "sha256:38b5385e58ea8210171bf8fac65856866abb4168b4ced0e2f3f9dd2c783ecff3"
         },
         "signals": {
           "release": {
-            "version": "0.2.1",
+            "version": "2.0.6",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/pyrion/0.2.1/"
+              "evidence_url": "https://pypi.org/project/flexprice/2.0.6/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "09b923a6aa48a942ec1ce917c31aad6d",
-        "url": "https://pypi.org/project/graqle/0.16.0/",
-        "published_at": "2026-03-13T15:52:48Z",
-        "updated_at": "2026-03-13T15:52:48Z",
-        "headline": "graqle 0.16.0",
+        "id": "1b7bc143e7a597e7ab493011d29d3122",
+        "url": "https://pypi.org/project/pollyweb/1.0.6/",
+        "published_at": "2026-03-13T16:25:22Z",
+        "updated_at": "2026-03-13T16:25:22Z",
+        "headline": "pollyweb 1.0.6",
         "content": {
-          "excerpt_text": "Dev Intelligence Layer — turn any codebase into a reasoning-ready knowledge graph. Query your architecture, not your files.",
+          "excerpt_text": "A neutral, open, and global web protocol that allows any person or AI agent to chat with any business, place, or thing.",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/graqle/0.16.0/"
+            "https://pypi.org/project/pollyweb/1.0.6/"
           ],
-          "content_hash": "sha256:3f1a1e375dd82e5efd22d127af7b568bbfceb459d303994917951c7eafa0a6f7"
+          "content_hash": "sha256:bb395ef893144bcb3d19b8621f41dad213e0dc1e77d306d962fe3212fa7dbf65"
         },
         "signals": {
           "release": {
-            "version": "0.16.0",
+            "version": "1.0.6",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/graqle/0.16.0/"
+              "evidence_url": "https://pypi.org/project/pollyweb/1.0.6/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "acae5fa24ebff6f4bce5659a7cb55968",
-        "url": "https://pypi.org/project/mcp-interactive/0.1.6/",
-        "published_at": "2026-03-13T15:52:45Z",
-        "updated_at": "2026-03-13T15:52:45Z",
-        "headline": "mcp-interactive 0.1.6",
+        "id": "41fb1aa7c5fadd5947a23e178c3e66bc",
+        "url": "https://pypi.org/project/ton-core/0.1.46/",
+        "published_at": "2026-03-13T16:25:20Z",
+        "updated_at": "2026-03-13T16:25:20Z",
+        "headline": "ton-core 0.1.46",
         "content": {
-          "excerpt_text": "MCP server for interactive feedback collection in AI-assisted development workflows.",
+          "excerpt_text": "Alias package for pytoniq-core — TON Blockchain primitives",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/mcp-interactive/0.1.6/"
+            "https://pypi.org/project/ton-core/0.1.46/"
           ],
-          "content_hash": "sha256:2b71720469d98fe00999a95bfb2dedd8b0f8c108782a7a265de851a13f75e789"
+          "content_hash": "sha256:c695ab2eacd4c74c26bccf402bbb77237b88be0970a3da610b4a803d1644703c"
         },
         "signals": {
           "release": {
-            "version": "0.1.6",
+            "version": "0.1.46",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/mcp-interactive/0.1.6/"
+              "evidence_url": "https://pypi.org/project/ton-core/0.1.46/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "6f0be78d8319c2088d1ee22186efc8ed",
-        "url": "https://pypi.org/project/emion/0.5.0/",
-        "published_at": "2026-03-13T15:52:44Z",
-        "updated_at": "2026-03-13T15:52:44Z",
-        "headline": "emion 0.5.0",
+        "id": "db41f8878a22b08bbd93801096bbbbdf",
+        "url": "https://pypi.org/project/credigraph/0.3.1/",
+        "published_at": "2026-03-13T16:25:17Z",
+        "updated_at": "2026-03-13T16:25:17Z",
+        "headline": "credigraph 0.3.1",
         "content": {
-          "excerpt_text": "Professional ION-DTN Mission Control & BPv7 Simulation Framework",
+          "excerpt_text": "Python client for the CrediGraph API",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/emion/0.5.0/"
+            "https://pypi.org/project/credigraph/0.3.1/"
           ],
-          "content_hash": "sha256:b4198b278df6f42263e726799564e5cb08d5a12379d3df35e6446b7b7cd5ea61"
+          "content_hash": "sha256:a322067f7032c7df58d51aad1377e5cb4c9a57e1d2a6da27a4b03ba3f17e430e"
         },
         "signals": {
           "release": {
-            "version": "0.5.0",
+            "version": "0.3.1",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/emion/0.5.0/"
+              "evidence_url": "https://pypi.org/project/credigraph/0.3.1/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "4efed206981bc1b9d9bb67418e806f4d",
-        "url": "https://pypi.org/project/cuws/0.0.4/",
-        "published_at": "2026-03-13T15:52:38Z",
-        "updated_at": "2026-03-13T15:52:38Z",
-        "headline": "cuws 0.0.4",
+        "id": "5eed089f5e2164ff9b2250087f912393",
+        "url": "https://pypi.org/project/sense-music/0.1.0/",
+        "published_at": "2026-03-13T16:25:11Z",
+        "updated_at": "2026-03-13T16:25:11Z",
+        "headline": "sense-music 0.1.0",
         "content": {
-          "excerpt_text": "CuWS implements watershed segmentation from minima on GPUs.",
+          "excerpt_text": "Turn audio into structured analysis and annotated visualizations for AI perception",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/cuws/0.0.4/"
+            "https://pypi.org/project/sense-music/0.1.0/"
           ],
-          "content_hash": "sha256:415e227c52342d9269d6aa9cd5e6dc0aedb5ceba1d9c77e0a65bec9f3eebaf8d"
+          "content_hash": "sha256:91182a7b7b95b756afacc7af33b1bade7375a278e88567c73a9ba63822a3148d"
         },
         "signals": {
           "release": {
-            "version": "0.0.4",
+            "version": "0.1.0",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/cuws/0.0.4/"
+              "evidence_url": "https://pypi.org/project/sense-music/0.1.0/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "04ceb3aafc0cd99c0539704dacb06992",
-        "url": "https://pypi.org/project/datons/0.4.0/",
-        "published_at": "2026-03-13T15:52:32Z",
-        "updated_at": "2026-03-13T15:52:32Z",
-        "headline": "datons 0.4.0",
+        "id": "b18d95f7c02a62903cead7f951794478",
+        "url": "https://pypi.org/project/plutus-ai/0.3.51/",
+        "published_at": "2026-03-13T16:25:05Z",
+        "updated_at": "2026-03-13T16:25:05Z",
+        "headline": "plutus-ai 0.3.51",
         "content": {
-          "excerpt_text": "Python client for Datons data APIs",
+          "excerpt_text": "Autonomous AI agent with subprocess orchestration, dynamic tool creation, and a local-first web interface",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/datons/0.4.0/"
+            "https://pypi.org/project/plutus-ai/0.3.51/"
           ],
-          "content_hash": "sha256:9588fa85ac07bc0dcd498bc0ad919a42a68ced83e98b33d48371e4664f6ab3bb"
+          "content_hash": "sha256:2bd8e60e869c4b1ea308aa979f66f3496963f0f3ba5d10e5ee3bcafd4c1df74f"
         },
         "signals": {
           "release": {
-            "version": "0.4.0",
+            "version": "0.3.51",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/datons/0.4.0/"
+              "evidence_url": "https://pypi.org/project/plutus-ai/0.3.51/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "664ebdd9319ab81a7e3dda13dfa5899c",
-        "url": "https://pypi.org/project/cartelis-name-normalizer/1.3.0/",
-        "published_at": "2026-03-13T15:52:20Z",
-        "updated_at": "2026-03-13T15:52:20Z",
-        "headline": "cartelis-name-normalizer 1.3.0",
+        "id": "c85b2dd266ecc8e460fb86c1ab8351b4",
+        "url": "https://pypi.org/project/ebi-pm/0.3.11/",
+        "published_at": "2026-03-13T16:25:02Z",
+        "updated_at": "2026-03-13T16:25:02Z",
+        "headline": "ebi-pm 0.3.11",
         "content": {
-          "excerpt_text": "Normalisation des noms et prénoms (nettoyage, patterns, détection d’anomalies)",
+          "excerpt_text": "Ebi: a stochastic process mining utility",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/cartelis-name-normalizer/1.3.0/"
+            "https://pypi.org/project/ebi-pm/0.3.11/"
           ],
-          "content_hash": "sha256:006bc871b871a6774a6d8ff1d530ae14705510d674a560608eb41ed648001992"
+          "content_hash": "sha256:be1bc36da8c422791d91f4e884ed9be8b51d76127126a4b5d38d89b204392a39"
         },
         "signals": {
           "release": {
-            "version": "1.3.0",
+            "version": "0.3.11",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/cartelis-name-normalizer/1.3.0/"
+              "evidence_url": "https://pypi.org/project/ebi-pm/0.3.11/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "380743d6b84d7aff94c46f506cc6c38c",
-        "url": "https://pypi.org/project/jmcomic-ai/0.0.9/",
-        "published_at": "2026-03-13T15:52:12Z",
-        "updated_at": "2026-03-13T15:52:12Z",
-        "headline": "jmcomic-ai 0.0.9",
+        "id": "e3e7d83f11d19dda1ad65bd11993e7a5",
+        "url": "https://pypi.org/project/nd2py/3.1.0/",
+        "published_at": "2026-03-13T16:24:36Z",
+        "updated_at": "2026-03-13T16:24:36Z",
+        "headline": "nd2py 3.1.0",
         "content": {
-          "excerpt_text": "AI-powered JMComic crawler with MCP server and skills management for seamless AI agent integration",
+          "excerpt_text": "nd2py (Neural Discovery of Network Dynamics) symbolic regression",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/jmcomic-ai/0.0.9/"
+            "https://pypi.org/project/nd2py/3.1.0/"
           ],
-          "content_hash": "sha256:8ba67bcbd3b18056ea163578bccf9b8479bb2c310be04aec1b87ef0780096c07"
+          "content_hash": "sha256:c9d2d556a87ae1ee9fe3a93957731465775cbefe9f40ae3a679c7118e2218b35"
         },
         "signals": {
           "release": {
-            "version": "0.0.9",
+            "version": "3.1.0",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/jmcomic-ai/0.0.9/"
+              "evidence_url": "https://pypi.org/project/nd2py/3.1.0/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "0e5c5e8ef228225eaee3aead7d919de5",
-        "url": "https://pypi.org/project/paude/0.12.0/",
-        "published_at": "2026-03-13T15:51:38Z",
-        "updated_at": "2026-03-13T15:51:38Z",
-        "headline": "paude 0.12.0",
+        "id": "9f672657ed6f01157a619948cdfa380f",
+        "url": "https://pypi.org/project/oakley/3.1.3/",
+        "published_at": "2026-03-13T16:24:35Z",
+        "updated_at": "2026-03-13T16:24:35Z",
+        "headline": "oakley 3.1.3",
         "content": {
-          "excerpt_text": "Podman wrapper for running Claude Code in isolated containers",
+          "excerpt_text": "A small collection of lightweight, opinionated utilities for printing fancy console output in Python: colored strings, pretty messages, simple progress bars, task context managers, and tiny system/status helpers.",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/paude/0.12.0/"
+            "https://pypi.org/project/oakley/3.1.3/"
           ],
-          "content_hash": "sha256:66446d4c15721484bd82989545ecaa8b40332791ab84f5716e2f3dc6aaabdb38"
+          "content_hash": "sha256:9fac52ef0db005c68872da908c45dec4655bf1a65c6856fab10a52db566eb51c"
         },
         "signals": {
           "release": {
-            "version": "0.12.0",
+            "version": "3.1.3",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/paude/0.12.0/"
+              "evidence_url": "https://pypi.org/project/oakley/3.1.3/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "5eb0bacb599ed2a2e821587b0d26981e",
-        "url": "https://pypi.org/project/matrice-analytics/0.1.202/",
-        "published_at": "2026-03-13T15:51:37Z",
-        "updated_at": "2026-03-13T15:51:37Z",
-        "headline": "matrice-analytics 0.1.202",
+        "id": "f932ac3f9bf617eeb56b6096c5222323",
+        "url": "https://pypi.org/project/python-po-lint/0.1.1/",
+        "published_at": "2026-03-13T16:24:31Z",
+        "updated_at": "2026-03-13T16:24:31Z",
+        "headline": "python-po-lint 0.1.1",
         "content": {
-          "excerpt_text": "Common server utilities for Matrice.ai services",
+          "excerpt_text": "Lint .po translation files for contamination, wrong languages, shifts, and garbled text",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/matrice-analytics/0.1.202/"
+            "https://pypi.org/project/python-po-lint/0.1.1/"
           ],
-          "content_hash": "sha256:b772e19c4b4146b3a539cf9e97ec6bffeaee2e35ec32f2512a3c92dbbaf58767"
-        },
-        "signals": {
-          "release": {
-            "version": "0.1.202",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/matrice-analytics/0.1.202/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "b6001b37fe9358a3ae74b77cd170ee64",
-        "url": "https://pypi.org/project/ikomia/0.16.1/",
-        "published_at": "2026-03-13T15:51:34Z",
-        "updated_at": "2026-03-13T15:51:34Z",
-        "headline": "ikomia 0.16.1",
-        "content": {
-          "excerpt_text": "Ikomia Python API for Computer Vision workflow and plugin integration in Ikomia Studio",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/ikomia/0.16.1/"
-          ],
-          "content_hash": "sha256:a783c5c26fb714386053b00aa3dc87f33b7295d8c7d6fcff23dccb3d2829e497"
-        },
-        "signals": {
-          "release": {
-            "version": "0.16.1",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/ikomia/0.16.1/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "8f3ae465fcbaa39a6efae4f69f409517",
-        "url": "https://pypi.org/project/getsources/0.0.3/",
-        "published_at": "2026-03-13T15:51:22Z",
-        "updated_at": "2026-03-13T15:51:22Z",
-        "headline": "getsources 0.0.3",
-        "content": {
-          "excerpt_text": "A way to get the source code of functions",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/getsources/0.0.3/"
-          ],
-          "content_hash": "sha256:f95fd27aa469ef420a5e1c1584b424301ca4cc2cdc043d40441e6d2da8859c8e"
-        },
-        "signals": {
-          "release": {
-            "version": "0.0.3",
-            "prerelease": true,
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/getsources/0.0.3/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "726a3ec6b75317de8bca49cfd4183970",
-        "url": "https://pypi.org/project/excel-vba/0.4.4/",
-        "published_at": "2026-03-13T15:51:03Z",
-        "updated_at": "2026-03-13T15:51:03Z",
-        "headline": "excel-vba 0.4.4",
-        "content": {
-          "excerpt_text": "Edit, export and import Excel VBA code from the command line. Thin entry-point wrapper for vba-edit.",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/excel-vba/0.4.4/"
-          ],
-          "content_hash": "sha256:5ab1777ff29645eaf1ef5b58a561dab450f8e14f8b98ef0616c67ad195ab9016"
-        },
-        "signals": {
-          "release": {
-            "version": "0.4.4",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/excel-vba/0.4.4/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "ad8fd390784ec7ba2bc33cb790a6bf37",
-        "url": "https://pypi.org/project/nas-sync-script-builder/0.6.0/",
-        "published_at": "2026-03-13T15:50:55Z",
-        "updated_at": "2026-03-13T15:50:55Z",
-        "headline": "nas-sync-script-builder 0.6.0",
-        "content": {
-          "excerpt_text": "GUI tool to generate a bash script for one-way, no-deletion NAS sync using rsync and lsyncd",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/nas-sync-script-builder/0.6.0/"
-          ],
-          "content_hash": "sha256:c576a3889272f0a56d48e6c77091c096589e3c2acd8bbf84bd7a7fefff358ebd"
-        },
-        "signals": {
-          "release": {
-            "version": "0.6.0",
-            "provenance": {
-              "method": "title_regex",
-              "authority": "PyPI Recent Updates",
-              "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/nas-sync-script-builder/0.6.0/"
-            }
-          }
-        }
-      },
-      {
-        "source": "pypi_recent_updates",
-        "id": "0a6eefa23dbfe2e27a2695212314a0a6",
-        "url": "https://pypi.org/project/mautic-cli/0.1.1/",
-        "published_at": "2026-03-13T15:50:50Z",
-        "updated_at": "2026-03-13T15:50:50Z",
-        "headline": "mautic-cli 0.1.1",
-        "content": {
-          "excerpt_text": "Control Mautic from the command line or any AI coding agent.",
-          "lang": "en"
-        },
-        "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
-          "evidence_urls": [
-            "https://pypi.org/project/mautic-cli/0.1.1/"
-          ],
-          "content_hash": "sha256:7b54e1aff3a5e0015f4664611fd3f126174d006aac712458cad123caec8c4a4e"
+          "content_hash": "sha256:6af28e4a451df40ec7d0af17832b0adf856606f428bb2f32072a34a2870f8bd1"
         },
         "signals": {
           "release": {
@@ -6279,97 +6094,729 @@
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/mautic-cli/0.1.1/"
+              "evidence_url": "https://pypi.org/project/python-po-lint/0.1.1/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "90cef1d5841b7ba9e73866760202c5ca",
-        "url": "https://pypi.org/project/dwarffi/0.0.20/",
-        "published_at": "2026-03-13T15:50:18Z",
-        "updated_at": "2026-03-13T15:50:18Z",
-        "headline": "dwarffi 0.0.20",
+        "id": "599851620abd173e0e4e9155a9e752dd",
+        "url": "https://pypi.org/project/linear-canal/0.2.2/",
+        "published_at": "2026-03-13T16:24:30Z",
+        "updated_at": "2026-03-13T16:24:30Z",
+        "headline": "linear-canal 0.2.2",
         "content": {
-          "excerpt_text": "dwarffi is a Python library for parsing ISF files and providing an interface to access kernel symbols and types.",
+          "excerpt_text": "CLI tool for Linear Canal — Context Intelligence Layer for AI Coding Agents",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/dwarffi/0.0.20/"
+            "https://pypi.org/project/linear-canal/0.2.2/"
           ],
-          "content_hash": "sha256:0289a42c4a8d75ffb20b21b6bb2d1f1aaa73a83704976836ba668f364a0ac625"
+          "content_hash": "sha256:e1bc21fc4c765e77a2006897cadf6f16f391bbc049fc1808e500b8341e9e4952"
         },
         "signals": {
           "release": {
-            "version": "0.0.20",
+            "version": "0.2.2",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/dwarffi/0.0.20/"
+              "evidence_url": "https://pypi.org/project/linear-canal/0.2.2/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "230d2ff0ca23943428ac338706fbc5fc",
-        "url": "https://pypi.org/project/mangono-addon-redis-session-store/2.3.0/",
-        "published_at": "2026-03-13T15:50:10Z",
-        "updated_at": "2026-03-13T15:50:10Z",
-        "headline": "mangono-addon-redis_session_store 2.3.0",
+        "id": "419c7202ef0b7720478cda07a6f89c0e",
+        "url": "https://pypi.org/project/trickle-observe/0.1.74/",
+        "published_at": "2026-03-13T16:24:30Z",
+        "updated_at": "2026-03-13T16:24:30Z",
+        "headline": "trickle-observe 0.1.74",
         "content": {
-          "excerpt_text": "None",
+          "excerpt_text": "Runtime type observability for Python applications",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/mangono-addon-redis-session-store/2.3.0/"
+            "https://pypi.org/project/trickle-observe/0.1.74/"
           ],
-          "content_hash": "sha256:4280f1d3a8613f7c356cdca4aa3f7e5432115ccc5dab7a99a050067bf92912eb"
+          "content_hash": "sha256:5ac4744c0e52120977281991505c79ca3daad33cc10abbe00a3105b548a770a7"
         },
         "signals": {
           "release": {
-            "version": "2.3.0",
+            "version": "0.1.74",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/mangono-addon-redis-session-store/2.3.0/"
+              "evidence_url": "https://pypi.org/project/trickle-observe/0.1.74/"
             }
           }
         }
       },
       {
         "source": "pypi_recent_updates",
-        "id": "a46780ef9d9d054c435695144eb4ea00",
-        "url": "https://pypi.org/project/agentweave-ai/0.5.0/",
-        "published_at": "2026-03-13T15:50:02Z",
-        "updated_at": "2026-03-13T15:50:02Z",
-        "headline": "agentweave-ai 0.5.0",
+        "id": "bbae8efde09df27adc5d663c0cc80c2b",
+        "url": "https://pypi.org/project/aegro/0.3.0/",
+        "published_at": "2026-03-13T16:24:18Z",
+        "updated_at": "2026-03-13T16:24:18Z",
+        "headline": "aegro 0.3.0",
         "content": {
-          "excerpt_text": "Multi-agent AI collaboration framework (Claude, Kimi, Gemini, Codex, and more)",
+          "excerpt_text": "CLI for Aegro agricultural management API",
           "lang": "en"
         },
         "provenance": {
-          "fetched_at": "2026-03-13T15:57:01Z",
+          "fetched_at": "2026-03-13T16:26:39Z",
           "evidence_urls": [
-            "https://pypi.org/project/agentweave-ai/0.5.0/"
+            "https://pypi.org/project/aegro/0.3.0/"
           ],
-          "content_hash": "sha256:2f00337dac91f341b873e8e456467a2a83fd8a62f506a09f537f6c3e35f814b8"
+          "content_hash": "sha256:efac002240045d54aeff77c3010cbf674aff99196cae9cca92b573c98a39f986"
         },
         "signals": {
           "release": {
-            "version": "0.5.0",
+            "version": "0.3.0",
             "provenance": {
               "method": "title_regex",
               "authority": "PyPI Recent Updates",
               "authority_url": "https://pypi.org",
-              "evidence_url": "https://pypi.org/project/agentweave-ai/0.5.0/"
+              "evidence_url": "https://pypi.org/project/aegro/0.3.0/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "1d07212787d63f5d353f16aab1c2e4b9",
+        "url": "https://pypi.org/project/datashadric/0.3.1/",
+        "published_at": "2026-03-13T16:24:03Z",
+        "updated_at": "2026-03-13T16:24:03Z",
+        "headline": "datashadric 0.3.1",
+        "content": {
+          "excerpt_text": "An exploratory data science toolkit for analysis, machine learning, multimodal ai agents for text and image processing, and visualization (Apache Superset)",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/datashadric/0.3.1/"
+          ],
+          "content_hash": "sha256:1fc3131e619b08f26be4c71786c294437e26f05cb467298c5063724d6ae24837"
+        },
+        "signals": {
+          "release": {
+            "version": "0.3.1",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/datashadric/0.3.1/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "674bdeec29aa0a3b18da8158f823fe58",
+        "url": "https://pypi.org/project/visonorm/0.1.4/",
+        "published_at": "2026-03-13T16:23:34Z",
+        "updated_at": "2026-03-13T16:23:34Z",
+        "headline": "visonorm 0.1.4",
+        "content": {
+          "excerpt_text": "Vietnamese Social Media Lexical Normalization Toolkit",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/visonorm/0.1.4/"
+          ],
+          "content_hash": "sha256:752103f05637cca88caf3c04e4be4936e7e23a59884f1218d0d0c65ce2575917"
+        },
+        "signals": {
+          "release": {
+            "version": "0.1.4",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/visonorm/0.1.4/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "cb5f0e11972040ea78c225de795381f2",
+        "url": "https://pypi.org/project/multiqc-mapper/0.2.1/",
+        "published_at": "2026-03-13T16:23:17Z",
+        "updated_at": "2026-03-13T16:23:17Z",
+        "headline": "multiqc-mapper 0.2.1",
+        "content": {
+          "excerpt_text": "Normalize MultiQC metrics across tools into a unified long-format table",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/multiqc-mapper/0.2.1/"
+          ],
+          "content_hash": "sha256:7ad1f95b8cce5d37feca44108cfcf0a4a015922e7fb09373f37ad12b117082da"
+        },
+        "signals": {
+          "release": {
+            "version": "0.2.1",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/multiqc-mapper/0.2.1/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "314bcfca04d0d192bcd92c7ca0156ad6",
+        "url": "https://pypi.org/project/nao-core/0.0.57/",
+        "published_at": "2026-03-13T16:22:59Z",
+        "updated_at": "2026-03-13T16:22:59Z",
+        "headline": "nao-core 0.0.57",
+        "content": {
+          "excerpt_text": "nao Core is your analytics context builder with the best chat interface.",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/nao-core/0.0.57/"
+          ],
+          "content_hash": "sha256:0df6ff78d196263bff2e53ddf72bd0a61de1d307d557d1ca16aa4525b1fd27d1"
+        },
+        "signals": {
+          "release": {
+            "version": "0.0.57",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/nao-core/0.0.57/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "16cd372e8f34d874ba28d8d2564e48e8",
+        "url": "https://pypi.org/project/mcmu/1.2.1/",
+        "published_at": "2026-03-13T16:22:59Z",
+        "updated_at": "2026-03-13T16:22:59Z",
+        "headline": "mcmu 1.2.1",
+        "content": {
+          "excerpt_text": "A utility to update Minecraft java edition mods from Modrinth",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/mcmu/1.2.1/"
+          ],
+          "content_hash": "sha256:468c644559a757be874784c9506db56034f8c7dc56ca75c57b3c56c64a718c16"
+        },
+        "signals": {
+          "release": {
+            "version": "1.2.1",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/mcmu/1.2.1/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "d4871e224aa8cfd9eae4d25431dc84a8",
+        "url": "https://pypi.org/project/postgres-dbman/0.1.1/",
+        "published_at": "2026-03-13T16:22:54Z",
+        "updated_at": "2026-03-13T16:22:54Z",
+        "headline": "postgres-dbman 0.1.1",
+        "content": {
+          "excerpt_text": "A CLI tool to manage PostgreSQL databases running in separate Docker containers on top of ZFS",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/postgres-dbman/0.1.1/"
+          ],
+          "content_hash": "sha256:e32da81f7c84738f0323aae300c0357227d7f04be62f5b74d305d9bd4cc17575"
+        },
+        "signals": {
+          "release": {
+            "version": "0.1.1",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/postgres-dbman/0.1.1/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "e0532fbf418006070478569fc0effe39",
+        "url": "https://pypi.org/project/pioneer-sdk2/0.10.6/",
+        "published_at": "2026-03-13T16:22:49Z",
+        "updated_at": "2026-03-13T16:22:49Z",
+        "headline": "pioneer-sdk2 0.10.6",
+        "content": {
+          "excerpt_text": "SDK for control and programming Geoscan Pioneer Drones",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/pioneer-sdk2/0.10.6/"
+          ],
+          "content_hash": "sha256:d383c528753c2998e6fc144df51c08a7b6566fae8211401fd06fa108add7f2eb"
+        },
+        "signals": {
+          "release": {
+            "version": "0.10.6",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/pioneer-sdk2/0.10.6/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "f5edadee1b5546ad60f749403406c03f",
+        "url": "https://pypi.org/project/objutils/0.9.1/",
+        "published_at": "2026-03-13T16:22:41Z",
+        "updated_at": "2026-03-13T16:22:41Z",
+        "headline": "objutils 0.9.1",
+        "content": {
+          "excerpt_text": "Objectfile library for Python",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/objutils/0.9.1/"
+          ],
+          "content_hash": "sha256:ef29d90ea89360722c158f44eb51b7682f7bfe3024f4b3c0026f449779416ed1"
+        },
+        "signals": {
+          "release": {
+            "version": "0.9.1",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/objutils/0.9.1/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "574bcc2763fa66976f45c4488d11b6fd",
+        "url": "https://pypi.org/project/funcexpr/0.1.0/",
+        "published_at": "2026-03-13T16:22:31Z",
+        "updated_at": "2026-03-13T16:22:31Z",
+        "headline": "funcexpr 0.1.0",
+        "content": {
+          "excerpt_text": "A lightweight wrapper around numexpr that adds support for registered callables and automatic type normalization",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/funcexpr/0.1.0/"
+          ],
+          "content_hash": "sha256:3e4a0cf3140bbda1122ab71db147155bad1a0cc41c6dffa47a07aa0845eb9a1e"
+        },
+        "signals": {
+          "release": {
+            "version": "0.1.0",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/funcexpr/0.1.0/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "125b9f2a23cb87ef3ab1bd4850f41102",
+        "url": "https://pypi.org/project/git-explain/1.1.3/",
+        "published_at": "2026-03-13T16:22:27Z",
+        "updated_at": "2026-03-13T16:22:27Z",
+        "headline": "git-explain 1.1.3",
+        "content": {
+          "excerpt_text": "CLI that suggests git add/commit from diffs using Gemini",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/git-explain/1.1.3/"
+          ],
+          "content_hash": "sha256:b2f1d55e0e7b3b7d85f40870d3c455b06cccc5414868b72a5f0704c396ac2ba8"
+        },
+        "signals": {
+          "release": {
+            "version": "1.1.3",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/git-explain/1.1.3/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "961528c87e255be116ade2a4c8ec3172",
+        "url": "https://pypi.org/project/airbyte-source-google-ads/4.1.6.dev202603131622/",
+        "published_at": "2026-03-13T16:22:15Z",
+        "updated_at": "2026-03-13T16:22:15Z",
+        "headline": "airbyte-source-google-ads 4.1.6.dev202603131622",
+        "content": {
+          "excerpt_text": "Source implementation for Google Ads.",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/airbyte-source-google-ads/4.1.6.dev202603131622/"
+          ],
+          "content_hash": "sha256:ffe0e32c1e3bb25b6bd85119b0cf4a59d6971815aa3f22cec6a860c2b479b27f"
+        },
+        "signals": {
+          "release": {
+            "version": "4.1.6.dev202603131622",
+            "prerelease": true,
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/airbyte-source-google-ads/4.1.6.dev202603131622/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "c7c9086b9bba6811b1e1bf05a2d431d0",
+        "url": "https://pypi.org/project/mes-courriels/0.0.7/",
+        "published_at": "2026-03-13T16:21:52Z",
+        "updated_at": "2026-03-13T16:21:52Z",
+        "headline": "mes-courriels 0.0.7",
+        "content": {
+          "excerpt_text": "A Python mail connector library",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/mes-courriels/0.0.7/"
+          ],
+          "content_hash": "sha256:023750ff7c5c1aa72e9c0d320d86cca917d2c95e46b6eb8590ff0c0af98d4570"
+        },
+        "signals": {
+          "release": {
+            "version": "0.0.7",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/mes-courriels/0.0.7/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "4829bf479e24ff8a3f39af3e18836851",
+        "url": "https://pypi.org/project/dtw-loss-functions/1.0.5/",
+        "published_at": "2026-03-13T16:21:47Z",
+        "updated_at": "2026-03-13T16:21:47Z",
+        "headline": "dtw-loss-functions 1.0.5",
+        "content": {
+          "excerpt_text": "Torch implementation of various DTW inpsired loss functions",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/dtw-loss-functions/1.0.5/"
+          ],
+          "content_hash": "sha256:ba32fa0166304a964e9575580b93f1c7b7d4dc9e85dc1ffeddf0d22d4628016b"
+        },
+        "signals": {
+          "release": {
+            "version": "1.0.5",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/dtw-loss-functions/1.0.5/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "7aa7a35d59fe64d773546a9835f71a88",
+        "url": "https://pypi.org/project/eyefeatures/2.0.1/",
+        "published_at": "2026-03-13T16:21:27Z",
+        "updated_at": "2026-03-13T16:21:27Z",
+        "headline": "eyefeatures 2.0.1",
+        "content": {
+          "excerpt_text": "Preprocessing, visualization, statistical analysis, feature engineering, and machine learning of eye movement data.",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/eyefeatures/2.0.1/"
+          ],
+          "content_hash": "sha256:4d9a41b15dbd3271f27276395d5868945fb3aa8f3f778b10feb0ab918844c6fa"
+        },
+        "signals": {
+          "release": {
+            "version": "2.0.1",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/eyefeatures/2.0.1/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "6ef9c1182ff666863aa63e593e297710",
+        "url": "https://pypi.org/project/vibeblocks/0.1.3/",
+        "published_at": "2026-03-13T16:21:27Z",
+        "updated_at": "2026-03-13T16:21:27Z",
+        "headline": "vibeblocks 0.1.3",
+        "content": {
+          "excerpt_text": "Lightweight Python workflow orchestration library for AI agents, async task execution, retries, and failure-safe automation.",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/vibeblocks/0.1.3/"
+          ],
+          "content_hash": "sha256:bb894929404423e8d677bfa6db8354e7bac679b9b306827655780634529f7309"
+        },
+        "signals": {
+          "release": {
+            "version": "0.1.3",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/vibeblocks/0.1.3/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "20844c7e8660cba224f80a2f31c53a27",
+        "url": "https://pypi.org/project/lbagents/0.18.2/",
+        "published_at": "2026-03-13T16:21:19Z",
+        "updated_at": "2026-03-13T16:21:19Z",
+        "headline": "LbAgents 0.18.2",
+        "content": {
+          "excerpt_text": "LangGraph-based agent workflows for LHCb Analysis Productions",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/lbagents/0.18.2/"
+          ],
+          "content_hash": "sha256:53cefd2b5d076b4d98e80eb668be1f74951308ef1872612972148d07e4df8eaa"
+        },
+        "signals": {
+          "release": {
+            "version": "0.18.2",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/lbagents/0.18.2/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "071a1579487a17e4d087572228da5be7",
+        "url": "https://pypi.org/project/zea/0.0.11/",
+        "published_at": "2026-03-13T16:21:18Z",
+        "updated_at": "2026-03-13T16:21:18Z",
+        "headline": "zea 0.0.11",
+        "content": {
+          "excerpt_text": "A Toolbox for Cognitive Ultrasound Imaging. Provides a set of tools for processing of ultrasound data, all built in your favorite machine learning framework.",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/zea/0.0.11/"
+          ],
+          "content_hash": "sha256:14d7eb9a4d0fd0ad07de4def075ce710885af5ad775d40e213a6524dfba137c7"
+        },
+        "signals": {
+          "release": {
+            "version": "0.0.11",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/zea/0.0.11/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "ce6749a72a866d81d4dfa054cd0baa71",
+        "url": "https://pypi.org/project/mosaic-search/1.3.8/",
+        "published_at": "2026-03-13T16:21:16Z",
+        "updated_at": "2026-03-13T16:21:16Z",
+        "headline": "mosaic-search 1.3.8",
+        "content": {
+          "excerpt_text": "Multi-source Scientific Article Indexer and Collector",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/mosaic-search/1.3.8/"
+          ],
+          "content_hash": "sha256:bd03c99b5adf0d2c49f577fd73b04e886c0793c473a2902898b58c0104c49253"
+        },
+        "signals": {
+          "release": {
+            "version": "1.3.8",
+            "prerelease": true,
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/mosaic-search/1.3.8/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "d5ac27d663080f756ae7a3c856a83bb9",
+        "url": "https://pypi.org/project/dploot/3.2.1/",
+        "published_at": "2026-03-13T16:21:14Z",
+        "updated_at": "2026-03-13T16:21:14Z",
+        "headline": "dploot 3.2.1",
+        "content": {
+          "excerpt_text": "DPAPI looting remotely in Python",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/dploot/3.2.1/"
+          ],
+          "content_hash": "sha256:7166601aa2f1b1b4d45fdbb5bfd60ac2e5f60098bcbc50a106b33b08c42207e4"
+        },
+        "signals": {
+          "release": {
+            "version": "3.2.1",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/dploot/3.2.1/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "b69ea9b9db1a2803ee16e51061c913d5",
+        "url": "https://pypi.org/project/geocif/0.4.215/",
+        "published_at": "2026-03-13T16:21:10Z",
+        "updated_at": "2026-03-13T16:21:10Z",
+        "headline": "geocif 0.4.215",
+        "content": {
+          "excerpt_text": "Models to visualize and forecast crop conditions and yields",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/geocif/0.4.215/"
+          ],
+          "content_hash": "sha256:ab4e8d22cf7e904253cb617652fdd475ea95cf19b0f4b039b0128a473bec8dee"
+        },
+        "signals": {
+          "release": {
+            "version": "0.4.215",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/geocif/0.4.215/"
+            }
+          }
+        }
+      },
+      {
+        "source": "pypi_recent_updates",
+        "id": "f3f980ae373cdd4f4b765de21997d9ef",
+        "url": "https://pypi.org/project/zotero-mcp-local/0.1.0/",
+        "published_at": "2026-03-13T16:21:06Z",
+        "updated_at": "2026-03-13T16:21:06Z",
+        "headline": "zotero-mcp-local 0.1.0",
+        "content": {
+          "excerpt_text": "MCP Server for accessing and analyzing your local Zotero library with AI agents",
+          "lang": "en"
+        },
+        "provenance": {
+          "fetched_at": "2026-03-13T16:26:39Z",
+          "evidence_urls": [
+            "https://pypi.org/project/zotero-mcp-local/0.1.0/"
+          ],
+          "content_hash": "sha256:21d9f36f3ba1c5bc8a06e73ff39da0f1de55f53cfd911a3d09a0982ce68c6a40"
+        },
+        "signals": {
+          "release": {
+            "version": "0.1.0",
+            "provenance": {
+              "method": "title_regex",
+              "authority": "PyPI Recent Updates",
+              "authority_url": "https://pypi.org",
+              "evidence_url": "https://pypi.org/project/zotero-mcp-local/0.1.0/"
             }
           }
         }
@@ -6379,6 +6826,6 @@
     "removed": []
   },
   "integrity_reset": false,
-  "archive_url": "/archive/_global/2026/03/13/20260313T155702Z_dd438cf7915e8fd7.json",
+  "archive_url": "/archive/_global/2026/03/13/20260313T162639Z_f2eada7f168049c8.json",
   "sources_url": "/diff/sources.json"
 }
