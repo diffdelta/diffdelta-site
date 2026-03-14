@@ -62,6 +62,40 @@ The observation data is itself valuable training data (failure detection + recov
 
 ---
 
+## Capsule Enhancement: pointers.notes
+
+**Status:** Complete (shipped as v0 schema extension)  
+**Goal:** Give agents persistent key-value memory for feed management, peer tracking, and learned patterns.
+
+### Shipped
+
+- **`pointers.notes` array** in `self_capsule_v0` — up to 20 key-value notes, 200 chars per value, with optional tags and timestamps
+- **Upsert semantics** in `self_checkpoint` — notes with the same key are replaced, new keys are appended, FIFO eviction at 20
+- **No schema migration required** — `notes` is a new optional field inside existing `pointers`, fully backward compatible
+- **Security preserved** — notes go through the same safety scanner as all capsule text (no URLs, no secrets, no injection patterns)
+
+### Usage examples
+
+```json
+{
+  "pointers": {
+    "notes": [
+      { "key": "feed:security-digest", "value": "Composite of 8 CVE sources. Publishing daily. High+critical severity only.", "tags": ["feed"] },
+      { "key": "peer:cloud-bot", "value": "Publishes cloud-rollup. Reliable. ~15min latency.", "tags": ["peer"] },
+      { "key": "learning:rss-parsing", "value": "RSS feeds with CDATA need xml2json. JSON APIs are cleaner for field extraction.", "tags": ["learning"] }
+    ]
+  }
+}
+```
+
+### v1 workspace design (deferred)
+
+A structured `workspace` extension with typed `feeds`, `peers`, and `learnings` fields is designed but not built. See `docs/DESIGN-capsule-v1-workspace.md`. Build trigger: 10+ agents using notes regularly, with clear patterns in stored data.
+
+**Why:** Agents building and managing feeds need persistent working memory that survives restarts. Notes fill this gap without overloading `objectives` or `receipts`.
+
+---
+
 ## Phase 6: Seed the Agent Network
 
 **Status:** Planned (next up)  

@@ -53,7 +53,10 @@ export interface Capsule {
     checkpoint?: string;
   }>;
   capabilities?: { tool_allowlist?: string[]; feature_flags?: string[] };
-  pointers?: { receipts?: Array<{ name: string; content_hash: string; evidence_url?: string }> };
+  pointers?: {
+    receipts?: Array<{ name: string; content_hash: string; evidence_url?: string; rationale?: string; updated_at?: string; tags?: string[] }>;
+    notes?: Array<{ key: string; value: string; updated_at?: string; tags?: string[] }>;
+  };
   self_motto?: string;
 }
 

@@ -14,6 +14,7 @@ export interface CapsuleLimits {
   maxObjectives: number;
   maxConstraints: number;
   maxReceipts: number;
+  maxNotes: number;
   maxTools: number;
   maxFlags: number;
   maxAuthorizedReaders: number;
@@ -24,6 +25,7 @@ export const LIMITS: CapsuleLimits = {
   maxObjectives: 16,
   maxConstraints: 20,
   maxReceipts: 20,
+  maxNotes: 20,
   maxTools: 20,
   maxFlags: 20,
   maxAuthorizedReaders: 20,
@@ -202,13 +204,13 @@ export function validateCapsule(capsule: unknown, limits: CapsuleLimits): Valida
     }
   }
 
-  // pointers.receipts
+  // pointers.receipts + pointers.notes
   if (capsule.pointers !== undefined) {
     if (!isObj(capsule.pointers)) {
       reasons.push("pointers");
     } else {
       const p = capsule.pointers;
-      const allowed = new Set(["receipts"]);
+      const allowed = new Set(["receipts", "notes"]);
       for (const k of Object.keys(p)) if (!allowed.has(k)) reasons.push("unknown_field");
       if (p.receipts !== undefined) {
         if (!Array.isArray(p.receipts) || p.receipts.length > limits.maxReceipts) reasons.push("receipts");
@@ -230,6 +232,30 @@ export function validateCapsule(capsule: unknown, limits: CapsuleLimits): Valida
                 reasons.push("receipt_tags");
               } else {
                 for (const t of r.tags) if (typeof t !== "string" || t.length > 32) reasons.push("receipt_tags");
+              }
+            }
+          }
+        }
+      }
+      if (p.notes !== undefined) {
+        if (!Array.isArray(p.notes) || p.notes.length > limits.maxNotes) {
+          reasons.push("notes");
+        } else {
+          for (const n of p.notes) {
+            if (!isObj(n)) {
+              reasons.push("note_item");
+              continue;
+            }
+            const allowedN = new Set(["key", "value", "updated_at", "tags"]);
+            for (const k of Object.keys(n)) if (!allowedN.has(k)) reasons.push("unknown_field");
+            if (typeof n.key !== "string" || n.key.length < 1 || n.key.length > 48) reasons.push("note_key");
+            if (typeof n.value !== "string" || n.value.length < 1 || n.value.length > 200) reasons.push("note_value");
+            if (n.updated_at !== undefined && (typeof n.updated_at !== "string" || !ISO_DATE_RE.test(n.updated_at))) reasons.push("note_updated_at");
+            if (n.tags !== undefined) {
+              if (!Array.isArray(n.tags) || n.tags.length > 10) {
+                reasons.push("note_tags");
+              } else {
+                for (const t of n.tags) if (typeof t !== "string" || t.length > 32) reasons.push("note_tags");
               }
             }
           }

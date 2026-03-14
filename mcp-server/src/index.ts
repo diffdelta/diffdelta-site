@@ -136,7 +136,7 @@ server.tool(
       .describe(
         "The capsule object following self_capsule_v0 schema. Must include " +
           "schema_version, agent_id, policy, and optionally constraints, " +
-          "objectives, capabilities, pointers, self_motto, access_control."
+          "objectives, capabilities, pointers (receipts + notes), self_motto, access_control."
       ),
   },
   async (args) => handleSelfWrite(args)
@@ -218,8 +218,13 @@ server.tool(
     "Quick pre-compression state save — read, patch, sign, and publish in one call.",
     "",
     "Reads your current capsule, applies lightweight patches (objective status",
-    "changes, new receipts, motto), and publishes the update. Designed for the",
-    "'context compression approaching — save what matters NOW' use case.",
+    "changes, new receipts, notes, motto), and publishes the update. Designed",
+    "for the 'context compression approaching — save what matters NOW' use case.",
+    "",
+    "Notes are key-value pairs that persist across restarts. Use them to",
+    "remember feed configs, peer observations, learned patterns, or anything",
+    "you'd want to know next time you wake up. Notes with the same key are",
+    "replaced (upsert). Max 20 notes, 200 chars per value.",
     "",
     "Costs ~150 tokens. Saves you from doing self_read + self_write separately.",
     "Only writes if there are actual changes (unless force:true).",
@@ -271,6 +276,26 @@ server.tool(
       )
       .optional()
       .describe("New receipts to append to the capsule."),
+    notes: z
+      .array(
+        z.object({
+          key: z
+            .string()
+            .max(48)
+            .describe("Note key — use namespaced keys like 'feed:security-digest' or 'peer:a1b2'. Same key replaces existing note."),
+          value: z
+            .string()
+            .max(200)
+            .describe("Note content — observations, configs, learnings. Plain text, no URLs."),
+          tags: z
+            .array(z.string().max(32))
+            .max(10)
+            .optional()
+            .describe("Semantic tags for filtering (e.g. 'feed', 'peer', 'learning')."),
+        })
+      )
+      .optional()
+      .describe("Notes to upsert — persistent key-value observations that survive restarts."),
     motto: z
       .string()
       .max(160)

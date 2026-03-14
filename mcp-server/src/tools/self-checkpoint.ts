@@ -133,6 +133,27 @@ export async function handleSelfCheckpoint(
     changesMade += newReceipts.length;
   }
 
+  // Upsert notes (keyed — existing notes with same key are replaced)
+  const newNotes = args.notes as
+    | Array<{ key: string; value: string; tags?: string[] }>
+    | undefined;
+  if (newNotes && Array.isArray(newNotes)) {
+    const pointers = (capsule.pointers || {}) as Record<string, unknown>;
+    const existing = (pointers.notes || []) as Array<Record<string, unknown>>;
+    for (const n of newNotes) {
+      n.updated_at = now;
+      const idx = existing.findIndex((e) => e.key === n.key);
+      if (idx >= 0) {
+        existing[idx] = n;
+      } else {
+        existing.push(n);
+      }
+    }
+    pointers.notes = existing.slice(-20);
+    capsule.pointers = pointers;
+    changesMade += newNotes.length;
+  }
+
   // Update motto
   const motto = args.motto as string | undefined;
   if (motto !== undefined) {
