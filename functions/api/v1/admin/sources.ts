@@ -7,33 +7,15 @@
 // ─────────────────────────────────────────────────────────
 
 import { jsonResponse, errorResponse } from "../../../_shared/response";
+import { checkAdmin } from "../../../_shared/admin";
 import type { Env, CustomSource } from "../../../_shared/types";
-
-// ── Admin auth helper ──
-
-function checkAdmin(request: Request, env: Env): Response | null {
-  const adminSecret = (env as Record<string, unknown>).ADMIN_SECRET as
-    | string
-    | undefined;
-
-  if (!adminSecret) {
-    return errorResponse("Admin endpoint not configured", 503);
-  }
-
-  const authHeader = request.headers.get("Authorization");
-  if (authHeader !== `Bearer ${adminSecret}`) {
-    return errorResponse("Unauthorized", 401);
-  }
-
-  return null; // Auth passed
-}
 
 // ── GET: List custom sources (filterable by status) ──
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
 
-  const authError = checkAdmin(request, env);
+  const authError = await checkAdmin(request, env);
   if (authError) return authError;
 
   const url = new URL(request.url);
@@ -79,7 +61,7 @@ interface ReviewBody {
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
 
-  const authError = checkAdmin(request, env);
+  const authError = await checkAdmin(request, env);
   if (authError) return authError;
 
   let body: ReviewBody;

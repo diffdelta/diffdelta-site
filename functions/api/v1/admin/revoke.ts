@@ -6,6 +6,7 @@
 // ─────────────────────────────────────────────────────────
 
 import { jsonResponse, errorResponse } from "../../../_shared/response";
+import { checkAdmin } from "../../../_shared/admin";
 import type { Env, KeyData } from "../../../_shared/types";
 
 interface RevokeBody {
@@ -17,19 +18,8 @@ interface RevokeBody {
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
 
-  // ── Admin auth: requires ADMIN_SECRET env var ──
-  const adminSecret = (env as Record<string, unknown>).ADMIN_SECRET as
-    | string
-    | undefined;
-
-  if (!adminSecret) {
-    return errorResponse("Admin endpoint not configured", 503);
-  }
-
-  const authHeader = request.headers.get("Authorization");
-  if (authHeader !== `Bearer ${adminSecret}`) {
-    return errorResponse("Unauthorized", 401);
-  }
+  const authError = await checkAdmin(request, env);
+  if (authError) return authError;
 
   // ── Parse request ──
   let body: RevokeBody;

@@ -8,6 +8,7 @@
 // ─────────────────────────────────────────────────────────
 
 import { jsonResponse, errorResponse } from "../../../_shared/response";
+import { checkAdmin } from "../../../_shared/admin";
 import type { Env, AgentFeedMeta } from "../../../_shared/types";
 import {
   getFeedMeta,
@@ -19,29 +20,10 @@ import {
 import { getAgentRegistry } from "../../../_shared/self/store";
 import { FREE_FEED_LIMITS } from "../../../_shared/types";
 
-// ── Admin auth (same pattern as self/agents.ts) ──
-
-function checkAdmin(request: Request, env: Env): Response | null {
-  const adminSecret = (env as Record<string, unknown>).ADMIN_SECRET as
-    | string
-    | undefined;
-
-  if (!adminSecret) {
-    return errorResponse("Admin endpoint not configured", 503);
-  }
-
-  const authHeader = request.headers.get("Authorization");
-  if (authHeader !== `Bearer ${adminSecret}`) {
-    return errorResponse("Unauthorized", 401);
-  }
-
-  return null;
-}
-
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
 
-  const authError = checkAdmin(request, env);
+  const authError = await checkAdmin(request, env);
   if (authError) return authError;
 
   // Get all bootstrapped agents, then check which ones have feeds

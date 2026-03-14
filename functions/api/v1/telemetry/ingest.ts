@@ -12,7 +12,7 @@ import type { Env } from "../../../_shared/types";
 const MAX_REQUEST_BYTES = 16_384; // 16KB — telemetry payloads are small
 const MAX_EVENTS_PER_BATCH = 25;
 const MAX_SOURCE_IDS = 20;
-const VALID_EVENT_TYPES = ["poll", "check", "publish", "discover", "compose", "probe"] as const;
+const VALID_EVENT_TYPES = ["poll", "check", "publish", "discover", "compose", "probe", "create_source"] as const;
 type EventType = typeof VALID_EVENT_TYPES[number];
 
 interface TelemetryEvent {

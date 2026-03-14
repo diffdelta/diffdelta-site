@@ -7,6 +7,7 @@
 // ─────────────────────────────────────────────────────────
 
 import { jsonResponse, errorResponse } from "../../../_shared/response";
+import { checkAdmin } from "../../../_shared/admin";
 import type { Env } from "../../../_shared/types";
 import {
   getAgentRegistry,
@@ -18,27 +19,10 @@ import {
 
 const WRITE_LIMIT_24H = 50;
 
-function checkAdmin(request: Request, env: Env): Response | null {
-  const adminSecret = (env as Record<string, unknown>).ADMIN_SECRET as
-    | string
-    | undefined;
-
-  if (!adminSecret) {
-    return errorResponse("Admin endpoint not configured", 503);
-  }
-
-  const authHeader = request.headers.get("Authorization");
-  if (authHeader !== `Bearer ${adminSecret}`) {
-    return errorResponse("Unauthorized", 401);
-  }
-
-  return null;
-}
-
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
 
-  const authError = checkAdmin(request, env);
+  const authError = await checkAdmin(request, env);
   if (authError) return authError;
 
   const registry = await getAgentRegistry(env);
