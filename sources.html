@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DiffDelta — Source Builder</title>
-  <meta name="description" content="Create custom sources and composite feeds. Paste a URL, preview the schema, pick your fields, go.">
+  <title>DiffDelta — Source Scanner</title>
+  <meta name="description" content="Scan any URL to see what data DiffDelta can extract. Request new sources with one click.">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -15,7 +15,7 @@
       --purple:#a855f7;--purple-glow:rgba(168,85,247,0.08);
       --font:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
       --mono:ui-monospace,'SF Mono','Cascadia Code','Fira Code',monospace;
-      --max-w:860px;--px:24px
+      --max-w:780px;--px:24px
     }
     html{font-size:16px}
     body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;
@@ -25,7 +25,7 @@
     code{font-family:var(--mono);font-size:.875em;background:var(--surface);padding:2px 6px;border-radius:4px}
 
     .nav{max-width:var(--max-w);margin:0 auto;padding:20px var(--px);display:flex;align-items:center;justify-content:space-between}
-    .nav-brand{font-weight:700;font-size:1.15rem;color:var(--text);letter-spacing:-.5px}
+    .nav-brand{font-weight:700;font-size:1.15rem;color:var(--text);letter-spacing:-.5px;text-decoration:none}
     .nav-brand span{color:var(--accent)}
     .nav-links{display:flex;gap:24px;font-size:.9rem}
     .nav-links a{color:var(--text2);transition:color .15s}
@@ -35,22 +35,14 @@
     .page h1{font-size:1.8rem;font-weight:800;letter-spacing:-1px;margin-bottom:8px}
     .page .subtitle{color:var(--text2);margin-bottom:32px}
 
-    .tabs{display:flex;gap:4px;margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:0}
-    .tab{padding:10px 20px;font-size:.9rem;font-weight:600;color:var(--text3);cursor:pointer;
-      border-bottom:2px solid transparent;transition:all .15s;background:none;border-top:0;border-left:0;border-right:0}
-    .tab:hover{color:var(--text2)}
-    .tab.active{color:var(--purple);border-bottom-color:var(--purple)}
-    .tab-content{display:none}
-    .tab-content.active{display:block}
-
     .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px}
     .card h3{font-size:1.05rem;font-weight:700;margin-bottom:12px;letter-spacing:-.3px}
 
     label{display:block;font-size:.85rem;font-weight:600;color:var(--text2);margin-bottom:6px}
-    input[type="text"],input[type="url"],input[type="number"],select{
+    input[type="text"],input[type="url"],input[type="email"]{
       width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);
       border-radius:8px;color:var(--text);font-size:.9rem;font-family:var(--font);outline:none;transition:border .15s}
-    input:focus,select:focus{border-color:var(--purple)}
+    input:focus{border-color:var(--purple)}
     .input-row{display:flex;gap:12px;margin-bottom:16px}
     .input-row>*{flex:1}
     .field-group{margin-bottom:16px}
@@ -62,51 +54,36 @@
     .btn-primary:disabled{opacity:.5;cursor:not-allowed}
     .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
     .btn-ghost:hover{background:var(--surface);color:var(--text)}
-    .btn-sm{padding:6px 14px;font-size:.82rem}
-    .btn-danger{background:transparent;color:var(--red);border:1px solid var(--red)}
-    .btn-danger:hover{background:var(--red);color:#fff}
 
     .fields-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:12px 0}
-    .field-check{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface2);
-      border-radius:6px;font-size:.85rem;cursor:pointer;transition:background .1s}
-    .field-check:hover{background:var(--border)}
-    .field-check input{accent-color:var(--purple)}
+    .field-tag{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface2);
+      border-radius:6px;font-size:.82rem;color:var(--text2)}
     .field-type{color:var(--text3);font-size:.75rem;font-family:var(--mono)}
-    .field-sample{color:var(--text3);font-size:.75rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
     .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.75rem;font-weight:600}
     .badge-green{background:rgba(34,197,94,.15);color:var(--green)}
-    .badge-yellow{background:rgba(234,179,8,.15);color:var(--yellow)}
-    .badge-blue{background:rgba(59,130,246,.15);color:var(--accent)}
-    .badge-gray{background:var(--surface2);color:var(--text3)}
 
     .msg{padding:14px 18px;border-radius:8px;font-size:.88rem;margin:16px 0}
     .msg-success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:var(--green)}
     .msg-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--red)}
     .msg-info{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.3);color:var(--accent)}
 
-    .source-table{width:100%;border-collapse:collapse;font-size:.88rem}
-    .source-table th{text-align:left;padding:8px 12px;color:var(--text3);font-weight:600;border-bottom:1px solid var(--border)}
-    .source-table td{padding:10px 12px;border-bottom:1px solid var(--border)}
-    .source-table tr:last-child td{border-bottom:none}
-
     .spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--purple);
       border-radius:50%;animation:spin .6s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    .toggle{display:flex;gap:4px;background:var(--surface2);border-radius:6px;padding:2px}
-    .toggle-opt{padding:6px 14px;border-radius:4px;font-size:.82rem;cursor:pointer;color:var(--text3);transition:all .1s}
-    .toggle-opt.active{background:var(--purple);color:#fff}
-
     .hidden{display:none!important}
-    .mt-12{margin-top:12px}
-    .mt-24{margin-top:24px}
-    .mb-16{margin-bottom:16px}
+
+    .footer{max-width:var(--max-w);margin:0 auto;padding:24px var(--px);
+      border-top:1px solid var(--border);display:flex;justify-content:space-between;
+      align-items:center;font-size:.8rem;color:var(--text3)}
+    .footer a{color:var(--text3)}
+    .footer a:hover{color:var(--text)}
 
     @media(max-width:640px){
       .input-row{flex-direction:column}
       .fields-grid{grid-template-columns:1fr}
-      .tabs{overflow-x:auto}
+      .footer{flex-direction:column;gap:8px;text-align:center}
     }
   </style>
 </head>
@@ -114,20 +91,21 @@
   <nav class="nav">
     <a href="/" class="nav-brand">Diff<span>Delta</span></a>
     <div class="nav-links">
-      <a href="/docs/spec/diffdelta-feed-spec.md">Spec</a>
-      <a href="/pro.html">Pro</a>
+      <a href="/self">Self</a>
+      <a href="/#feeds">Feeds</a>
+      <a href="/status">Status</a>
       <a href="/">Home</a>
     </div>
   </nav>
 
   <div class="page">
-    <h1>Source Builder</h1>
-    <p class="subtitle">Create custom sources and composite feeds. Paste a URL, preview the schema, pick your fields.</p>
+    <h1>Source Scanner</h1>
+    <p class="subtitle">Paste any URL — we'll detect the format, extract the schema, and show you what DiffDelta can do with it. No account required.</p>
 
-    <!-- Step 1: Probe — open to everyone, no auth required -->
-    <div id="probe-step" class="card">
+    <!-- Step 1: Probe -->
+    <div class="card">
       <h3>Scan a URL</h3>
-      <p style="color:var(--text2);font-size:.88rem;margin-bottom:12px">Paste an RSS feed or JSON API endpoint. We'll detect the format and show you the fields.</p>
+      <p style="color:var(--text2);font-size:.88rem;margin-bottom:12px">RSS feeds, JSON APIs, status pages — we'll detect the format and show you the fields. 3 free scans per day.</p>
       <div class="input-row">
         <div class="field-group" style="flex:3">
           <input type="url" id="probe-url" placeholder="https://api.example.com/v1/items.json">
@@ -139,189 +117,54 @@
       <div id="probe-result"></div>
     </div>
 
-    <!-- Step 2: Configure (hidden until probe succeeds) -->
-    <div id="config-step" class="card hidden">
-      <h3>Configure Source</h3>
-
-      <!-- Inline auth prompt — only shown when not yet authenticated -->
-      <div id="inline-auth" class="card" style="background:var(--surface2);border-color:var(--purple);margin-bottom:20px">
-        <p style="color:var(--text2);font-size:.88rem;margin-bottom:10px">Enter your API key to save this source. <a href="/pro.html">Get a key</a></p>
-        <div class="input-row">
-          <div class="field-group" style="flex:3">
-            <input type="text" id="api-key-input" placeholder="dd_..." autocomplete="off">
-          </div>
-          <div style="flex:0">
-            <button class="btn btn-primary" onclick="authenticate()" id="auth-btn">Connect</button>
-          </div>
-        </div>
-        <div id="auth-error"></div>
+    <!-- Step 2: Results + Request (shown after probe) -->
+    <div id="results-step" class="hidden">
+      <div class="card">
+        <h3>Detected Schema</h3>
+        <div id="schema-summary"></div>
+        <div id="fields-container" class="fields-grid"></div>
       </div>
 
-      <div class="input-row">
+      <div class="card">
+        <h3>Want this as a DiffDelta source?</h3>
+        <p style="color:var(--text2);font-size:.88rem;margin-bottom:16px">Submit a request and we'll review it. High-demand sources get added first. You'll get structured cursor-based feeds — no scraping on your end.</p>
         <div class="field-group">
-          <label>Source Name</label>
-          <input type="text" id="src-name" placeholder="My Security Feed">
+          <label>Your email (so we can notify you when it's live)</label>
+          <input type="email" id="request-email" placeholder="you@example.com">
         </div>
-        <div class="field-group">
-          <label>Visibility</label>
-          <div class="toggle" id="src-visibility">
-            <div class="toggle-opt active" data-val="private" onclick="toggleVis(this)">Private</div>
-            <div class="toggle-opt" data-val="public" onclick="toggleVis(this)">Public</div>
-          </div>
-        </div>
+        <button class="btn btn-primary" onclick="requestSource()" id="request-btn">Request this source</button>
+        <div id="request-result"></div>
       </div>
-
-      <div class="field-group">
-        <label>Description (optional)</label>
-        <input type="text" id="src-desc" placeholder="What this source monitors">
-      </div>
-
-      <div class="field-group">
-        <label>Tags (comma-separated, optional)</label>
-        <input type="text" id="src-tags" placeholder="security, ai, news">
-      </div>
-
-      <div class="input-row">
-        <div class="field-group">
-          <label>Max Items</label>
-          <input type="number" id="src-max-items" value="50" min="1" max="200">
-        </div>
-        <div class="field-group">
-          <label>Poll Interval (seconds)</label>
-          <input type="number" id="src-ttl" value="1800" min="900">
-        </div>
-      </div>
-
-      <div id="json-overrides" class="hidden">
-        <div class="input-row">
-          <div class="field-group">
-            <label>Title Field Override</label>
-            <select id="src-title-field"><option value="">Auto-detect</option></select>
-          </div>
-          <div class="field-group">
-            <label>Content Field Override</label>
-            <select id="src-content-field"><option value="">Auto-detect</option></select>
-          </div>
-        </div>
-      </div>
-
-      <div class="field-group">
-        <label>Promote Fields (metadata that survives into the feed)</label>
-        <div id="promote-fields" class="fields-grid"></div>
-      </div>
-
-      <button class="btn btn-primary mt-12" onclick="createSource()" id="create-src-btn">Create Source</button>
-      <div id="create-result" class="mt-12"></div>
     </div>
 
-    <!-- Tabs for Feed Builder & Dashboard — hidden until auth -->
-    <div id="extra-tabs" class="hidden" style="margin-top:32px">
-      <div class="tabs">
-        <button class="tab active" onclick="switchTab('create-feed')">New Feed</button>
-        <button class="tab" onclick="switchTab('dashboard')">My Dashboard</button>
+    <!-- Existing sources -->
+    <div class="card" style="margin-top:24px">
+      <h3>Already Available</h3>
+      <p style="color:var(--text2);font-size:.88rem;margin-bottom:12px">DiffDelta already monitors 47 curated sources. Check if the one you want exists before scanning.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a href="/diff/sources.json" class="btn btn-ghost" style="font-size:.85rem">View all sources →</a>
+        <a href="/status" class="btn btn-ghost" style="font-size:.85rem">Source health →</a>
       </div>
+    </div>
 
-      <!-- Tab: Create Feed -->
-      <div id="tab-create-feed" class="tab-content active">
-        <div class="card">
-          <h3>Create Composite Feed</h3>
-          <p style="color:var(--text2);font-size:.88rem;margin-bottom:16px">Bundle multiple sources into a single pollable endpoint. Mix your custom sources with curated feeds.</p>
-
-          <div class="input-row">
-            <div class="field-group">
-              <label>Feed Name</label>
-              <input type="text" id="feed-name" placeholder="My Tech Intelligence">
-            </div>
-            <div class="field-group">
-              <label>Visibility</label>
-              <div class="toggle" id="feed-visibility">
-                <div class="toggle-opt active" data-val="private" onclick="toggleVis(this)">Private</div>
-                <div class="toggle-opt" data-val="public" onclick="toggleVis(this)">Public</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="field-group">
-            <label>Description (optional)</label>
-            <input type="text" id="feed-desc" placeholder="What this feed covers">
-          </div>
-
-          <div class="field-group">
-            <label>Source IDs (one per line — your custom sources or curated IDs like "hn_front_page")</label>
-            <textarea id="feed-sources" rows="5" style="width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);
-              border-radius:8px;color:var(--text);font-size:.88rem;font-family:var(--mono);outline:none;resize:vertical"
-              placeholder="hn_front_page&#10;cs_abc123&#10;github_advisories"></textarea>
-          </div>
-
-          <button class="btn btn-primary mt-12" onclick="createFeed()" id="create-feed-btn">Create Feed</button>
-          <div id="feed-result" class="mt-12"></div>
-        </div>
-      </div>
-
-      <!-- Tab: Dashboard -->
-      <div id="tab-dashboard" class="tab-content">
-        <div class="card">
-          <h3>My Sources</h3>
-          <div id="sources-list"><p style="color:var(--text3);font-size:.88rem">Loading...</p></div>
-        </div>
-        <div class="card">
-          <h3>My Composite Feeds</h3>
-          <div id="feeds-list"><p style="color:var(--text3);font-size:.88rem">Loading...</p></div>
-        </div>
-      </div>
+    <div class="card" style="border-color:var(--purple);border-style:dashed">
+      <h3 style="color:var(--purple)">For agents: diffdelta_create_source</h3>
+      <p style="color:var(--text2);font-size:.88rem;margin-bottom:8px">Agents can probe and request sources programmatically with a single MCP tool call. No auth needed.</p>
+      <code style="font-size:.82rem;display:block;padding:12px 16px;background:var(--surface2);border-radius:6px;line-height:1.6;white-space:pre">diffdelta_create_source({ url: "https://example.com/feed.json" })</code>
     </div>
   </div>
 
+  <footer class="footer">
+    <div>&copy; 2026 DiffDelta &middot; <a href="/terms">Terms</a> &middot; <a href="mailto:human@diffdelta.io">human@diffdelta.io</a></div>
+    <div>
+      <a href="/diff/sources.json" style="margin-right:12px">Sources</a>
+      <a href="/">Home</a>
+    </div>
+  </footer>
+
   <script>
-    let API_KEY = '';
-    let probeData = null;
-    let isAuthenticated = false;
+    let probedUrl = '';
 
-    const headers = () => {
-      const h = { 'Content-Type': 'application/json' };
-      if (API_KEY) h['X-DiffDelta-Key'] = API_KEY;
-      return h;
-    };
-
-    async function authenticate() {
-      const key = document.getElementById('api-key-input').value.trim();
-      if (!key) return;
-      API_KEY = key;
-      document.getElementById('auth-btn').disabled = true;
-      document.getElementById('auth-error').innerHTML = '';
-      try {
-        const resp = await fetch('/api/v1/sources/custom', { headers: headers() });
-        if (!resp.ok) throw new Error((await resp.json()).error || 'Authentication failed');
-        isAuthenticated = true;
-        document.getElementById('inline-auth').classList.add('hidden');
-        document.getElementById('extra-tabs').classList.remove('hidden');
-        loadDashboard();
-      } catch (e) {
-        API_KEY = '';
-        document.getElementById('auth-error').innerHTML =
-          `<div class="msg msg-error">${e.message}</div>`;
-      }
-      document.getElementById('auth-btn').disabled = false;
-    }
-
-    function switchTab(name) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-      document.querySelector(`[onclick="switchTab('${name}')"]`).classList.add('active');
-      document.getElementById('tab-' + name).classList.add('active');
-      if (name === 'dashboard') loadDashboard();
-    }
-
-    function toggleVis(el) {
-      el.parentElement.querySelectorAll('.toggle-opt').forEach(o => o.classList.remove('active'));
-      el.classList.add('active');
-    }
-
-    function getToggleVal(id) {
-      return document.querySelector(`#${id} .toggle-opt.active`).dataset.val;
-    }
-
-    // ── Probe (works without auth) ──
     async function probeUrl() {
       const url = document.getElementById('probe-url').value.trim();
       if (!url) return;
@@ -330,219 +173,75 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>';
       result.innerHTML = '';
+      document.getElementById('results-step').classList.add('hidden');
 
       try {
         const resp = await fetch('/api/v1/sources/probe', {
           method: 'POST',
-          headers: headers(),
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url }),
         });
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'Probe failed');
 
-        probeData = data;
-        result.innerHTML = `<div class="msg msg-success">
-          Detected <strong>${data.adapter.toUpperCase()}</strong> feed with <strong>${data.item_count}</strong> items
-          ${data.json_items_key ? ` (items key: <code>${data.json_items_key}</code>)` : ''}
-        </div>`;
+        probedUrl = url;
+        result.innerHTML = '<div class="msg msg-success">' +
+          'Detected <strong>' + esc(data.adapter.toUpperCase()) + '</strong> feed with <strong>' + data.item_count + '</strong> items' +
+          (data.json_items_key ? ' (items key: <code>' + esc(data.json_items_key) + '</code>)' : '') +
+          '</div>';
 
-        document.getElementById('config-step').classList.remove('hidden');
+        const summary = document.getElementById('schema-summary');
+        summary.innerHTML = '<p style="color:var(--text2);font-size:.88rem;margin-bottom:8px">' +
+          '<span class="badge badge-green">' + esc(data.adapter.toUpperCase()) + '</span> &middot; ' +
+          data.item_count + ' items &middot; ' +
+          (data.fields ? data.fields.length + ' fields' : 'no fields detected') +
+          '</p>';
 
-        const container = document.getElementById('promote-fields');
+        const container = document.getElementById('fields-container');
         container.innerHTML = '';
         if (data.fields) {
-          data.fields.forEach(f => {
-            const checked = f.type === 'number' || f.name.includes('date') || f.name.includes('status') ? 'checked' : '';
-            container.innerHTML += `<label class="field-check">
-              <input type="checkbox" value="${f.name}" ${checked}>
-              <span>${f.name}</span>
-              <span class="field-type">${f.type}</span>
-            </label>`;
+          data.fields.forEach(function(f) {
+            container.innerHTML += '<div class="field-tag"><span>' + esc(f.name) + '</span><span class="field-type">' + esc(f.type) + '</span></div>';
           });
         }
 
-        if (data.adapter === 'json' && data.fields) {
-          document.getElementById('json-overrides').classList.remove('hidden');
-          const titleSel = document.getElementById('src-title-field');
-          const contentSel = document.getElementById('src-content-field');
-          titleSel.innerHTML = '<option value="">Auto-detect</option>';
-          contentSel.innerHTML = '<option value="">Auto-detect</option>';
-          data.fields.filter(f => f.type === 'string').forEach(f => {
-            titleSel.innerHTML += `<option value="${f.name}" ${f.name === data.suggested_title_field ? 'selected' : ''}>${f.name}</option>`;
-            contentSel.innerHTML += `<option value="${f.name}" ${f.name === data.suggested_content_field ? 'selected' : ''}>${f.name}</option>`;
-          });
-        } else {
-          document.getElementById('json-overrides').classList.add('hidden');
-        }
-
+        document.getElementById('results-step').classList.remove('hidden');
+        document.getElementById('request-result').innerHTML = '';
       } catch (e) {
-        result.innerHTML = `<div class="msg msg-error">${e.message}</div>`;
+        result.innerHTML = '<div class="msg msg-error">' + esc(e.message) + '</div>';
       }
       btn.disabled = false;
       btn.textContent = 'Scan';
     }
 
-    // ── Create Source (requires auth) ──
-    async function createSource() {
-      if (!probeData) return;
-      if (!isAuthenticated) {
-        document.getElementById('inline-auth').style.borderColor = 'var(--yellow)';
-        document.getElementById('api-key-input').focus();
-        document.getElementById('auth-error').innerHTML =
-          '<div class="msg msg-info">Connect your API key first to save this source.</div>';
+    async function requestSource() {
+      const email = document.getElementById('request-email').value.trim();
+      if (!email || !email.includes('@')) {
+        document.getElementById('request-result').innerHTML = '<div class="msg msg-error">Please enter a valid email.</div>';
         return;
       }
-      const btn = document.getElementById('create-src-btn');
-      const result = document.getElementById('create-result');
+      const btn = document.getElementById('request-btn');
       btn.disabled = true;
 
-      const promoteFields = Array.from(document.querySelectorAll('#promote-fields input:checked')).map(c => c.value);
-      const config = {
-        max_items: parseInt(document.getElementById('src-max-items').value) || 50,
-        ttl_sec: parseInt(document.getElementById('src-ttl').value) || 1800,
-        promote_fields: promoteFields.length > 0 ? promoteFields : undefined,
-      };
-
-      if (probeData.json_items_key) config.json_items_key = probeData.json_items_key;
-
-      const titleField = document.getElementById('src-title-field').value;
-      const contentField = document.getElementById('src-content-field').value;
-      if (titleField) config.json_title_field = titleField;
-      if (contentField) config.json_content_field = contentField;
-
-      const tags = document.getElementById('src-tags').value.split(',').map(t => t.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '')).filter(t => t.length >= 2);
-
       try {
-        const resp = await fetch('/api/v1/sources/custom', {
+        const resp = await fetch('/api/v1/source-request', {
           method: 'POST',
-          headers: headers(),
-          body: JSON.stringify({
-            name: document.getElementById('src-name').value.trim(),
-            url: document.getElementById('probe-url').value.trim(),
-            adapter: probeData.adapter,
-            visibility: getToggleVal('src-visibility'),
-            description: document.getElementById('src-desc').value.trim(),
-            tags: tags.length > 0 ? tags : undefined,
-            config,
-          }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, source: probedUrl }),
         });
         const data = await resp.json();
-        if (!resp.ok) throw new Error(data.error || 'Creation failed');
+        if (!resp.ok) throw new Error(data.error || 'Request failed');
 
-        result.innerHTML = `<div class="msg msg-success">
-          Source created: <code>${data.source.id}</code><br>
-          Feed path: <code>${data.feed_path}</code><br>
-          Your source will be live within 15 minutes.
-        </div>`;
-
+        document.getElementById('request-result').innerHTML =
+          '<div class="msg msg-success">Request submitted! We\'ll notify you at <strong>' + esc(email) + '</strong> when this source is live.</div>';
       } catch (e) {
-        result.innerHTML = `<div class="msg msg-error">${e.message}</div>`;
+        document.getElementById('request-result').innerHTML = '<div class="msg msg-error">' + esc(e.message) + '</div>';
       }
       btn.disabled = false;
-    }
-
-    // ── Create Feed (requires auth) ──
-    async function createFeed() {
-      const btn = document.getElementById('create-feed-btn');
-      const result = document.getElementById('feed-result');
-      btn.disabled = true;
-
-      const sourceIds = document.getElementById('feed-sources').value
-        .split('\n').map(s => s.trim()).filter(s => s.length > 0);
-
-      try {
-        const resp = await fetch('/api/v1/feeds/composite', {
-          method: 'POST',
-          headers: headers(),
-          body: JSON.stringify({
-            name: document.getElementById('feed-name').value.trim(),
-            description: document.getElementById('feed-desc').value.trim(),
-            visibility: getToggleVal('feed-visibility'),
-            source_ids: sourceIds,
-          }),
-        });
-        const data = await resp.json();
-        if (!resp.ok) throw new Error(data.error || 'Creation failed');
-
-        result.innerHTML = `<div class="msg msg-success">
-          Feed created: <code>${data.feed.id}</code><br>
-          Feed path: <code>${data.feed_path}</code><br>
-          Available immediately.
-        </div>`;
-
-      } catch (e) {
-        result.innerHTML = `<div class="msg msg-error">${e.message}</div>`;
-      }
-      btn.disabled = false;
-    }
-
-    // ── Dashboard ──
-    async function loadDashboard() {
-      try {
-        const resp = await fetch('/api/v1/sources/custom', { headers: headers() });
-        const data = await resp.json();
-        const container = document.getElementById('sources-list');
-        if (!data.sources || data.sources.length === 0) {
-          container.innerHTML = '<p style="color:var(--text3);font-size:.88rem">No custom sources yet.</p>';
-        } else {
-          let html = `<p style="color:var(--text3);font-size:.82rem;margin-bottom:12px">${data.used}/${data.limit} sources used</p>`;
-          html += '<table class="source-table"><thead><tr><th>Name</th><th>Status</th><th>Visibility</th><th>ID</th><th></th></tr></thead><tbody>';
-          data.sources.forEach(s => {
-            html += `<tr>
-              <td><strong>${esc(s.name)}</strong></td>
-              <td><span class="badge ${s.status === 'active' ? 'badge-green' : 'badge-yellow'}">${s.status}</span></td>
-              <td><span class="badge ${s.visibility === 'public' ? 'badge-blue' : 'badge-gray'}">${s.visibility}</span></td>
-              <td><code style="font-size:.78rem">${s.id}</code></td>
-              <td><button class="btn btn-sm btn-danger" onclick="deleteSource('${s.id}')">Delete</button></td>
-            </tr>`;
-          });
-          html += '</tbody></table>';
-          container.innerHTML = html;
-        }
-      } catch {
-        document.getElementById('sources-list').innerHTML = '<p style="color:var(--red);font-size:.88rem">Failed to load sources.</p>';
-      }
-
-      try {
-        const resp = await fetch('/api/v1/feeds/composite', { headers: headers() });
-        const data = await resp.json();
-        const container = document.getElementById('feeds-list');
-        if (!data.feeds || data.feeds.length === 0) {
-          container.innerHTML = '<p style="color:var(--text3);font-size:.88rem">No composite feeds yet.</p>';
-        } else {
-          let html = `<p style="color:var(--text3);font-size:.82rem;margin-bottom:12px">${data.used}/${data.limit} feeds used</p>`;
-          html += '<table class="source-table"><thead><tr><th>Name</th><th>Sources</th><th>Visibility</th><th>Path</th><th></th></tr></thead><tbody>';
-          data.feeds.forEach(f => {
-            html += `<tr>
-              <td><strong>${esc(f.name)}</strong></td>
-              <td>${f.source_ids.length} sources</td>
-              <td><span class="badge ${f.visibility === 'public' ? 'badge-blue' : 'badge-gray'}">${f.visibility}</span></td>
-              <td><code style="font-size:.78rem">/feeds/cf/${f.id}/head.json</code></td>
-              <td><button class="btn btn-sm btn-danger" onclick="deleteFeed('${f.id}')">Delete</button></td>
-            </tr>`;
-          });
-          html += '</tbody></table>';
-          container.innerHTML = html;
-        }
-      } catch {
-        document.getElementById('feeds-list').innerHTML = '<p style="color:var(--red);font-size:.88rem">Failed to load feeds.</p>';
-      }
-    }
-
-    async function deleteSource(id) {
-      if (!confirm('Delete this source? This cannot be undone.')) return;
-      await fetch(`/api/v1/sources/custom/${id}`, { method: 'DELETE', headers: headers() });
-      loadDashboard();
-    }
-
-    async function deleteFeed(id) {
-      if (!confirm('Delete this feed? This cannot be undone.')) return;
-      await fetch(`/api/v1/feeds/composite/${id}`, { method: 'DELETE', headers: headers() });
-      loadDashboard();
     }
 
     function esc(s) {
-      const d = document.createElement('div');
+      var d = document.createElement('div');
       d.textContent = s;
       return d.innerHTML;
     }

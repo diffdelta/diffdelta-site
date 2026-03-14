@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DiffDelta — Source Health</title>
+  <meta name="description" content="Real-time health status for all DiffDelta curated sources. See which sources are operational, degraded, or failing.">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#09090b;--surface:#18181b;--surface2:#1f1f23;--border:#27272a;
+      --text:#fafafa;--text2:#a1a1aa;--text3:#71717a;
+      --accent:#3b82f6;--green:#22c55e;--yellow:#eab308;--red:#ef4444;--orange:#f97316;
+      --purple:#a855f7;--purple-glow:rgba(168,85,247,0.08);
+      --font:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+      --mono:ui-monospace,'SF Mono','Cascadia Code','Fira Code',monospace;
+      --max-w:960px;--px:24px
+    }
+    html{font-size:16px}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;
+      background-image:radial-gradient(ellipse 60% 50% at 50% -10%,var(--purple-glow),transparent)}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    code{font-family:var(--mono);font-size:.875em;background:var(--surface);padding:2px 6px;border-radius:4px}
+
+    .nav{max-width:var(--max-w);margin:0 auto;padding:20px var(--px);display:flex;align-items:center;justify-content:space-between}
+    .nav-brand{font-weight:700;font-size:1.15rem;color:var(--text);letter-spacing:-.5px}
+    .nav-brand span{color:var(--accent)}
+    .nav-links{display:flex;gap:24px;font-size:.9rem}
+    .nav-links a{color:var(--text2);transition:color .15s}
+    .nav-links a:hover{color:var(--text);text-decoration:none}
+
+    .page{max-width:var(--max-w);margin:0 auto;padding:40px var(--px) 80px}
+    .page h1{font-size:1.8rem;font-weight:800;letter-spacing:-1px;margin-bottom:8px}
+    .subtitle{color:var(--text2);margin-bottom:32px}
+
+    .summary-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);
+      border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:32px}
+    .summary-cell{background:var(--surface);padding:16px;text-align:center}
+    .summary-value{font-size:1.4rem;font-weight:700}
+    .summary-label{font-size:.72rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+    .summary-value.ok{color:var(--green)}
+    .summary-value.degraded{color:var(--yellow)}
+    .summary-value.error{color:var(--red)}
+    .summary-value.disabled{color:var(--text3)}
+
+    .health-bar{height:8px;background:var(--surface);border-radius:4px;overflow:hidden;margin-bottom:24px}
+    .health-bar-fill{height:100%;border-radius:4px;transition:width .3s}
+
+    .filter-row{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+    .filter-btn{padding:6px 14px;border-radius:6px;font-size:.82rem;font-weight:600;cursor:pointer;
+      border:1px solid var(--border);background:var(--surface);color:var(--text2);transition:all .15s}
+    .filter-btn:hover{border-color:var(--purple);color:var(--text)}
+    .filter-btn.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+    .filter-count{font-size:.72rem;opacity:.7;margin-left:4px}
+
+    .source-list{display:flex;flex-direction:column;gap:6px}
+    .source-row{display:flex;align-items:center;gap:12px;padding:12px 16px;
+      background:var(--surface);border:1px solid var(--border);border-radius:10px;transition:border-color .15s}
+    .source-row:hover{border-color:var(--purple)}
+    .source-row.hidden{display:none}
+
+    .status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .status-dot.ok{background:var(--green)}
+    .status-dot.degraded{background:var(--yellow)}
+    .status-dot.error{background:var(--red)}
+    .status-dot.disabled{background:var(--text3)}
+
+    .source-name{font-weight:600;font-size:.9rem;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .source-meta{display:flex;gap:16px;align-items:center;flex-shrink:0}
+    .source-badge{font-size:.72rem;padding:2px 8px;border-radius:4px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+    .source-badge.ok{background:rgba(34,197,94,.12);color:var(--green)}
+    .source-badge.degraded{background:rgba(234,179,8,.12);color:var(--yellow)}
+    .source-badge.error{background:rgba(239,68,68,.12);color:var(--red)}
+    .source-badge.disabled{background:rgba(113,113,122,.12);color:var(--text3)}
+    .source-reliability{font-size:.78rem;color:var(--text3);font-family:var(--mono);width:48px;text-align:right}
+    .source-detail{font-size:.78rem;color:var(--text3);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+    .timestamp{font-size:.78rem;color:var(--text3);margin-top:24px;text-align:center}
+
+    .loading{text-align:center;padding:60px;color:var(--text3)}
+
+    .issues-section{margin-top:40px}
+    .issues-section h2{font-size:1.2rem;font-weight:700;margin-bottom:16px}
+    .issue-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:8px}
+    .issue-card.high{border-left:3px solid var(--red)}
+    .issue-card.medium{border-left:3px solid var(--orange)}
+    .issue-card.low{border-left:3px solid var(--yellow)}
+    .issue-summary{font-size:.88rem;margin-bottom:6px}
+    .issue-workaround{font-size:.78rem;color:var(--text3)}
+    .issue-workaround code{font-size:.75rem}
+
+    .footer{max-width:var(--max-w);margin:0 auto;padding:24px var(--px);
+      border-top:1px solid var(--border);display:flex;justify-content:space-between;
+      align-items:center;font-size:.8rem;color:var(--text3)}
+    .footer a{color:var(--text3)}
+    .footer a:hover{color:var(--text)}
+
+    @media(max-width:768px){
+      .summary-grid{grid-template-columns:repeat(3,1fr)}
+      .source-meta{gap:8px}
+      .source-detail{display:none}
+      .nav-links{gap:14px;font-size:.8rem}
+      .footer{flex-direction:column;gap:8px;text-align:center}
+    }
+    @media(max-width:480px){
+      .summary-grid{grid-template-columns:repeat(2,1fr)}
+      .nav{flex-direction:column;gap:12px}
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <a href="/" class="nav-brand" style="text-decoration:none">Diff<span>Delta</span></a>
+    <div class="nav-links">
+      <a href="/self">Self</a>
+      <a href="/#feeds">Feeds</a>
+      <a href="/sources">Sources</a>
+      <a href="https://github.com/diffdelta">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="page">
+    <h1>Source Health</h1>
+    <p class="subtitle">Real-time status for all DiffDelta curated sources. Updated every 15 minutes.</p>
+
+    <div id="loading" class="loading">Loading health data...</div>
+
+    <div id="dashboard" style="display:none">
+      <div class="summary-grid" id="summary-grid"></div>
+
+      <div class="health-bar"><div class="health-bar-fill" id="health-bar-fill"></div></div>
+
+      <div class="filter-row" id="filter-row"></div>
+
+      <div class="source-list" id="source-list"></div>
+
+      <div class="issues-section" id="issues-section" style="display:none">
+        <h2>Active Issues</h2>
+        <div id="issues-list"></div>
+      </div>
+
+      <div class="timestamp" id="timestamp"></div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div>&copy; 2026 DiffDelta &middot; <a href="/terms">Terms</a> &middot; <a href="mailto:human@diffdelta.io">human@diffdelta.io</a></div>
+    <div>
+      <a href="/diff/health.json" style="margin-right:12px">Health API</a>
+      <a href="/known_issues.json" style="margin-right:12px">Known Issues</a>
+      <a href="/diff/sources.json">Sources</a>
+    </div>
+  </footer>
+
+  <script>
+    (async function() {
+      const [healthRes, issuesRes] = await Promise.all([
+        fetch('/diff/health.json'),
+        fetch('/known_issues.json'),
+      ]);
+
+      if (!healthRes.ok) {
+        document.getElementById('loading').textContent = 'Health data not available.';
+        return;
+      }
+
+      const health = await healthRes.json();
+      const issues = issuesRes.ok ? await issuesRes.json() : { issues: [] };
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+
+      const s = health.summary;
+
+      // Summary grid
+      const summaryGrid = document.getElementById('summary-grid');
+      const cells = [
+        { value: s.total, label: 'Total', cls: '' },
+        { value: s.ok, label: 'Operational', cls: 'ok' },
+        { value: s.degraded, label: 'Degraded', cls: 'degraded' },
+        { value: s.error, label: 'Error', cls: 'error' },
+        { value: s.disabled, label: 'Disabled', cls: 'disabled' },
+      ];
+      summaryGrid.innerHTML = cells.map(c =>
+        `<div class="summary-cell">
+          <div class="summary-value ${c.cls}">${c.value}</div>
+          <div class="summary-label">${c.label}</div>
+        </div>`
+      ).join('');
+
+      // Health bar
+      const bar = document.getElementById('health-bar-fill');
+      const pct = s.health_pct || 0;
+      bar.style.width = pct + '%';
+      bar.style.background = pct >= 90 ? 'var(--green)' : pct >= 70 ? 'var(--yellow)' : 'var(--red)';
+
+      // Count by status
+      const counts = { all: 0, ok: 0, error: 0, degraded: 0, disabled: 0 };
+      for (const src of Object.values(health.sources)) {
+        counts.all++;
+        counts[src.status] = (counts[src.status] || 0) + 1;
+      }
+
+      // Filters
+      const filterRow = document.getElementById('filter-row');
+      const filters = [
+        { key: 'all', label: 'All' },
+        { key: 'ok', label: 'Operational' },
+        { key: 'error', label: 'Error' },
+        { key: 'degraded', label: 'Degraded' },
+        { key: 'disabled', label: 'Disabled' },
+      ];
+      filterRow.innerHTML = filters.map(f =>
+        `<button class="filter-btn ${f.key === 'all' ? 'active' : ''}" data-filter="${f.key}">
+          ${f.label}<span class="filter-count">${counts[f.key]}</span>
+        </button>`
+      ).join('');
+
+      filterRow.addEventListener('click', e => {
+        const btn = e.target.closest('.filter-btn');
+        if (!btn) return;
+        filterRow.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+        document.querySelectorAll('.source-row').forEach(row => {
+          row.classList.toggle('hidden', filter !== 'all' && row.dataset.status !== filter);
+        });
+      });
+
+      // Source list (errors/degraded first, then ok, then disabled)
+      const statusOrder = { error: 0, degraded: 1, ok: 2, disabled: 3 };
+      const entries = Object.entries(health.sources).sort((a, b) => {
+        const ao = statusOrder[a[1].status] ?? 4;
+        const bo = statusOrder[b[1].status] ?? 4;
+        return ao - bo || a[0].localeCompare(b[0]);
+      });
+
+      const sourceList = document.getElementById('source-list');
+      sourceList.innerHTML = entries.map(([id, src]) => {
+        const rel = src.reliability != null ? (src.reliability * 100).toFixed(0) + '%' : '—';
+        let detail = '';
+        if (src.error_code) detail = src.error_code;
+        else if (src.fallback_active) detail = 'Fallback active';
+        else if (src.stale) detail = 'Stale';
+        else if (src.changed) detail = 'Updated';
+
+        return `<div class="source-row" data-status="${src.status}">
+          <div class="status-dot ${src.status}"></div>
+          <div class="source-name">${id.replace(/_/g, ' ')}</div>
+          <div class="source-meta">
+            ${detail ? `<span class="source-detail">${detail}</span>` : ''}
+            <span class="source-reliability">${rel}</span>
+            <span class="source-badge ${src.status}">${src.status}</span>
+          </div>
+        </div>`;
+      }).join('');
+
+      // Issues
+      const activeIssues = (issues.issues || []).filter(i => i.status === 'active');
+      if (activeIssues.length > 0) {
+        const section = document.getElementById('issues-section');
+        section.style.display = 'block';
+        const list = document.getElementById('issues-list');
+        list.innerHTML = activeIssues.map(i => {
+          const workarounds = (i.workarounds || [])
+            .map(w => `<div class="issue-workaround">${w}</div>`)
+            .join('');
+          return `<div class="issue-card ${i.severity}">
+            <div class="issue-summary">${i.summary}</div>
+            ${workarounds}
+          </div>`;
+        }).join('');
+      }
+
+      // Timestamp
+      const ts = health.generated_at;
+      document.getElementById('timestamp').textContent =
+        `Last updated: ${new Date(ts).toLocaleString()} · Data from diff/health.json`;
+    })();
+  </script>
+
+</body>
+</html>

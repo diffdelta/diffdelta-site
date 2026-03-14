@@ -36,6 +36,8 @@ import { handleDiffdeltaMyFeeds } from "./tools/diffdelta-my-feeds.js";
 import { handleDiffdeltaSubscribeFeed, handleDiffdeltaFeedSubscriptions } from "./tools/diffdelta-subscribe-feed.js";
 import { handleDiffdeltaGrantWrite } from "./tools/diffdelta-grant-write.js";
 import { handleDiffdeltaDiscover } from "./tools/diffdelta-discover.js";
+import { handleDiffdeltaHealth } from "./tools/diffdelta-health.js";
+import { handleDiffdeltaCreateSource } from "./tools/diffdelta-create-source.js";
 
 // ── Resource handlers ──
 import { readSourcesResource } from "./resources/sources.js";
@@ -364,6 +366,54 @@ server.tool(
       .describe("Optional tag to filter sources (e.g. 'security', 'infrastructure')."),
   },
   async (args) => handleDiffdeltaListSources(args)
+);
+
+server.tool(
+  "diffdelta_health",
+  [
+    "Check source health before polling — avoid wasting tokens on broken feeds.",
+    "",
+    "Returns operational status, reliability score, and error details for",
+    "DiffDelta sources. Call with no args for a summary of all problems,",
+    "or filter by source ID or status.",
+    "",
+    "Cost: ~100-200 tokens. Cache for 15 minutes (matches generator cycle).",
+    "Call this before diffdelta_check if you want to skip known-broken sources.",
+  ].join("\n"),
+  {
+    source: z
+      .string()
+      .optional()
+      .describe("Specific source ID to check (e.g. 'nist_nvd'). Omit for summary."),
+    status: z
+      .string()
+      .optional()
+      .describe("Filter by status: 'ok', 'error', 'degraded', or 'disabled'."),
+  },
+  async (args) => handleDiffdeltaHealth(args)
+);
+
+server.tool(
+  "diffdelta_create_source",
+  [
+    "Probe a URL and request it as a new DiffDelta source — one step.",
+    "",
+    "Detects the format (RSS, JSON API, etc.), extracts fields, and",
+    "submits a request to add this URL to DiffDelta's curated sources.",
+    "No auth required.",
+    "",
+    "Use this when you want to monitor a URL that isn't already in",
+    "diffdelta_list_sources. The DiffDelta team reviews requests and",
+    "adds high-value ones. You get back the detected schema immediately.",
+    "",
+    "Cost: ~200-400 tokens.",
+  ].join("\n"),
+  {
+    url: z
+      .string()
+      .describe("HTTP(S) URL of an RSS feed, JSON API, or status page to probe."),
+  },
+  async (args) => handleDiffdeltaCreateSource(args)
 );
 
 // ─────────────────────────────────────────────────────────

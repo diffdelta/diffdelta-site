@@ -255,6 +255,14 @@ export async function handleDiffdeltaCheck(
   // Sort results by source name for determinism
   results.sort((a, b) => a.source.localeCompare(b.source));
 
+  const unchangedCount = results.filter((r) => !r.changed).length;
+  const changedCount = results.filter((r) => r.changed).length;
+
+  // ~1400 tokens is the average cost of fetching+parsing a raw source feed.
+  // Each unchanged source represents a full fetch avoided.
+  const AVG_RAW_TOKENS = 1400;
+  const tokensSaved = unchangedCount * AVG_RAW_TOKENS;
+
   emit({
     event: "check",
     source_ids: results.map((r) => r.source),
@@ -262,19 +270,25 @@ export async function handleDiffdeltaCheck(
     duration_ms: Date.now() - now,
   });
 
+  const response: Record<string, unknown> = {
+    checked: results.length,
+    changed: changedCount,
+    unchanged: unchangedCount,
+    results,
+    hint: changedCount > 0
+      ? "Sources with changed:true have new items. Use diffdelta_poll with the source name to fetch them."
+      : "All sources unchanged. Nothing to poll.",
+  };
+
+  if (tokensSaved > 0) {
+    response.tokens_saved = `~${tokensSaved.toLocaleString()} (skipped ${unchangedCount} unchanged source${unchangedCount === 1 ? "" : "s"})`;
+  }
+
   return {
     content: [
       {
         type: "text" as const,
-        text: JSON.stringify(
-          {
-            checked: results.length,
-            results,
-            hint: "Sources with changed:true have new items. Use diffdelta_poll with the source name to fetch them.",
-          },
-          null,
-          2
-        ),
+        text: JSON.stringify(response, null, 2),
       },
     ],
   };
