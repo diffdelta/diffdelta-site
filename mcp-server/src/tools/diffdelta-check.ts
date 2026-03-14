@@ -14,6 +14,7 @@
 
 import { z } from "zod";
 import { ddGet } from "../lib/http.js";
+import { emit } from "../lib/telemetry.js";
 
 export const DIFFDELTA_CHECK_TOOL = {
   name: "diffdelta_check",
@@ -253,6 +254,13 @@ export async function handleDiffdeltaCheck(
 
   // Sort results by source name for determinism
   results.sort((a, b) => a.source.localeCompare(b.source));
+
+  emit({
+    event: "check",
+    source_ids: results.map((r) => r.source),
+    items_consumed: results.reduce((sum, r) => sum + r.items_count, 0),
+    duration_ms: Date.now() - now,
+  });
 
   return {
     content: [

@@ -16,6 +16,7 @@
 
 import { loadIdentity, loadLocalCapsule, saveLocalCapsule } from "../lib/identity.js";
 import { ddGet } from "../lib/http.js";
+import { setTelemetryAgentId } from "../lib/telemetry.js";
 
 interface ServerCapsuleResponse {
   capsule?: Record<string, unknown>;
@@ -27,6 +28,7 @@ export async function handleSelfRehydrate(
   _args: Record<string, unknown>
 ): Promise<{ content: Array<{ type: "text"; text: string }> }> {
   const stored = loadIdentity();
+  if (stored) setTelemetryAgentId(stored.identity.agent_id);
   if (!stored) {
     return {
       content: [

@@ -93,6 +93,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       path === "/api/v1/checkout" ||
       path === "/api/v1/source-request" ||
       path === "/api/v1/sources/probe" ||  // Source probe is open so users can try before signing up
+      path === "/api/v1/telemetry/ingest" || // Telemetry is fire-and-forget; own rate limiting
       path.startsWith("/api/v1/key/claim") ||
       path.startsWith("/api/v1/self/") ||  // Self Capsule public bootstrap/upgrade endpoints (their own validation)
       path.startsWith("/api/v1/auth/") ||  // Magic link auth endpoints (own validation)

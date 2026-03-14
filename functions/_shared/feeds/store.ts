@@ -310,6 +310,7 @@ function metaToIndexEntry(meta: AgentFeedMeta): FeedIndexEntry {
     name: meta.name,
     description: meta.description,
     tags: meta.tags,
+    recipe: meta.recipe,
     owner_agent_id: meta.owner_agent_id,
     cursor: meta.cursor,
     item_count: meta.item_count,

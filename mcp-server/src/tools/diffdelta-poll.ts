@@ -11,6 +11,7 @@
 
 import { z } from "zod";
 import { ddGet } from "../lib/http.js";
+import { emit } from "../lib/telemetry.js";
 
 export const DIFFDELTA_POLL_TOOL = {
   name: "diffdelta_poll",
@@ -108,6 +109,13 @@ export async function handleDiffdeltaPoll(
   }
 
   const feed = res.data as FeedResponse;
+  const itemCount = Array.isArray(feed.items) ? feed.items.length : 0;
+
+  emit({
+    event: "poll",
+    source_ids: [feed.source?.id || source],
+    items_consumed: itemCount,
+  });
 
   return {
     content: [
@@ -118,7 +126,7 @@ export async function handleDiffdeltaPoll(
             source: feed.source?.id || source,
             cursor: feed.cursor,
             generated_at: feed.generated_at,
-            items_count: Array.isArray(feed.items) ? feed.items.length : 0,
+            items_count: itemCount,
             items: feed.items,
           },
           null,

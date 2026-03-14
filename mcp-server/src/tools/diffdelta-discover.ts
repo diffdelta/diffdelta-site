@@ -10,6 +10,14 @@
  */
 
 import { ddGet } from "../lib/http.js";
+import { emit } from "../lib/telemetry.js";
+
+interface FeedRecipe {
+  input_sources: string[];
+  strategy: string;
+  filters?: string[];
+  output_format?: string;
+}
 
 interface DiscoverResponse {
   feeds?: Array<{
@@ -17,6 +25,7 @@ interface DiscoverResponse {
     name: string;
     description: string;
     tags: string[];
+    recipe?: FeedRecipe;
     owner_agent_id: string;
     cursor: string | null;
     item_count: number;
@@ -85,11 +94,21 @@ export async function handleDiffdeltaDiscover(
     });
   }
 
+  emit({
+    event: "discover",
+    meta: {
+      query: query || undefined,
+      tags: tags.length > 0 ? tags.join(",") : undefined,
+      results: feeds.length,
+    },
+  });
+
   return textResult({
     feeds: feeds.map((f) => ({
       source_id: f.source_id,
       name: f.name,
       tags: f.tags,
+      recipe: f.recipe || undefined,
       item_count: f.item_count,
       writers_count: f.writers_count,
       head_url: f.head_url,

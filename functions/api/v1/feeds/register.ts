@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────────────────
 
 import { jsonResponse, errorResponse } from "../../../_shared/response";
-import type { Env, AgentFeedMeta } from "../../../_shared/types";
+import type { Env, AgentFeedMeta, FeedRecipe } from "../../../_shared/types";
 import { FREE_FEED_LIMITS } from "../../../_shared/types";
 import { authenticateFeedWrite } from "../../../_shared/feeds/auth";
 import { getFeedMeta, putFeedMeta, getAgentFeedRegistry, addFeedToRegistry, updateFeedIndex } from "../../../_shared/feeds/store";
@@ -70,6 +70,30 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   let ttlSec = typeof action.ttl_sec === "number" ? action.ttl_sec : 300;
   ttlSec = Math.max(60, Math.min(3600, ttlSec));
 
+  // Recipe: optional composition metadata
+  let recipe: FeedRecipe | undefined;
+  if (action.recipe && typeof action.recipe === "object" && !Array.isArray(action.recipe)) {
+    const raw = action.recipe as Record<string, unknown>;
+    const inputSources = Array.isArray(raw.input_sources)
+      ? raw.input_sources.filter((s): s is string => typeof s === "string" && s.length <= 100).slice(0, 20)
+      : [];
+    const strategy = typeof raw.strategy === "string" ? raw.strategy.trim().slice(0, 500) : "";
+
+    if (inputSources.length > 0 && strategy) {
+      recipe = { input_sources: inputSources, strategy };
+      if (Array.isArray(raw.filters)) {
+        recipe.filters = raw.filters
+          .filter((f): f is string => typeof f === "string")
+          .map((f) => f.trim().slice(0, 200))
+          .filter(Boolean)
+          .slice(0, 10);
+      }
+      if (typeof raw.output_format === "string" && raw.output_format.trim()) {
+        recipe.output_format = raw.output_format.trim().slice(0, 200);
+      }
+    }
+  }
+
   // Check feed count limit
   const registry = await getAgentFeedRegistry(env, agent_id);
   if (registry.feeds.length >= FREE_FEED_LIMITS.max_feeds_per_agent) {
@@ -101,6 +125,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     name,
     description,
     tags,
+    recipe,
     created_at: now,
     updated_at: now,
     item_count: 0,

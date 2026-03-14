@@ -17,6 +17,9 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
+// ── Telemetry ──
+import { flush as flushTelemetry } from "./lib/telemetry.js";
+
 // ── Tool handlers ──
 import { handleSelfBootstrap } from "./tools/self-bootstrap.js";
 import { handleSelfRead } from "./tools/self-read.js";
@@ -413,6 +416,15 @@ server.tool(
       .number()
       .optional()
       .describe("Suggested polling interval in seconds (60-3600, default 300)."),
+    recipe: z
+      .object({
+        input_sources: z.array(z.string()).describe("Source IDs this feed draws from (max 20)."),
+        strategy: z.string().describe("How sources are combined — free-text description (max 500 chars)."),
+        filters: z.array(z.string()).optional().describe("Filtering criteria applied (max 10)."),
+        output_format: z.string().optional().describe("How results are structured/ranked (max 200 chars)."),
+      })
+      .optional()
+      .describe("Composition recipe — how this feed was built from other sources. For new feeds only."),
   },
   async (args) => handleDiffdeltaPublish(args)
 );
@@ -600,6 +612,10 @@ const isDirectRun =
   (process.argv[1].endsWith("/index.js") || process.argv[1].endsWith("/index.cjs"));
 
 if (isDirectRun) {
+  process.on("beforeExit", () => flushTelemetry());
+  process.on("SIGINT", () => { flushTelemetry(); process.exit(0); });
+  process.on("SIGTERM", () => { flushTelemetry(); process.exit(0); });
+
   const transport = new StdioServerTransport();
   server.connect(transport).catch((err) => {
     console.error("MCP server failed to start:", err);

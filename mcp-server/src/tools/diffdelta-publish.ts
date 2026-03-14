@@ -14,6 +14,7 @@
 import { loadIdentity, incrementSeq } from "../lib/identity.js";
 import { signCapsule } from "../lib/crypto.js";
 import { ddPost } from "../lib/http.js";
+import { emit } from "../lib/telemetry.js";
 
 interface RegisterResponse {
   registered?: boolean;
@@ -68,6 +69,9 @@ export async function handleDiffdeltaPublish(
   const tags = Array.isArray(args.tags) ? args.tags.filter((t): t is string => typeof t === "string") : [];
   const visibility = args.visibility === "private" ? "private" : "public";
   const ttlSec = typeof args.ttl_sec === "number" ? args.ttl_sec : 300;
+  const recipe = args.recipe && typeof args.recipe === "object" && !Array.isArray(args.recipe)
+    ? args.recipe as Record<string, unknown>
+    : undefined;
 
   // Determine source_id: either provided or needs registration
   let resolvedSourceId = sourceId;
@@ -82,13 +86,14 @@ export async function handleDiffdeltaPublish(
   // If no source_id provided, register a new feed
   if (!resolvedSourceId) {
     const seq = incrementSeq();
-    const actionPayload = {
+    const actionPayload: Record<string, unknown> = {
       name: feedName,
       description,
       tags,
       visibility,
       ttl_sec: ttlSec,
     };
+    if (recipe) actionPayload.recipe = recipe;
     const envelope = signCapsule(identity, actionPayload, seq);
     const registerBody = {
       agent_id: identity.agent_id,
@@ -166,6 +171,12 @@ export async function handleDiffdeltaPublish(
       item_errors: pubRes.data.item_errors,
     });
   }
+
+  emit({
+    event: "publish",
+    source_ids: [resolvedSourceId],
+    items_produced: pubRes.data.items_accepted || items.length,
+  });
 
   return textResult({
     published: true,

@@ -11,6 +11,7 @@
 import { z } from "zod";
 import { loadIdentity, createAndSaveIdentity, getIdentityPath } from "../lib/identity.js";
 import { ddPost } from "../lib/http.js";
+import { setTelemetryAgentId } from "../lib/telemetry.js";
 
 export const SELF_BOOTSTRAP_TOOL = {
   name: "self_bootstrap",
@@ -40,9 +41,9 @@ interface BootstrapResponse {
 export async function handleSelfBootstrap(
   _args: Record<string, unknown>
 ): Promise<{ content: Array<{ type: "text"; text: string }> }> {
-  // Check for existing identity first (idempotent)
   const existing = loadIdentity();
   if (existing) {
+    setTelemetryAgentId(existing.identity.agent_id);
     return {
       content: [
         {
@@ -67,8 +68,8 @@ export async function handleSelfBootstrap(
     };
   }
 
-  // Generate new identity
   const { identity, seq } = createAndSaveIdentity();
+  setTelemetryAgentId(identity.agent_id);
 
   // Register with DiffDelta API
   const res = await ddPost<BootstrapResponse>("/api/v1/self/bootstrap", {

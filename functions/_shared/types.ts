@@ -134,6 +134,14 @@ export interface AuthorizedWriter {
   expires_at?: string;            // ISO 8601 (optional, enforced server-side)
 }
 
+/** How an agent composed a derived feed from multiple sources */
+export interface FeedRecipe {
+  input_sources: string[];        // Source IDs this feed draws from (max 20)
+  strategy: string;               // Free-text description of the composition logic (max 500 chars)
+  filters?: string[];             // Filtering criteria applied (max 10, each max 200 chars)
+  output_format?: string;         // How results are structured/ranked (max 200 chars)
+}
+
 /** Stored in FEEDS KV under `feed:meta:{source_id}` */
 export interface AgentFeedMeta {
   source_id: string;              // e.g. "agent_ab12cd_my_security_feed"
@@ -141,6 +149,7 @@ export interface AgentFeedMeta {
   name: string;                   // Display name (max 100 chars)
   description: string;            // Max 500 chars
   tags: string[];                 // Max 5 tags, pattern: ^[a-z0-9_\-]{2,32}$
+  recipe?: FeedRecipe;            // How this feed was composed from other sources
   created_at: string;             // ISO 8601
   updated_at: string;             // ISO 8601
   item_count: number;             // Current items in feed
@@ -193,6 +202,7 @@ export interface FeedIndexEntry {
   name: string;
   description: string;
   tags: string[];
+  recipe?: FeedRecipe;
   owner_agent_id: string;
   cursor: string | null;
   item_count: number;

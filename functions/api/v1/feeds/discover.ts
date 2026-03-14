@@ -33,6 +33,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     name: e.name,
     description: e.description,
     tags: e.tags,
+    recipe: e.recipe || undefined,
     owner_agent_id: e.owner_agent_id,
     cursor: e.cursor,
     item_count: e.item_count,
